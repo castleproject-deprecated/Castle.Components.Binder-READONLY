@@ -28,6 +28,10 @@ namespace TestSiteNVelocity.Controllers
 		{
 		}
 
+		public void Form()
+		{
+		}
+
 		public void Welcome()
 		{
 			RenderView("heyhello");

@@ -54,11 +54,16 @@ namespace Castle.CastleOnRails.Framework.Helpers
 		/// <returns></returns>
 		public String GetJavascriptFunctions()
 		{
-			ResourceManager rs = new ResourceManager(
-				"Castle.CastleOnRails.Framework.Javascripts", 
-				  Assembly.GetAssembly( typeof(AjaxHelper) ) );
+			ResourceManager rs = GetResourceManager();
 
 			return rs.GetString("jsfunctions");
+		}
+
+		private static ResourceManager GetResourceManager()
+		{
+			return new ResourceManager(
+				"Castle.CastleOnRails.Framework.Javascripts", 
+				Assembly.GetAssembly( typeof(AjaxHelper) ) );
 		}
 
 		/// <summary>
@@ -103,6 +108,32 @@ namespace Castle.CastleOnRails.Framework.Helpers
 			return LinkToFunction(name, RemoteFunction(options) );
 		}
 
+		public String RemoteForm(String formId, String url, String idOfElementToBeUpdated, 
+			String with, String loading, String loaded, String interactive, String complete)
+		{
+			IDictionary options = GetOptions(url, idOfElementToBeUpdated, with, loading, loaded, complete, interactive);
+
+			return BuildFormRemoteScript(formId, options);
+		}
+
+		public String RemoteForm(String formId, String url, String idOfElementToBeUpdated, String with)
+		{
+			IDictionary options = GetOptions(url, idOfElementToBeUpdated, with, null, null, null, null);
+
+			return BuildFormRemoteScript(formId, options);
+		}
+
+		public String BuildFormRemoteScript(string formID, IDictionary options)
+		{
+			options["form"] = true;
+
+			String remoteFunc = RemoteFunction(options);
+
+			string scriptSkeleton = GetResourceManager().GetString("ajax_aspx_overloader");
+
+			return String.Format(scriptSkeleton, remoteFunc, formID);
+		}
+
 		/// <summary>
 		/// Returns a form tag that will submit using XMLHttpRequest 
 		/// in the background instead of the regular 
@@ -116,14 +147,7 @@ namespace Castle.CastleOnRails.Framework.Helpers
 		/// <returns></returns>
 		public String BuildFormRemoteTag(String url, String idOfElementToBeUpdated, String with)
 		{
-			IDictionary options = new Hashtable();
-
-			options["form"] = true;
-			options["url"] = url;
-//			options["method"] = method;
-
-			if (idOfElementToBeUpdated != null) options["update"] = idOfElementToBeUpdated;
-			if (with != null) options["with"] = with;
+			IDictionary options = GetOptions(url, idOfElementToBeUpdated, with, null, null, null, null);
 
 			return BuildFormRemoteTag(options);
 		}
@@ -131,18 +155,7 @@ namespace Castle.CastleOnRails.Framework.Helpers
 		public String BuildFormRemoteTag(String url, String idOfElementToBeUpdated, 
 			String with, String loading, String loaded, String interactive, String complete)
 		{
-			IDictionary options = new Hashtable();
-
-			options["form"] = true;
-			options["url"] = url;
-			//	options["method"] = method;
-
-			if (idOfElementToBeUpdated != null) options["update"] = idOfElementToBeUpdated;
-			if (with != null) options["with"] = with;
-			if (loading != null) options["Loading"] = loading;
-			if (loaded != null) options["Loaded"] = loaded;
-			if (complete != null) options["Complete"] = complete;
-			if (interactive != null) options["Interactive"] = interactive;
+			IDictionary options = GetOptions(url, idOfElementToBeUpdated, with, loading, loaded, complete, interactive);
 
 			return BuildFormRemoteTag(options);
 		}
@@ -166,6 +179,24 @@ namespace Castle.CastleOnRails.Framework.Helpers
 			String remoteFunc = RemoteFunction(options);
 
 			return String.Format("<form onsubmit=\"{0}; return false;\">", remoteFunc);
+		}
+
+		public IDictionary GetOptions(string url, string idOfElementToBeUpdated, string with, string loading, string loaded, string complete, string interactive)
+		{
+			IDictionary options = new Hashtable();
+	
+			options["form"] = true;
+			options["url"] = url;
+			//	options["method"] = method;
+	
+			if (idOfElementToBeUpdated != null && idOfElementToBeUpdated.Length > 0) options["update"] = idOfElementToBeUpdated;
+			if (with != null && with.Length > 0) options["with"] = with;
+			if (loading != null && loading.Length > 0) options["Loading"] = loading;
+			if (loaded != null && loaded.Length > 0) options["Loaded"] = loaded;
+			if (complete != null && complete.Length > 0) options["Complete"] = complete;
+			if (interactive != null && interactive.Length > 0) options["Interactive"] = interactive;
+
+			return options;
 		}
 
 		/// <summary>

@@ -228,6 +228,10 @@
                     BuildAction = "Content"
                 />
                 <File
+                    RelPath = "views\home\form.vm"
+                    BuildAction = "None"
+                />
+                <File
                     RelPath = "views\home\heyhello.vm"
                     BuildAction = "None"
                 />

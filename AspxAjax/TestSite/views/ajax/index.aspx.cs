@@ -24,6 +24,8 @@ namespace TestSite.views.ajax
 		protected System.Web.UI.WebControls.TextBox addressf;
 		protected Castle.CastleOnRails.Framework.Views.Aspx.InvokeHelper ObserveForm;
 		protected System.Web.UI.WebControls.Button postBackerBtn;
+		protected System.Web.UI.WebControls.Label message;
+		protected System.Web.UI.WebControls.Button addUserBtn;
 
 		private Controller _controller;
 
@@ -31,9 +33,14 @@ namespace TestSite.views.ajax
 		{
 			if (!IsPostBack)
 			{
-				DataGrid1.DataSource = _controller.PropertyBag["users"];
-				DataGrid1.DataBind();
+				LoadGrid();
 			}
+		}
+
+		private void LoadGrid()
+		{
+			DataGrid1.DataSource = _controller.PropertyBag["users"];
+			DataGrid1.DataBind();
 		}
 
 		#region Web Form Designer generated code
@@ -60,6 +67,13 @@ namespace TestSite.views.ajax
 		public void SetController(Controller controller)
 		{
 			_controller = controller;
+		}
+
+		public void OnAddUserClick(object sender, EventArgs e)
+		{
+			_controller.Send("AddUserWithAjax");
+
+			LoadGrid();
 		}
 	}
 }

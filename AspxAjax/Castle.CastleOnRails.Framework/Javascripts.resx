@@ -501,4 +501,50 @@ Effect.Highlight.prototype = {
 ]]>
 </value>
 </data>
+
+<data name="ajax_aspx_overloader" type="String" mimetype="text">
+<value>
+<![CDATA[
+	<script language="javascript">
+		
+		var __initialOnSubmit = null;
+		
+		function setupOnSubmit(form)
+		{{
+			__initialOnSubmit = form.onsubmit;
+			
+			form.onsubmit = ajaxOnSubmitHook;
+			
+			//alert(form.onsubmit);
+		}}
+		
+		function ajaxOnSubmitHook()
+		{{
+			alert("submitted");
+			try
+			{{
+				if (__initialOnSubmit != null)
+				{{
+					__initialOnSubmit();
+				}}
+				
+				{0};
+			}}
+			catch(e)
+			{{
+				alert(e.message);
+			}}
+			finally
+			{{
+				return false;
+			}}
+			
+		}}
+		
+		setupOnSubmit(document.getElementById('{1}'));
+		
+	</script>
+]]>
+</value>
+</data>
 </root>
