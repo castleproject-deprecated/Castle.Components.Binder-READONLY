@@ -12,30 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MicroKernel.Model
+namespace Castle.Model
 {
-	using System;
-	using System.Reflection;
+	using System.Collections;
+
+	using Castle.Model.Interceptor;
 
 	/// <summary>
-	/// Holds the information to allow the container to
-	/// correctly instantiate the component implementation.
+	/// Summary description for InterceptorCollection.
 	/// </summary>
-	public interface IConstructionModel
+	public class InterceptorCollection : ReadOnlyCollectionBase
 	{
-		/// <summary>
-		/// Implementation type
-		/// </summary>
-        Type Implementation { get; set; }
+		public void Add(IMethodInterceptor interceptor)
+		{
+			InnerList.Add( interceptor );
+		}
 
-        /// <summary>
-		/// The best constructor selected.
-		/// </summary>
-        ConstructorInfo SelectedConstructor { get; set; }
+		public bool HasInterceptors
+		{
+			get { return Count != 0; }
+		}
 
-        /// <summary>
-		/// Properties that will be used to satisfy dependencies.
-		/// </summary>
-		PropertyInfo[] SelectedProperties { get; }
+		public IMethodInterceptor[] ToArray()
+		{
+			return (IMethodInterceptor[]) InnerList.ToArray( typeof(IMethodInterceptor) );
+		}
 	}
 }

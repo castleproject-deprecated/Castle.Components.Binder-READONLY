@@ -12,30 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MicroKernel.Model
+namespace Castle.Windsor
 {
 	using System;
-	using System.Reflection;
+
+	using Castle.MicroKernel;
 
 	/// <summary>
-	/// Holds the information to allow the container to
-	/// correctly instantiate the component implementation.
+	/// Summary description for IWindsorContainer.
 	/// </summary>
-	public interface IConstructionModel
+	public interface IWindsorContainer : IDisposable
 	{
-		/// <summary>
-		/// Implementation type
-		/// </summary>
-        Type Implementation { get; set; }
+		IKernel Kernel
+		{
+			get;
+		}
 
-        /// <summary>
-		/// The best constructor selected.
-		/// </summary>
-        ConstructorInfo SelectedConstructor { get; set; }
+		IWindsorContainer Parent
+		{
+			get; set;
+		}
 
-        /// <summary>
-		/// Properties that will be used to satisfy dependencies.
-		/// </summary>
-		PropertyInfo[] SelectedProperties { get; }
+		void AddFacility( IFacility facility );
+
+		void AddComponent( String key, Type classType );
+
+		void AddComponent( String key, Type serviceType, Type classType );
+
+		object Resolve( String key );
+
+		object Resolve( Type service );
+
+		void Release( object instance );
+
+		void AddChildContainer(IWindsorContainer childContainer);
 	}
 }

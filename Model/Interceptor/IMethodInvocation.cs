@@ -12,30 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MicroKernel.Model
+namespace Castle.Model.Interceptor
 {
 	using System;
 	using System.Reflection;
 
 	/// <summary>
-	/// Holds the information to allow the container to
-	/// correctly instantiate the component implementation.
+	/// Summary description for IMethodInvocation.
 	/// </summary>
-	public interface IConstructionModel
+	public interface IMethodInvocation
 	{
 		/// <summary>
-		/// Implementation type
+		/// 
 		/// </summary>
-        Type Implementation { get; set; }
+		object Proxy { get; }
 
-        /// <summary>
-		/// The best constructor selected.
+		/// <summary>
+		/// 
 		/// </summary>
-        ConstructorInfo SelectedConstructor { get; set; }
+		object InvocationTarget { get;set; }
 
-        /// <summary>
-		/// Properties that will be used to satisfy dependencies.
+		/// <summary>
+		/// 
 		/// </summary>
-		PropertyInfo[] SelectedProperties { get; }
+		MethodInfo Method { get; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		object Proceed( params object[] args );
 	}
 }

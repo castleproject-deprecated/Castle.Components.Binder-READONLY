@@ -12,30 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MicroKernel.Model
+namespace Castle.MicroKernel.Handlers
 {
-	using System;
-	using System.Reflection;
+	using Castle.Model;
 
 	/// <summary>
-	/// Holds the information to allow the container to
-	/// correctly instantiate the component implementation.
+	/// Summary description for DefaultHandler.
 	/// </summary>
-	public interface IConstructionModel
+	public class DefaultHandler : AbstractHandler
 	{
-		/// <summary>
-		/// Implementation type
-		/// </summary>
-        Type Implementation { get; set; }
+		public DefaultHandler(ComponentModel model) : base(model)
+		{
+		}
 
-        /// <summary>
-		/// The best constructor selected.
-		/// </summary>
-        ConstructorInfo SelectedConstructor { get; set; }
+		#region IHandler Members
 
-        /// <summary>
-		/// Properties that will be used to satisfy dependencies.
-		/// </summary>
-		PropertyInfo[] SelectedProperties { get; }
+		public override object Resolve()
+		{
+			if (CurrentState == HandlerState.WaitingDependency)
+			{
+				throw new HandlerException(
+					"Can't create component as it has dependencies to be satisfied");
+			}
+			
+			return _lifestyleManager.Resolve();
+		}
+
+		public override void Release(object instance)
+		{
+			_lifestyleManager.Release( instance );
+		}
+
+		#endregion
 	}
 }
