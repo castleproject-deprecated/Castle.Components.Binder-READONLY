@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MicroKernel
+namespace Castle.Windsor.Tests.Components
 {
+	using System;
+
 	using Castle.Model;
 
 	/// <summary>
-	/// Defines the contract used by the kernel 
-	/// to obtain proxies for components. The implementor
-	/// must return a proxied instance that dispatch 
-	/// the invocation to the registered interceptors in the model
+	/// Summary description for CalculatorServiceWithAttributes.
 	/// </summary>
-	public interface IProxyFactory
+	[Interceptor( typeof(ResultModifierInterceptor) )]
+	public class CalculatorServiceWithAttributes
 	{
-		/// <summary>
-		/// Implementors must create a proxy based on 
-		/// the information exposed by ComponentModel
-		/// </summary>
-		/// <param name="kernel"></param>
-		/// <param name="mode"></param>
-		/// <param name="constructorArguments"></param>
-		/// <returns></returns>
-		object Create( IKernel kernel, ComponentModel mode, params object[] constructorArguments );
+		public CalculatorServiceWithAttributes()
+		{
+		}
+
+		public virtual int Sum(int x, int y)
+		{
+			return x + y;
+		}
 	}
 }

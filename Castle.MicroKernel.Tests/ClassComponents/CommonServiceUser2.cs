@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MicroKernel
+namespace Castle.MicroKernel.Tests.ClassComponents
 {
-	using Castle.Model;
+	using System;
 
 	/// <summary>
-	/// Defines the contract used by the kernel 
-	/// to obtain proxies for components. The implementor
-	/// must return a proxied instance that dispatch 
-	/// the invocation to the registered interceptors in the model
+	/// Summary description for CommonServiceUser2.
 	/// </summary>
-	public interface IProxyFactory
+	public class CommonServiceUser2
 	{
-		/// <summary>
-		/// Implementors must create a proxy based on 
-		/// the information exposed by ComponentModel
-		/// </summary>
-		/// <param name="kernel"></param>
-		/// <param name="mode"></param>
-		/// <param name="constructorArguments"></param>
-		/// <returns></returns>
-		object Create( IKernel kernel, ComponentModel mode, params object[] constructorArguments );
+		private ICommon _common;
+
+		public CommonServiceUser2()
+		{
+		}
+
+		public ICommon CommonService
+		{
+			get { return _common; }
+			set { _common = value; }
+		}
 	}
 }
