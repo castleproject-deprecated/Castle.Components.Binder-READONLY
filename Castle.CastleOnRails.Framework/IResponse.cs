@@ -32,6 +32,10 @@ namespace Castle.CastleOnRails.Framework
 
 		void Write(char[] buffer, int index, int count);
 
+		void Redirect( String controller, String action );
+
+		void Redirect( String area, String controller, String action );
+
 		void Redirect(String url);
 
 		void Redirect(String url, bool endProcess);
