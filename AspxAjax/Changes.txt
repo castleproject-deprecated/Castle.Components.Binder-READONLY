@@ -1,0 +1,8 @@
+Change history
+
+Beta 2
+------ 
+
+- Few bug corrections
+- Applied patch from Dru Sellers: NVelocityViewEngine adds a $siteRoot exposing the Request.ApplicationPath
+

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding='iso-8859-1' ?>
+<project name="rails" default="build">
+
+	<property name="base.dir" value="." />
+	<property name="bin.dir" value="${base.dir}/bin" />
+	<property name="library.dir" value="${base.dir}/lib" />
+	<property name="name" value="CastleOnRails" />
+	<property name="version" value="beta-1" />
+
+	<property name="container.bin.dir" value="${base.dir}/../InversionOfControl/bin" />
+	<property name="template.component.bin.dir" value="${base.dir}/../Components\General\TemplateEngine\bin" />
+
+	<property name="rails.test" value="true" unless="${property::exists('rails.test')}" />
+
+	<include buildfile="../common.inc" />		
+
+	<property name="debug" value="false" />
+	<property name="optimize" value="true" />
+
+	<target name="build" depends="clean, init, framework, engine, integration, nvelocity, samples, tests, generator" />
+
+	<target name="clean">
+		<delete>
+			<fileset>
+				<include name="${bin.dir}\*.dll" />
+				<include name="${bin.dir}\*.pdb" />
+				<include name="${bin.dir}\*.xml" />
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="init">
+		<copy todir="${bin.dir}">
+			<fileset basedir="${container.bin.dir}">
+				<include name="*.dll" />
+			</fileset>
+		</copy>
+		<copy todir="${bin.dir}">
+			<fileset basedir="${template.component.bin.dir}">
+				<include name="*.dll" />
+			</fileset>
+		</copy>
+		<copy todir="${bin.dir}">
+			<fileset basedir="${library.dir}">
+				<include name="*.dll" />
+			</fileset>
+		</copy>
+		<exec program="gacutil" failonerror="false" verbose="true" workingdir="${bin.dir}">
+			<arg value="/u" />
+			<arg value="Cassini" />
+		</exec>
+		<exec program="gacutil" failonerror="false" verbose="true" workingdir="${bin.dir}">
+			<arg value="/i" />
+			<arg value="Cassini.dll" />
+		</exec>
+	</target>
+	
+	<target name="framework" depends="init">
+		<nant buildfile="Castle.CastleOnRails.Framework/default.build" inheritall="true" target="compile" />
+	</target>
+
+	<target name="engine" depends="init">
+		<nant buildfile="Castle.CastleOnRails.Engine/default.build" inheritall="true" target="compile" />
+	</target>
+
+	<target name="integration" depends="init">
+		<nant buildfile="Castle.CastleOnRails.WindsorExtension/default.build" inheritall="true" target="compile" />
+	</target>
+
+	<target name="nvelocity" depends="init">
+		<nant buildfile="Castle.CastleOnRails.Framework.Views.NVelocity/default.build" inheritall="true" target="compile" />
+	</target>
+
+	<target name="samples" depends="init">
+		<nant buildfile="TestSite/sample.build" inheritall="true" target="compile" />
+		<nant buildfile="TestSiteWindsor/sample.build" inheritall="true" target="compile" />
+		<nant buildfile="TestSiteNVelocity/sample.build" inheritall="true" target="compile" />
+	</target>
+	
+	<target name="tests" depends="init" if="${rails.test}">
+		<nant buildfile="Castle.CastleOnRails.Framework/default.build" inheritall="true" target="test" />
+		<nant buildfile="Castle.CastleOnRails.Engine/default.build" inheritall="true" target="test" />
+		<nant buildfile="Castle.CastleOnRails.Framework.Views.NVelocity/default.build" inheritall="true" target="test" />
+		<nant buildfile="Castle.CastleOnRails.WindsorExtension/default.build" inheritall="true" target="test" />
+	</target>
+
+	<target name="generator" depends="init">
+		<nant buildfile="Castle.CastleOnRails.Generator/default.build" inheritall="true" target="compile" />
+	</target>
+
+	<target name="dist">
+		<zip zipfile="${name}.src.${version}.zip">
+			<fileset basedir="${base.dir}">
+				<exclude name="**/Debug/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**/*.user" />
+				<exclude name="**/*.suo" />
+				<exclude name="**/*.projdata" />
+				<exclude name="**/*.resharperoptions" />
+
+				<include name="License.txt" />				
+				<include name="Readme.txt" />				
+				<include name="*.build" />
+				<include name="*.sln" />
+				<include name="*.exe" />
+				<include name="*.dll" />
+				<include name="Castle.CastleOnRails.Engine/**/*.*" />
+				<include name="Castle.CastleOnRails.Engine.Tests/**/*.*" />
+				<include name="Castle.CastleOnRails.Framework/**/*.*" />
+				<include name="Castle.CastleOnRails.Framework.Tests/**/*.*" />
+				<include name="Castle.CastleOnRails.Framework.Views.NVelocity/**/*.*" />
+				<include name="Castle.CastleOnRails.Framework.Views.NVelocity.Tests/**/*.*" />
+				<include name="Castle.CastleOnRails.WindsorExtension/**/*.*" />
+				<include name="Castle.CastleOnRails.WindsorExtension.Tests/**/*.*" />
+				<include name="TestSite/**/*.*" />
+				<include name="TestSiteWindsor/**/*.*" />
+				<include name="TestSiteNVelocity/**/*.*" />
+			</fileset>
+		</zip>
+
+		<zip zipfile="${name}.bin.${version}.zip">
+			<fileset basedir="${base.dir}">
+				<include name="${bin.dir}/*.dll" />				
+				<include name="${base.dir}/License.txt" />				
+				<include name="${base.dir}/Readme.txt" />				
+				<include name="${name}.src.${version}.zip" />				
+			</fileset>
+		</zip>
+		
+	</target>
+
+</project>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+
+<configuration>
+
+    <configSections>
+        <section name="rails"
+                 type="Castle.CastleOnRails.Engine.Configuration.RailsSectionHandler, Castle.CastleOnRails.Engine" />
+#if($useWindsorIntegration)
+        <section name="castle"
+                 type="Castle.Windsor.Configuration.AppDomain.CastleSectionHandler, Castle.Windsor" />
+#end
+    </configSections>
+
+    <rails>
+		<viewEngine 
+			viewPathRoot="$viewpath" 
+			customEngine="$viewenginetypename" />
+#if($useWindsorIntegration)
+		<customControllerFactory type="Castle.CastleOnRails.WindsorExtension.WindsorControllerFactory, Castle.CastleOnRails.WindsorExtension" />
+		<customFilterFactory type="Castle.CastleOnRails.WindsorExtension.WindsorFilterFactory, Castle.CastleOnRails.WindsorExtension" />
+#else
+		<controllers>
+			<assembly>${name}</assembly>
+		</controllers>
+#end
+    </rails>
+#if($useWindsorIntegration)
+
+	<castle>
+		<facilities>
+		  <!-- Facilities declarations goes here -->
+		</facilities>
+
+		<components>
+		  <!-- Components declarations goes here -->
+		</components>
+	</castle>
+#end
+
+    <system.web>
+        <httpHandlers>
+            <add verb="*" path="*.rails" 
+               type="Castle.CastleOnRails.Engine.RailsHttpHandlerFactory, Castle.CastleOnRails.Engine" />
+        </httpHandlers>
+    </system.web>
+
+</configuration>
