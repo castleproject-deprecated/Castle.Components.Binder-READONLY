@@ -16,12 +16,9 @@ namespace Castle.ActiveRecord
 {
 	using System;
 
-	/// <summary>
-	/// 
-	/// </summary>
 	public enum RelationType
 	{
-		Guess,
+//		Guess,
 		Map,
 		Set,
 		List,
@@ -31,23 +28,16 @@ namespace Castle.ActiveRecord
 		PrimitiveArray
 	}
 
-
-	/// <summary>
-	/// Summary description for RelationAttribute.
-	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
 	public abstract class RelationAttribute : Attribute
 	{
-		private RelationType _relType = RelationType.Guess;
+		private RelationType _relType = RelationType.Bag;
 
-		public RelationAttribute()
+		public RelationAttribute(RelationType relationType)
 		{
+			_relType = relationType;
 		}
 
-//		public RelationAttribute( RelationType relType, bool inverse, 
-//			String condition, String order, bool lazy)
-//		{
-//		}
 		public RelationType RelationType
 		{
 			get { return _relType; }
