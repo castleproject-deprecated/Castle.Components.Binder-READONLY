@@ -33,5 +33,7 @@ namespace Castle.CastleOnRails.Framework
 		byte[] BinaryRead(int count);
 
 		String this [String key] { get; }
+
+		String ReadCookie( String name );
 	}
 }
