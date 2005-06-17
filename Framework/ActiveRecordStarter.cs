@@ -23,6 +23,7 @@ namespace Castle.ActiveRecord
 	using Castle.Model.Configuration;
 
 	using Castle.ActiveRecord.Framework;
+	using Castle.ActiveRecord.Framework.Internal;
 
 	/// <summary>
 	/// Performs the framework initialization 
@@ -45,7 +46,11 @@ namespace Castle.ActiveRecord
 			// Base configuration
 			SetUpConfiguration(source, typeof(ActiveRecordBase), holder);
 
-			NHibernateMappingEngine engine = new NHibernateMappingEngine();
+//			NHibernateMappingEngine engine = new NHibernateMappingEngine();
+
+			ActiveRecordModelBuilder builder = new ActiveRecordModelBuilder();
+
+			ActiveRecordModelCollection models = new ActiveRecordModelCollection();
 
 			foreach( Type type in types )
 			{
@@ -54,16 +59,29 @@ namespace Castle.ActiveRecord
 					continue;
 				}
 
-				SetUpConfiguration(source, type, holder);
+				ActiveRecordModel model = builder.Create( type );
 
-				Configuration cfg = holder.GetConfiguration( holder.GetRootType(type) );
+				models.Add(model);
 
-				if (!type.IsAbstract)
-				{
-					String xml = engine.CreateMapping(type, types);
-					if (xml != String.Empty) cfg.AddXmlString(xml);
-				}
+//				SetUpConfiguration(source, type, holder);
+//
+//				Configuration cfg = holder.GetConfiguration( holder.GetRootType(type) );
+//
+//				if (!type.IsAbstract)
+//				{
+//					String xml = engine.CreateMapping(type, types);
+//					if (xml != String.Empty) cfg.AddXmlString(xml);
+//				}
 			}
+
+			GraphConnectorVisitor connectorVisitor = new GraphConnectorVisitor();
+			connectorVisitor.VisitNodes( models );
+
+			SemanticVerifierVisitor semanticVisitor = new SemanticVerifierVisitor();
+			semanticVisitor.VisitNodes( models );
+
+			XmlGeneratorVisitor xmlVisitor = new XmlGeneratorVisitor();
+			xmlVisitor.VisitNodes( models );
 		}
 
 		/// <summary>

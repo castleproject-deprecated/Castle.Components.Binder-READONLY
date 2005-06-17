@@ -53,7 +53,7 @@ namespace Castle.ActiveRecord
 		private PrimaryKeyType _generator = PrimaryKeyType.Native;
 		private String _column;
 		private String _unsavedValue;
-		private bool _composite;
+		private String _sequenceName;
 
 		public PrimaryKeyAttribute() : this(PrimaryKeyType.Native)
 		{
@@ -87,10 +87,16 @@ namespace Castle.ActiveRecord
 			set { _unsavedValue = value; }
 		}
 
-		public bool IsComposite
+		public String SequenceName
 		{
-			get { return _composite; }
-			set { _composite = value; }
+			get { return _sequenceName; }
+			set { _sequenceName = value; }
 		}
+//
+//		public bool IsComposite
+//		{
+//			get { return _composite; }
+//			set { _composite = value; }
+//		}
 	}
 }
