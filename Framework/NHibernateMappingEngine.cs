@@ -593,8 +593,8 @@ namespace Castle.ActiveRecord
 		private void AddPropertyMapping(PropertyAttribute property, PropertyInfo prop, StringBuilder builder)
 		{
 			String column = (property.Column == null ? String.Format(columnAttribute, prop.Name) : String.Format(columnAttribute, property.Column));
-			String update = (property.Update == null ? "" : String.Format(updateAttribute, property.Update));
-			String insert = (property.Insert == null ? "" : String.Format(insertAttribute, property.Insert));
+			String update = "";//(property.Update == null ? "" : String.Format(updateAttribute, property.Update));
+			String insert = "";//(property.Insert == null ? "" : String.Format(insertAttribute, property.Insert));
 			String formula = (property.Formula == null ? "" : String.Format(formulaAttribute, property.Formula));
 			String length = (property.Length == 0 ? "" : String.Format(lengthAttribute, property.Length));
 			String notNull = (property.NotNull == false ? "" : String.Format(notNullAttribute, property.NotNull.ToString().ToLower()));

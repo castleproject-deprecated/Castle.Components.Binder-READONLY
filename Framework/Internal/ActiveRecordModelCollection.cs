@@ -29,6 +29,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 			Dictionary.Add(model.Type, model);
 		}
 
+		public bool Contains(Type type)
+		{
+			return Dictionary.Contains(type);
+		}
+
 		public ActiveRecordModel this[Type type]
 		{
 			get { return Dictionary[type] as ActiveRecordModel; }
@@ -36,7 +41,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 		#region IEnumerable Members
 
-		public IEnumerator GetEnumerator()
+		public new IEnumerator GetEnumerator()
 		{
 			return Dictionary.Values.GetEnumerator();
 		}

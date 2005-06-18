@@ -46,15 +46,13 @@ namespace Castle.ActiveRecord
 			// Base configuration
 			SetUpConfiguration(source, typeof(ActiveRecordBase), holder);
 
-//			NHibernateMappingEngine engine = new NHibernateMappingEngine();
-
 			ActiveRecordModelBuilder builder = new ActiveRecordModelBuilder();
 
 			ActiveRecordModelCollection models = new ActiveRecordModelCollection();
 
 			foreach( Type type in types )
 			{
-				if ( !typeof(ActiveRecordBase).IsAssignableFrom( type ) )
+				if ( models.Contains(type) || !typeof(ActiveRecordBase).IsAssignableFrom( type ) )
 				{
 					continue;
 				}
@@ -62,26 +60,34 @@ namespace Castle.ActiveRecord
 				ActiveRecordModel model = builder.Create( type );
 
 				models.Add(model);
-
-//				SetUpConfiguration(source, type, holder);
-//
-//				Configuration cfg = holder.GetConfiguration( holder.GetRootType(type) );
-//
-//				if (!type.IsAbstract)
-//				{
-//					String xml = engine.CreateMapping(type, types);
-//					if (xml != String.Empty) cfg.AddXmlString(xml);
-//				}
 			}
 
-			GraphConnectorVisitor connectorVisitor = new GraphConnectorVisitor();
+			GraphConnectorVisitor connectorVisitor = new GraphConnectorVisitor(models);
 			connectorVisitor.VisitNodes( models );
 
 			SemanticVerifierVisitor semanticVisitor = new SemanticVerifierVisitor();
 			semanticVisitor.VisitNodes( models );
 
-			XmlGeneratorVisitor xmlVisitor = new XmlGeneratorVisitor();
-			xmlVisitor.VisitNodes( models );
+			XmlGenerationVisitor xmlVisitor = new XmlGenerationVisitor();
+
+			foreach(ActiveRecordModel model in models)
+			{
+				SetUpConfiguration(source, model.Type, holder);
+				
+				Configuration cfg = holder.GetConfiguration( holder.GetRootType(model.Type) );
+
+				if (!model.Type.IsAbstract)
+				{
+					xmlVisitor.VisitNode(model);
+
+					String xml = xmlVisitor.Xml;
+					
+					if (xml != String.Empty)
+					{
+						cfg.AddXmlString(xml);
+					}
+				}
+			}
 		}
 
 		/// <summary>

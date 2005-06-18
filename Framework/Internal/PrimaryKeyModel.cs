@@ -18,7 +18,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System.Reflection;
 
 
-	public class PrimaryKeyModel : IVisitable
+	public class PrimaryKeyModel : IModelNode
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly PrimaryKeyAttribute pkAtt;
@@ -38,6 +38,15 @@ namespace Castle.ActiveRecord.Framework.Internal
 		{
 			get { return pkAtt; }
 		}
+
+		#region IModelNode Members
+
+		public String ToXml()
+		{
+			throw new NotImplementedException();
+		}
+
+		#endregion
 
 		#region IVisitable Members
 

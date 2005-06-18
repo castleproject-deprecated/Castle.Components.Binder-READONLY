@@ -16,37 +16,33 @@ namespace Castle.ActiveRecord.Framework.Internal
 {
 	using System;
 
-
+	/// <summary>
+	/// Connects <see cref="ActiveRecordModel"/> with their parents 
+	/// <see cref="ActiveRecordModel"/>
+	/// </summary>
 	public class GraphConnectorVisitor : AbstractDepthFirstVisitor
 	{
 		private readonly ActiveRecordModelCollection arCollection;
 
-		public GraphConnectorVisitor( ActiveRecordModelCollection arCollection )
+		public GraphConnectorVisitor(ActiveRecordModelCollection arCollection)
 		{
 			this.arCollection = arCollection;
 		}
 
 		public override void VisitModel(ActiveRecordModel model)
 		{
-			if (model.IsDiscriminatorBase)
+			if (model.IsDiscriminatorBase || model.IsJoinedSubClassBase)
 			{
 				foreach(ActiveRecordModel child in arCollection)
 				{
-					
+					if (child.Type.BaseType == model.Type)
+					{
+						model.SubClasses.Add(child);
+					}
 				}
 			}
 
 			base.VisitModel(model);
-		}
-
-		public override void VisitPrimaryKey(PrimaryKeyModel model)
-		{
-			base.VisitPrimaryKey(model);
-		}
-
-		public override void VisitProperty(PropertyModel model)
-		{
-			base.VisitProperty(model);
 		}
 	}
 }

@@ -28,7 +28,16 @@ namespace Castle.ActiveRecord.Framework.Internal
 					"and a joined subclass at the same time - check type {0}", model.Type.FullName) );
 			}
 
-
+// TODO:
+//			if (pk.Generator == PrimaryKeyType.Foreign)
+//			{
+//				PropertyInfo hasOneProp = GetPropertyWithAttribute( prop.DeclaringType, typeof(HasOneAttribute) );
+//
+//				if (hasOneProp != null)
+//				{
+//					builder.AppendFormat("<param name=\"property\">{0}</param>\r\n", hasOneProp.Name);
+//				}
+//			}
 
 			base.VisitModel(model);
 		}

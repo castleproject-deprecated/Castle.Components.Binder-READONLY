@@ -18,7 +18,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System.Reflection;
 
 
-	public class PropertyModel : IVisitable
+	public class PropertyModel : IModelNode
 	{
 		private readonly PropertyInfo prop;
 		private readonly PropertyAttribute att;
@@ -38,6 +38,15 @@ namespace Castle.ActiveRecord.Framework.Internal
 		{
 			get { return att; }
 		}
+
+		#region IModelNode Members
+
+		public String ToXml()
+		{
+			throw new NotImplementedException();
+		}
+
+		#endregion
 
 		#region IVisitable Members
 

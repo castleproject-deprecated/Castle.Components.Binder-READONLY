@@ -18,16 +18,18 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System.Collections;
 
 
-	public class ActiveRecordModel : IVisitable
+	public class ActiveRecordModel : IModelNode
 	{
 		private readonly Type type;
 
-		private String discriminatorType;
-		private String discriminatorValue;
 		private bool isJoinedSubClassBase;
 		private bool isDiscriminatorBase;
+		private String discriminatorType;
+		private String discriminatorValue;
+		private ActiveRecordAttribute arAtt;
 		private IList keys = new ArrayList();
 		private IList properties = new ArrayList();
+		private IList subclasses = new ArrayList();
 
 		public ActiveRecordModel(Type type)
 		{
@@ -63,6 +65,12 @@ namespace Castle.ActiveRecord.Framework.Internal
 			set { discriminatorValue = value; }
 		}
 
+		public ActiveRecordAttribute ActiveRecordAtt
+		{
+			get { return arAtt; }
+			set { arAtt = value; }
+		}
+
 		public IList Keys
 		{
 			get { return keys; }
@@ -71,6 +79,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 		public IList Properties
 		{
 			get { return properties; }
+		}
+
+		public IList SubClasses
+		{
+			get { return subclasses; }
 		}
 
 		#region IVisitable Members

@@ -309,6 +309,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "Framework\Internal\IModelNode.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "Framework\Internal\IVisitable.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -334,7 +339,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Framework\Internal\XmlGeneratorVisitor.cs"
+                    RelPath = "Framework\Internal\XmlGenerationVisitor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

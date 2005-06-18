@@ -23,24 +23,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 	{
 		private static readonly BindingFlags DefaultBindingFlags = BindingFlags.DeclaredOnly|BindingFlags.Public|BindingFlags.Instance;
 
-		/// <summary>
-		/// Just to avoid the possibiliy of two 
-		/// models pointing to the same type
-		/// </summary>
-		private IDictionary type2Model = new Hashtable();
-
 		public ActiveRecordModel Create(Type type)
 		{
 			if (type == null) throw new ArgumentNullException("type");
 
-			if (type2Model.Contains(type))
-			{
-				return type2Model[type] as ActiveRecordModel;
-			}
-
 			ActiveRecordModel model = new ActiveRecordModel(type);
-
-			type2Model[type] = model;
 
 			PopulateModel(model, type);
 
@@ -79,6 +66,8 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 		private void PopulateActiveRecordAttribute(ActiveRecordAttribute attribute, ActiveRecordModel model)
 		{
+			model.ActiveRecordAtt = attribute;
+
 			if (attribute.DiscriminatorColumn != null)
 			{
 				model.IsDiscriminatorBase = true;
@@ -97,13 +86,14 @@ namespace Castle.ActiveRecord.Framework.Internal
 				}
 
 				model.DiscriminatorValue = attribute.DiscriminatorValue;
-
 			}
 			else if (attribute.DiscriminatorType != null)
 			{
 				throw new ActiveRecordException( 
 					String.Format("The usage of DiscriminatorType for {0} is meaningless", model.Type.FullName) );
 			}
+
+			if (attribute.Table == null) attribute.Table = model.Type.Name;
 		}
 
 		private void ProcessRelations(Type type, ActiveRecordModel model)
@@ -120,6 +110,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 				{
 					PropertyAttribute propAtt = prop.GetCustomAttributes( typeof(PropertyAttribute), false )[0] as PropertyAttribute;
 
+					if (propAtt.Column == null)
+					{
+						propAtt.Column = prop.Name;
+					}
+
 					model.Properties.Add( new PropertyModel( prop, propAtt ) );
 				}
 			}
@@ -134,6 +129,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 				if (prop.IsDefined( typeof(PrimaryKeyAttribute), false ))
 				{
 					PrimaryKeyAttribute pkAtt = prop.GetCustomAttributes( typeof(PrimaryKeyAttribute), false )[0] as PrimaryKeyAttribute;
+
+					if (pkAtt.Column == null)
+					{
+						pkAtt.Column = prop.Name;
+					}
 
 					model.Keys.Add( new PrimaryKeyModel( prop, pkAtt ) );
 				}
