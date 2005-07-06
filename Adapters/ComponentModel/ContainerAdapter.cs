@@ -211,7 +211,7 @@ namespace Castle.Windsor.Adapters.ComponentModel
 				
 				try
 				{
-					ContainerAdapterSite site = component.Site as ContainerAdapterSite;
+					IContainerAdapterSite site = component.Site as ContainerAdapterSite;
 				
 					if (site != null && site.Container == this)
 					{
