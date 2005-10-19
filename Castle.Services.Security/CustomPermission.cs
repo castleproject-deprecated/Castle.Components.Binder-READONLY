@@ -16,39 +16,74 @@ namespace Castle.Services.Security
 {
 	using System;
 	using System.Security;
+	using System.Security.Permissions;
 	using System.Security.Principal;
 	using System.Threading;
 
-
-	public class CustomPermission : IPermission, ISecurityEncodable
+	[Serializable]
+	public sealed class CustomPermission : IPermission, ISecurityEncodable
 	{
-		private readonly string permissionName;
+		private string permissionName;
 
 		public CustomPermission(String permissionName)
 		{
 			this.permissionName = permissionName;
 		}
 
-		#region IPermission
+		public CustomPermission(PermissionState state)
+		{
+			
+		}
+
+		#region IPermission implementation
 
 		public IPermission Copy()
 		{
-			throw new NotImplementedException();
+			return new CustomPermission(permissionName);
 		}
 
 		public IPermission Intersect(IPermission target)
 		{
-			throw new NotImplementedException();
+			if (target == null)
+			{
+				return null;
+			}
+
+			CustomPermission other = target as CustomPermission;
+
+			if (other == null)
+			{
+				throw new ArgumentException("Wrong type specified. Expecting CustomPermission", "target");
+			}
+
+			if (other.permissionName.Equals(permissionName))
+			{
+				return new CustomPermission(permissionName);
+			}
+
+			return null;
 		}
 
 		public IPermission Union(IPermission target)
 		{
-			throw new NotImplementedException();
+			return Copy();
 		}
 
 		public bool IsSubsetOf(IPermission target)
 		{
-			throw new NotImplementedException();
+			if (target == null)
+			{
+				return false;
+			}
+
+			CustomPermission other = target as CustomPermission;
+
+			if (other == null)
+			{
+				throw new ArgumentException("Wrong type specified. Expecting CustomPermission", "target");
+			}
+
+			return (other.permissionName.Equals(permissionName));
 		}
 
 		public void Demand()
@@ -62,21 +97,42 @@ namespace Castle.Services.Security
 				throw new SecurityException("The current principal does not implement IExtendedPrincipal");
 			}
 
-
+			if (!extendedPrincipal.HasPermission(permissionName))
+			{
+				throw new SecurityException("Current principal does not have permission " + permissionName);
+			}
 		}
 
 		#endregion
 
-		#region ISecurityEncodable
+		#region ISecurityEncodable implementation
 
 		public SecurityElement ToXml()
 		{
-			throw new NotImplementedException();
+			SecurityElement elem = new SecurityElement("IPermission");
+			
+			elem.AddAttribute("class", 
+				String.Format("{0}, {1}", 
+					typeof(CustomPermission).FullName, typeof(CustomPermission).Assembly.FullName ));
+			elem.AddAttribute("version", "1");
+			elem.AddAttribute("Unrestricted", "false");
+
+			if (permissionName != null)
+			{
+				elem.AddAttribute("permName", permissionName);
+			}
+			
+			return elem;
 		}
 
-		public void FromXml(SecurityElement e)
+		public void FromXml(SecurityElement elem)
 		{
-			throw new NotImplementedException();
+			object permName = elem.Attributes["permName"];
+			
+			if (permName != null)
+			{
+				permissionName = permName.ToString();
+			}
 		}
 
 		#endregion

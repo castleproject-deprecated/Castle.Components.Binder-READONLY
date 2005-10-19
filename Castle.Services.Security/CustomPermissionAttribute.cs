@@ -18,8 +18,8 @@ namespace Castle.Services.Security
 	using System.Security;
 	using System.Security.Permissions;
 
-	
-	public class CustomPermissionAttribute : SecurityAttribute
+	[Serializable, AttributeUsage(AttributeTargets.Class|AttributeTargets.Method|AttributeTargets.Property, AllowMultiple=false, Inherited=false)]
+	public sealed class CustomPermissionAttribute : SecurityAttribute // CodeAccessSecurityAttribute
 	{
 		private readonly string permissionName;
 
@@ -30,7 +30,7 @@ namespace Castle.Services.Security
 
 		public override IPermission CreatePermission()
 		{
-			throw new CustomPermission(permissionName);
+			return new CustomPermission(permissionName);
 		}
 	}
 }

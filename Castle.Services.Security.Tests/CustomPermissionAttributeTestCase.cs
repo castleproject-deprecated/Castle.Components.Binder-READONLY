@@ -15,7 +15,12 @@
 namespace Castle.Services.Security.Tests
 {
 	using System;
+	using System.Security;
+	using System.Threading;
+	using System.Security.Principal;
 
+	using Castle.Services.Security.Tests.Model;
+	
 	using NUnit.Framework;
 
 
@@ -23,9 +28,40 @@ namespace Castle.Services.Security.Tests
 	public class CustomPermissionAttributeTestCase
 	{
 		[Test]
-		public void a()
+		public void UserCanAccessEverything()
 		{
-			
+			Thread.CurrentPrincipal = new GenericExtendedPrincipal(
+				new GenericIdentity("johndoe", "NTLS"), 
+				new string[] { "admin" } , 
+				new string[] { "can_access_private_info", "can_do_something_critical" });
+
+			MySecurityClass instance = new MySecurityClass();
+			instance.DoSomethingCritical();
+		}
+
+		[Test]
+		//[ExpectedException( typeof(SecurityException) )]
+		public void UserCannotAccessMethod()
+		{
+			Thread.CurrentPrincipal = new GenericExtendedPrincipal(
+				new GenericIdentity("johndoe", "NTLS"), 
+				new string[] { "admin" } , 
+				new string[] { "can_access_private_info" });
+
+			MySecurityClass instance = new MySecurityClass();
+			instance.DoSomethingCritical();
+		}
+
+		[Test]
+		//[ExpectedException( typeof(SecurityException) )]
+		public void UserCannotAccessAnything()
+		{
+			Thread.CurrentPrincipal = new GenericExtendedPrincipal(
+				new GenericIdentity("johndoe", "NTLS"), 
+				new string[] { "admin" } , 
+				new string[] {  });
+
+			new MySecurityClass();
 		}
 	}
 }
