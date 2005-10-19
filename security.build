@@ -34,7 +34,6 @@
 	<target name="copy">
 		<copy file="${bin.dir}/${assembly.name}" todir="../bin" />
 	</target>
-
 	
 	<target name="compile" depends="init">
 		<csc 
