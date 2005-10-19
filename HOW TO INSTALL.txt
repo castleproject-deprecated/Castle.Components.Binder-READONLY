@@ -1,3 +1,7 @@
+Be aware that the nant build process takes care of this
+
+---
+
 First add Castle.Services.Security.dll to the Global assembly cache
 
 > gacutil /i Castle.Services.Security.dll
@@ -5,4 +9,5 @@ First add Castle.Services.Security.dll to the Global assembly cache
 Then add the permission set to the machine policy
 
 > caspol -machine -addpset castlepermissionset.xml
+
 
