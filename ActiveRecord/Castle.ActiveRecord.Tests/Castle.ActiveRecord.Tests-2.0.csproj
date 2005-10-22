@@ -128,6 +128,7 @@
     <Compile Include="ActiveRecordTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ActiveRecordWithoutBaseTestCase.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -185,6 +186,7 @@
     <Compile Include="Model\Product.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Model\RulesModel\Rules.cs" />
     <Compile Include="Model\SimpleModel.cs">
       <SubType>Code</SubType>
     </Compile>

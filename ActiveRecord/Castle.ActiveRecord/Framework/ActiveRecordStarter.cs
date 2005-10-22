@@ -167,9 +167,13 @@ namespace Castle.ActiveRecord
 			Initialize( source, (Type[]) list.ToArray( typeof(Type) ) );
 		}
 
+        /// <summary>
+        /// Return true if the type has a [ActiveRecord] attribute or one of
+        /// its properties or fields has been marked.
+        /// </summary>
 		private static bool IsActiveRecordType(Type type)
 		{
-			return type.IsDefined(typeof(ActiveRecordAttribute),false);
+            return type.IsDefined(typeof(ActiveRecordAttribute), false);
 		}
 
 		/// <summary>
