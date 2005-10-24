@@ -135,6 +135,7 @@
     <Compile Include="JoinedSubClassTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Model\BadPostClass.cs" />
     <Compile Include="Model\Blog.cs">
       <SubType>Code</SubType>
     </Compile>
