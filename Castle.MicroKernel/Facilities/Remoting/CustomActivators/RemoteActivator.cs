@@ -31,7 +31,7 @@ namespace Castle.Facilities.Remoting
 		{
 			String url = (String) Model.ExtendedProperties["remoting.uri"];
 
-			return Activator.GetObject(Model.Implementation, url);
+			return Activator.GetObject(Model.Service, url);
 		}
 	}
 }
