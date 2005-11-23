@@ -762,6 +762,8 @@ namespace Castle.MonoRail.Framework
 				{
 					exceptionToThrow = ex;
 				}
+
+				RaiseOnActionExceptionOnExtension();
 			}
 			
 			try
@@ -1237,6 +1239,20 @@ namespace Castle.MonoRail.Framework
 			{
 				throw new RailsException("Error sending message!", ex);
 			}
+		}
+
+		#endregion
+
+		#region Extension 
+
+		protected void RaiseOnActionExceptionOnExtension()
+		{
+			ExtensionComposite composite = (ExtensionComposite) 
+				ServiceProvider.GetService( typeof(ExtensionComposite) );
+
+			if (!composite.HasExtension) return;
+
+			composite.OnActionException(Context);
 		}
 
 		#endregion

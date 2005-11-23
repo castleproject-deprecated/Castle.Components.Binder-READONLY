@@ -158,11 +158,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "IMonoRailExtension.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "IPropertyError.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -391,6 +386,26 @@
                 <File
                     RelPath = "Controllers\Validation.resx"
                     BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Extensions\AbstractMonoRailExtension.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Extensions\ExtensionComposite.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Extensions\IMonoRailExtension.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Extensions\ExceptionChaining\ExceptionChainingExtension.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
                 />
                 <File
                     RelPath = "Extensions\Session\CustomSessionExtension.cs"

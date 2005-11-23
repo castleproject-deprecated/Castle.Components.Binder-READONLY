@@ -37,15 +37,10 @@ namespace Castle.MonoRail.Framework
 
 		internal static readonly String RailsContextKey = "rails.context";
 		
-		private IControllerFactory controllerFactory;
-		private IViewEngine viewEngine;
-		private IFilterFactory filterFactory;
-		private IResourceFactory resourceFactory;
-		private IScaffoldingSupport scaffoldingSupport;
-		private IViewComponentFactory viewCompFactory;
+		private readonly IControllerFactory controllerFactory;
 		private readonly ControllerDescriptorBuilder controllerDescriptorBuilder = new ControllerDescriptorBuilder();
-		private readonly IMonoRailExtension[] extensions;
-		private IDictionary _type2Service = new HybridDictionary();
+		private readonly IDictionary _type2Service = new HybridDictionary();
+		private readonly ExtensionComposite extensionComposite;
 
 		#endregion
 
@@ -69,12 +64,7 @@ namespace Castle.MonoRail.Framework
 			IViewComponentFactory viewCompFactory, IMonoRailExtension[] extensions)
 		{
 			this.controllerFactory = controllerFactory;
-			this.viewEngine = viewEngine;
-			this.filterFactory = filterFactory;
-			this.resourceFactory = resourceFactory;
-			this.scaffoldingSupport = scaffoldingSupport;
-			this.viewCompFactory = viewCompFactory;
-			this.extensions = extensions;
+			this.extensionComposite = new ExtensionComposite(extensions);
 
 			AddService(typeof(IControllerFactory), controllerFactory);
 			AddService(typeof(IViewEngine), viewEngine);
@@ -83,41 +73,12 @@ namespace Castle.MonoRail.Framework
 			AddService(typeof(IScaffoldingSupport), scaffoldingSupport);
 			AddService(typeof(IViewComponentFactory), viewCompFactory);
 			AddService(typeof(ControllerDescriptorBuilder), controllerDescriptorBuilder);
+			AddService(typeof(ExtensionComposite), extensionComposite);
 		}
 
 		#endregion
 
 		#region Properties
-
-//		public IControllerFactory ControllerFactory
-//		{
-//			get { return controllerFactory; }
-//		}
-//
-//		public IViewEngine ViewEngine
-//		{
-//			get { return viewEngine; }
-//		}
-//
-//		public IFilterFactory FilterFactory
-//		{
-//			get { return filterFactory; }
-//		}
-//
-//		public IResourceFactory ResourceFactory
-//		{
-//			get { return resourceFactory; }
-//		}
-//
-//		public IScaffoldingSupport ScaffoldingSupport
-//		{
-//			get { return scaffoldingSupport; }
-//		}
-//
-//		public IViewComponentFactory ViewComponentFactory
-//		{
-//			get { return viewCompFactory; }
-//		}
 
 		/// <summary>
 		/// Returns the MonoRail context assosciated with the current
@@ -224,22 +185,16 @@ namespace Castle.MonoRail.Framework
 		{
 			context.UnderlyingContext.Items[RailsContextKey] = context;
 
-			if (extensions.Length == 0) return;
+			if (!extensionComposite.HasExtension) return;
 
-			foreach(IMonoRailExtension extension in extensions)
-			{
-				extension.OnRailsContextCreated(context);
-			}
+			extensionComposite.OnRailsContextCreated(context);
 		}
 
 		protected void RaiseEngineContextDiscarded(IRailsEngineContext context)
 		{
-			if (extensions.Length == 0) return;
+			if (!extensionComposite.HasExtension) return;
 
-			foreach(IMonoRailExtension extension in extensions)
-			{
-				extension.OnRailsContextDiscarded(context);
-			}
+			extensionComposite.OnRailsContextDiscarded(context);
 		}
 	}
 }

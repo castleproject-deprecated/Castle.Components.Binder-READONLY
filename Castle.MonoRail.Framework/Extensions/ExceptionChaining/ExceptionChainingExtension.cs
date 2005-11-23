@@ -12,29 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework
+namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 {
 	using System;
 
 	using Castle.MonoRail.Framework.Configuration;
 
 	/// <summary>
-	/// Contract for extensions that want to hook 
-	/// on MonoRail's events
+	/// 
 	/// </summary>
-	/// <remarks>
-	/// Extensions implementations must be thread safe
-	/// </remarks>
-	public interface IMonoRailExtension
+	public class ExceptionChainingExtension : AbstractMonoRailExtension
 	{
-		/// <summary>
-		/// Implementors have a chance to 
-		/// </summary>
-		/// <param name="configuration"></param>
-		void Init(MonoRailConfiguration configuration);
-
-		void OnRailsContextCreated(IRailsEngineContext context);
-
-		void OnRailsContextDiscarded(IRailsEngineContext context);
+		
 	}
 }
