@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 {
 	using System;
+	using System.Xml;
 
 	using Castle.MonoRail.Framework.Configuration;
 
@@ -23,6 +24,38 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 	/// </summary>
 	public class ExceptionChainingExtension : AbstractMonoRailExtension
 	{
-		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="configuration"></param>
+		public override void Init(MonoRailConfiguration configuration)
+		{
+			XmlNodeList handlers = configuration.ConfigSection.SelectNodes("exception/exceptionHandler");
+
+			foreach(XmlNode node in handlers)
+			{
+				XmlAttribute typeAtt = node.Attributes["type"];
+
+				if (typeAtt == null)
+				{
+					// TODO: Throw configuration exception
+				}
+
+				InstallExceptionHandler(node, typeAtt.Value);
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="context"></param>
+		public override void OnActionException(IRailsEngineContext context)
+		{
+			base.OnActionException(context);
+		}
+
+		private void InstallExceptionHandler(XmlNode node, string value)
+		{
+		}
 	}
 }

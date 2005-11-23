@@ -408,6 +408,16 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "Extensions\ExceptionChaining\IConfigurableHandler.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Extensions\ExceptionChaining\IExceptionHandler.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "Extensions\Session\CustomSessionExtension.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
