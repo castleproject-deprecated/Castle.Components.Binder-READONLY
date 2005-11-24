@@ -12,24 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
+namespace Castle.MonoRail.Framework.Configuration
 {
 	using System;
-	using System.Xml;
 
-	/// <summary>
-	/// Extends <see cref="IExceptionHandler"/> providing
-	/// an <see cref="IConfigurableHandler.Configure"/> method
-	/// that is invoked by the framework.
-	/// </summary>
-	public interface IConfigurableHandler : IExceptionHandler
+	public class SmtpConfig
 	{
-		/// <summary>
-		/// Implementors should check for known attributes and child nodes
-		/// within the <c>exceptionHandlerNode</c>
-		/// </summary>
-		/// <param name="exceptionHandlerNode">The Xml node 
-		/// that represents this handler on the configuration file</param>
-		void Configure(XmlNode exceptionHandlerNode);
+		private String host = "localhost";
+		private String username, password;
+
+		public string Host
+		{
+			get { return host; }
+			set { host = value; }
+		}
+
+		public string Username
+		{
+			get { return username; }
+			set { username = value; }
+		}
+
+		public string Password
+		{
+			get { return password; }
+			set { password = value; }
+		}
 	}
 }

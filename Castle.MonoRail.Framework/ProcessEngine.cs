@@ -17,10 +17,11 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
-	using System.ComponentModel;
 	using System.ComponentModel.Design;
 	using System.Web;
 
+	using Castle.Components.Common.EmailSender;
+	
 	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
@@ -48,20 +49,20 @@ namespace Castle.MonoRail.Framework
 
 		public ProcessEngine(IControllerFactory controllerFactory, IViewEngine viewEngine) : 
 			this(controllerFactory, viewEngine, new DefaultFilterFactory(), 
-			     new DefaultResourceFactory(), null, new DefaultViewComponentFactory(), new IMonoRailExtension[0])
+			     new DefaultResourceFactory(), null, new DefaultViewComponentFactory(), new IMonoRailExtension[0], null)
 		{
 		}
 
 		public ProcessEngine(IControllerFactory controllerFactory, IViewEngine viewEngine, IViewComponentFactory viewCompFactory) : 
 			this(controllerFactory, viewEngine, new DefaultFilterFactory(), 
-				new DefaultResourceFactory(), null, viewCompFactory, new IMonoRailExtension[0])
+				new DefaultResourceFactory(), null, viewCompFactory, new IMonoRailExtension[0], null)
 		{
 		}
 
 		public ProcessEngine(IControllerFactory controllerFactory, 
 			IViewEngine viewEngine, IFilterFactory filterFactory, 
 			IResourceFactory resourceFactory, IScaffoldingSupport scaffoldingSupport, 
-			IViewComponentFactory viewCompFactory, IMonoRailExtension[] extensions)
+			IViewComponentFactory viewCompFactory, IMonoRailExtension[] extensions, IEmailSender emailSender)
 		{
 			this.controllerFactory = controllerFactory;
 			this.extensionComposite = new ExtensionComposite(extensions);
@@ -73,7 +74,8 @@ namespace Castle.MonoRail.Framework
 			AddService(typeof(IScaffoldingSupport), scaffoldingSupport);
 			AddService(typeof(IViewComponentFactory), viewCompFactory);
 			AddService(typeof(ControllerDescriptorBuilder), controllerDescriptorBuilder);
-			AddService(typeof(ExtensionComposite), extensionComposite);
+			AddService(typeof(IMonoRailExtension), extensionComposite);
+			AddService(typeof(IEmailSender), emailSender);
 		}
 
 		#endregion
@@ -103,7 +105,10 @@ namespace Castle.MonoRail.Framework
 
 		public void AddService(Type serviceType, object serviceInstance)
 		{
-			_type2Service[serviceType] = serviceInstance;
+			if (serviceInstance != null)
+			{
+				_type2Service[serviceType] = serviceInstance;
+			}
 		}
 
 		public void AddService(Type serviceType, object serviceInstance, bool promote)
@@ -187,14 +192,14 @@ namespace Castle.MonoRail.Framework
 
 			if (!extensionComposite.HasExtension) return;
 
-			extensionComposite.OnRailsContextCreated(context);
+			extensionComposite.OnRailsContextCreated(context, this);
 		}
 
 		protected void RaiseEngineContextDiscarded(IRailsEngineContext context)
 		{
 			if (!extensionComposite.HasExtension) return;
 
-			extensionComposite.OnRailsContextDiscarded(context);
+			extensionComposite.OnRailsContextDiscarded(context, this);
 		}
 	}
 }

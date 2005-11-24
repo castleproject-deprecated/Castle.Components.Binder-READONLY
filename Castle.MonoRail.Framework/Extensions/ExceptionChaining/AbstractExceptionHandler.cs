@@ -15,21 +15,29 @@
 namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 {
 	using System;
-	using System.Xml;
 
-	/// <summary>
-	/// Extends <see cref="IExceptionHandler"/> providing
-	/// an <see cref="IConfigurableHandler.Configure"/> method
-	/// that is invoked by the framework.
-	/// </summary>
-	public interface IConfigurableHandler : IExceptionHandler
+	public abstract class AbstractExceptionHandler : IExceptionHandler
 	{
-		/// <summary>
-		/// Implementors should check for known attributes and child nodes
-		/// within the <c>exceptionHandlerNode</c>
-		/// </summary>
-		/// <param name="exceptionHandlerNode">The Xml node 
-		/// that represents this handler on the configuration file</param>
-		void Configure(XmlNode exceptionHandlerNode);
+		private IExceptionHandler nextHandler;
+
+		public virtual void Initialize()
+		{
+		}
+
+		public abstract void Process(IRailsEngineContext context, IServiceProvider serviceProvider);
+
+		public IExceptionHandler Next
+		{
+			get { return nextHandler; }
+			set { nextHandler = value; }
+		}
+
+		protected void InvokeNext(IRailsEngineContext context, IServiceProvider serviceProvider)
+		{
+			if (nextHandler != null)
+			{
+				nextHandler.Process(context, serviceProvider);
+			}
+		}
 	}
 }

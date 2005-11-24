@@ -14,6 +14,8 @@
 
 namespace Castle.MonoRail.Framework
 {
+	using System;
+
 	using Castle.MonoRail.Framework.Configuration;
 
 	/// <summary>
@@ -41,7 +43,7 @@ namespace Castle.MonoRail.Framework
 		/// hold a reference to the context
 		/// </remarks>
 		/// <param name="context"></param>
-		void OnRailsContextCreated(IRailsEngineContext context);
+		void OnRailsContextCreated(IRailsEngineContext context, IServiceProvider serviceProvider);
 
 		/// <summary>
 		/// Invoked when an instance of the implementation 
@@ -53,8 +55,8 @@ namespace Castle.MonoRail.Framework
 		/// hold a reference to the context
 		/// </remarks>
 		/// <param name="context"></param>
-		void OnRailsContextDiscarded(IRailsEngineContext context);
+		void OnRailsContextDiscarded(IRailsEngineContext context, IServiceProvider serviceProvider);
 
-		void OnActionException(IRailsEngineContext context);
+		void OnActionException(IRailsEngineContext context, IServiceProvider serviceProvider);
 	}
 }

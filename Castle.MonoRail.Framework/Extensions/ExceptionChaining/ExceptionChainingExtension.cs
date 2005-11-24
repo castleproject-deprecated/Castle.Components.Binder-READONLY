@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 {
 	using System;
+	using System.Configuration;
 	using System.Xml;
 
 	using Castle.MonoRail.Framework.Configuration;
@@ -24,6 +25,8 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 	/// </summary>
 	public class ExceptionChainingExtension : AbstractMonoRailExtension
 	{
+		private IExceptionHandler firstHandler;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -49,13 +52,61 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		/// 
 		/// </summary>
 		/// <param name="context"></param>
-		public override void OnActionException(IRailsEngineContext context)
+		public override void OnActionException(IRailsEngineContext context, IServiceProvider serviceProvider)
 		{
-			base.OnActionException(context);
+			firstHandler.Process(context, serviceProvider);
 		}
 
-		private void InstallExceptionHandler(XmlNode node, string value)
+		private void InstallExceptionHandler(XmlNode node, string typeName)
 		{
+			IExceptionHandler handler = null;
+
+			Type handlerType = MonoRailConfiguration.GetType(typeName);
+
+			if (handlerType == null)
+			{
+				throw new ConfigurationException("The Type for the custom session could not be loaded. " + 
+					typeName);
+			}
+
+			try
+			{
+				handler = (IExceptionHandler) Activator.CreateInstance(handlerType);
+			}
+			catch(InvalidCastException)
+			{
+				throw new ConfigurationException("The Type for the custom session must " + 
+					"implement ICustomSessionFactory. " + typeName);
+			}
+
+			IConfigurableHandler configurableHandler = handler as IConfigurableHandler;
+
+			if (configurableHandler != null)
+			{
+				configurableHandler.Configure(node);
+			}
+
+			handler.Initialize();
+
+			if (firstHandler == null)
+			{
+				firstHandler = handler;
+			}
+			else
+			{
+				IExceptionHandler navHandler = firstHandler;
+				
+				while(navHandler != null)
+				{
+					if (navHandler.Next == null)
+					{
+						navHandler.Next = handler;
+						break;
+					}
+
+					navHandler = navHandler.Next;
+				}
+			}
 		}
 	}
 }

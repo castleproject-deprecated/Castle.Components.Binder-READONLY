@@ -78,8 +78,7 @@ namespace Castle.MonoRail.Framework.Extensions.Session
 
 			try
 			{
-				customSession = (ICustomSessionFactory) 
-					Activator.CreateInstance(customSessType);
+				customSession = (ICustomSessionFactory) Activator.CreateInstance(customSessType);
 			}
 			catch(InvalidCastException)
 			{
@@ -93,7 +92,7 @@ namespace Castle.MonoRail.Framework.Extensions.Session
 		/// </summary>
 		/// <remarks>Note that the session available through IHttpContext is left untouched</remarks>
 		/// <param name="context"></param>
-		public override void OnRailsContextCreated(IRailsEngineContext context)
+		public override void OnRailsContextCreated(IRailsEngineContext context, IServiceProvider serviceProvider)
 		{
 			IDictionary session = customSession.ObtainSession(context);
 
@@ -104,7 +103,7 @@ namespace Castle.MonoRail.Framework.Extensions.Session
 		/// Retrives the ISession instance from <see cref="RailsEngineContextAdapter"/>.
 		/// and invokes <see cref="ICustomSessionFactory.PersistSession"/>
 		/// </summary>
-		public override void OnRailsContextDiscarded(IRailsEngineContext context)
+		public override void OnRailsContextDiscarded(IRailsEngineContext context, IServiceProvider serviceProvider)
 		{
 			customSession.PersistSession(context.Session, context);
 		}

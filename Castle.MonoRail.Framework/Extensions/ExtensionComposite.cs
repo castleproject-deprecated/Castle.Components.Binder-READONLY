@@ -54,11 +54,11 @@ namespace Castle.MonoRail.Framework
 		/// hold a reference to the context
 		/// </remarks>
 		/// <param name="context"></param>
-		public void OnRailsContextCreated(IRailsEngineContext context)
+		public void OnRailsContextCreated(IRailsEngineContext context, IServiceProvider serviceProvider)
 		{
 			foreach(IMonoRailExtension extension in extensions)
 			{
-				extension.OnRailsContextCreated(context);
+				extension.OnRailsContextCreated(context, serviceProvider);
 			}
 		}
 
@@ -72,19 +72,19 @@ namespace Castle.MonoRail.Framework
 		/// hold a reference to the context
 		/// </remarks>
 		/// <param name="context"></param>
-		public void OnRailsContextDiscarded(IRailsEngineContext context)
+		public void OnRailsContextDiscarded(IRailsEngineContext context, IServiceProvider serviceProvider)
 		{
 			foreach(IMonoRailExtension extension in extensions)
 			{
-				extension.OnRailsContextDiscarded(context);
+				extension.OnRailsContextDiscarded(context, serviceProvider);
 			}
 		}
 
-		public void OnActionException(IRailsEngineContext context)
+		public void OnActionException(IRailsEngineContext context, IServiceProvider serviceProvider)
 		{
 			foreach(IMonoRailExtension extension in extensions)
 			{
-				extension.OnActionException(context);
+				extension.OnActionException(context, serviceProvider);
 			}
 		}
 	}
