@@ -16,13 +16,32 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 {
 	using System;
 	using System.Configuration;
+	using System.Web;
 	using System.Xml;
 
 	using Castle.MonoRail.Framework.Configuration;
 
 	/// <summary>
-	/// 
+	/// This extension allow one to perform one or more steps
+	/// in response to an exception threw by an action. 
+	/// <seealso cref="IExceptionHandler"/>
 	/// </summary>
+	/// <remarks>
+	/// To successfully install this extension you must register 
+	/// it on the <c>extensions</c> node and the handlers within the <c>exception</c> node:
+	/// <code>
+	///   &lt;monoRail&gt;
+	///   	&lt;extensions&gt;
+	///   	  &lt;extension type="Castle.MonoRail.Framework.Extensions.ExceptionChaining.ExceptionChainingExtension, Castle.MonoRail.Framework" /&gt;
+	///   	&lt;/extensions&gt;
+	///   	
+	///   	&lt;exception&gt;
+	///   	  &lt;exceptionHandler type="Type name that implements IExceptionHandler" /&gt;
+	///   	  &lt;exceptionHandler type="Type name that implements IExceptionHandler" /&gt;
+	///   	&lt;/exception&gt;
+	///   &lt;/monoRail&gt;
+	/// </code>
+	/// </remarks>
 	public class ExceptionChainingExtension : AbstractMonoRailExtension
 	{
 		private IExceptionHandler firstHandler;
@@ -34,6 +53,8 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		public override void Init(MonoRailConfiguration configuration)
 		{
 			XmlNodeList handlers = configuration.ConfigSection.SelectNodes("exception/exceptionHandler");
+
+			HttpContext.Current.ApplicationInstance.Error += new EventHandler(ApplicationInstance_Error);
 
 			foreach(XmlNode node in handlers)
 			{
@@ -55,6 +76,15 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		public override void OnActionException(IRailsEngineContext context, IServiceProvider serviceProvider)
 		{
 			firstHandler.Process(context, serviceProvider);
+
+			// Mark the request as processed (so if the 
+			// ApplicationInstance_Error is invoked again, we wouldn't re-invoke the chain)
+
+		}
+
+		private void ApplicationInstance_Error(object sender, EventArgs e)
+		{
+			// TODO: Delegate to OnActionException
 		}
 
 		private void InstallExceptionHandler(XmlNode node, string typeName)
