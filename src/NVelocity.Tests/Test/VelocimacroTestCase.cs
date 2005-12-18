@@ -48,7 +48,7 @@ namespace NVelocity.Test
 
 			if (!result1.Equals(out_Renamed))
 			{
-				Assertion.Fail("output incorrect.");
+				Assert.Fail("output incorrect.");
 			}
 		}
 	}

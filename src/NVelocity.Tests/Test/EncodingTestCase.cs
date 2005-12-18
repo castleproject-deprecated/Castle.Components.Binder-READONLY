@@ -63,7 +63,7 @@ namespace NVelocity.Test
 
 			if (!isMatch(TemplateTestBase_Fields.RESULT_DIR, TemplateTestBase_Fields.COMPARE_DIR, "encodingtest", TemplateTestBase_Fields.RESULT_FILE_EXT, TemplateTestBase_Fields.CMP_FILE_EXT))
 			{
-				Assertion.Fail("Output 1 incorrect.");
+				Assert.Fail("Output 1 incorrect.");
 			}
 
 			/*
@@ -82,7 +82,7 @@ namespace NVelocity.Test
 
 			if (!isMatch(TemplateTestBase_Fields.RESULT_DIR, TemplateTestBase_Fields.COMPARE_DIR, "encodingtest2", TemplateTestBase_Fields.RESULT_FILE_EXT, TemplateTestBase_Fields.CMP_FILE_EXT))
 			{
-				Assertion.Fail("Output 2 incorrect.");
+				Assert.Fail("Output 2 incorrect.");
 			}
 
 			/*
@@ -101,7 +101,7 @@ namespace NVelocity.Test
 
 			if (!isMatch(TemplateTestBase_Fields.RESULT_DIR, TemplateTestBase_Fields.COMPARE_DIR, "encodingtest3", TemplateTestBase_Fields.RESULT_FILE_EXT, TemplateTestBase_Fields.CMP_FILE_EXT))
 			{
-				Assertion.Fail("Output 3 incorrect.");
+				Assert.Fail("Output 3 incorrect.");
 			}
 
 			/*
@@ -118,7 +118,7 @@ namespace NVelocity.Test
 
 			if (!isMatch(TemplateTestBase_Fields.RESULT_DIR, TemplateTestBase_Fields.COMPARE_DIR, "encodingtest_KOI8-R", TemplateTestBase_Fields.RESULT_FILE_EXT, TemplateTestBase_Fields.CMP_FILE_EXT))
 			{
-				Assertion.Fail("Output 4 incorrect.");
+				Assert.Fail("Output 4 incorrect.");
 			}
 
 
@@ -136,7 +136,7 @@ namespace NVelocity.Test
 
 			if (!isMatch(TemplateTestBase_Fields.RESULT_DIR, TemplateTestBase_Fields.COMPARE_DIR, "encodingtest_ISO-8859-1", TemplateTestBase_Fields.RESULT_FILE_EXT, TemplateTestBase_Fields.CMP_FILE_EXT))
 			{
-				Assertion.Fail("Output 5 incorrect.");
+				Assert.Fail("Output 5 incorrect.");
 			}
 		}
 	}

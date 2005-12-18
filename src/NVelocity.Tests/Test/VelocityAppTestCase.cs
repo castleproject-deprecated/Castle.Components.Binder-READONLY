@@ -57,7 +57,7 @@ namespace NVelocity.Test
 
 			if (!result1.Equals(compare1.ToString()))
 			{
-				Assertion.Fail("Output incorrect.");
+				Assert.Fail("Output incorrect.");
 			}
 		}
 

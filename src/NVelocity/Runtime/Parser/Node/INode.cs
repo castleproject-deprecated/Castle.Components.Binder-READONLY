@@ -116,14 +116,14 @@ namespace NVelocity.Runtime.Parser.Node
 		/// </summary>
 		Object jjtAccept(ParserVisitor visitor, Object data);
 
-		Object childrenAccept(ParserVisitor visitor, Object data);
+		Object ChildrenAccept(ParserVisitor visitor, Object data);
 		// added
-		Object init(InternalContextAdapter context, Object data);
-		bool evaluate(InternalContextAdapter context);
+		Object Init(InternalContextAdapter context, Object data);
+		bool Evaluate(InternalContextAdapter context);
 		Object Value(InternalContextAdapter context);
-		bool render(InternalContextAdapter context, TextWriter writer);
-		Object execute(Object o, InternalContextAdapter context);
-		String literal();
+		bool Render(InternalContextAdapter context, TextWriter writer);
+		Object Execute(Object o, InternalContextAdapter context);
+		string Literal { get; }
 		void setInvalid();
 		bool isInvalid();
 	}

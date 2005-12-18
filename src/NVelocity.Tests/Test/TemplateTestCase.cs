@@ -202,7 +202,7 @@ namespace NVelocity.Test
 
 			if (!allpass)
 			{
-				Assertion.Fail(failures.ToString() + " templates failed");
+				Assert.Fail(failures.ToString() + " templates failed");
 			}
 		}
 
@@ -254,7 +254,7 @@ namespace NVelocity.Test
 			{
 				Console.Out.WriteLine("EXCEPTION : " + e);
 
-				Assertion.Fail(e.Message);
+				Assert.Fail(e.Message);
 			}
 
 			return true;

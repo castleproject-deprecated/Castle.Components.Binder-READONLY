@@ -21,13 +21,13 @@ namespace NVelocity.Dvsl.Directive
 		}
 
 
-		public override int Type
+		public override DirectiveType Type
 		{
-			get { return DirectiveConstants_Fields.BLOCK; }
+			get { return DirectiveType.BLOCK; }
 		}
 
 
-		public override bool render(InternalContextAdapter context, TextWriter writer, INode node)
+		public override bool Render(InternalContextAdapter context, TextWriter writer, INode node)
 		{
 			/*
 	    *  what is our arg?
@@ -39,7 +39,7 @@ namespace NVelocity.Dvsl.Directive
 				try
 				{
 					String element = (String) node.jjtGetChild(0).Value(context);
-					TemplateHandler th = (TemplateHandler) rsvc.getApplicationAttribute("NVelocity.Dvsl.TemplateHandler");
+					TemplateHandler th = (TemplateHandler) rsvc.GetApplicationAttribute("NVelocity.Dvsl.TemplateHandler");
 
 					th.RegisterMatch(element, (SimpleNode) node.jjtGetChild(node.jjtGetNumChildren() - 1));
 				}

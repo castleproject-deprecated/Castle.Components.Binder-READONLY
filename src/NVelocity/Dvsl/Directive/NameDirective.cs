@@ -19,17 +19,14 @@ namespace NVelocity.Dvsl.Directive
 		}
 
 
-		public override Int32 Type
+		public override DirectiveType Type
 		{
-			get { return DirectiveConstants_Fields.BLOCK; }
+			get { return DirectiveType.BLOCK; }
 		}
 
-
-		public override Boolean render(InternalContextAdapter context, TextWriter writer, INode node)
+		public override Boolean Render(InternalContextAdapter context, TextWriter writer, INode node)
 		{
 			return true;
 		}
-
-
 	}
 }

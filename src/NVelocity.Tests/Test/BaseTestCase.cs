@@ -95,7 +95,7 @@ namespace NVelocity.Test
 				tmpBool = Directory.Exists(dir.FullName);
 			if (!tmpBool)
 			{
-				RuntimeSingleton.info("Template results directory does not exist");
+				RuntimeSingleton.Info("Template results directory does not exist");
 				Boolean ok = true;
 				try
 				{
@@ -108,13 +108,13 @@ namespace NVelocity.Test
 
 				if (ok)
 				{
-					RuntimeSingleton.info("Created template results directory");
+					RuntimeSingleton.Info("Created template results directory");
 				}
 				else
 				{
 					String errMsg = "Unable to create template results directory";
-					RuntimeSingleton.warn(errMsg);
-					Assertion.Fail(errMsg);
+					RuntimeSingleton.Warn(errMsg);
+					Assert.Fail(errMsg);
 				}
 			}
 		}
