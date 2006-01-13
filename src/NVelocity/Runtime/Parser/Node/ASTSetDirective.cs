@@ -62,7 +62,7 @@ namespace NVelocity.Runtime.Parser.Node
 			right = RightHandSide;
 			left = LeftHandSide;
 
-			blather = rsvc.GetBoolean(RuntimeConstants_Fields.RUNTIME_LOG_REFERENCE_LOG_INVALID, true);
+			blather = rsvc.GetBoolean(RuntimeConstants.RUNTIME_LOG_REFERENCE_LOG_INVALID, true);
 
 			/*
 	    *  grab this now.  No need to redo each time
@@ -102,7 +102,7 @@ namespace NVelocity.Runtime.Parser.Node
 		    */
 					if (ec != null)
 					{
-						doit = ec.shouldLogOnNullSet(left.Literal, right.Literal);
+						doit = ec.ShouldLogOnNullSet(left.Literal, right.Literal);
 					}
 
 					if (doit)

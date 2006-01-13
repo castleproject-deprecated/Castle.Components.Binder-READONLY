@@ -205,7 +205,7 @@ namespace NVelocity.Runtime
 		*  All we have to do is get the template. The template will be parsed;
 		*  VM's  are added during the parse phase
 		*/
-				Object libfiles = rsvc.GetProperty(RuntimeConstants_Fields.VM_LIBRARY);
+				Object libfiles = rsvc.GetProperty(RuntimeConstants.VM_LIBRARY);
 
 				if (libfiles != null)
 				{
@@ -274,7 +274,7 @@ namespace NVelocity.Runtime
 		*/
 				AddMacroPermission = true;
 
-				if (!rsvc.GetBoolean(RuntimeConstants_Fields.VM_PERM_ALLOW_INLINE, true))
+				if (!rsvc.GetBoolean(RuntimeConstants.VM_PERM_ALLOW_INLINE, true))
 				{
 					AddMacroPermission = false;
 
@@ -293,7 +293,7 @@ namespace NVelocity.Runtime
 		*/
 				ReplacementPermission = false;
 
-				if (rsvc.GetBoolean(RuntimeConstants_Fields.VM_PERM_ALLOW_INLINE_REPLACE_GLOBAL, false))
+				if (rsvc.GetBoolean(RuntimeConstants.VM_PERM_ALLOW_INLINE_REPLACE_GLOBAL, false))
 				{
 					ReplacementPermission = true;
 
@@ -313,7 +313,7 @@ namespace NVelocity.Runtime
 				/*
 		*  template-local inline VM mode : default is off
 		*/
-				TemplateLocalInline = rsvc.GetBoolean(RuntimeConstants_Fields.VM_PERM_INLINE_LOCAL, false);
+				TemplateLocalInline = rsvc.GetBoolean(RuntimeConstants.VM_PERM_INLINE_LOCAL, false);
 
 				if (TemplateLocalInline)
 				{
@@ -329,7 +329,7 @@ namespace NVelocity.Runtime
 				/*
 		*  general message switch.  default is on
 		*/
-				Blather = rsvc.GetBoolean(RuntimeConstants_Fields.VM_MESSAGES_ON, true);
+				Blather = rsvc.GetBoolean(RuntimeConstants.VM_MESSAGES_ON, true);
 
 				if (Blather)
 				{
@@ -343,7 +343,7 @@ namespace NVelocity.Runtime
 				/*
 		*  autoload VM libraries
 		*/
-				Autoload = rsvc.GetBoolean(RuntimeConstants_Fields.VM_LIBRARY_AUTORELOAD, false);
+				Autoload = rsvc.GetBoolean(RuntimeConstants.VM_LIBRARY_AUTORELOAD, false);
 
 				if (Autoload)
 				{

@@ -27,7 +27,7 @@ namespace NVelocity.App
 	/// call init().
 	/// </summary>
 	/// <author> <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a></author>
-	public class VelocityEngine : RuntimeConstants
+	public class VelocityEngine
 	{
 		private RuntimeInstance ri = new RuntimeInstance();
 
@@ -172,7 +172,7 @@ namespace NVelocity.App
 
 			try
 			{
-				encoding = ri.GetString(RuntimeConstants_Fields.INPUT_ENCODING, RuntimeConstants_Fields.ENCODING_DEFAULT);
+				encoding = ri.GetString(RuntimeConstants.INPUT_ENCODING, RuntimeConstants.ENCODING_DEFAULT);
 				br = new StreamReader(new StreamReader(instream, Encoding.GetEncoding(encoding)).BaseStream);
 			}
 			catch (IOException uce)
@@ -306,7 +306,7 @@ namespace NVelocity.App
 		[Obsolete("Use the overload that takes the encoding as parameter")]
 		public bool MergeTemplate(String templateName, IContext context, TextWriter writer)
 		{
-			return MergeTemplate(templateName, ri.GetString(RuntimeConstants_Fields.INPUT_ENCODING, RuntimeConstants_Fields.ENCODING_DEFAULT), context, writer);
+			return MergeTemplate(templateName, ri.GetString(RuntimeConstants.INPUT_ENCODING, RuntimeConstants.ENCODING_DEFAULT), context, writer);
 		}
 
 		/// <summary>

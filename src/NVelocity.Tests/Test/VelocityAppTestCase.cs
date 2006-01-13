@@ -24,7 +24,7 @@ namespace NVelocity.Test
 		{
 			try
 			{
-				Velocity.SetProperty(RuntimeConstants_Fields.FILE_RESOURCE_LOADER_PATH, TemplateTestBase_Fields.FILE_RESOURCE_LOADER_PATH);
+				Velocity.SetProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, TemplateTest.FILE_RESOURCE_LOADER_PATH);
 				Velocity.Init();
 			}
 			catch (Exception e)

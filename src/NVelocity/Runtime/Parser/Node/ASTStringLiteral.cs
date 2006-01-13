@@ -105,7 +105,7 @@ namespace NVelocity.Runtime.Parser.Node
 	    *  can  interpolate.  Otherwise, don't bother.
 	    */
 
-			interpolate = rsvc.GetBoolean(RuntimeConstants_Fields.INTERPOLATE_STRINGLITERALS, true) && FirstToken.Image.StartsWith("\"") && ((FirstToken.Image.IndexOf((Char) '$') != - 1) || (FirstToken.Image.IndexOf((Char) '#') != - 1));
+			interpolate = rsvc.GetBoolean(RuntimeConstants.INTERPOLATE_STRINGLITERALS, true) && FirstToken.Image.StartsWith("\"") && ((FirstToken.Image.IndexOf((Char) '$') != - 1) || (FirstToken.Image.IndexOf((Char) '#') != - 1));
 
 			/*
 	    *  get the contents of the string, minus the '/" at each end

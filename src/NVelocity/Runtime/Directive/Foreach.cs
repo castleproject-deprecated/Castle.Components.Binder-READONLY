@@ -77,8 +77,8 @@ namespace NVelocity.Runtime.Directive
 		{
 			base.Init(rs, context, node);
 
-			counterName = rsvc.GetString(RuntimeConstants_Fields.COUNTER_NAME);
-			counterInitialValue = rsvc.GetInt(RuntimeConstants_Fields.COUNTER_INITIAL_VALUE);
+			counterName = rsvc.GetString(RuntimeConstants.COUNTER_NAME);
+			counterInitialValue = rsvc.GetInt(RuntimeConstants.COUNTER_INITIAL_VALUE);
 
 			// this is really the only thing we can do here as everything
 			// else is context sensitive

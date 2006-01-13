@@ -41,7 +41,7 @@ namespace NVelocity.Runtime.Log
 		{
 			// if a logSystem was set as a configuation value, use that.
 			// This is any class the user specifies.
-			Object o = rsvc.GetProperty(RuntimeConstants_Fields.RUNTIME_LOG_LOGSYSTEM);
+			Object o = rsvc.GetProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM);
 
 			if (o != null && o is LogSystem)
 			{
@@ -57,7 +57,7 @@ namespace NVelocity.Runtime.Log
 			// AvalonLogSystem and the SimpleLog4JLogSystem for convenience -
 			// so we use whichever we find.
 			IList classes = new ArrayList();
-			Object obj = rsvc.GetProperty(RuntimeConstants_Fields.RUNTIME_LOG_LOGSYSTEM_CLASS);
+			Object obj = rsvc.GetProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS);
 
 			// we might have a list, or not - so check
 			if (obj is IList)

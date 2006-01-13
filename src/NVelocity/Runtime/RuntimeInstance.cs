@@ -56,7 +56,7 @@ namespace NVelocity.Runtime
 	/// </pre>
 	/// *
 	/// </summary>
-	public class RuntimeInstance : RuntimeConstants, RuntimeServices
+	public class RuntimeInstance : RuntimeServices
 	{
 		private DefaultTraceListener debugOutput = new DefaultTraceListener();
 
@@ -237,7 +237,7 @@ namespace NVelocity.Runtime
 		/// </summary>
 		private void initializeIntrospection()
 		{
-			String rm = GetString(RuntimeConstants_Fields.UBERSPECT_CLASSNAME);
+			String rm = GetString(RuntimeConstants.UBERSPECT_CLASSNAME);
 
 			if (rm != null && rm.Length > 0)
 			{
@@ -295,7 +295,7 @@ namespace NVelocity.Runtime
 			try
 			{
 				// TODO: this was modified in v1.4 to use the classloader
-				configuration.Load(Assembly.GetExecutingAssembly().GetManifestResourceStream(RuntimeConstants_Fields.DEFAULT_RUNTIME_PROPERTIES));
+				configuration.Load(Assembly.GetExecutingAssembly().GetManifestResourceStream(RuntimeConstants.DEFAULT_RUNTIME_PROPERTIES));
 			}
 			catch (System.Exception ex)
 			{
@@ -449,7 +449,7 @@ namespace NVelocity.Runtime
 			 * Which resource manager?
 			 */
 
-			String rm = GetString(RuntimeConstants_Fields.RESOURCE_MANAGER_CLASS);
+			String rm = GetString(RuntimeConstants.RESOURCE_MANAGER_CLASS);
 
 			if (rm != null && rm.Length > 0)
 			{
@@ -556,7 +556,7 @@ namespace NVelocity.Runtime
 
 			try
 			{
-				directiveProperties.Load(Assembly.GetExecutingAssembly().GetManifestResourceStream(RuntimeConstants_Fields.DEFAULT_RUNTIME_DIRECTIVES));
+				directiveProperties.Load(Assembly.GetExecutingAssembly().GetManifestResourceStream(RuntimeConstants.DEFAULT_RUNTIME_DIRECTIVES));
 			}
 			catch (System.Exception ex)
 			{
@@ -617,7 +617,7 @@ namespace NVelocity.Runtime
 		/// </summary>
 		private void initializeParserPool()
 		{
-			int numParsers = GetInt(RuntimeConstants_Fields.PARSER_POOL_SIZE, RuntimeConstants_Fields.NUMBER_OF_PARSERS);
+			int numParsers = GetInt(RuntimeConstants.PARSER_POOL_SIZE, RuntimeConstants.NUMBER_OF_PARSERS);
 
 			parserPool = new SimplePool(numParsers);
 
@@ -756,7 +756,7 @@ namespace NVelocity.Runtime
 		/// </returns>
 		public Template GetTemplate(String name)
 		{
-			return GetTemplate(name, GetString(RuntimeConstants_Fields.INPUT_ENCODING, RuntimeConstants_Fields.ENCODING_DEFAULT));
+			return GetTemplate(name, GetString(RuntimeConstants.INPUT_ENCODING, RuntimeConstants.ENCODING_DEFAULT));
 		}
 
 		/// <summary> Returns a <code>Template</code> from the resource manager
@@ -798,7 +798,7 @@ namespace NVelocity.Runtime
 	    *  the bytestream should be dumped to the output stream
 	    */
 
-			return GetContent(name, GetString(RuntimeConstants_Fields.INPUT_ENCODING, RuntimeConstants_Fields.ENCODING_DEFAULT));
+			return GetContent(name, GetString(RuntimeConstants.INPUT_ENCODING, RuntimeConstants.ENCODING_DEFAULT));
 		}
 
 		/// <summary> Returns a static content resource from the
@@ -845,7 +845,7 @@ namespace NVelocity.Runtime
 		{
 			if (configuration.IsInitialized())
 			{
-				return GetBoolean(RuntimeConstants_Fields.RUNTIME_LOG_WARN_STACKTRACE, false);
+				return GetBoolean(RuntimeConstants.RUNTIME_LOG_WARN_STACKTRACE, false);
 			}
 			else
 			{

@@ -119,12 +119,12 @@ namespace NVelocity.Runtime.Resource
 			* now see if this is overridden by configuration
 			*/
 
-			logWhenFound = rsvc.GetBoolean(RuntimeConstants_Fields.RESOURCE_MANAGER_LOGWHENFOUND, true);
+			logWhenFound = rsvc.GetBoolean(RuntimeConstants.RESOURCE_MANAGER_LOGWHENFOUND, true);
 
 			/*
 			*  now, is a global cache specified?
 			*/
-			String claz = rsvc.GetString(RuntimeConstants_Fields.RESOURCE_MANAGER_CACHE_CLASS);
+			String claz = rsvc.GetString(RuntimeConstants.RESOURCE_MANAGER_CACHE_CLASS);
 			Object o = null;
 
 			if (claz != null && claz.Length > 0)
@@ -175,7 +175,7 @@ namespace NVelocity.Runtime.Resource
 				return;
 			}
 
-			ArrayList resourceLoaderNames = rsvc.Configuration.GetVector(RuntimeConstants_Fields.RESOURCE_LOADER);
+			ArrayList resourceLoaderNames = rsvc.Configuration.GetVector(RuntimeConstants.RESOURCE_LOADER);
 
 			for (int i = 0; i < resourceLoaderNames.Count; i++)
 			{
@@ -187,7 +187,7 @@ namespace NVelocity.Runtime.Resource
 				 * The loader id is the prefix used for all properties
 				 * pertaining to a particular loader.
 				 */
-				String loaderID = resourceLoaderNames[i] + "." + RuntimeConstants_Fields.RESOURCE_LOADER;
+				String loaderID = resourceLoaderNames[i] + "." + RuntimeConstants.RESOURCE_LOADER;
 
 				ExtendedProperties loaderConfiguration = rsvc.Configuration.Subset(loaderID);
 
@@ -513,7 +513,7 @@ namespace NVelocity.Runtime.Resource
 		/// </deprecated>
 		public Resource getResource(String resourceName, int resourceType)
 		{
-			return getResource(resourceName, resourceType, RuntimeConstants_Fields.ENCODING_DEFAULT);
+			return getResource(resourceName, resourceType, RuntimeConstants.ENCODING_DEFAULT);
 		}
 
 		/// <summary>  Determines is a template exists, and returns name of the loader that

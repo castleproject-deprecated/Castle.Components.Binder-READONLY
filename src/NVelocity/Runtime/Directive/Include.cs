@@ -131,10 +131,10 @@ namespace NVelocity.Runtime.Directive
 
 			// get the msg, and add the space so we don't have to
 	    // do it each time
-			outputMsgStart = rsvc.GetString(RuntimeConstants_Fields.ERRORMSG_START);
+			outputMsgStart = rsvc.GetString(RuntimeConstants.ERRORMSG_START);
 			outputMsgStart = outputMsgStart + " ";
 
-			outputMsgEnd = rsvc.GetString(RuntimeConstants_Fields.ERRORMSG_END);
+			outputMsgEnd = rsvc.GetString(RuntimeConstants.ERRORMSG_END);
 			outputMsgEnd = " " + outputMsgEnd;
 		}
 
@@ -208,7 +208,7 @@ namespace NVelocity.Runtime.Directive
 				if (current != null)
 					encoding = current.Encoding;
 				else
-					encoding = (String) rsvc.GetProperty(RuntimeConstants_Fields.INPUT_ENCODING);
+					encoding = (String) rsvc.GetProperty(RuntimeConstants.INPUT_ENCODING);
 
 				resource = rsvc.GetContent(arg, encoding);
 			}

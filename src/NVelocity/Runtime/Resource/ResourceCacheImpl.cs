@@ -58,7 +58,7 @@ namespace NVelocity.Runtime.Resource
 		{
 			rsvc = rs;
 
-			int maxSize = rsvc.GetInt(RuntimeConstants_Fields.RESOURCE_MANAGER_DEFAULTCACHE_SIZE, 89);
+			int maxSize = rsvc.GetInt(RuntimeConstants.RESOURCE_MANAGER_DEFAULTCACHE_SIZE, 89);
 			if (maxSize > 0)
 			{
 				// Create a whole new Map here to avoid hanging on to a

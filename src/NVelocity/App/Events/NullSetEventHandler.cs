@@ -77,6 +77,6 @@ namespace NVelocity.App.Events
 		/// <returns>true if log message should be written, false otherwise
 		///
 		/// </returns>
-		bool shouldLogOnNullSet(String lhs, String rhs);
+		bool ShouldLogOnNullSet(String lhs, String rhs);
 	}
 }

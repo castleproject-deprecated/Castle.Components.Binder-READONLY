@@ -69,6 +69,6 @@ namespace NVelocity.App.Events
 	/// </version>
 	public interface MethodExceptionEventHandler : EventHandler
 	{
-		Object methodException(Type claz, String method, Exception e);
+		Object MethodException(Type claz, String method, Exception e);
 	}
 }

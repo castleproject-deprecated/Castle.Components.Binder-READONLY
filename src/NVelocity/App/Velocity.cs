@@ -31,7 +31,7 @@ namespace NVelocity.App
 	/// facilities without direct spelunking of the internals.  If there is
 	/// something you feel is necessary to add here, please, send a patch.
 	/// </summary>
-	public class Velocity : RuntimeConstants
+	public class Velocity
 	{
 		/// <summary>
 		/// initialize the NVelocity runtime engine, using the default
@@ -151,7 +151,7 @@ namespace NVelocity.App
 
 			try
 			{
-				encoding = RuntimeSingleton.getString(RuntimeConstants_Fields.INPUT_ENCODING, RuntimeConstants_Fields.ENCODING_DEFAULT);
+				encoding = RuntimeSingleton.getString(RuntimeConstants.INPUT_ENCODING, RuntimeConstants.ENCODING_DEFAULT);
 				reader = new StreamReader(new StreamReader(instream, Encoding.GetEncoding(encoding)).BaseStream);
 			}
 			catch (IOException uce)
@@ -285,7 +285,7 @@ namespace NVelocity.App
 		[Obsolete("Use the overload that takes an encoding")]
 		public static bool MergeTemplate(String templateName, IContext context, TextWriter writer)
 		{
-			return MergeTemplate(templateName, RuntimeSingleton.getString(RuntimeConstants_Fields.INPUT_ENCODING, RuntimeConstants_Fields.ENCODING_DEFAULT), context, writer);
+			return MergeTemplate(templateName, RuntimeSingleton.getString(RuntimeConstants.INPUT_ENCODING, RuntimeConstants.ENCODING_DEFAULT), context, writer);
 		}
 
 		/// <summary>

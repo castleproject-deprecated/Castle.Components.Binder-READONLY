@@ -292,12 +292,12 @@ namespace NVelocity.Runtime.Parser.Node
 			return null;
 		}
 
-		public void setInvalid()
+		public void SetInvalid()
 		{
 			invalid = true;
 		}
 
-		public bool isInvalid()
+		public bool IsInvalid()
 		{
 			return invalid;
 		}

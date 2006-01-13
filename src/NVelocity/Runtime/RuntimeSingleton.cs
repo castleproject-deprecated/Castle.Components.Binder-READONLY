@@ -55,7 +55,7 @@ namespace NVelocity.Runtime
 	/// <version> $Id: RuntimeSingleton.cs,v 1.5 2004/12/27 05:59:46 corts Exp $
 	///
 	/// </version>
-	public class RuntimeSingleton : RuntimeConstants
+	public class RuntimeSingleton
 	{
 		private static RuntimeInstance ri = new RuntimeInstance();
 

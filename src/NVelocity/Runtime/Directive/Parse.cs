@@ -129,7 +129,7 @@ namespace NVelocity.Runtime.Directive
 	    // If it isn't configured, put a stop at 20 just in case.
 			Object[] templateStack = context.TemplateNameStack;
 
-			if (templateStack.Length >= rsvc.GetInt(RuntimeConstants_Fields.PARSE_DIRECTIVE_MAXDEPTH, 20))
+			if (templateStack.Length >= rsvc.GetInt(RuntimeConstants.PARSE_DIRECTIVE_MAXDEPTH, 20))
 			{
 				StringBuilder path = new StringBuilder();
 
@@ -149,7 +149,7 @@ namespace NVelocity.Runtime.Directive
 			if (current != null)
 				encoding = current.Encoding;
 			else
-				encoding = (String) rsvc.GetProperty(RuntimeConstants_Fields.INPUT_ENCODING);
+				encoding = (String) rsvc.GetProperty(RuntimeConstants.INPUT_ENCODING);
 
 			// now use the Runtime resource loader to get the template
 			Template t = null;

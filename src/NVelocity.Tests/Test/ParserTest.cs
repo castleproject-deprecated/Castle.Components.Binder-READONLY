@@ -104,7 +104,7 @@ namespace NVelocity.Test
 				VelocityEngine ve = new VelocityEngine();
 
 				ExtendedProperties ep = new ExtendedProperties();
-				ep.SetProperty(RuntimeConstants_Fields.FILE_RESOURCE_LOADER_PATH, "../../test/templates");
+				ep.SetProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, "../../test/templates");
 				
 				ve.Init(ep);
 
