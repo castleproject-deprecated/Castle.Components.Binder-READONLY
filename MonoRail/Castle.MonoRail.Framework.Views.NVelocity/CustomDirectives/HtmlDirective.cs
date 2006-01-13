@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using DirectiveConstants_Fields = NVelocity.Runtime.Directive.DirectiveConstants_Fields;
+#if NOT_COMPLETED
 
 using INode = NVelocity.Runtime.Parser.Node.INode;
 using Template = NVelocity.Template;
 using Resource = NVelocity.Runtime.Resource.Resource;
 using Directive = NVelocity.Runtime.Directive.Directive;
 using SimpleNode = NVelocity.Runtime.Parser.Node.SimpleNode;
-using RuntimeConstants_Fields = NVelocity.Runtime.RuntimeConstants_Fields;
+using RuntimeConstants = NVelocity.Runtime.RuntimeConstants;
 using RuntimeServices = NVelocity.Runtime.RuntimeServices;
 using InternalContextAdapter = NVelocity.Context.InternalContextAdapter;
 using MethodInvocationException = NVelocity.Exception.MethodInvocationException;
@@ -31,7 +31,6 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 
 	using Castle.MonoRail.Framework.Internal;
 
-	#if NOT_COMPLETED
 	public class HtmlDirective : Directive
 	{
 		public HtmlDirective(IViewComponentFactory viewComponentFactory) : base(viewComponentFactory)
@@ -44,15 +43,16 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 			set {  }
 		}
 
-		public override int Type
+		public override DirectiveType Type
 		{
-			get { return DirectiveConstants_Fields.LINE; }
+			get { return DirectiveType.LINE; }
 		}
 		
-		public void render(NVelocity.Context.InternalContextAdapter ctx, System.IO.TextWriter w, NVelocity.Runtime.Parser.Node.INode node)
+		public void Render(NVelocity.Context.InternalContextAdapter ctx, System.IO.TextWriter w, NVelocity.Runtime.Parser.Node.INode node)
 		{
 			throw new NotImplementedException();
 		}
 	}
-	#endif
 }
+
+#endif
