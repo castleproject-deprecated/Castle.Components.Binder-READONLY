@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace NVelocity.Test.Extensions
 {
 	using System;
