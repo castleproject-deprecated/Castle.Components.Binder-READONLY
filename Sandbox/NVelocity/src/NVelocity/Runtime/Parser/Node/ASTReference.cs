@@ -272,8 +272,11 @@ namespace NVelocity.Runtime.Parser.Node
 			// get the root object from the context
 			Object result = GetVariableValue(context, rootString);
 
-			referenceStack = new Stack();
-			referenceStack.Push(result);
+			if (context.EventCartridge != null)
+			{
+				referenceStack = new Stack();
+				referenceStack.Push(result);
+			}
 
 			if (result == null)
 				return null;
@@ -297,7 +300,8 @@ namespace NVelocity.Runtime.Parser.Node
 					// de quais objetos foram chamados e processar adequadamente
 					result = jjtGetChild(i).Execute(result, context);
 
-					referenceStack.Push(result);
+					if (referenceStack != null)
+						referenceStack.Push(result);
 					
 					if (result == null)
 						return null;
@@ -356,7 +360,7 @@ namespace NVelocity.Runtime.Parser.Node
 			// if we have an event cartridge, get a new value object
 			EventCartridge ec = context.EventCartridge;
 
-			if (ec != null)
+			if (ec != null && referenceStack != null)
 				value = ec.ReferenceInsert(referenceStack, nullString, value);
 
 			// if value is null...
