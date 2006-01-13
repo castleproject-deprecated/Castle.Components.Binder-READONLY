@@ -36,7 +36,7 @@ namespace NVelocity.Test.Dvsl
 
 			dvsl.Transform(new StringReader(input), sw);
 
-			Assertion.Assert("First Test : " + sw.ToString(), sw.ToString().Equals("Hello from CDATA"));
+			Assert.IsTrue(sw.ToString().Equals("Hello from CDATA"), "First Test : " + sw.ToString());
 		}
 
 		/// <summary>
@@ -63,7 +63,7 @@ namespace NVelocity.Test.Dvsl
 
 			dvsl.Transform(new StringReader(input), sw);
 
-			Assertion.Assert("First Test : " + sw.ToString(), sw.ToString().Equals("Matched"));
+			Assert.IsTrue(sw.ToString().Equals("Matched"), "First Test : " + sw.ToString());
 		}
 
 	}

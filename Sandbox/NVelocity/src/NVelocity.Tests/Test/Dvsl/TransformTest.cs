@@ -29,7 +29,7 @@ namespace NVelocity.Test.Dvsl
 			}
 			catch (Exception e)
 			{
-				Assertion.Fail(e.Message);
+				Assert.Fail(e.Message);
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace NVelocity.Test.Dvsl
 			dvsl.Transform(new StringReader(input), sw);
 
 			if (!sw.ToString().Equals("Hello from element! Foo"))
-				Assertion.Fail("Result of first test is wrong : " + sw.ToString());
+				Assert.Fail("Result of first test is wrong : " + sw.ToString());
 
 			/*
 	    * now test if we can pass it a Document
@@ -64,7 +64,7 @@ namespace NVelocity.Test.Dvsl
 			dvsl.Transform(document, sw);
 
 			if (!sw.ToString().Equals("Hello from element! Foo"))
-				Assertion.Fail("Result of second test is wrong : " + sw.ToString());
+				Assert.Fail("Result of second test is wrong : " + sw.ToString());
 		}
 
 	}

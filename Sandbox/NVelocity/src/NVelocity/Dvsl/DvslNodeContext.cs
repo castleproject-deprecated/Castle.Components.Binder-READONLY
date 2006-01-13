@@ -55,13 +55,11 @@ namespace NVelocity.Dvsl
 		/// <returns>value as object</returns>
 		public override Object InternalGet(String key)
 		{
-			Object o = null;
-
 			/*
-	    *  special token : NODE
-	    *
-	    *  returns current node
-	    */
+			*  special token : NODE
+			*
+			*  returns current node
+			*/
 
 			if (key.Equals(NODE))
 			{
@@ -69,8 +67,8 @@ namespace NVelocity.Dvsl
 			}
 
 			/*
-	    *  ATTRIB - returns attribute map
-	    */
+			*  ATTRIB - returns attribute map
+			*/
 			if (key.Equals(ATTRIB))
 			{
 				DvslNode n = PeekNode();
@@ -78,8 +76,8 @@ namespace NVelocity.Dvsl
 			}
 
 			/*
-	    *  start with local storage
-	    */
+			*  start with local storage
+			*/
 			return ctx[key];
 		}
 

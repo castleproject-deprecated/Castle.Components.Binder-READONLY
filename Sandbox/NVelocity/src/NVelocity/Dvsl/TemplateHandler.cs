@@ -65,7 +65,7 @@ namespace NVelocity.Dvsl
 
 				try
 				{
-					sn.render(ica, writer);
+					sn.Render(ica, writer);
 				}
 				finally
 				{
