@@ -312,7 +312,7 @@ namespace NVelocity.Runtime.Parser.Node
 				{
 					try
 					{
-						return ec.MethodException(o.GetType(), methodName, ite.GetBaseException());
+						return ec.HandleMethodException(o.GetType(), methodName, ite.GetBaseException());
 					}
 					catch (Exception e)
 					{

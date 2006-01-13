@@ -134,7 +134,7 @@ namespace NVelocity.Runtime.Parser.Node
 				{
 					try
 					{
-						return ec.MethodException(o.GetType(), vg.MethodName, ite.InnerException);
+						return ec.HandleMethodException(o.GetType(), vg.MethodName, ite.InnerException);
 					}
 					catch (Exception)
 					{
