@@ -122,7 +122,10 @@
     <Compile Include="TestDBUtils.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Content Include="blogconfirmremoval.txt" />
+    <Content Include="blogedit.txt" />
     <Content Include="bloglist.txt" />
+    <Content Include="blognew.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
