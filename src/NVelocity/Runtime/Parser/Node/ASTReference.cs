@@ -9,7 +9,7 @@ namespace NVelocity.Runtime.Parser.Node
 	using NVelocity.Context;
 	using NVelocity.Exception;
 	using NVelocity.Runtime.Exception;
-
+	
 	/// <summary>
 	/// This class is responsible for handling the references in
 	/// VTL ($foo).
@@ -24,6 +24,17 @@ namespace NVelocity.Runtime.Parser.Node
 	/// <version> $Id: ASTReference.cs,v 1.4 2003/10/27 13:54:10 corts Exp $ </version>
 	public class ASTReference : SimpleNode
 	{
+		/// <summary>
+		/// Reference types
+		/// </summary>
+ 		private enum ReferenceType
+		{
+			Normal = 1,
+			Formal = 2,
+			Quiet = 3,
+			Runt = 4,
+		}
+
 		/// <summary>
 		/// Returns the 'root string', the reference key
 		/// </summary>
@@ -142,7 +153,7 @@ namespace NVelocity.Runtime.Parser.Node
 
 				if (t.Image.StartsWith("$!"))
 				{
-					referenceType = QUIET_REFERENCE;
+					referenceType = ReferenceType.Quiet;
 
 					// only if we aren't escaped do we want to null the output
 					if (!escaped)
@@ -162,14 +173,14 @@ namespace NVelocity.Runtime.Parser.Node
 				else if (t.Image.Equals("${"))
 				{
 					// ex : ${provider.Title}
-					referenceType = FORMAL_REFERENCE;
+					referenceType = ReferenceType.Formal;
 					return t.Next.Image;
 				}
 				else if (t.Image.StartsWith("$"))
 				{
 					// just nip off the '$' so we have 
 					// the root
-					referenceType = NORMAL_REFERENCE;
+					referenceType = ReferenceType.Normal;
 					return t.Image.Substring(1);
 				}
 				else
@@ -177,7 +188,7 @@ namespace NVelocity.Runtime.Parser.Node
 					// this is a 'RUNT', which can happen in certain circumstances where
 					// the parser is fooled into believeing that an IDENTIFIER is a real 
 					// reference.  Another 'dreaded' MORE hack :). 
-					referenceType = RUNT;
+					referenceType = ReferenceType.Runt;
 					return t.Image;
 				}
 
@@ -202,13 +213,7 @@ namespace NVelocity.Runtime.Parser.Node
 			}
 		}
 
-		/* Reference types */
-		private const int NORMAL_REFERENCE = 1;
-		private const int FORMAL_REFERENCE = 2;
-		private const int QUIET_REFERENCE = 3;
-		private const int RUNT = 4;
-
-		private int referenceType;
+		private ReferenceType referenceType;
 		private String nullString;
 		private String rootString;
 		private bool escaped = false;
@@ -218,6 +223,8 @@ namespace NVelocity.Runtime.Parser.Node
 		private String identifier = "";
 
 		private String literal = null;
+
+		private Stack referenceStack;
 
 		private int numChildren = 0;
 
@@ -259,16 +266,17 @@ namespace NVelocity.Runtime.Parser.Node
 		/// </summary>
 		public override Object Execute(Object o, InternalContextAdapter context)
 		{
-			if (referenceType == RUNT)
+			if (referenceType == ReferenceType.Runt)
 				return null;
 
 			// get the root object from the context
 			Object result = GetVariableValue(context, rootString);
 
+			referenceStack = new Stack();
+			referenceStack.Push(result);
+
 			if (result == null)
-			{
 				return null;
-			}
 
 			// Iteratively work 'down' (it's flat...) the reference
 			// to get the value, but check to make sure that
@@ -284,12 +292,15 @@ namespace NVelocity.Runtime.Parser.Node
 			{
 				for (int i = 0; i < numChildren; i++)
 				{
+					// HACK: inserir aqui uma extensão que vai permitir um "avaliador"
+					// adicionar na pilha cada resultado, para permitir uma avaliação
+					// de quais objetos foram chamados e processar adequadamente
 					result = jjtGetChild(i).Execute(result, context);
 
+					referenceStack.Push(result);
+					
 					if (result == null)
-					{
 						return null;
-					}
 				}
 
 				return result;
@@ -312,7 +323,7 @@ namespace NVelocity.Runtime.Parser.Node
 		/// <param name="writer">  writer to render to </param>
 		public override bool Render(InternalContextAdapter context, TextWriter writer)
 		{
-			if (referenceType == RUNT)
+			if (referenceType == ReferenceType.Runt)
 			{
 				writer.Write(rootString);
 				return true;
@@ -346,9 +357,7 @@ namespace NVelocity.Runtime.Parser.Node
 			EventCartridge ec = context.EventCartridge;
 
 			if (ec != null)
-			{
-				value = ec.referenceInsert(nullString, value);
-			}
+				value = ec.ReferenceInsert(referenceStack, nullString, value);
 
 			// if value is null...
 			if (value == null)
@@ -359,7 +368,7 @@ namespace NVelocity.Runtime.Parser.Node
 				writer.Write(morePrefix);
 				writer.Write(nullString);
 
-				if (referenceType != QUIET_REFERENCE && rsvc.GetBoolean(RuntimeConstants_Fields.RUNTIME_LOG_REFERENCE_LOG_INVALID, true))
+				if (referenceType != ReferenceType.Quiet && rsvc.GetBoolean(RuntimeConstants.RUNTIME_LOG_REFERENCE_LOG_INVALID, true))
 				{
 					rsvc.Warn(new ReferenceException("reference : template = " + context.CurrentTemplateName, this));
 				}
