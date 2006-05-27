@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections;
+using System.Reflection;
 using System.Text;
 using Castle.MicroKernel.Exceptions;
 using Castle.Model;
@@ -26,7 +27,7 @@ namespace Castle.MicroKernel
 	{
         private readonly ArrayList dependencies;
 	    public readonly static CreationContext Empty = new CreationContext(new DependencyModel[0]);
-
+	    
 		#if DOTNET2
 		private readonly Type[] arguments;
 		#endif
@@ -36,21 +37,22 @@ namespace Castle.MicroKernel
             this.dependencies = new ArrayList(dependencies);
         }
 
-        public void AddDependncy(DependencyModel dependencyModel)
+        public void AddDependncy(MemberInfo info, DependencyModel dependencyModel)
         {
             if (dependencies.Contains(dependencyModel))
             {
-                StringBuilder sb = new StringBuilder("A cycle was detected when creating the service.");
-                foreach (DependencyModel dependency in dependencies)
+                StringBuilder sb = new StringBuilder("A cycle was detected when trying to create a service. ");
+                sb.Append("The depedency graph that resulted in a cycle is:");
+                foreach (DependencyKey key in dependencies)
                 {
-                    sb.AppendLine().AppendFormat("\t- {0}", dependency);
+                    sb.Append("\r\n").AppendFormat(" - {0} for {1} in type {2}", key.DepednedcyModel, key.Info, key.Info.DeclaringType);
                 }
-                sb.AppendLine().
-                    AppendFormat("The dependecy that caused the cycle is: {0}", dependencyModel).
-                    AppendLine();
+                sb.Append("\r\n").
+                    AppendFormat(" + {0} for {1} in {2}", dependencyModel, info, info.DeclaringType)
+                    .Append("\r\n");
                 throw new CircularDependecyException(sb.ToString());
             }
-            dependencies.Add(dependencyModel);
+            dependencies.Add(new DependencyKey(dependencyModel, info));
         }
 
 	    public ICollection Dependencies
@@ -78,5 +80,38 @@ namespace Castle.MicroKernel
 	    
 		#endif
 	    
+	    internal class DependencyKey
+	    {
+            DependencyModel depednedcyModel;
+            MemberInfo info;
+
+	        public DependencyModel DepednedcyModel
+	        {
+	            get { return depednedcyModel; }
+	            set { depednedcyModel = value; }
+	        }
+
+            public MemberInfo Info
+	        {
+	            get { return info; }
+	            set { info = value; }
+	        }
+
+            public DependencyKey(DependencyModel model, MemberInfo service)
+	        {
+	            this.depednedcyModel = model;
+	            this.info = service;
+	        }
+
+            public override bool Equals(object obj)
+            {
+                return this.depednedcyModel.Equals(obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return depednedcyModel.GetHashCode();
+            }
+	    }
 	}
 }
