@@ -198,6 +198,7 @@ namespace Castle.MicroKernel.ComponentActivator
 
 			foreach(DependencyModel dependency in constructor.Dependencies)
 			{
+			    context.AddDependncy(dependency);
 				object value = Kernel.Resolver.Resolve(context, Model, dependency);
 				arguments[index] = value;
 				signature[index++] = dependency.TargetType;
@@ -210,6 +211,7 @@ namespace Castle.MicroKernel.ComponentActivator
 		{
 			foreach(PropertySet property in Model.Properties)
 			{
+                context.AddDependncy(property.Dependency);
 				object value = Kernel.Resolver.Resolve(context, Model, property.Dependency);
 
 				if (value == null) continue;
