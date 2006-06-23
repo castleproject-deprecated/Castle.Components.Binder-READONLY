@@ -12,21 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections;
-using System.Reflection;
-using System.Text;
-using Castle.MicroKernel.Exceptions;
-using Castle.Model;
-
 namespace Castle.MicroKernel
 {
 	using System;
+	using System.Collections;
+	using System.Reflection;
+	using System.Text;
 
+	using Castle.MicroKernel.Exceptions;
+	using Castle.Model;
+
+	
 	[Serializable]
 	public sealed class CreationContext
 	{
-        private readonly ArrayList dependencies;
-	    public readonly static CreationContext Empty = new CreationContext(new DependencyModel[0]);
+		public readonly static CreationContext Empty = new CreationContext(new DependencyModel[0]);
+		
+		private readonly ArrayList dependencies;
 	    
 		#if DOTNET2
 		private readonly Type[] arguments;
@@ -37,21 +39,25 @@ namespace Castle.MicroKernel
             this.dependencies = new ArrayList(dependencies);
         }
 
-        public void AddDependncy(MemberInfo info, DependencyModel dependencyModel)
+        public void AddDependency(MemberInfo info, DependencyModel dependencyModel)
         {
             if (dependencies.Contains(dependencyModel))
             {
                 StringBuilder sb = new StringBuilder("A cycle was detected when trying to create a service. ");
-                sb.Append("The depedency graph that resulted in a cycle is:");
-                foreach (DependencyKey key in dependencies)
+                sb.Append("The dependency graph that resulted in a cycle is:");
+                
+            	foreach (DependencyKey key in dependencies)
                 {
-                    sb.Append("\r\n").AppendFormat(" - {0} for {1} in type {2}", key.DepednedcyModel, key.Info, key.Info.DeclaringType);
+                    sb.AppendFormat("\r\n - {0} for {1} in type {2}", 
+                                    key.Dependency, key.Info, key.Info.DeclaringType);
                 }
-                sb.Append("\r\n").
-                    AppendFormat(" + {0} for {1} in {2}", dependencyModel, info, info.DeclaringType)
-                    .Append("\r\n");
-                throw new CircularDependecyException(sb.ToString());
+            	
+                sb.AppendFormat("\r\n + {0} for {1} in {2}\r\n", 
+                                dependencyModel, info, info.DeclaringType);
+                
+            	throw new CircularDependecyException(sb.ToString());
             }
+        	
             dependencies.Add(new DependencyKey(dependencyModel, info));
         }
 
@@ -60,7 +66,7 @@ namespace Castle.MicroKernel
 	        get { return dependencies; }
 	    }
 
-#if DOTNET2
+		#if DOTNET2
 		
 		public CreationContext(ICollection dependencies, Type target)
 		{
@@ -82,35 +88,33 @@ namespace Castle.MicroKernel
 	    
 	    internal class DependencyKey
 	    {
-            DependencyModel depednedcyModel;
+            DependencyModel dependencyModel;
             MemberInfo info;
-
-	        public DependencyModel DepednedcyModel
-	        {
-	            get { return depednedcyModel; }
-	            set { depednedcyModel = value; }
-	        }
-
-            public MemberInfo Info
-	        {
-	            get { return info; }
-	            set { info = value; }
-	        }
 
             public DependencyKey(DependencyModel model, MemberInfo service)
 	        {
-	            this.depednedcyModel = model;
-	            this.info = service;
+	            dependencyModel = model;
+	            info = service;
 	        }
+
+			public DependencyModel Dependency
+			{
+				get { return dependencyModel; }
+			}
+
+			public MemberInfo Info
+			{
+				get { return info; }
+			}
 
             public override bool Equals(object obj)
             {
-                return this.depednedcyModel.Equals(obj);
+                return dependencyModel.Equals(obj);
             }
 
             public override int GetHashCode()
             {
-                return depednedcyModel.GetHashCode();
+                return dependencyModel.GetHashCode();
             }
 	    }
 	}

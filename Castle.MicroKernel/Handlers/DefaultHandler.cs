@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-
 namespace Castle.MicroKernel.Handlers
 {
 	using System;
@@ -35,8 +33,8 @@ namespace Castle.MicroKernel.Handlers
 			AssertNotWaitingForDependency();
 
 #if DOTNET2
-			CreationContext newContext = new CreationContext(context.Dependencies,
-			                                                 ComponentModel.Service);
+			CreationContext newContext = new CreationContext(context.Dependencies, 
+															 ComponentModel.Service);
 #else
 			CreationContext newContext = new CreationContext(context.Dependencies);
 #endif

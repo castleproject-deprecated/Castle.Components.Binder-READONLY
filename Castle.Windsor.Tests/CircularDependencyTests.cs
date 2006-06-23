@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 namespace Castle.Windsor.Tests
 {
-    using System;
-    using System.Text;
     using Castle.MicroKernel.Exceptions;
     using Castle.Windsor.Tests.Components;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -30,14 +28,30 @@ namespace Castle.Windsor.Tests
  - Service dependency 'Controller' type 'Castle.Windsor.Tests.Components.IController' for Castle.Windsor.Tests.Components.IController Controller in type Castle.Windsor.Tests.Components.View
  + Service dependency 'view' type 'Castle.Windsor.Tests.Components.IView' for Void .ctor(Castle.Windsor.Tests.Components.IView) in Castle.Windsor.Tests.Components.Controller
 ")]
-        public void ThrowsACircularDependencyExceptionAndDoesNotGoesIntoStackOverFlow()
+        public void ThrowsACircularDependencyException()
         {
             IWindsorContainer container = new WindsorContainer();
             container.AddComponent("controller", typeof(IController), typeof(Controller));
             container.AddComponent("view", typeof(IView), typeof(View));
 
             container.Resolve("controller");
-
         }
+    	
+		[Test]
+		[ExpectedException(typeof(CircularDependecyException), @"A cycle was detected when trying to create a service. The depedency graph that resulted in a cycle is:
+ - Service dependency 'view' type 'Castle.Windsor.Tests.Components.IView' for Void .ctor(Castle.Windsor.Tests.Components.IView) in type Castle.Windsor.Tests.Components.Controller
+ - Service dependency 'Controller' type 'Castle.Windsor.Tests.Components.IController' for Castle.Windsor.Tests.Components.IController Controller in type Castle.Windsor.Tests.Components.View
+ + Service dependency 'view' type 'Castle.Windsor.Tests.Components.IView' for Void .ctor(Castle.Windsor.Tests.Components.IView) in Castle.Windsor.Tests.Components.Controller
+")]
+		public void ThrowsACircularDependencyException2()
+		{
+			IWindsorContainer container = new WindsorContainer();
+			container.AddComponent("compA", typeof(CompA));
+			container.AddComponent("compB", typeof(CompB));
+			container.AddComponent("compC", typeof(CompC));
+			container.AddComponent("compD", typeof(CompD));
+
+			container.Resolve("compA");
+		}
     }
 }

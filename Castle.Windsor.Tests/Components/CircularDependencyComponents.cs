@@ -14,46 +14,70 @@
 
 namespace Castle.Windsor.Tests.Components
 {
-    using System;
-    using System.Text;
+	public interface IView
+	{
+		void Display();
+	}
 
-    public interface IView
-    {
-        void Display();
-    }
-    
-    public interface IController
-    {
-        void Process();
-    }
-    
-    public class View : IView
-    {
-        IController controller;
+	public interface IController
+	{
+		void Process();
+	}
 
-        public IController Controller
-        {
-            get { return controller; }
-            set { controller = value; }
-        }
+	public class View : IView
+	{
+		IController controller;
 
-        public void Display()
-        {
-            
-        }
-    }
-    
-    public class Controller : IController{
-        IView View;
+		public IController Controller
+		{
+			get { return controller; }
+			set { controller = value; }
+		}
 
-        public Controller(IView view)
-        {
-            View = view;
-        }
+		public void Display()
+		{
+		}
+	}
 
-        public void Process()
-        {
-            
-        }
-    } 
+	public class Controller : IController
+	{
+		IView View;
+
+		public Controller(IView view)
+		{
+			View = view;
+		}
+
+		public void Process()
+		{
+		}
+	}
+	
+	public class CompA
+	{
+		public CompA(CompB compb)
+		{
+		}
+	}
+	
+	public class CompB
+	{
+		public CompB(CompC compC)
+		{
+		}
+	}
+	
+	public class CompC
+	{
+		public CompC(CompD compD)
+		{
+		}
+	}
+	
+	public class CompD
+	{
+		public CompD(CompA compA)
+		{
+		}
+	}
 }
