@@ -52,13 +52,6 @@ namespace Castle.Windsor.Tests
     public class ReviewerRepository : DemoRepository<IReviewer>
     {
         string name;
-        ICache<IReviewer> cache;
-
-        public ICache<IReviewer> Cache
-        {
-            get { return cache; }
-            set { cache = value; }
-        }
 
         public string Name
         {

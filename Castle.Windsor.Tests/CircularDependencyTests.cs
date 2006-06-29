@@ -18,12 +18,13 @@ namespace Castle.Windsor.Tests
     using Castle.Windsor.Tests.Components;
 
     using NUnit.Framework;
+	using Castle.MicroKernel.Handlers;
 
     [TestFixture]
     public class CircularDependencyTests
     {
         [Test]
-        [ExpectedException(typeof(CircularDependecyException), @"A cycle was detected when trying to create a service. The depedency graph that resulted in a cycle is:
+        [ExpectedException(typeof(CircularDependecyException), @"A cycle was detected when trying to create a service. The dependency graph that resulted in a cycle is:
  - Service dependency 'view' type 'Castle.Windsor.Tests.Components.IView' for Void .ctor(Castle.Windsor.Tests.Components.IView) in type Castle.Windsor.Tests.Components.Controller
  - Service dependency 'Controller' type 'Castle.Windsor.Tests.Components.IController' for Castle.Windsor.Tests.Components.IController Controller in type Castle.Windsor.Tests.Components.View
  + Service dependency 'view' type 'Castle.Windsor.Tests.Components.IView' for Void .ctor(Castle.Windsor.Tests.Components.IView) in Castle.Windsor.Tests.Components.Controller
@@ -38,10 +39,26 @@ namespace Castle.Windsor.Tests
         }
     	
 		[Test]
-		[ExpectedException(typeof(CircularDependecyException), @"A cycle was detected when trying to create a service. The depedency graph that resulted in a cycle is:
- - Service dependency 'view' type 'Castle.Windsor.Tests.Components.IView' for Void .ctor(Castle.Windsor.Tests.Components.IView) in type Castle.Windsor.Tests.Components.Controller
- - Service dependency 'Controller' type 'Castle.Windsor.Tests.Components.IController' for Castle.Windsor.Tests.Components.IController Controller in type Castle.Windsor.Tests.Components.View
- + Service dependency 'view' type 'Castle.Windsor.Tests.Components.IView' for Void .ctor(Castle.Windsor.Tests.Components.IView) in Castle.Windsor.Tests.Components.Controller
+		[ExpectedException(typeof(HandlerException), @"Can't create component 'compA' as it has dependencies to be satisfied. 
+compA is waiting for the following dependencies: 
+
+Services: 
+- Castle.Windsor.Tests.Components.CompB which was registered but is also waiting for dependencies. 
+
+compB is waiting for the following dependencies: 
+
+Services: 
+- Castle.Windsor.Tests.Components.CompC which was registered but is also waiting for dependencies. 
+
+compC is waiting for the following dependencies: 
+
+Services: 
+- Castle.Windsor.Tests.Components.CompD which was registered but is also waiting for dependencies. 
+
+compD is waiting for the following dependencies: 
+
+Services: 
+- Castle.Windsor.Tests.Components.CompA which was registered but is also waiting for dependencies. 
 ")]
 		public void ThrowsACircularDependencyException2()
 		{

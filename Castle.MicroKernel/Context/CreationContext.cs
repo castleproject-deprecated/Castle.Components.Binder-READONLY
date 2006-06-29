@@ -39,7 +39,11 @@ namespace Castle.MicroKernel
             this.dependencies = new ArrayList(dependencies);
         }
 
-        public void AddDependency(MemberInfo info, DependencyModel dependencyModel)
+		/// <summary>
+		/// Track dependencies and guards against circular dependencies.
+		/// </summary>
+		/// <returns>A dependency key that can be used to remove the dependency if it was resolved correctly.</returns>
+        public object TrackDependency(MemberInfo info, DependencyModel dependencyModel)
         {
             if (dependencies.Contains(dependencyModel))
             {
@@ -57,9 +61,19 @@ namespace Castle.MicroKernel
                 
             	throw new CircularDependecyException(sb.ToString());
             }
-        	
-            dependencies.Add(new DependencyKey(dependencyModel, info));
+
+			object trackingKey = new DependencyKey(dependencyModel, info);
+			dependencies.Add(trackingKey);
+			return trackingKey;
         }
+
+		/// <summary>
+		/// Removes a dependency that was resolved successfully.
+		/// </summary>
+		public void RemoveDependencyTracking(object key)
+		{
+			dependencies.Remove(key);
+		}
 
 	    public ICollection Dependencies
 	    {
@@ -107,9 +121,12 @@ namespace Castle.MicroKernel
 				get { return info; }
 			}
 
+
             public override bool Equals(object obj)
             {
-                return dependencyModel.Equals(obj);
+				if ( Object.ReferenceEquals(this, obj))
+					return true;
+				return dependencyModel.Equals(obj);
             }
 
             public override int GetHashCode()
