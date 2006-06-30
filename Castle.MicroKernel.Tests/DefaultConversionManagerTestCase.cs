@@ -30,6 +30,25 @@ namespace Castle.MicroKernel.Tests
 		DefaultConversionManager conversionMng = new DefaultConversionManager();
 
 		[Test]
+		public void PerformConversionValueType()
+		{
+			MutableConfiguration config = new MutableConfiguration("item");
+			config.Children.Add( new MutableConfiguration("Name", "Ayende") );
+			config.Children.Add( new MutableConfiguration("Type", "Int32") );
+			config.Children.Add( new MutableConfiguration("Start", "12") );
+			config.Children.Add( new MutableConfiguration("End", "15") );
+			config.Children.Add( new MutableConfiguration("Format", "yyyyMMdd") );
+
+			ConfigObj result = (ConfigObj)conversionMng.PerformConversion(config, typeof(ConfigObj));
+
+			Assert.AreEqual("Ayende", result.Name);
+			Assert.AreEqual(TypeCode.Int32, result.Type);
+			Assert.AreEqual(12, result.Start);
+			Assert.AreEqual(15, result.End);
+			Assert.AreEqual("yyyyMMdd", result.Format);
+		}
+
+		[Test]
 		public void PerformConversionInt()
 		{
 			Assert.AreEqual(100, conversionMng.PerformConversion("100", typeof(int)));
@@ -147,6 +166,45 @@ namespace Castle.MicroKernel.Tests
 
 		public class UnsupportedType
 		{
+		}
+
+		public struct ConfigObj
+		{
+			string name;
+			TypeCode code;
+			int start, end;
+			string format;
+
+			public string Name
+			{
+				get { return name; }
+				set { name = value; }
+			}
+
+			public TypeCode Type
+			{
+				get { return code; }
+				set { code = value; }
+			}
+		
+
+			public int Start
+			{
+				get { return start; }
+				set { start = value; }
+			}
+
+			public int End
+			{
+				get { return end; }
+				set { end = value; }
+			}
+
+			public string Format
+			{
+				get { return format; }
+				set { format = value; }
+			}
 		}
 	}
 }
