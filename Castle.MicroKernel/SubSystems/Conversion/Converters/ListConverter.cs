@@ -53,7 +53,7 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 
 			foreach(IConfiguration itemConfig in configuration.Children)
 			{
-				list.Add( Context.Composition.PerformConversion(itemConfig.Value, convertTo) );
+				list.Add( Context.Composition.PerformConversion(itemConfig, convertTo) );
 			}
 
 			return list;
