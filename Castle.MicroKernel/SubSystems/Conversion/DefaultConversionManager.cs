@@ -47,7 +47,7 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 			Add( new DictionaryConverter() );
 			Add( new ArrayConverter() ); 
 			Add( new ComponentConverter() ); 
-			Add( new ValueTypeConverter() );
+			Add( new ConfigurationObjectConverter() );
 		}
 
 		#region IConversionManager Members

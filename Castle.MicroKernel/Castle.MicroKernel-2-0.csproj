@@ -364,7 +364,7 @@
     <Compile Include="SubSystems\Conversion\Converters\TypeNameConverter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SubSystems\Conversion\Converters\ValueTypeConverter.cs" />
+    <Compile Include="SubSystems\Conversion\Converters\ConfigurationObjectConverter.cs" />
     <Compile Include="SubSystems\Conversion\DefaultConversionManager.cs">
       <SubType>Code</SubType>
     </Compile>

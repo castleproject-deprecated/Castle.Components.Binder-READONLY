@@ -92,6 +92,7 @@
     <Compile Include="Attributes\CastleComponent.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Attributes\ConfigurationObjectAttribute.cs" />
     <Compile Include="Attributes\InterceptorAttribute.cs">
       <SubType>Code</SubType>
     </Compile>

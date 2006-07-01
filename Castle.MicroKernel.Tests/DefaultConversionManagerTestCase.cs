@@ -22,6 +22,7 @@ namespace Castle.MicroKernel.Tests
 	using Castle.Model.Configuration;
 
 	using Castle.MicroKernel.SubSystems.Conversion;
+	using Castle.Model.Attributes;
 
 
 	[TestFixture]
@@ -30,7 +31,7 @@ namespace Castle.MicroKernel.Tests
 		DefaultConversionManager conversionMng = new DefaultConversionManager();
 
 		[Test]
-		public void PerformConversionValueType()
+		public void PerformConversionConfigurationObject()
 		{
 			MutableConfiguration config = new MutableConfiguration("item");
 			config.Children.Add( new MutableConfiguration("Name", "Ayende") );
@@ -168,7 +169,8 @@ namespace Castle.MicroKernel.Tests
 		{
 		}
 
-		public struct ConfigObj
+		[ConfigurationObject]
+		public class ConfigObj
 		{
 			string name;
 			TypeCode code;
