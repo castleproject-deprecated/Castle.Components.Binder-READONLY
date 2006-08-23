@@ -126,6 +126,22 @@ namespace Castle.MicroKernel
 		/// </summary>
 		object this[Type key] { get; }
 
+		/// <summary>
+		/// Returns the component instance by the service
+		/// </summary>
+		/// <param name="service"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		object Resolve(Type service, params object[] arguments);
+
+		/// <summary>
+		/// Returns the component instance by the key
+		/// </summary>
+		/// <param name="service"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		object Resolve(string key, params object[] arguments);
+
 		#if DOTNET2
 
 		/// <summary>

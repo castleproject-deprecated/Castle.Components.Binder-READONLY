@@ -263,6 +263,17 @@ namespace Castle.Windsor
 			get { return Resolve(service); }
 		}
 
+		public object Resolve(string key, params  object[] arguments)
+		{
+			return _kernel.Resolve(key, arguments);    
+		}
+
+		public object Resolve(Type service, params object[] arguments)
+		{
+			return _kernel.Resolve(service, arguments);
+		}
+
+
 #if DOTNET2
 
 		/// <summary>
@@ -280,9 +291,20 @@ namespace Castle.Windsor
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public T Resolve<T>()
+		public virtual T Resolve<T>()
 		{
 			return (T) Resolve(typeof(T));
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="parameters"></param>
+		/// <returns></returns>
+		public virtual T Resolve<T>(params object[] arguments)
+		{
+				return (T) _kernel.Resolve( typeof(T), arguments);
 		}
 
 		/// <summary>
@@ -356,5 +378,6 @@ namespace Castle.Windsor
 		}
 
 		#endregion
-	}
+
+    }
 }

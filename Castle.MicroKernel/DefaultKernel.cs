@@ -404,6 +404,34 @@ namespace Castle.MicroKernel
 
 		#if DOTNET2
 
+		public virtual object Resolve(Type service, params  object[] arguments)
+		{
+			if (service == null) throw new ArgumentNullException("service");
+
+			if (!HasComponent(service))
+			{
+				throw new ComponentNotFoundException(service);
+			}
+
+			IHandler handler = GetHandler(service);
+
+			return ResolveComponent(handler, service, arguments);
+		}
+
+		public virtual object Resolve(string key, params  object[] arguments)
+		{
+			if (key == null) throw new ArgumentNullException("key");
+
+			if (!HasComponent(key))
+			{
+				throw new ComponentNotFoundException(key);
+			}
+
+			IHandler handler = GetHandler(key);
+
+			return ResolveComponent(handler, arguments);
+		}
+
 		/// <summary>
 		/// Returns a component instance by the key
 		/// </summary>
@@ -814,6 +842,11 @@ namespace Castle.MicroKernel
 			return ResolveComponent(handler, handler.ComponentModel.Service);
 		}
 
+		protected object ResolveComponent(IHandler handler, params object[] arguments)
+		{
+			return ResolveComponent(handler,handler.ComponentModel.Service, arguments);
+		}
+
 		protected object ResolveComponent(IHandler handler, Type service)
 		{
 			CreationContext context = CreateCreationContext(service);
@@ -825,14 +858,34 @@ namespace Castle.MicroKernel
 			return instance;
 		}
 
+		protected object ResolveComponent(IHandler handler, Type service, params object[] arguments)
+		{
+			CreationContext context = CreateCreationContext(service, arguments);
+
+			object instance = handler.Resolve(context);
+
+			ReleasePolicy.Track(instance, handler);
+
+			return instance;
+		}
+
 		protected CreationContext CreateCreationContext(Type typeToExtractArguments)
 		{
 #if DOTNET2
-			return new CreationContext(new DependencyModel[0],typeToExtractArguments);
+			return new CreationContext( new DependencyModel[0],typeToExtractArguments, new object[0]);
 #else
-			return new CreationContext(new DependencyModel[0]);
+			return new CreationContext(new DependencyModel[0], new object[0]);
 #endif
-		}
+        }
+
+		protected CreationContext CreateCreationContext(Type typeToExtractArguments, params object[] arguments)
+		{
+#if DOTNET2
+			return new CreationContext(new ArrayList(),typeToExtractArguments, arguments);
+#else
+			return new CreationContext(new ArrayList(), arguments);
+#endif
+        }
 
 		#endregion
 

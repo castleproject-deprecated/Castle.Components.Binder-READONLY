@@ -18,26 +18,25 @@ namespace Castle.MicroKernel.Handlers
 	using System.Text;
 	using System.Collections;
 	using System.Collections.Specialized;
-
 	using Castle.Model;
 
 	/// <summary>
 	/// Implements the basis of <see cref="IHandler"/>
-    /// </summary>
+	/// </summary>
 #if DOTNET2
-    [System.Diagnostics.DebuggerDisplay("Model: {ComponentModel.Service} / {ComponentModel.Implementation} ")]
+	[System.Diagnostics.DebuggerDisplay("Model: {ComponentModel.Service} / {ComponentModel.Implementation} ")]
 #endif
-    [Serializable]
+	[Serializable]
 	public abstract class AbstractHandler : MarshalByRefObject, IHandler, IExposeDependencyInfo, IDisposable
 	{
 		private IKernel kernel;
 		private ComponentModel model;
 		private HandlerState state;
-		private ArrayList dependenciesByService; 
-		private IDictionary dependenciesByKey; 
+		private ArrayList dependenciesByService;
+		private IDictionary dependenciesByKey;
 
 		protected ILifestyleManager lifestyleManager;
-		
+
 		public AbstractHandler(ComponentModel model)
 		{
 			this.model = model;
@@ -52,7 +51,7 @@ namespace Castle.MicroKernel.Handlers
 			this.kernel.AddedAsChildKernel += new EventHandler(OnAddedAsChildKernel);
 
 			IComponentActivator activator = kernel.CreateComponentActivator(ComponentModel);
-			
+
 			lifestyleManager = CreateLifestyleManager(activator);
 
 			EnsureDependenciesCanBeSatisfied();
@@ -71,7 +70,7 @@ namespace Castle.MicroKernel.Handlers
 		{
 			get { return model; }
 		}
-		
+
 		#endregion
 
 		#region IDisposable Members
@@ -88,7 +87,7 @@ namespace Castle.MicroKernel.Handlers
 			get { return kernel; }
 		}
 
-		protected void SetNewState( HandlerState newState )
+		protected void SetNewState(HandlerState newState)
 		{
 			state = newState;
 		}
@@ -97,7 +96,7 @@ namespace Castle.MicroKernel.Handlers
 		{
 			get
 			{
-				if (dependenciesByService == null) 
+				if (dependenciesByService == null)
 				{
 					dependenciesByService = new ArrayList();
 				}
@@ -109,7 +108,7 @@ namespace Castle.MicroKernel.Handlers
 		{
 			get
 			{
-				if (dependenciesByKey == null) 
+				if (dependenciesByKey == null)
 				{
 					dependenciesByKey = new HybridDictionary();
 				}
@@ -123,7 +122,7 @@ namespace Castle.MicroKernel.Handlers
 
 			LifestyleType type = ComponentModel.LifestyleType;
 
-			if (type == LifestyleType.Undefined	|| type == LifestyleType.Singleton)
+			if (type == LifestyleType.Undefined || type == LifestyleType.Singleton)
 			{
 				manager = new Lifestyle.SingletonLifestyleManager();
 			}
@@ -137,8 +136,7 @@ namespace Castle.MicroKernel.Handlers
 			}
 			else if (type == LifestyleType.Custom)
 			{
-				manager = (ILifestyleManager) 
-					Activator.CreateInstance( ComponentModel.CustomLifestyle );
+				manager = (ILifestyleManager) Activator.CreateInstance(ComponentModel.CustomLifestyle);
 			}
 			else if (type == LifestyleType.Pooled)
 			{
@@ -170,9 +168,9 @@ namespace Castle.MicroKernel.Handlers
 		/// <param name="handler"></param>
 		protected virtual void DependencySatisfied(IHandler handler, ref bool stateChanged)
 		{
-			Type[] services = (Type[]) DependenciesByService.ToArray( typeof(Type) );
+			Type[] services = (Type[]) DependenciesByService.ToArray(typeof (Type));
 
-			foreach(Type service in services)
+			foreach (Type service in services)
 			{
 				if (HasValidComponent(service))
 				{
@@ -184,7 +182,7 @@ namespace Castle.MicroKernel.Handlers
 			String[] keys = new String[DependenciesByKey.Keys.Count];
 			DependenciesByKey.Keys.CopyTo(keys, 0);
 
-			foreach(String compKey in keys)
+			foreach (String compKey in keys)
 			{
 				if (HasValidComponent(compKey))
 				{
@@ -195,11 +193,12 @@ namespace Castle.MicroKernel.Handlers
 
 			if (DependenciesByService.Count == 0 && DependenciesByKey.Count == 0)
 			{
-				SetNewState(HandlerState.Valid); stateChanged = true;
+				SetNewState(HandlerState.Valid);
+				stateChanged = true;
 				Kernel.HandlerRegistered -= new HandlerDelegate(DependencySatisfied);
 
 				// All components with dependencies (that happened to be 
-				
+
 				// We don't need these anymore
 				dependenciesByKey = null;
 				dependenciesByService = null;
@@ -217,10 +216,10 @@ namespace Castle.MicroKernel.Handlers
 			// The following dependencies were added by - for example - 
 			// facilities, for some reason, and we need to satisfy the non-optional
 
-			foreach(DependencyModel dependency in ComponentModel.Dependencies)
+			foreach (DependencyModel dependency in ComponentModel.Dependencies)
 			{
-				if (!dependency.IsOptional && 
-				    (dependency.DependencyType == DependencyType.Service || 
+				if (!dependency.IsOptional &&
+				    (dependency.DependencyType == DependencyType.Service ||
 				     dependency.DependencyType == DependencyType.ServiceOverride))
 				{
 					AddDependency(dependency);
@@ -232,22 +231,37 @@ namespace Castle.MicroKernel.Handlers
 
 			ConstructorCandidate candidate = ComponentModel.Constructors.FewerArgumentsCandidate;
 
-			foreach(DependencyModel dependency in candidate.Dependencies)
+			foreach (DependencyModel dependency in candidate.Dependencies)
 			{
-				if (dependency.DependencyType == DependencyType.Service || 
-					dependency.DependencyType == DependencyType.ServiceOverride)
+				if (dependency.DependencyType == DependencyType.Service ||
+				    dependency.DependencyType == DependencyType.ServiceOverride)
 				{
 					AddDependency(dependency);
 				}
 			}
 		}
 
+		public virtual void RemovedDependency(DependencyModel dependency)
+		{
+			if (dependency.DependencyType == DependencyType.Service && dependency.TargetType != null)
+			{
+				DependenciesByService.Remove(dependency.TargetType);
+			}
+			else
+			{
+				DependenciesByKey.Remove(dependency.DependencyKey);
+			}
+			//force re-evaluation of all the components in the kernel
+			//will put this component, and its dependent in happy state
+			//if this is good
+			((KernelEventSupport) kernel).RaiseHandlerRegistered(this);
+		}
+
 		protected virtual void AddDependency(DependencyModel dependency)
 		{
-			if (dependency.DependencyType == DependencyType.Service && 
-			    dependency.TargetType != null)
+			if (dependency.DependencyType == DependencyType.Service && dependency.TargetType != null)
 			{
-				if (dependency.TargetType == typeof(IKernel)) return;
+				if (dependency.TargetType == typeof (IKernel)) return;
 
 				if (HasValidComponent(dependency.TargetType))
 				{
@@ -264,7 +278,7 @@ namespace Castle.MicroKernel.Handlers
 					AddGraphDependency(Kernel.GetHandler(dependency.DependencyKey).ComponentModel);
 					return;
 				}
-				
+
 				DependenciesByKey.Add(dependency.DependencyKey, String.Empty);
 			}
 
@@ -291,7 +305,7 @@ namespace Castle.MicroKernel.Handlers
 
 		private bool HasValidComponent(String key)
 		{
-			return IsValidHandlerState( kernel.GetHandler(key) );
+			return IsValidHandlerState(kernel.GetHandler(key));
 		}
 
 		private bool IsValidHandlerState(IHandler handler)
@@ -307,11 +321,11 @@ namespace Castle.MicroKernel.Handlers
 
 			bool stateChanged = false;
 
-			Type[] services = new Type[ DependenciesByService.Count ];
-			
-			DependenciesByService.CopyTo( services, 0 );
+			Type[] services = new Type[DependenciesByService.Count];
 
-			foreach(Type service in services)
+			DependenciesByService.CopyTo(services, 0);
+
+			foreach (Type service in services)
 			{
 				if (Kernel.Parent.HasComponent(service))
 				{
@@ -320,11 +334,11 @@ namespace Castle.MicroKernel.Handlers
 				}
 			}
 
-			String[] keys = new String[ DependenciesByKey.Count ];
-			
-			DependenciesByKey.Keys.CopyTo( services, 0 );
+			String[] keys = new String[DependenciesByKey.Count];
 
-			foreach(String key in keys)
+			DependenciesByKey.Keys.CopyTo(services, 0);
+
+			foreach (String key in keys)
 			{
 				if (Kernel.Parent.HasComponent(key))
 				{
@@ -336,7 +350,7 @@ namespace Castle.MicroKernel.Handlers
 
 		private void AddGraphDependency(ComponentModel model)
 		{
-			ComponentModel.AddDependent( model );
+			ComponentModel.AddDependent(model);
 		}
 
 		/// <summary>
@@ -356,13 +370,13 @@ namespace Castle.MicroKernel.Handlers
 			
 			StringBuilder sb = new StringBuilder();
 
-			sb.AppendFormat( "\r\n{0} is waiting for the following dependencies: \r\n", ComponentModel.Name );
+			sb.AppendFormat("\r\n{0} is waiting for the following dependencies: \r\n", ComponentModel.Name);
 
 			if (DependenciesByService.Count != 0)
 			{
-				sb.Append( "\r\nServices: \r\n" );
+				sb.Append("\r\nServices: \r\n");
 
-				foreach(Type type in DependenciesByService)
+				foreach (Type type in DependenciesByService)
 				{
 					IHandler handler = Kernel.GetHandler(type);
 
@@ -372,17 +386,17 @@ namespace Castle.MicroKernel.Handlers
 					}
 					else if (handler == this)
 					{
-						sb.AppendFormat("- {0}. \r\n  A dependency cannot be satisfied by itself, " + 
-							"did you forget to add a parameter name to differentiate between the " + 
-							"two dependencies? \r\n", type.FullName);
+						sb.AppendFormat(
+							"- {0}. \r\n  A dependency cannot be satisfied by itself, " +
+							"did you forget to add a parameter name to differentiate between the " + "two dependencies? \r\n",
+							type.FullName);
 					}
 					else
 					{
-						sb.AppendFormat( "- {0} which was registered but is also waiting for " + 
-							"dependencies. \r\n", type.FullName);
+						sb.AppendFormat("- {0} which was registered but is also waiting for " + "dependencies. \r\n", type.FullName);
 
 						IExposeDependencyInfo info = handler as IExposeDependencyInfo;
-						
+
 						if (info != null)
 						{
 							sb.Append(info.ObtainDependencyDetails(dependenciesChecked));
@@ -393,12 +407,12 @@ namespace Castle.MicroKernel.Handlers
 
 			if (DependenciesByKey.Count != 0)
 			{
-				sb.Append( "\r\nKeys (components with specific keys)\r\n" );
+				sb.Append("\r\nKeys (components with specific keys)\r\n");
 
-				foreach(DictionaryEntry entry in DependenciesByKey)
+				foreach (DictionaryEntry entry in DependenciesByKey)
 				{
 					String key = entry.Key.ToString();
-					
+
 					IHandler handler = Kernel.GetHandler(key);
 
 					if (handler == null)
@@ -407,11 +421,10 @@ namespace Castle.MicroKernel.Handlers
 					}
 					else
 					{
-						sb.AppendFormat( "- {0} which was registered but is also " + 
-							"waiting for dependencies. \r\n", key);
+						sb.AppendFormat("- {0} which was registered but is also " + "waiting for dependencies. \r\n", key);
 
 						IExposeDependencyInfo info = handler as IExposeDependencyInfo;
-						
+
 						if (info != null)
 						{
 							sb.Append(info.ObtainDependencyDetails(dependenciesChecked));

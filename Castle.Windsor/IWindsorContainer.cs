@@ -74,6 +74,14 @@ namespace Castle.Windsor
 		/// <returns></returns>
 		object Resolve(String key);
 
+		/// <summary>
+		/// Returns a component instance by the key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		object Resolve(String key, params object[] arguments);
+
 		#if DOTNET2
 
 		/// <summary>
@@ -91,6 +99,14 @@ namespace Castle.Windsor
 		/// <param name="service"></param>
 		/// <returns></returns>
 		object Resolve(Type service);
+
+		/// <summary>
+		/// Returns a component instance by the service
+		/// </summary>
+		/// <param name="service"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		object Resolve(Type service, params object[] arguments);
 
 		/// <summary>
 		/// Releases a component instance
@@ -137,6 +153,14 @@ namespace Castle.Windsor
 		/// <typeparam name="T">Service type</typeparam>
 		/// <returns>The Component instance</returns>
 		T Resolve<T>(String key);
+
+		/// <summary>
+		/// Returns a component instance by the service
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		T Resolve<T>(params object[] arguments);
 
 		#endif
 

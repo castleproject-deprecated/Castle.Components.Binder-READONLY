@@ -195,11 +195,43 @@ namespace Castle.MicroKernel.ComponentActivator
 			signature = new Type[arguments.Length];
 
 			int index = 0;
+			int constructorIndex = 0;
 
 			foreach(DependencyModel dependency in constructor.Dependencies)
 			{
 				object dependencyKey = context.TrackDependency(constructor.Constructor, dependency);
-				object value = Kernel.Resolver.Resolve(context, Model, dependency);
+				object value = null;
+
+				// if the kernel doesn't know the awnser, perhaps the user arguments can help us out.
+				if (Kernel.Resolver.CanResolve(context, Model, dependency) == false)
+				{
+					if (context.ConstructorArguments == null ||
+						context.ConstructorArguments.Length < constructorIndex+1 ||
+						dependency.TargetType.IsAssignableFrom(context.ConstructorArguments[constructorIndex].GetType()) == false)
+					{
+						String implementation = String.Empty;
+
+						if (Model.Implementation != null)
+						{
+							implementation = Model.Implementation.FullName;
+						}
+
+						String message = String.Format(
+							"Could not resolve non-optional dependency for '{0}' ({1}). Parameter '{2}' type '{3}'",
+							Model.Name, implementation, dependency.DependencyKey, dependency.TargetType.FullName);
+
+						throw new Resolvers.DependencyResolverException(message);
+					}
+					else
+					{
+						value = context.ConstructorArguments[constructorIndex];
+						constructorIndex++;
+					}
+				}
+				else
+				{
+					value = Kernel.Resolver.Resolve(context, Model, dependency);
+				}
 
 				//The depdency was resolved successfully, we can stop tracking it.
 				context.RemoveDependencyTracking(dependencyKey);
