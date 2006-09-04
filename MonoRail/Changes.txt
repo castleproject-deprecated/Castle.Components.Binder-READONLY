@@ -1,0 +1,780 @@
+Change history
+--------------
+
+Release Candidate 1
+===================
+
+- Introduced [AjaxAction] attribute. Any action marked with this attribute
+  can be accessed on client-side scripting using a JavaScript proxy, like
+  this:
+
+     $ajaxHelper.getJavascriptFunctions()
+       ## MANDATORY, must come before any call to generateJSProxy
+
+     $ajaxHelper.generateJSProxy('thisController')
+       ## will declare an object named "thisController", allowing access
+       ## to all [AjaxAction]s on the current controller
+
+     $ajaxHelper.generateJSProxy('util', 'lists', 'myLists')
+       ## will declare an object named "myLists", allowing access
+       ## to all [AjaxAction]s on the controller named 'lists', in the 'util' area
+
+  Note that proxies can perform synchronous (blocking) or asynchronous (non-blocking) calls.
+  For asynchronous calls, you must always supply a JavaScript function as an additional
+  last parameter. When that parameter is absent, the proxy will perform a synchronous call.
+
+     [AjaxAction] public void Sum(int num1, int num2) { RenderText(Convert.ToString(num1 + num2)); }
+
+  You can write:
+
+     // synchronous call
+     $('result').value = myLists.sum($('num1').value, $('num2').value);
+
+  Or:
+
+     // asynchronous call
+     myLists.sum($('num1').value, $('num2').value, function(t) { $('result').value = t.responseText; });
+
+  Being:
+
+     $('num1').value     = the value of an input with id=num1
+     $('num2').value     = the value of an input with id=num2
+     function(t) { ... } = the callback
+     t.responseText      = any text that the action could have rendered
+
+- Applied Marc-André's patch fixing MR-140
+  "ARDataBindAttribute doesn't  use the controller's DataBinder"
+
+- Updated AbstractServiceContainer to support adding/removing services.
+
+- MonoRails services now accept and IServiceContainer instead of an
+  IServiceProvider to be able to add services if desired.
+
+- Small refactor of Controller to to accomodate passing action arguments.
+
+- Updated SmartDispatchController to utilize HttpRequest parameters when
+  additional arguments are supplied via a Send.
+
+- Applied patch by Freyr Magnússon <freyr.magnusson@gmail.com> fixing MR-139
+  "ExceptionChainingExtension doesn´t handle unhandled exceptions"
+  
+  Which also introduces a new feature:
+
+Controllers can request IExceptionProcessor through IServiceProvider
+and invoke the handlers to process an exception. For example:
+
+public void BuyMercedes()
+{
+		try
+		{
+			...
+		}
+		catch(Exception ex)
+		{
+			IExceptionProcessor exProcessor = (IExceptionProcessor) ServiceProvider.GetService(typeof(IExceptionProcessor));
+			exProcessor.ProcessException(ex);
+
+			RenderView("CouldNotBuyMercedes");
+		}
+}
+
+- Changed DataBinder behavior to return empty arrays, instead of null arrays, 
+  when the IBindingDataSourceNode is null
+
+- Applied patch by  Bryan Brown fixing MR-138
+  "patch to fix formhelper.LabelFor to use IDictionary"
+
+- Applied Freyr Magnússon's patch fixing MR-137
+  "Databinding through DataBindAttribute does not register errors with SmartDispatcherController"
+
+- Applied peter dol's patch fixing MR-136
+  "An overload for ButtonToRemote that accepts htmloptions"
+
+- WizardStepPage: added more redirect overloads to allow parameters to be 
+  specified
+
+- AR Support: Added support to deal with ICollection<T> containers
+
+- Applied Marc-Andre's patch fixing MR-133
+  "TestSupport not working under Mono"
+
+- Removed PropertyBag.Clear() in Controller.cs to restore the ability to
+  update the PropertyBag in filters.
+
+- Applied Colin Ramsay <castleproject-devel@happyandlost.co.uk> patch making
+  the _selectedViewName field accessible through a public property.
+
+- Checked in changes to better support ASP.NET Views
+
+- Refactor FormHelper to use a common code to CheckboxList and Select. 
+  Added support mentioned in MR-130
+
+- Introduced CreateCheckboxList. See preliminary documentation at 
+    http://www.castleproject.org/index.php/MonoRail:FormHelper#CheckboxList
+
+- Applied Colin Ramsay <castleproject-devel@happyandlost.co.uk> patch adding more
+  asserts to TestSupport.AbstractMRTestCase and refactored some other things
+
+- MR-125 testsupport doesn't handle posting to smart dispatcher controller 
+  Fixed by Andrei Shires <andrei@internetware.co.uk>
+
+- FormHelper: Now it can fill parameters with the values from the Request.Params
+
+- FormHelper: fixed Checkbox behavior with databinder by adding a hidden 
+  field with the same name but carrying the 'false' value. The false value
+  can be overriden with a key 'falseValue' if you're working with a non-boolean
+  
+  For example
+  
+  FormHelper.CheckboxField("some.property")
+  
+  Will render
+  
+  <input type="checkbox" id="some_property" name="some.property" value="true" />
+  <input type="hidden" id="some_propertyH" name="some.property" value="false" />
+
+
+  FormHelper.CheckboxField("acceptDisclaimer", %{trueValue = 'accept', hiddenValue = 'reject'})
+  
+  Will render
+  
+  <input type="checkbox" id="acceptDisclaimer" name="acceptDisclaimer" value="accept" />
+  <input type="hidden" id="acceptDisclaimerH" name="acceptDisclaimer" value="reject" />
+
+
+- Applied Ernst Naezer's patch to allow MR to throw a descriptive
+  exception message when two helpers are registered using the same key
+
+- Added a hack to the WebFormsViewEngine to accomodate different behavior
+  with respect to invoking PageParser.GetCompiledInstance on ASP.NET 2.0
+
+- Added support for defaultValue attribute to FormHelper, which specificy
+  what the value should be if the target evaluates to null.
+
+- Added indexed properties support to FormHelper
+
+  When the target is an array you can
+  
+    PropertyBag.Add("roles", Roles.FindAll());
+    --
+    FormHelper.TextField("roles[0].Id")
+  
+  Which will output
+  
+    <input type="text" id="roles_0_Id" name="roles[0].Id" value="1" />
+
+  The indexed property can be nested
+
+    PropertyBag.Add("user", User.Find(1));
+    --
+    FormHelper.TextField("user.roles[0].Id")
+
+    <input type="text" id="user_roles_0_Id" name="user.roles[0].Id" value="1" />
+
+- Added RadioField(String target, object valueToSend, [IDictionary attributes]) to FormHelper
+
+  The radio will be marked with checked="checked" if the value collected 
+  from the target matches the valueToSend parameter
+
+- Fixed RedirectToAction on WizardStepPage. Now it produces a correct action url.
+
+- Changed WizardStepPage.InternalRedirectToStep to simply RedirectToStep
+
+- Changed SmartDispatcherController.BuildMethodArguments. Now it tests if the conversion 
+  succeeded before setting the value on the array.
+
+- Introduced IWizardPageFactory on WindsorExtension, so a Wizard controller doesn't
+  need to reference the IKernel directly
+
+- Some optimization on Redirect* methods on Controller class. Now they accept
+  an IDictionary as a parameter specifier (in addition to NameValueCollection).
+  
+- Refactored ControllerDescriptorBuilder (renamed to ControllerDescriptorProvider)
+  to use child providers to obtain descriptor. Attributes are now descriptors builders
+  and that allows one to come up with custom attributes like
+
+  public class MyAttribute : Attribute, ILayoutDescriptorBuilder, IHelperDescriptorBuilder
+  {
+     public LayoutDescriptor BuildLayoutDescriptor() 
+     {
+       return new LayoutDescriptor("mylayout");
+     }
+
+     public HelperDescriptor[] BuildHelperDescriptors()
+     {
+       return new HelperDescriptor[] { new HelperDescriptor(typeof(MyHelper)) };
+     }
+  }
+
+  Kudos to Fabio by coming up with the idea.
+
+- ViewComponents: added subsection support
+
+  (Using nvelocity as example)
+  
+  #blockcomponent(GridComponent)
+    #header
+      <th>Name</th>
+    #end
+    
+    #footer
+      Showing record $startrecord to $total
+    #end
+    
+    #item
+      <td>$item.Name</td>
+    #end
+
+    #empty
+      <td>No records found</td>
+    #end
+  #end
+  
+  On the code you can use
+
+	public override bool SupportsSection(String name)
+	{
+		return name == "header" || name == "item" || name == "footer" || 
+			name == "empty";
+	}
+
+	public override void Render()
+	{
+		ICollection source = (ICollection) ComponentParams["source"];
+
+		StartTable();
+
+		Context.RenderSection("header");
+
+		if (source != null && source.Count != 0)
+		{
+			foreach(object item in source)
+			{
+				PropertyBag["item"] = item;
+				
+				RenderText("<tr>");
+				
+				Context.RenderSection("item");
+				
+				RenderText("</tr>");
+			}
+		}
+		else
+		{
+			RenderText("<tr>");
+			Context.RenderSection("empty");
+			RenderText("</tr>");
+		}
+
+		Context.RenderSection("footer");
+
+		EndTable();
+	}
+
+- ViewComponent on NVelocity: added to support to interpolation on component parameters. 
+
+  Action:
+  
+    public void List()
+    {
+      PropertyBag.Add("customers", Customer.FindAll());
+    }
+
+  View:
+
+    #blockcomponent(GridComponent with "source=$customers")
+  
+    #end
+  
+  ViewComponent code:
+  
+    public override void Render()
+    {
+      IList items = (IList) ComponentParams["source"];
+    
+      foreach(object item in items)
+      {
+        Context.ContextVars["item"] = item;
+        // Do something like rendering the body
+      }
+    }
+
+- Configuration changed:
+
+  . Added <cacheprovider> node
+  . Added <additionalSources> node under <viewEngine>
+
+  Example:
+  
+  <monoRail>
+    <cacheProvider type="my custom implementation"/>
+    
+    <viewEngine viewPathRoot="views" customEngine="Castle.MonoRail.Framework.Views.NVelocity.NVelocityViewEngine, Castle.MonoRail.Framework.Views.NVelocity">
+      <additionalSources>
+        <assembly name="MyAssembly" namespace="My.Assembly" />
+      </additionalSources>
+    </viewEngine>
+  </monoRail>
+
+- IViewEngine refactored to use the IViewSourceLoader to locate views
+
+- Introduced IViewSourceLoader and IViewSource. The former represents an approach to load
+  views. The default implementation is FileAssemblyViewSourceLoader which first look ups 
+  the file system then the configured assemblies for the specified view
+
+- ICacheProvider service introduced (available on IServiceProvider implementation).
+  Two implementations available: 
+  
+  . DefaultCacheProvider which uses the HttpContext.Cache
+  . WeakReferenceCacheProvider which uses a hashtable with WeakReferences as entries
+
+- Warning about Nullables and SmartDispatcher arguments. The behavior has changed a
+  little
+  
+  . In the past, if the value for a nullable was not present, that was accepted and
+    the nullable was initialized with HasData=false
+  . Now the value mustn't be present, but the entry must be present
+  
+  For example
+  
+  Controller Action:
+  
+	public void Transfer(NullableDouble amount)
+	{
+		...
+	}
+  
+  If you invoke it with Controller/Transfer.rails you'll get an exception
+  
+  If you invoke it with Controller/Transfer.rails?amount= then it's ok
+
+  If you invoke it with Controller/Transfer.rails?amount=10 is obviously ok too.
+
+- Removed Obsolete members of ExecuteEnum. If you were using
+
+  . ExecuteEnum.Before, change to ExecuteEnum.BeforeAction
+  . ExecuteEnum.After, change to ExecuteEnum.AfterAction or ExecuteEnum.AfterRendering
+  . ExecuteEnum.Around, change to ExecuteEnum.Always or combine the flags
+
+- Refactored DefaultRailsEngineContext and EngineContextModule. Now EngineContextModule
+  is also a ServiceContainer. When a DefaultRailsEngineContext is created we pass
+  the EngineContextModule as a parent container. 
+  
+  This saves us some cycles of registering
+  the services on every single DefaultRailsEngineContext instance.
+
+- Added attribute 'checkClientIsConnected' to monoRail configuration check. If 
+  'true' the controller class will always check IsClientConnected on
+  
+  - InternalSend (beginning)
+  - Before Staring filter process 
+  - Before invoking the view engine
+  
+  The default value is 'false'
+  
+  (kudos to Ahmed)
+
+- Removed AutoLoadUnlessKeyIs and NullIfKeyIs from ARDataBinder. Added enum 
+  AutoLoadBehavior to replace them:
+
+  AutoLoadBehavior.Never (default): Means that no autoload should be perform on the target
+    type nor on nested types.
+      
+  AutoLoadBehavior.Always: Means that autoload should be used for the target type
+    and the nested types (if present). This demands that the primary key be present on the http request
+  
+  AutoLoadBehavior.NewInstanceIfInvalidKey: Means that we should autoload, but if the key is 
+    invalid, like null, 0 or an empty string, then just create a new instance of the target type.
+  
+  AutoLoadBehavior.NullIfInvalidKey: Means that we should autoload, but if the key is 
+    invalid, like null, 0 or an empty string, then just return null
+
+- Added support for AccessibleThrough(Verb.Post, or Verb.Get) to restrict the type of access a controller action requires.
+
+- Added suport for InPlaceRenderView for Brail
+
+- Added <? ?> tags for Brail, to match the php style.
+
+- Added RemoveCookie() method to IResponse
+
+- Fixed a bug in Brail's ViewComponents, where a parameter was search using case sensitive search.
+
+- Fixed a bug in ARFetch, where if the parameter was an array and the parameters didn't appear, a null reference would be thrown. Now it's returning an empty array.
+
+- Updated boo binaries, should fix the problems with the build on machines with only one framework installed.
+
+- Fixed a bug in Brail where a new line was required before a method call was recognized
+
+- Added support for optional parameters in Brail, using the syntax ?foo will return null if the value was not set (instead of throwing.)
+
+- Fixed a bug where Brail would throw on Empty Views.
+
+- Added support for AutoLoadUnlessKeyIs in ARDataBinder - will load the object unless the key is a specific value
+ Usages: public void Save([ARDataBinder(AutoLoadUnlessKeyIs=0)] User user) 
+
+- Added checks for null id when doing data binding.
+
+- Removed useless error handling from Brail, now you'll get the normal ASP.Net Yellow Screen Of Death on errors. More consistent with the rest of the framework.
+
+- Added support for <?brail ?> tags for Brail, so it can be valid XML documents
+
+- Added logging for Brail, so you can see the Boo code the preprocessor is generating.
+
+- Added more verbose output to compiler errors in Brail.
+
+- Changed the way Brail name the generated class, now the chances for name clashes are much lower. (View: Users.boo and a parameter Users will not cause problems).
+
+- Fixed a bug with Brail not picking up changes that occured by VS.Net
+
+- Fixed bug with NVelocity components that caused an InvalidCastException to be thrown by the Render method if there was something other than an IRailsEngineContext occupying the "context" key.
+
+- MonoRail is now CLSCompliant (kudos to Roelof Blom <roelof.blom@gmail.com>)
+
+- Breaking change: now MonoRail requires that you add the following module to web.config:
+
+	<system.web>
+		<httpModules>
+			<add name="monorail" type="Castle.MonoRail.Framework.EngineContextModule, Castle.MonoRail.Framework" />
+		</httpModules>
+	</system.web>
+
+- Configuration nodes and attributes changes:
+  - mailto to mailTo 
+  - mailfrom to mailFrom
+  - customsession to customSession
+
+- SmartViewComponent removed
+
+- DataBinder refactored out. Now implementation lies on Castle.Components.Binder
+  + Big performance improvement
+
+- ARDataBinder now issues a FindByPK for nested objects if the keys differs (existing object with 
+  form fields)
+
+- SmartDispatcherController: now there's no hardcode reference to DataBind, ARDataBind or ARFetch attributes. 
+  They only must implement the interface IParameterBinding. This opens an interesting extension point
+  for users willing to create their own logic to binding form/querystring parameters to their data components
+
+- Controller: Added RedirectToAction(String action, params String[] queryStringParameters)
+  example:  RedirectToAction("edit", "id=" + id, "error=couldn't update the row");
+
+- Added FlashBinderAttribute (being evaluated)
+
+- Added FormHelper (being evaluated)
+
+- Added CaptureFor component
+
+- Renamed ARPager splitted into ARPaginationHelper and ARPager
+
+- ARDataBinder is now able to deal with HasAndBelongsToMany relations. 
+  This works in two ways. Suppose you have a Product class with a relation HasAndBelongsToMany to Category.
+  
+  If you send the following fields from a form:
+    
+    product.categories.id=1 
+    product.categories.id=2
+    
+  ARDataBinder will ignore the AutoLoad property and always populate the Categories 
+  collection on the product class with the result of FindByPrimaryKey of the categories.
+  Any other field will be ignored, for example product.categories.name will not be bound
+  
+  However, if you send the values like
+  
+    product.categories[0].id=1 
+    product.categories[1].id=2
+    
+  Then ARDataBinder will use the usual path, not ignoring the AutoLoad.
+  
+  This behavior is being evaluated.
+
+- Removed AbstractExtension
+
+- Extension now uses events (See ExtensionManager)
+
+- Interface IMonoRailExtension changed (has only Init method now)
+
+- Refactored IParameterBinder in order to make it participate on calculations points.
+
+- Introduced WindsorMonoRailSectionHandler which has the support for statements similar to those supported
+  by windsor's XmlInterpreter
+  
+- Added ARDataBindAttribute.NullWhenPrimaryKey which forces the databinder to
+  ignore and do not load a record if the retrieved PK has the value assigned to this
+  property (kudos to Roelof Blom <roelof.blom@gmail.com>)
+
+Beta 5
+======
+
+** Core ** 
+
+- Fixed Flash (it now persists the new entries between requests)  (by Ahmed)
+
+- Added FilterAttribute.ExecutionOrder, the default value is Int32.MaxValue 
+  so the less the value higher will be the filter priority
+
+- Added Controller.RedirectToAction(String actionName)
+
+- Added Controller.RedirectToAction overloads (by Fabio Batista)
+
+- Controller.Redirect(String) is now virtual, and it's called by all Redirect* methods (by Fabio Batista)
+
+- Moved action collection to ControllerMetaDescriptor class, using new method that does not require ScreenCommonPublicMethods.
+
+- Moved ControllerDescriptorBuilder creation to ProcessEngineFactory to ensure ControllerDescriptors are only created once
+
+- ITrace and Trace property added to IRailsEngineContext (kudos to Chad Humphries)
+
+- Hierarchy of areas support (kudos to Fabio Batista)
+
+- Support for [Layout] attribute on Actions, so actions can override 
+  the Controller's specified layout (by Fabio Batista, rev 1459)
+
+- PaginationHelper introduced: paginates objects that implements IList, and supports caching.
+
+- ARPager introduced: allows you to specify a custom NHibernate HQL Query or an NHibernate Criteria
+  (using Expression.Eq, à là ActiveRecord's FindAll()) and fetch the results with pagination.
+  (by Fabio Batista)
+
+- Added IServerUtility.JavaScriptEscape() (kudos to Chad Humphries)
+
+- Added DataBindAttribute.Exclude - A comma separated list of property names 
+  to exclude from databinding (kudos to Chad Humphries)
+
+- Added IResponse.BinaryWrite() and CreateCookie( HttpCookie ) overload
+
+- Added IServerUtility.MapPath()
+
+- Added IRailsContext.ApplicationPhysicalPath
+
+- Added to HtmlHelper:
+  - InputCheckbox
+  - InputRadio
+  - InputFile
+  - InputButton
+  - Form(action, attribtes) overload
+
+- Added more fine-grained support for ExecuteEnum in Filters (by Fabio Batista, rev 1286-1287)
+
+    The values are now: BeforeAction, AfterAction, AfterRendering and Always.
+  
+- Support for nullable types in SmartDispatcherController, useful for
+  detecting missing ValueType parameters. Works with Nullables library, still
+  not working on .NET 2.0 Nullables (by Fabio Batista, rev 1297 and 1363)
+
+  Example of use:
+
+    // .NET 1.1
+    public void CreateTicket(string name, NullableDateTime date, NullableInt32 priority)
+    {
+      if (name == null || name.Length == 0) throw new MissingFieldException();
+      if (!date.HasValue) throw new MissingFieldException();
+      if (!priority.HasValue) throw new MissingFieldException();
+    }
+
+    // .NET 2.0 (NOT WORKING YET)
+    public void CreateTicket(string name, DateTime? date, int? priority)
+    {
+      if (name == null || name.Length == 0) throw new MissingFieldException();
+      if (!date.HasValue) throw new MissingFieldException();
+      if (!priority.HasValue) throw new MissingFieldException();
+    }
+
+- Broaded support for Enums. They can be specified by number or by text (by Fabio Batista, rev 1203)
+
+  public enum MyEnum {
+    First = 1,
+    Second = 2
+  }
+  
+  <input type="hidden" name="myEnumValue" value="1" />
+  <input type="hidden" name="myOtherEnumValue" value="seCoNd" />
+  
+  public void TestEnumValues(MyEnum myEnumValue, MyEnum myOtherEnumValue)
+  {
+    if (myEnumValue == MyEnum.First) // ok
+    if (myOtherEnumValue == MyEnum.Second) // ok
+  }
+
+- Support for ActiveRecord fetching in Castle.MonoRail.ActiveRecordSupport
+  (by Fabio Batista, rev. 1380).
+	
+	Mainly for those unconfortable with direct binding of form values
+	to ActiveRecord objects. This attribute only fetches the ActiveRecord based
+	on its Primary Key, nothing more.
+	
+	Usage:
+	
+		public class MyCrudExample : ARSmartDispatchController
+		{
+			// simple usage.
+			public void Save( [ARFetch] Example example, string name, ...)
+			{
+				example.Name = name;
+				// ...
+				
+				example.Save();
+			}
+
+			// using a different request parameter, instead of the action's parameter name
+			public void Save( [ARFetch("primaryKey")] Example example, string name, ...)
+			{
+				example.Name = name;
+				// ...
+				
+				example.Save();
+			}
+
+			// ignoring invalid primary keys
+			public void Save( [ARFetch(Require=false)] Example example, string name, ...)
+			{
+				example.Name = name;
+				// ...
+				
+				example.Save();
+			}
+
+			// not creating new records automatically, when the parameter is empty or null
+			public void Save( [ARFetch(Create=false)] Example example, string name, ...)
+			{
+				if (example == null)
+					example = new Example(someRequiredConstructorParameter);
+				
+				example.Name = name;
+				// ...
+				
+				example.Save();
+			}
+
+			// fetching a list of Active Records
+			public void Delete( [ARFetch("selected")] Example[] examples )
+			{
+				foreach (Example example in examples)
+					example.Delete();
+			}
+		}
+
+- Support for smart arrays (aside from primitives) (kudos do Ahmed)
+
+  Quoting the explanation:
+  
+Suppose you have this class:
+
+ 
+class Person
+{
+  public string Name {get;set;}
+
+  public int Age {get;set;}
+}
+
+With the following view 
+
+  <input name="Person[0].Name"   value="John">
+  <input name="Person[0].Age"    value="30">
+  <input name="Person[1].Name"   value="Mary">
+  <input name="Person[1].Age"    value="25">
+
+Now you can specify the DataBinderAttribute to an array element in your controller:
+
+public void SavePeople( [DataBinder(Prefix=”People”)] Person[] people )
+{
+  // you should be able to access the people as an Person array
+
+  Assert.IsTrue( people[0].Name == “John” );
+  Assert.IsTrue( people[1].Name == “Mary” );
+}
+
+There are a couple extra things, first you can specify an “ignore” attribute to any element in which that case the data binder will completely ignore the element
+
+  <input name="Person[0].Name"   value="John">
+  <input name="Person[0].Age"    value="30">
+  <input name="Person[0]@ignore" value="yes">
+  <input name="Person[1].Name"   value="Mary">
+  <input name="Person[1].Age"    value="25">
+
+In the previous html code, the people array in the controller will only have one element (Mary).
+
+Notice that I reserved the @ sign as a special character to add metadata to any element, right now the only attributes supported are “ignore” and “count”.
+
+The count attribute serves as a performance optimization when your elements are keyed using sequential integers, for example:
+
+  <input name="Person@count"   value="5">
+  <input name="Person[0].Name" value="John">
+  <input name="Person[1].Name" value="James">
+  <input name="Person[2].Name" value="Jeff">
+  <input name="Person[3].Name" value="Geoff">
+  <input name="Person[4].Name" value="Jeffrey">
+
+** Ajax Helper **
+   
+- AjaxHelper2 renamed to AjaxHelper. The old one was renamed to AjaxHelperOld
+
+- Two more callbacks supported: onSuccess and onFailure. For example
+
+  $AjaxHelper.BuildFormRemoteTag( $DictHelper.CreateDict("url=something.rails", "OnSuccess=myjavascriptfunction();", "OnFailure=otherfunction(request)" ) );
+  
+  Do not confuse it with 'success' and 'failure' keys, though. Those means the id of elements
+  to be updated in the event of success and failure.
+
+
+** NVelocity View Engine **
+
+- Added support for global macros. Every *.vm file which is placed in the Views/macros directory
+  will be scanned for macros (by Fabio Batista, rev. 1374)
+
+** Brail View Engine **
+
+- Upgraded to use Boo 0.75, should solve the problem that Brail had with breaking tests.
+
+** Scaffolding support **
+
+- huge refactoring
+- It's now using templates
+
+
+** Test support **
+
+- Introduced Castle.MonoRail.TestSupport
+
+
+** Bug fixes **
+
+MR-68	PreSendView is not being invoked by NVelocityViewEngine
+        http://support.castleproject.org/jira/browse/MR-68
+MR-66	DataBinder and ConvertUtils should support TypeConverters
+        http://support.castleproject.org/jira/browse/MR-66
+MR-64	DataBinder.Convert should support decimal
+        http://support.castleproject.org/jira/browse/MR-64
+MR-58	AbstractHelper generates invalid XHTML
+        http://support.castleproject.org/jira/browse/MR-58
+MR-57	Wrong urls are crashing UrlTokenizer
+        http://support.castleproject.org/jira/browse/MR-57
+MR-52	Support for real Flash feature
+        http://support.castleproject.org/jira/browse/MR-52
+MR-49	Remove public properties from the list of available actions (Controller.cs)
+        http://support.castleproject.org/jira/browse/MR-49
+MR-30	MR should not accept incorrect urls
+        http://support.castleproject.org/jira/browse/MR-30
+
+
+Beta 4
+======
+
+- Added useWindsorIntegration attribute to monoRail configuration section
+
+Beta 3
+======
+
+- Databind
+- Initial Scaffolding support
+- Routing feature
+- Localization support
+- More helpers and improvements
+
+
+Beta 2
+====== 
+
+- Few bug corrections
+- Applied patch from Dru Sellers: NVelocityViewEngine adds a $siteRoot exposing the Request.ApplicationPath
+
