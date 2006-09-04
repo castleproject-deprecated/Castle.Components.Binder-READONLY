@@ -134,7 +134,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "DataReaderAdapterTestCase.cs"
+                    RelPath = "DataReaderIntegrationTestCase.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
