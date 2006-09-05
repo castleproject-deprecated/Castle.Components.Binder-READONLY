@@ -15,8 +15,6 @@
 namespace Castle.Components.Binder
 {
 	using System;
-	using System.Collections;
-	using System.Collections.Specialized;
 
 	/// <summary>
 	/// Depicts the contract for implementations able to convert an object
@@ -26,21 +24,10 @@ namespace Castle.Components.Binder
 	{
 		object Convert(Type desiredType, Type inputType, object input, out bool conversionSucceeded);
 		
+		bool CanConvert(Type desiredType, Type inputType, object input, out bool exactMatch);
+		
 //		object Convert(Type desiredType, object input);
 //
 //		object Convert(Type desiredType, object input, out bool conversionSucceeded);
-//
-//		object Convert(Type desiredType, String paramName, NameValueCollection paramList, IDictionary files);
-//
-//		object Convert(Type desiredType, String paramName, IDictionary paramList, IDictionary files);
-//
-//		object Convert(Type desiredType, String paramName, NameValueCollection paramList, IDictionary files, out bool conversionSucceeded);
-//
-//		object Convert(Type desiredType, String paramName, IDictionary paramList, IDictionary files, out bool conversionSucceeded);
-//
-//		object Convert(Type desiredType, String paramName, object input, out bool conversionSucceeded);
-//
-//		bool CanConvert(Type desiredType, object input, out bool exactMatch);
-
 	}
 }

@@ -62,12 +62,31 @@ namespace Castle.Components.Binder
 		
 		public bool CanBindParameter(Type desiredType, String paramName, CompositeNode treeRoot)
 		{
-			return false;
+			bool canConvert;
+			
+			Node childNode = treeRoot.GetChildNode(paramName);
+			
+			if (childNode != null)
+			{
+				canConvert = true;
+			}
+			else if (childNode == null && desiredType == typeof(DateTime))
+			{
+				TrySpecialDateTimeBinding(treeRoot, paramName, out canConvert);
+			}
+			else
+			{
+				canConvert = false;
+			}
+			
+			return canConvert;
 		}
 		
 		public bool CanBindObject(Type targetType, String prefix, CompositeNode treeRoot)
 		{
-			return false;
+			Node childNode = treeRoot.GetChildNode(prefix);
+			
+			return childNode != null;
 		}
 		
 		public object BindParameter(Type desiredType, String paramName, CompositeNode treeRoot)

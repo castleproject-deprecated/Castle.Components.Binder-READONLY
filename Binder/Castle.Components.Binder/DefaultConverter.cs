@@ -20,6 +20,27 @@ namespace Castle.Components.Binder
 
 	public class DefaultConverter : MarshalByRefObject, IConverter
 	{
+		public bool CanConvert(Type desiredType, Type inputType, object input, out bool exactMatch)
+		{
+			exactMatch = false;
+
+			if (input == null)
+			{
+				return true;
+			}
+			else if (inputType == desiredType)
+			{
+				exactMatch = true;
+			}
+			else if (!desiredType.IsInstanceOfType(input))
+			{
+				TypeConverter conv = TypeDescriptor.GetConverter(desiredType);
+				return (conv != null && conv.CanConvertFrom(inputType));
+			}
+
+			return false;
+		}
+
 		public object Convert(Type desiredType, Type inputType, object input, out bool conversionSucceeded)
 		{
 			if (inputType == desiredType) // Nothing to convert
