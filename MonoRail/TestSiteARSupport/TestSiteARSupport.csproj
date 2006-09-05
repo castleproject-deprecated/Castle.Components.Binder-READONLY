@@ -197,32 +197,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Model\Blog.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Model\BlogCategory.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "Model\Category.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Model\ContactInfo.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Model\Customer.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Model\Person.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -326,6 +301,10 @@
                 />
                 <File
                     RelPath = "Views\ProductLicense\new.vm"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "Views\ProductLicense\newwithaccounts.vm"
                     BuildAction = "None"
                 />
                 <File

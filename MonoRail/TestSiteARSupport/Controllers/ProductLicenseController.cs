@@ -18,6 +18,7 @@ namespace TestSiteARSupport.Controllers
 	using Castle.Components.Binder;
 	using Castle.MonoRail.ActiveRecordSupport;
 	using Castle.MonoRail.Framework;
+	
 	using TestSiteARSupport.Model;
 
 	public class ProductLicenseController : ARSmartDispatcherController
@@ -27,8 +28,14 @@ namespace TestSiteARSupport.Controllers
 			PropertyBag.Add("pl", new ProductLicense());
 		}
 		
+		public void NewWithAccounts()
+		{
+			PropertyBag.Add("pl", new ProductLicense());
+			PropertyBag.Add("accounts", Account.FindAll());
+		}
+		
 		[AccessibleThrough(Verb.Post)]
-		public void Insert([ARDataBind("pl", AutoLoad=AutoLoadBehavior.Never)] ProductLicense pl)
+		public void Insert([ARDataBind("pl", AutoLoad=AutoLoadBehavior.OnlyNested)] ProductLicense pl)
 		{
 			ErrorList errorList = (ErrorList) BoundInstanceErrors[pl];
 			
@@ -45,6 +52,7 @@ namespace TestSiteARSupport.Controllers
 		public void Edit([ARFetch("id", false, true)] ProductLicense pl)
 		{
 			PropertyBag.Add("pl", pl);
+			PropertyBag.Add("accounts", Account.FindAll());
 		}
 		
 		[AccessibleThrough(Verb.Post)]

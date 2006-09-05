@@ -101,7 +101,8 @@ namespace Castle.MonoRail.ActiveRecordSupport
 					{
 						instance = base.CreateInstance(instanceType, paramPrefix, node);
 					}
-					else if (autoLoad == AutoLoadBehavior.NullIfInvalidKey)
+					else if (autoLoad == AutoLoadBehavior.NullIfInvalidKey || 
+					         autoLoad == AutoLoadBehavior.OnlyNested)
 					{
 						instance = null;
 					}
@@ -140,17 +141,34 @@ namespace Castle.MonoRail.ActiveRecordSupport
 			Type targetType = null;
 			ActiveRecordModel targetModel = null;
 
-			foreach(HasAndBelongsToManyModel hasManyModel in model.HasAndBelongsToMany)
+			foreach(HasAndBelongsToManyModel hasMany2ManyModel in model.HasAndBelongsToMany)
 			{
 				// Inverse=true relations will be ignored
-				if (hasManyModel.Property.Name == prefix && !hasManyModel.HasManyAtt.Inverse)
+				if (hasMany2ManyModel.Property.Name == prefix && !hasMany2ManyModel.HasManyAtt.Inverse)
 				{
-					targetType = hasManyModel.HasManyAtt.MapType;
+					targetType = hasMany2ManyModel.HasManyAtt.MapType;
 
 					targetModel = ActiveRecordModel.GetModel(targetType);
 
 					found = true;
 					break;
+				}
+			}
+			
+			if (!found)
+			{
+				foreach(HasManyModel hasManyModel in model.HasMany)
+				{
+					// Inverse=true relations will be ignored
+					if (hasManyModel.Property.Name == prefix && !hasManyModel.HasManyAtt.Inverse)
+					{
+						targetType = hasManyModel.HasManyAtt.MapType;
+
+						targetModel = ActiveRecordModel.GetModel(targetType);
+
+						found = true;
+						break;
+					}
 				}
 			}
 
@@ -216,6 +234,16 @@ namespace Castle.MonoRail.ActiveRecordSupport
 		protected override bool IsSpecialType(Type instanceType)
 		{
 			return IsContainerType(instanceType);
+		}
+
+		protected override bool ShouldRecreateInstance(object value, Type type, string prefix, Node node)
+		{
+			if (IsContainerType(type))
+			{
+				return true;
+			}
+			
+			return base.ShouldRecreateInstance(value, type, prefix, node);
 		}
 
 		#region helpers

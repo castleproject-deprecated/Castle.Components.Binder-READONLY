@@ -78,8 +78,7 @@ class Account
 			assert_equal(name, ie.span(:id, 'name').text)
 			assert_equal(email, ie.span(:id, 'email').text)
 			assert_equal(password, ie.span(:id, 'password').text)
-			assert_equal(prod_lic_id, ie.span(:id, 'pl').text)
-			puts ie.span(:id, 'permissions').text
+			assert_equal(prod_lic_id, ie.span(:id, 'pl').text) unless prod_lic_id == "0"
 			assert_equal(permissions.sort!, ie.span(:id, 'permissions').text.split(',').sort!)
 
 			# returns new created id
@@ -98,7 +97,6 @@ class Account
 			ie.checkboxes.each { |check| check.clear() }
 			
 			permissions.each { |value|
-				puts "checking box with value #{value}"
 				ie.checkbox(:id, 'account_permissions', value.to_s).set
 			}
 			
@@ -112,7 +110,7 @@ class Account
 			assert_equal(name, ie.span(:id, 'name').text)
 			assert_equal(email, ie.span(:id, 'email').text)
 			assert_equal(password, ie.span(:id, 'password').text)
-			assert_equal(prod_lic_id, ie.span(:id, 'pl').text)
+			assert_equal(prod_lic_id, ie.span(:id, 'pl').text) unless prod_lic_id == "0"
 			assert_equal(permissions.sort!, ie.span(:id, 'permissions').text.split(',').sort!)
 		end
 

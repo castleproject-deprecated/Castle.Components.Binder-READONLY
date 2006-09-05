@@ -1,9 +1,6 @@
 <html>
 <body>
-<form action="update.castle" method="post">
-
-  $FormHelper.HiddenField("pl.id") 
-
+<form action="insert.castle" method="post">
   <p>
   Created: 
   $FormHelper.TextField("pl.created") 
@@ -22,8 +19,7 @@
 #end
   </p>
 
-
-  <input type="submit" id="updatebutton" value="Update" />
+  <input type="submit" id="insertbutton" value="Insert" />
 
 </form>
 </body>

@@ -28,11 +28,11 @@ namespace TestSiteARSupport
 			IConfigurationSource source = ActiveRecordSectionHandler.Instance;
 
 			ActiveRecordStarter.Initialize( source, 
-				typeof(Blog), typeof(Person), typeof(Customer), typeof(Account), 
+				typeof(Account), 
 				typeof(AccountPermission), typeof(ProductLicense),
 				typeof(SimplePerson), typeof(Category) );
 			
-//			ActiveRecordStarter.CreateSchema();
+			ActiveRecordStarter.CreateSchema();
 		}
 	}
 }

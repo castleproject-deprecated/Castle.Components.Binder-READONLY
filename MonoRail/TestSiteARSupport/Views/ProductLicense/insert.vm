@@ -8,6 +8,7 @@
 <span id="newid">$pl.id</span>
 <span id="created">$pl.Created.ToShortDateString()</span>
 <span id="expires">$pl.Expires.ToShortDateString()</span>
+<span id="accounts">#foreach($it in $pl.Accounts)$it.Id,#end</span>
 
 </body>
 </html>

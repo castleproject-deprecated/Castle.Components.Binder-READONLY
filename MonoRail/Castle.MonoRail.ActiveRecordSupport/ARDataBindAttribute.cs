@@ -27,7 +27,7 @@ namespace Castle.MonoRail.ActiveRecordSupport
 	{
 		/// <summary>
 		/// Means that no autoload should be perform on the target
-		/// type nor on nested types.
+		/// type or on nested types.
 		/// </summary>
 		Never,
 		
@@ -39,7 +39,8 @@ namespace Castle.MonoRail.ActiveRecordSupport
 		Always,
 		
 		/// <summary>
-		/// Pendent
+		/// Does not load the root type, but loads nested types
+		/// if the primary key is present. If not present, sets null on nested type.
 		/// </summary>
 		OnlyNested,
 

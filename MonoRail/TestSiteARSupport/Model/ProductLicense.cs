@@ -55,7 +55,7 @@ namespace TestSiteARSupport.Model
 			set { expires = value; }
 		}
 
-		[HasMany(typeof(Account), Inverse=true)]
+		[HasMany(typeof(Account), Inverse=false)]
 		public ISet Accounts
 		{
 			get { return accounts; }

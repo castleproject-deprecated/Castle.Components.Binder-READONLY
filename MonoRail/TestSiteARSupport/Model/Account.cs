@@ -83,5 +83,10 @@ namespace TestSiteARSupport.Model
 			get { return permissions; }
 			set { permissions = value; }
 		}
+		
+		public static Account[] FindAll()
+		{
+			return (Account[]) ActiveRecordBase.FindAll(typeof(Account));
+		}
 	}
 }

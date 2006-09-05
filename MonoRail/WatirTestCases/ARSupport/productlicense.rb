@@ -43,6 +43,34 @@ class ProductLicense
 			
 		end
 		
+		def create_with_accounts(ie, created, expires, *accounts)
+
+			ie.goto('http://localhost:88/ProductLicense/newwithaccounts.castle')
+
+			ie.text_field(:id, "pl_created").set(created)
+			ie.text_field(:id, "pl_Expires").set(expires)
+			
+			accounts.each { |value|
+				ie.checkbox(:id, 'pl_accounts', value.to_s).set
+			}
+			
+			ie.button(:id, 'insertbutton').click
+
+			# Check for errors
+			
+			fail('There were databind errors') if ie.contains_text('binding error')
+			fail('Unexpected exception') if ie.contains_text('Exception')
+			
+			assert_equal(created, ie.span(:id, 'created').text, 'Insert: created was not set')
+			assert_equal(expires, ie.span(:id, 'expires').text, 'Insert: expires was not set')
+			assert_equal(accounts.sort!, ie.span(:id, 'accounts').text.split(',').sort!)
+
+			# returns new id
+			
+			ie.span(:id, 'newid').text
+			
+		end
+		
 		def edit(ie, id, created, expires)
 
 			ie.goto("http://localhost:88/ProductLicense/edit.castle?id=#{id}")
