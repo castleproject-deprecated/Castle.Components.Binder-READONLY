@@ -196,6 +196,11 @@ namespace Castle.Components.Binder
 		{
 			succeeded = false;
 
+			if (IsSpecialType(instanceType))
+			{
+				return BindSpecialObjectInstance(instanceType, paramPrefix, node, out succeeded);
+			}
+
 			if (ShouldIgnoreType(instanceType)) return null;
 
 			if (instanceType.IsArray)
@@ -210,12 +215,12 @@ namespace Castle.Components.Binder
 				return instance;
 			}
 		}
-		
+
 		protected void InternalRecursiveBindObjectInstance(object instance, String prefix, Node node)
 		{
 			if (node == null) return;
 			
-			if (node.NodeType != NodeType.Composite)
+			if (node.NodeType != NodeType.Composite && node.NodeType != NodeType.Indexed)
 			{
 				throw new BindingException("Non-composite node passed to InternalRecursiveBindObjectInstance while binding {0} with prefix {1}", instance, prefix);
 			}
@@ -314,6 +319,11 @@ namespace Castle.Components.Binder
 
 			AfterBinding(instance, prefix, node);
 		}
+		
+		protected int StackDepth
+		{
+			get { return instanceStack.Count; }
+		}
 
 		private string Translate(Type instanceType, string paramName)
 		{
@@ -380,8 +390,45 @@ namespace Castle.Components.Binder
 		{
 			return false;
 		}
+		
+		/// <summary>
+		/// Implementations will bound the instance itself.
+		/// <seealso cref="IsSpecialType"/>
+		/// </summary>
+		/// <remarks>
+		/// <seealso cref="IsSpecialType"/>
+		/// </remarks>
+		/// <param name="instanceType"></param>
+		/// <param name="prefix"></param>
+		/// <param name="node"></param>
+		/// <param name="succeeded"></param>
+		protected virtual object BindSpecialObjectInstance(Type instanceType, String prefix, 
+		                                                 Node node, out bool succeeded)
+		{
+			succeeded = false;
+			
+			return null;
+		}
+
+		/// <summary>
+		/// Invoked during object binding to allow 
+		/// subclasses to have a chance of binding the types itself.
+		/// If the implementation returns <c>true</c>
+		/// the binder will invoke <see cref="BindSpecialObjectInstance"/>
+		/// </summary>
+		/// <param name="instanceType">Type about to be bound</param>
+		/// <returns><c>true</c> if subclass wants to handle binding</returns>
+		protected virtual bool IsSpecialType(Type instanceType)
+		{
+			return false;
+		}
 
 		#endregion
+		
+		protected object ConvertLeafNode(Type desiredType, LeafNode lNode, out bool conversionSucceeded)
+		{
+			return Converter.Convert(desiredType, lNode.ValueType, lNode.Value, out conversionSucceeded);
+		}
 		
 		private object ConvertToSimpleValue(Type desiredType, string key, CompositeNode parent, out bool conversionSucceeded)
 		{
@@ -543,11 +590,6 @@ namespace Castle.Components.Binder
 			object result = ConvertLeafNode(desiredType, (LeafNode) node, out conversionSucceeded);
 			
 			return conversionSucceeded ? result : defaultValue;
-		}
-		
-		private object ConvertLeafNode(Type desiredType, LeafNode lNode, out bool conversionSucceeded)
-		{
-			return Converter.Convert(desiredType, lNode.ValueType, lNode.Value, out conversionSucceeded);
 		}
 		
 		#region Support methods
