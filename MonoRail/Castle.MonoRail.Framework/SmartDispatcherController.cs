@@ -398,7 +398,12 @@ namespace Castle.MonoRail.Framework
 			}
 		}
 
-		protected internal CompositeNode ObtainParamsNode(ParamStore from)
+		/// <summary>
+		/// This method is for internal use only
+		/// </summary>
+		/// <param name="from"></param>
+		/// <returns></returns>
+		public CompositeNode ObtainParamsNode(ParamStore from)
 		{
 			switch(from)
 			{

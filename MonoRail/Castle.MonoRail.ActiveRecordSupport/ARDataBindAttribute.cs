@@ -16,7 +16,7 @@ namespace Castle.MonoRail.ActiveRecordSupport
 {
 	using System;
 	using System.Reflection;
-
+	using Castle.Components.Binder;
 	using Castle.MonoRail.Framework;
 
 	/// <summary>
@@ -37,6 +37,11 @@ namespace Castle.MonoRail.ActiveRecordSupport
 		/// the primary key be present on the http request
 		/// </summary>
 		Always,
+		
+		/// <summary>
+		/// Pendent
+		/// </summary>
+		OnlyNested,
 
 		/// <summary>
 		/// Means that we should autoload, but if the key is 
@@ -107,11 +112,11 @@ namespace Castle.MonoRail.ActiveRecordSupport
 				binder = new ARDataBinder();
 			}
 
-			ConfigureBinder(binder, controller);
-
 			binder.AutoLoad = autoLoad;
+			
+			CompositeNode node = controller.ObtainParamsNode(From);
 
-			object instance = binder.BindObject(parameterInfo.ParameterType, Prefix, Exclude, Allow, ResolveParams(controller));
+			object instance = binder.BindObject(parameterInfo.ParameterType, Prefix, Exclude, Allow, node);
 
 			if (instance != null)
 			{

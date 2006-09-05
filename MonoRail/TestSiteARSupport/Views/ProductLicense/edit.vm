@@ -1,0 +1,21 @@
+<html>
+<body>
+<form action="update.castle" method="post">
+
+  $FormHelper.HiddenField("pl.id") 
+
+  <p>
+  Created: 
+  $FormHelper.TextField("pl.created") 
+  </p>
+
+  <p>
+  Expires: 
+  $FormHelper.TextField("pl.Expires") 
+  </p>
+
+  <input type="submit" id="updatebutton" value="Update" />
+
+</form>
+</body>
+</html>
