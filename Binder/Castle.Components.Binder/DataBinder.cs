@@ -230,7 +230,7 @@ namespace Castle.Components.Binder
 
 		protected void InternalRecursiveBindObjectInstance(object instance, String prefix, CompositeNode node)
 		{
-			if (node == null) return;
+			if (node == null || instance == null) return;
 
 			BeforeBinding(instance, prefix, node);
 
