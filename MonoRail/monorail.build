@@ -6,7 +6,7 @@
 	<property name="bin.dir" value="${base.dir}/bin" />
 	<property name="doc.dir" value="${base.dir}/docs" />
 
-	<include buildfile="../common.inc" />
+	<include buildfile="../common.xml" />
 
 	<property name="samples.dir" value="${base.dir}/../Samples/MonoRail" />
 
