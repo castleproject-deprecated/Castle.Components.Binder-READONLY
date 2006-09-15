@@ -31,14 +31,14 @@ namespace Castle.MicroKernel.Handlers
 
 		public override object Resolve(CreationContext context)
 		{
-			if (context.ConstructorArguments == null || context.ConstructorArguments.Length == 0)
+			if (context.HasRegisteredDependencies == false)
 				AssertNotWaitingForDependency();
             
 #if DOTNET2
-			CreationContext newContext = new CreationContext(context.Dependencies, ComponentModel.Service, context.ConstructorArguments);
+			CreationContext newContext = new CreationContext(context.Dependencies, ComponentModel.Service, context);
 
 #else
-			CreationContext newContext = new CreationContext(context.Dependencies, context.ConstructorArguments );
+			CreationContext newContext = new CreationContext(context.Dependencies, context );
 #endif
 
             return lifestyleManager.Resolve(newContext);

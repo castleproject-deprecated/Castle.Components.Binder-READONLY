@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Castle.Model;
+
 namespace Castle.MicroKernel.Tests.RuntimeParameters
 {
 	using System;
@@ -25,6 +27,7 @@ namespace Castle.MicroKernel.Tests.RuntimeParameters
 		}
 	}
 
+	[Transient]
 	public class CompB
 	{
 		private string myArgument = string.Empty;

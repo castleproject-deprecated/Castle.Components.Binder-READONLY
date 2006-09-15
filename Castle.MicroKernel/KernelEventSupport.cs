@@ -187,7 +187,7 @@ namespace Castle.MicroKernel
 			if (eventDelegate != null) eventDelegate(model);
 		}
 
-		protected internal virtual void RaiseHandlerRegistered(IHandler handler)
+		protected virtual void RaiseHandlerRegistered(IHandler handler)
 		{
 			bool stateChanged = true;
 

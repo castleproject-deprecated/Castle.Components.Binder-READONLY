@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Castle.MicroKernel.Resolvers;
+
 namespace Castle.MicroKernel
 {
     using System;
@@ -30,7 +32,8 @@ namespace Castle.MicroKernel
 
         private readonly ArrayList dependencies;
 
-        private readonly object[] constructorArguments;
+		private readonly Hashtable dependencyArguments = new Hashtable(CaseInsensitiveHashCodeProvider.DefaultInvariant,
+			CaseInsensitiveComparer.DefaultInvariant);
 
 #if DOTNET2
         private readonly Type[] arguments;
@@ -81,24 +84,32 @@ namespace Castle.MicroKernel
         {
             get { return dependencies; }
         }
-
-        public CreationContext(ICollection dependencies, Type target, object[] constructorArguments)
+    	
+		public CreationContext(ICollection dependencies, Type target, CreationContext parent)
+    		:this(dependencies,target,parent.dependencyArguments)
+		{
+			
+		}
+		public CreationContext(ICollection dependencies, Type target, IDictionary dependencyArguments)
         {
             arguments = ExtractGenericArguments(target);
             this.dependencies = new ArrayList(dependencies);
             arguments = ExtractGenericArguments(target);
-            this.constructorArguments = constructorArguments;
-        }
-
-        public object[] ConstructorArguments
-        {
-            get { return constructorArguments; }
+			foreach (DictionaryEntry entry in dependencyArguments)
+			{
+				this.dependencyArguments.Add(entry.Key, entry.Value);
+			}
         }
 
         public Type[] GenericArguments
         {
             get { return arguments; }
         }
+
+    	public bool HasRegisteredDependencies
+    	{
+			get { return dependencyArguments.Count > 0; }
+    	}
 
 #if DOTNET2
         
@@ -143,5 +154,35 @@ namespace Castle.MicroKernel
                 return dependencyModel.GetHashCode();
             }
         }
+
+    	public bool CanResolveDependency(ComponentModel model, DependencyModel dependency)
+    	{
+    		if( CanResolveDependencyInternal(dependency, dependencyArguments))
+    			return true;
+			return CanResolveDependencyInternal(dependency, model.LiveDependencies);
+    	}
+
+    	private bool CanResolveDependencyInternal(DependencyModel dependency, IDictionary dependenciesArgs)
+    	{
+    		if(!dependenciesArgs.Contains(dependency.DependencyKey))
+    			return false;
+    		object argument = dependenciesArgs[dependency.DependencyKey];
+    		//we allow null dependency here, but only if the dependency if not a value type
+    		if(argument==null && !dependency.TargetType.IsValueType)
+    			return true;
+    		return dependency.TargetType.IsInstanceOfType(argument);
+    	}
+
+    	public object ResolveDependency(ComponentModel model, DependencyModel dependency)
+    	{
+    		if(!CanResolveDependency(model, dependency))
+    		{
+    			//should not happen, because the check should be made anyway.
+				throw new DependencyResolverException(string.Format("Could not resolve dependency {0} from the creation context!", dependency.DependencyKey));
+    		}
+			if( dependencyArguments.Contains(dependency.DependencyKey))
+				return dependencyArguments[dependency.DependencyKey];
+			return model.LiveDependencies[dependency.DependencyKey];
+    	}
     }
 }

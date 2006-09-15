@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections;
+
 namespace Castle.MicroKernel.Tests
 {
 	using NUnit.Framework;
@@ -29,11 +31,18 @@ namespace Castle.MicroKernel.Tests
 	public class RuntimeParametersTestCase
 	{
 		private IKernel kernel;
+		private Hashtable deps;
 
 		[SetUp]
 		public void Init()
 		{
 			kernel = new DefaultKernel();
+			kernel.AddComponent("compa", typeof(CompA));
+			kernel.AddComponent("compb", typeof(CompB));
+
+			deps = new Hashtable();
+			deps.Add("cc", new CompC(12));
+			deps.Add("myArgument", "ernst");
 		}
 
 		[TearDown]
@@ -45,18 +54,50 @@ namespace Castle.MicroKernel.Tests
 		[Test]
 		public void ResolveUsingParameters()
 		{
-			kernel.AddComponent("compa", typeof(CompA));
-			kernel.AddComponent("compb", typeof(CompB));
-
 			CompB compb = null;
-			compb = kernel.Resolve(typeof(CompB), new object[] { new CompC(12), "ernst" }) as CompB;
+			compb = kernel.Resolve(typeof(CompB), deps) as CompB;
 
+			ValidateDependencies(compb);
+		}
+
+		[Test]
+		public void AddLiveParametersToKernel()
+		{
+			CompB compb = null;
+			IHandler b_handler = kernel.GetHandler("compb");
+			kernel.RegisterLiveDependencies(b_handler, deps);
+			compb = kernel[typeof(CompB)] as CompB;
+
+			ValidateDependencies(compb);
+		}
+
+		[Test]
+		public void PrecedenceInPrameters()
+		{
+			IHandler b_handler = kernel.GetHandler("compb");
+			kernel.RegisterLiveDependencies(b_handler, deps);
+
+			CompB instance_with_model = (CompB)kernel[typeof(CompB)];
+			Assert.AreSame(deps["cc"], instance_with_model.Compc, "Model dependency should override kernel dependency");
+
+			Hashtable deps2 = new Hashtable();
+			deps2.Add("cc", new CompC(12));
+			deps2.Add("myArgument", "ayende");
+	
+			CompB instance_with_args = (CompB)kernel.Resolve(typeof(CompB),deps2);
+			
+			Assert.AreSame(deps2["cc"],instance_with_args.Compc, "Should get it from resolve params");
+			Assert.AreEqual("ayende", instance_with_args.MyArgument);
+		}
+		
+		private void ValidateDependencies(CompB compb)
+		{
 			Assert.IsNotNull(compb, "Component B should have been resolved");
 
 			Assert.IsNotNull(compb.Compc, "CompC property should not be null");
 			Assert.IsTrue(compb.MyArgument != string.Empty, "MyArgument property should not be empty");
 
-			Assert.IsTrue(typeof(CompC).IsAssignableFrom(compb.Compc.GetType()), "CompC property should be null assignable from CompC");
+			Assert.AreSame(deps["cc"], compb.Compc, "CompC property should be the same instnace as in the hashtable argument");
 			Assert.IsTrue("ernst".Equals(compb.MyArgument),string.Format( "The MyArgument property of compb should be equal to ernst, found {0}", compb.MyArgument));
 		}
 	}

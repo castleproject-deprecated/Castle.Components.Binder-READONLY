@@ -263,12 +263,12 @@ namespace Castle.Windsor
 			get { return Resolve(service); }
 		}
 
-		public object Resolve(string key, params  object[] arguments)
+		public object Resolve(string key, IDictionary arguments)
 		{
 			return _kernel.Resolve(key, arguments);    
 		}
 
-		public object Resolve(Type service, params object[] arguments)
+		public object Resolve(Type service, IDictionary arguments)
 		{
 			return _kernel.Resolve(service, arguments);
 		}
@@ -300,9 +300,8 @@ namespace Castle.Windsor
 		/// 
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="parameters"></param>
 		/// <returns></returns>
-		public virtual T Resolve<T>(params object[] arguments)
+		public virtual T Resolve<T>(IDictionary arguments)
 		{
 				return (T) _kernel.Resolve( typeof(T), arguments);
 		}

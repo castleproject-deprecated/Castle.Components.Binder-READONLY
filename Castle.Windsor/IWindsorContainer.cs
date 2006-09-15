@@ -80,7 +80,7 @@ namespace Castle.Windsor
 		/// <param name="key"></param>
 		/// <param name="arguments"></param>
 		/// <returns></returns>
-		object Resolve(String key, params object[] arguments);
+		object Resolve(String key, IDictionary arguments);
 
 		#if DOTNET2
 
@@ -106,7 +106,7 @@ namespace Castle.Windsor
 		/// <param name="service"></param>
 		/// <param name="arguments"></param>
 		/// <returns></returns>
-		object Resolve(Type service, params object[] arguments);
+		object Resolve(Type service, IDictionary arguments);
 
 		/// <summary>
 		/// Releases a component instance
@@ -160,7 +160,7 @@ namespace Castle.Windsor
 		/// <typeparam name="T"></typeparam>
 		/// <param name="arguments"></param>
 		/// <returns></returns>
-		T Resolve<T>(params object[] arguments);
+		T Resolve<T>(IDictionary arguments);
 
 		#endif
 

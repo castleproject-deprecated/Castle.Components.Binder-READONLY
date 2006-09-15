@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections;
+
 namespace Castle.MicroKernel
 {
 	using System;
@@ -74,5 +76,16 @@ namespace Castle.MicroKernel
 		/// managed by this handler.
 		/// </summary>
 		ComponentModel ComponentModel { get; }
+
+		/// <summary>
+		/// This method tell the handler that it should assume that the dependencies
+		/// lists in the <c>dependncies</c> parameter exists.
+		/// This will cause the dependecies to be removed from the waiting dependencies list
+		/// </summary>
+		/// <remarks>
+		/// Note: After calling this, the kernel should raise HandlerRegistered event
+		/// to ensure that the state of this (and related) handlers is changed.
+		/// </remarks>
+		void AssumeDependenciesExists(IDictionary dependencies);
 	}
 }

@@ -34,9 +34,10 @@ namespace Castle.MicroKernel.ComponentActivator
 	[Serializable]
 	public class DefaultComponentActivator : AbstractComponentActivator
 	{
-		public DefaultComponentActivator(ComponentModel model, IKernel kernel, 
-			ComponentInstanceDelegate onCreation, 
-			ComponentInstanceDelegate onDestruction) : base(model, kernel, onCreation, onDestruction)
+		public DefaultComponentActivator(ComponentModel model, IKernel kernel,
+			ComponentInstanceDelegate onCreation,
+			ComponentInstanceDelegate onDestruction)
+			: base(model, kernel, onCreation, onDestruction)
 		{
 		}
 
@@ -55,7 +56,7 @@ namespace Castle.MicroKernel.ComponentActivator
 
 		protected override void InternalDestroy(object instance)
 		{
-			ApplyDecommissionConcerns( instance );
+			ApplyDecommissionConcerns(instance);
 		}
 
 		#endregion
@@ -63,7 +64,7 @@ namespace Castle.MicroKernel.ComponentActivator
 		protected virtual object Instantiate(CreationContext context)
 		{
 			ConstructorCandidate candidate = SelectEligibleConstructor(context);
-	
+
 			Type[] signature;
 			object[] arguments = CreateConstructorArguments(candidate, context, out signature);
 
@@ -82,7 +83,7 @@ namespace Castle.MicroKernel.ComponentActivator
 				{
 					instance = Kernel.ProxyFactory.Create(Kernel, Model, arguments);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new ComponentActivatorException("ComponentActivator: could not proxy " + Model.Implementation.FullName, ex);
 				}
@@ -92,18 +93,18 @@ namespace Castle.MicroKernel.ComponentActivator
 				try
 				{
 					ConstructorInfo cinfo = implType.GetConstructor(
-							BindingFlags.Public|BindingFlags.Instance, null, signature, null);
+							BindingFlags.Public | BindingFlags.Instance, null, signature, null);
 
 					instance = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(implType);
 
 					cinfo.Invoke(instance, arguments);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new ComponentActivatorException("ComponentActivator: could not instantiate " + Model.Implementation.FullName, ex);
 				}
 			}
-			
+
 			return instance;
 		}
 
@@ -123,7 +124,7 @@ namespace Castle.MicroKernel.ComponentActivator
 		{
 			foreach (ILifecycleConcern concern in steps)
 			{
-				concern.Apply( Model, instance );
+				concern.Apply(Model, instance);
 			}
 		}
 
@@ -145,11 +146,11 @@ namespace Castle.MicroKernel.ComponentActivator
 				return Model.Constructors.FewerArgumentsCandidate;
 			}
 
-			ConstructorCandidate winnerCandidate = null; 
+			ConstructorCandidate winnerCandidate = null;
 
-			foreach(ConstructorCandidate candidate in Model.Constructors)
+			foreach (ConstructorCandidate candidate in Model.Constructors)
 			{
-				foreach(DependencyModel dep in candidate.Dependencies)
+				foreach (DependencyModel dep in candidate.Dependencies)
 				{
 					if (CanSatisfyDependency(context, dep))
 					{
@@ -195,46 +196,16 @@ namespace Castle.MicroKernel.ComponentActivator
 			signature = new Type[arguments.Length];
 
 			int index = 0;
-			int constructorIndex = 0;
 
-			foreach(DependencyModel dependency in constructor.Dependencies)
+			foreach (DependencyModel dependency in constructor.Dependencies)
 			{
-				object dependencyKey = context.TrackDependency(constructor.Constructor, dependency);
+				object dependencyTrackingIdentifier = context.TrackDependency(constructor.Constructor, dependency);
 				object value = null;
 
-				// if the kernel doesn't know the awnser, perhaps the user arguments can help us out.
-				if (Kernel.Resolver.CanResolve(context, Model, dependency) == false)
-				{
-					if (context.ConstructorArguments == null ||
-						context.ConstructorArguments.Length < constructorIndex+1 ||
-						dependency.TargetType.IsAssignableFrom(context.ConstructorArguments[constructorIndex].GetType()) == false)
-					{
-						String implementation = String.Empty;
-
-						if (Model.Implementation != null)
-						{
-							implementation = Model.Implementation.FullName;
-						}
-
-						String message = String.Format(
-							"Could not resolve non-optional dependency for '{0}' ({1}). Parameter '{2}' type '{3}'",
-							Model.Name, implementation, dependency.DependencyKey, dependency.TargetType.FullName);
-
-						throw new Resolvers.DependencyResolverException(message);
-					}
-					else
-					{
-						value = context.ConstructorArguments[constructorIndex];
-						constructorIndex++;
-					}
-				}
-				else
-				{
-					value = Kernel.Resolver.Resolve(context, Model, dependency);
-				}
+				value = ResolveDependency(context, dependency);
 
 				//The depdency was resolved successfully, we can stop tracking it.
-				context.RemoveDependencyTracking(dependencyKey);
+				context.RemoveDependencyTracking(dependencyTrackingIdentifier);
 				arguments[index] = value;
 				signature[index++] = dependency.TargetType;
 			}
@@ -242,28 +213,72 @@ namespace Castle.MicroKernel.ComponentActivator
 			return arguments;
 		}
 
+		private object ResolveDependency(CreationContext context, DependencyModel dependency)
+		{
+			object value;
+			if (TryResolveDependency(context, dependency, out value))
+				return value;
+
+			String implementation = String.Empty;
+
+			if (Model.Implementation != null)
+			{
+				implementation = Model.Implementation.FullName;
+			}
+
+			String message = String.Format(
+				"Could not resolve non-optional dependency for '{0}' ({1}). Parameter '{2}' type '{3}'",
+				Model.Name, implementation, dependency.DependencyKey, dependency.TargetType.FullName);
+			throw new Resolvers.DependencyResolverException(message);
+
+		}
+
+		private bool TryResolveDependency(CreationContext context, DependencyModel dependency, out object value)
+		{
+			value = null;
+			//first try to get the dependency from the context
+			if (context.CanResolveDependency(Model, dependency))
+			{
+				value = context.ResolveDependency(Model, dependency);
+				return true;
+			}
+
+			//now try to get the dependency from the kernel
+			if (Kernel.Resolver.CanResolve(context, Model, dependency))
+			{
+				value = Kernel.Resolver.Resolve(context, Model, dependency);
+				return true;
+			}
+			return false;
+		}
+
 		protected virtual void SetUpProperties(object instance, CreationContext context)
 		{
-			foreach(PropertySet property in Model.Properties)
+			foreach (PropertySet property in Model.Properties)
 			{
-				object dependencyKey = context.TrackDependency(property.Property, property.Dependency);
-				object value = Kernel.Resolver.Resolve(context, Model, property.Dependency);
+				object dependencyTrackingIdentifier = context.TrackDependency(property.Property, property.Dependency);
 
-				//The depdency was resolved successfully, we can stop tracking it.
-				context.RemoveDependencyTracking(dependencyKey);
+				object value;
+				bool resolved = TryResolveDependency(context, property.Dependency, out value);
+				
+				//The depdency was resolved (or not) successfully, we can stop tracking it.
+				context.RemoveDependencyTracking(dependencyTrackingIdentifier);
 
-				if (value == null) continue;
-
+				if(resolved == false)
+				{	
+					continue;
+				}
+				
 				MethodInfo setMethod = property.Property.GetSetMethod();
 
 				try
 				{
 					setMethod.Invoke(instance, new object[] { value });
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
-					String message = String.Format("Error setting property {0} on type {1}, Component id is {2}. See inner exception for more information.", 
-					                               setMethod.Name, instance.GetType().FullName, Model.Name);
+					String message = String.Format("Error setting property {0} on type {1}, Component id is {2}. See inner exception for more information.",
+												   setMethod.Name, instance.GetType().FullName, Model.Name);
 					throw new ComponentActivatorException(message, ex);
 				}
 			}

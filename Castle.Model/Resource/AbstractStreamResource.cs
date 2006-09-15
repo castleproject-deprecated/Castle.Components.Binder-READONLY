@@ -179,7 +179,7 @@ namespace Castle.Model.Resource
 			{
 			}
 
-			public void Dispose()
+			void IDisposable.Dispose()
 			{
 			}
 

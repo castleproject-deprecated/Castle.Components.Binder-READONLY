@@ -128,6 +128,9 @@ namespace Castle.Model
 
 		private bool requiresGenericArguments;
 
+		private Hashtable liveDependencies = new Hashtable(CaseInsensitiveHashCodeProvider.DefaultInvariant,
+			CaseInsensitiveComparer.DefaultInvariant);
+		
         #endregion
 
         /// <summary>
@@ -237,7 +240,12 @@ namespace Castle.Model
             }
         }
 
-        public LifestyleType LifestyleType
+		public Hashtable LiveDependencies
+		{
+			get { return liveDependencies; }
+		}
+
+		public LifestyleType LifestyleType
         {
             get { return lifestyleType; }
             set { lifestyleType = value; }
@@ -306,6 +314,14 @@ namespace Castle.Model
                 }
                 return dependencies;
             }
+		}
+
+		public void AddLiveDependecies(IDictionary liveDependenciesArguments)
+		{
+			foreach (DictionaryEntry entry in liveDependenciesArguments)
+			{
+				liveDependencies[entry.Key] = entry.Value;
+			}		
 		}
 	}
 }

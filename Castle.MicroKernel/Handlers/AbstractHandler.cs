@@ -32,7 +32,7 @@ namespace Castle.MicroKernel.Handlers
 		private IKernel kernel;
 		private ComponentModel model;
 		private HandlerState state;
-		private ArrayList dependenciesByService;
+		private IDictionary dependenciesByService;
 		private IDictionary dependenciesByKey;
 
 		protected ILifestyleManager lifestyleManager;
@@ -92,13 +92,13 @@ namespace Castle.MicroKernel.Handlers
 			state = newState;
 		}
 
-		protected ArrayList DependenciesByService
+		protected IDictionary DependenciesByService
 		{
 			get
 			{
 				if (dependenciesByService == null)
 				{
-					dependenciesByService = new ArrayList();
+					dependenciesByService = new HybridDictionary();
 				}
 				return dependenciesByService;
 			}
@@ -110,7 +110,7 @@ namespace Castle.MicroKernel.Handlers
 			{
 				if (dependenciesByKey == null)
 				{
-					dependenciesByKey = new HybridDictionary();
+					dependenciesByKey = new HybridDictionary(true);
 				}
 				return dependenciesByKey;
 			}
@@ -161,6 +161,32 @@ namespace Castle.MicroKernel.Handlers
 		}
 
 		/// <summary>
+		/// This method tell the handler that it should assume that the dependencies
+		/// lists in the <c>dependncies</c> parameter exists.
+		/// This will cause the dependecies to be removed from the waiting dependencies list
+		/// </summary>
+		/// <remarks>
+		/// Note: After calling this, the kernel should raise HandlerRegistered event
+		/// to ensure that the state of this (and related) handlers is changed.
+		/// </remarks>
+		public void AssumeDependenciesExists(IDictionary dependencies)
+		{
+			foreach (string dependencyKey in dependencies.Keys)
+			{
+				DependenciesByKey.Remove(dependencyKey);
+				foreach (DictionaryEntry entry in new Hashtable(DependenciesByService))
+				{
+					DependencyModel dependency = (DependencyModel) entry.Value;
+					if(CaseInsensitiveComparer.Default.Compare(dependency.DependencyKey, dependencyKey)==0)
+					{
+						DependenciesByService.Remove(entry.Key);
+					}
+				}
+			}	
+			
+		}
+
+		/// <summary>
 		/// Invoked by the kernel
 		/// when one of registered dependencies were satisfied by 
 		/// new components registered.
@@ -168,7 +194,8 @@ namespace Castle.MicroKernel.Handlers
 		/// <param name="handler"></param>
 		protected virtual void DependencySatisfied(IHandler handler, ref bool stateChanged)
 		{
-			Type[] services = (Type[]) DependenciesByService.ToArray(typeof (Type));
+			Type[] services = new Type[DependenciesByService.Keys.Count];
+			DependenciesByService.Keys.CopyTo(services,0);
 
 			foreach (Type service in services)
 			{
@@ -241,22 +268,6 @@ namespace Castle.MicroKernel.Handlers
 			}
 		}
 
-		public virtual void RemovedDependency(DependencyModel dependency)
-		{
-			if (dependency.DependencyType == DependencyType.Service && dependency.TargetType != null)
-			{
-				DependenciesByService.Remove(dependency.TargetType);
-			}
-			else
-			{
-				DependenciesByKey.Remove(dependency.DependencyKey);
-			}
-			//force re-evaluation of all the components in the kernel
-			//will put this component, and its dependent in happy state
-			//if this is good
-			((KernelEventSupport) kernel).RaiseHandlerRegistered(this);
-		}
-
 		protected virtual void AddDependency(DependencyModel dependency)
 		{
 			if (dependency.DependencyType == DependencyType.Service && dependency.TargetType != null)
@@ -269,7 +280,7 @@ namespace Castle.MicroKernel.Handlers
 					return;
 				}
 
-				DependenciesByService.Add(dependency.TargetType);
+				DependenciesByService.Add(dependency.TargetType, dependency);
 			}
 			else
 			{
@@ -323,7 +334,7 @@ namespace Castle.MicroKernel.Handlers
 
 			Type[] services = new Type[DependenciesByService.Count];
 
-			DependenciesByService.CopyTo(services, 0);
+			DependenciesByService.Keys.CopyTo(services, 0);
 
 			foreach (Type service in services)
 			{
@@ -376,7 +387,7 @@ namespace Castle.MicroKernel.Handlers
 			{
 				sb.Append("\r\nServices: \r\n");
 
-				foreach (Type type in DependenciesByService)
+				foreach (Type type in DependenciesByService.Keys)
 				{
 					IHandler handler = Kernel.GetHandler(type);
 

@@ -155,7 +155,7 @@ namespace Castle.MicroKernel.Resolvers
 
                 String value = ExtractComponentKey(parameter.Value, parameter.Name);
 
-                return kernel.HasComponent(value);
+				return kernel.HasComponent(value);
             }
             else if (dependency.TargetType == typeof(IKernel))
             {
@@ -164,8 +164,7 @@ namespace Castle.MicroKernel.Resolvers
             else
             {
                 // Default behaviour
-
-                return kernel.HasComponent(dependency.TargetType);
+				return kernel.HasComponent(dependency.TargetType);
             }
         }
 
@@ -218,19 +217,6 @@ namespace Castle.MicroKernel.Resolvers
 
                     handler = kernel.GetHandler(dependency.TargetType);
 
-                    // Default behaviour
-                    // Find all handlers that can match this dependency, so we will not
-                    // get locked on the first one if it is the same as we are currently searching
-                    // and it is the same model as the one that we are search the dependency on.
-                    // This can happen in decorators scenarios.wl
-                    // foreach (IHandler possibleHandler in kernel.GetHandlers(dependency.TargetType))
-                    // {
-                    // 	if (possibleHandler.ComponentModel != model)
-                    // 	{
-                    // 		handler = possibleHandler;
-                    // 		break;
-                    // 	}
-                    // }
                 }
             }
 
@@ -308,7 +294,7 @@ namespace Castle.MicroKernel.Resolvers
             if (parameterType.ContainsGenericParameters)
                 return current;
             else
-                return new CreationContext(current.Dependencies, parameterType, current.ConstructorArguments);
+                return new CreationContext(current.Dependencies, parameterType, current);
         }
 #endif
     }

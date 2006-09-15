@@ -132,15 +132,15 @@ namespace Castle.MicroKernel
 		/// <param name="service"></param>
 		/// <param name="arguments"></param>
 		/// <returns></returns>
-		object Resolve(Type service, params object[] arguments);
+		object Resolve(Type service, IDictionary arguments);
 
 		/// <summary>
 		/// Returns the component instance by the key
 		/// </summary>
-		/// <param name="service"></param>
+		/// <param name="key"></param>
 		/// <param name="arguments"></param>
 		/// <returns></returns>
-		object Resolve(string key, params object[] arguments);
+		object Resolve(string key, IDictionary arguments);
 
 		#if DOTNET2
 
@@ -296,5 +296,10 @@ namespace Castle.MicroKernel
 		/// Graph of components and iteractions.
 		/// </summary>
 		GraphNode[] GraphNodes { get; }
+
+		/// <summary>
+		/// Register live object dependencies for this handler.
+		/// </summary>
+		void RegisterLiveDependencies(IHandler handler, IDictionary dependencies);
 	}
 }
