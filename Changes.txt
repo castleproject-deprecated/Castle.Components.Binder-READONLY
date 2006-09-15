@@ -1,5 +1,10 @@
 RC 3
 ====
+
+- Added a way to add live instances of object as resolved dependencies to the kernel and in resolving time. 
+ The parameters are passed as IDictionary, and can be either registered in the kernel, using RegisterLiveDependecies 
+	or at ResolveTime, by passing the dictionary to the Resolve() overload
+
 - Added checks to handle cycles in dependencies graphs and avoid deadly Stack Overflow Exceptions.
 
 - Fixed IOC-24: "Allow user to provide an attribute which will customize how to inspect properties (PropertiesDependenciesModelInspector)"
