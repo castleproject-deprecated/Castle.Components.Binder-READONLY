@@ -80,29 +80,29 @@
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
                 />
                 <Reference
-                    Name = "Castle.DynamicProxy"
-                    AssemblyName = "Castle.DynamicProxy"
-                    HintPath = "..\bin\Castle.DynamicProxy.dll"
-                />
-                <Reference
-                    Name = "Castle.MicroKernel"
-                    Project = "{8C6AADEB-D099-4D2A-8F5B-4EBC12AC9159}"
-                    Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
-                />
-                <Reference
                     Name = "Castle.Windsor"
-                    Project = "{60EFCB9B-E3FF-46A5-A2D2-D9F0EF75D5FE}"
-                    Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
-                />
-                <Reference
-                    Name = "nunit.framework"
-                    AssemblyName = "nunit.framework"
-                    HintPath = "C:\devtools\nunit\nuni228-net11\bin\nunit.framework.dll"
+                    AssemblyName = "Castle.Windsor"
+                    HintPath = "..\..\build\net-1.1\Castle.Windsor.dll"
                 />
                 <Reference
                     Name = "Castle.Core"
                     AssemblyName = "Castle.Core"
-                    HintPath = "..\..\Core\bin\Castle.Core.dll"
+                    HintPath = "..\..\build\net-1.1\Castle.Core.dll"
+                />
+                <Reference
+                    Name = "Castle.DynamicProxy"
+                    AssemblyName = "Castle.DynamicProxy"
+                    HintPath = "..\..\build\net-1.1\Castle.DynamicProxy.dll"
+                />
+                <Reference
+                    Name = "Castle.MicroKernel"
+                    AssemblyName = "Castle.MicroKernel"
+                    HintPath = "..\..\build\net-1.1\Castle.MicroKernel.dll"
+                />
+                <Reference
+                    Name = "nunit.framework"
+                    AssemblyName = "nunit.framework"
+                    HintPath = "C:\bin\NUnit 2.2.8\bin\nunit.framework.dll"
                 />
             </References>
         </Build>

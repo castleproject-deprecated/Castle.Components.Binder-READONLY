@@ -74,9 +74,9 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.DynamicProxy">
-      <Name>Castle.DynamicProxy</Name>
-      <HintPath>..\..\Tools\DynamicProxy\bin\Castle.DynamicProxy.dll</HintPath>
+    <Reference Include="Castle.DynamicProxy, Version=1.1.5.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\net-2.0\Castle.DynamicProxy.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -91,7 +91,7 @@
       <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
       <Name>Castle.Core-vs2005</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Castle.MicroKernel\Castle.MicroKernel-2-0.csproj">
+    <ProjectReference Include="..\Castle.MicroKernel\Castle.MicroKernel-vs2005.csproj">
       <Name>Castle.MicroKernel</Name>
       <Project>{8C6AADEB-D099-4D2A-8F5B-4EBC12AC9159}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>

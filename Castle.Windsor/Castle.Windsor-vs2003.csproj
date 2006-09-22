@@ -3,13 +3,13 @@
         ProjectType = "Local"
         ProductVersion = "7.10.6030"
         SchemaVersion = "2.0"
-        ProjectGuid = "{EF9313A4-C6E0-40F7-9E3F-530D547D3AEF}"
+        ProjectGuid = "{60EFCB9B-E3FF-46A5-A2D2-D9F0EF75D5FE}"
     >
         <Build>
             <Settings
                 ApplicationIcon = ""
                 AssemblyKeyContainerName = ""
-                AssemblyName = "Castle.MicroKernel.Tests"
+                AssemblyName = "Castle.Windsor"
                 AssemblyOriginatorKeyFile = ""
                 DefaultClientScript = "JScript"
                 DefaultHTMLPageLayout = "Grid"
@@ -18,7 +18,7 @@
                 OutputType = "Library"
                 PreBuildEvent = ""
                 PostBuildEvent = ""
-                RootNamespace = "Castle.MicroKernel.Tests"
+                RootNamespace = "Castle.Windsor"
                 RunPostBuildEvent = "OnBuildSuccess"
                 StartupObject = ""
             >
@@ -36,7 +36,7 @@
                     NoStdLib = "false"
                     NoWarn = ""
                     Optimize = "false"
-                    OutputPath = "..\bin\"
+                    OutputPath = "..\bin\aa\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -56,7 +56,7 @@
                     NoStdLib = "false"
                     NoWarn = ""
                     Optimize = "true"
-                    OutputPath = "..\bin\"
+                    OutputPath = "bin\Release\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -70,6 +70,11 @@
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.dll"
                 />
                 <Reference
+                    Name = "System.Data"
+                    AssemblyName = "System.Data"
+                    HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
+                />
+                <Reference
                     Name = "System.XML"
                     AssemblyName = "System.Xml"
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
@@ -80,19 +85,14 @@
                     Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
                 />
                 <Reference
-                    Name = "System.Data"
-                    AssemblyName = "System.Data"
-                    HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
-                />
-                <Reference
-                    Name = "nunit.framework"
-                    AssemblyName = "nunit.framework"
-                    HintPath = "C:\devtools\nunit\nuni228-net11\bin\nunit.framework.dll"
-                />
-                <Reference
                     Name = "Castle.Core"
                     AssemblyName = "Castle.Core"
-                    HintPath = "..\..\Core\bin\Castle.Core.dll"
+                    HintPath = "..\..\build\net-1.1\Castle.Core.dll"
+                />
+                <Reference
+                    Name = "Castle.DynamicProxy"
+                    AssemblyName = "Castle.DynamicProxy"
+                    HintPath = "..\..\build\net-1.1\Castle.DynamicProxy.dll"
                 />
             </References>
         </Build>
@@ -104,257 +104,256 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "BestConstructorTestCase.cs"
+                    RelPath = "AsyncInitializationContainer.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "BinaryTreeComponentNameTestCase.cs"
+                    RelPath = "IContainerAccessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "DefaultConversionManagerTestCase.cs"
+                    RelPath = "InitializationException.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "DependencyGraph.cs"
+                    RelPath = "IWindsorContainer.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "DependencyResolvers.cs"
+                    RelPath = "windsor.build"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "WindsorContainer.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "DependencyResolvingTestCases.cs"
+                    RelPath = "Adapters\ComponentModel\ContainerAdapter.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "FacilityTestCase.cs"
+                    RelPath = "Adapters\ComponentModel\ContainerAdapter.resx"
+                    DependentUpon = "ContainerAdapter.cs"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Adapters\ComponentModel\ContainerAdapterSite.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "GraphTestCase.cs"
+                    RelPath = "Adapters\ComponentModel\ContainerWrapper.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "MicroKernelTestCase.cs"
+                    RelPath = "Adapters\ComponentModel\ContainerWrapper.resx"
+                    DependentUpon = "ContainerWrapper.cs"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Adapters\ComponentModel\IContainerAdapter.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "NamingPartsSubSystemTestCase.cs"
+                    RelPath = "Adapters\ComponentModel\IContainerAdapterSite.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "RuntimeParametersTestCase.cs"
+                    RelPath = "Adapters\ComponentModel\ServiceCreatorCallbackActivator.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "SerializationTestCase.cs"
+                    RelPath = "Configuration\CascadeConfigurationStore.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "UnsatisfiedDependenciesTestCase.cs"
+                    RelPath = "Configuration\IConfigurationInterpreter.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\ClassWithArrayConstructor.cs"
+                    RelPath = "Configuration\AppDomain\CastleSectionHandler.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\ClassWithListConstructor.cs"
+                    RelPath = "Configuration\Interpreters\AbstractInterpreter.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\CommonImpl1.cs"
+                    RelPath = "Configuration\Interpreters\XmlInterpreter.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\CommonImpl2.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ConfigurationProcessingException.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\CommonServiceUser.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\DefaultXmlProcessorEngine.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\CommonServiceUser2.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\DefaultXmlProcessorNodeList.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\ComponentFactory.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\IXmlNodeProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\CustomerImpl.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\IXmlProcessorEngine.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\CustomerImpl2.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\IXmlProcessorNodeList.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\CustomLifestyleManager.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\XmlProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\DefaultCustomer.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\XmlProcessorException.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\DefaultMailSenderService.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\AbstractStatementElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\DefaultSpamService.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\AbstractXmlNodeProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\DefaultSpamServiceWithConstructor.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\AttributesElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\DefaultTemplateEngine.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\ChooseElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\HiperFacility.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\DefaultElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\ICommon.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\DefaultTextNodeProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClassComponents\ICustomer.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\DefinedProcessingInstructionProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Configuration\ConfigurationTestCase.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\DefineElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Configuration\Components\ClassWithConstructors.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\IfElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Facilities\Startable\StartableFacilityTestCase.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\IfProcessingInstructionProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Facilities\Startable\Components\NoInterfaceStartableComponent.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\IncludeElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Facilities\Startable\Components\StartableComponent.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\PropertiesElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifecycle\LifecycleTestCase.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\UndefElementProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifecycle\Components\HttpFakeServer.cs"
+                    RelPath = "Configuration\Interpreters\XmlProcessor\ElementProcessors\UndefProcessingInstructionProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifestyle\LifestyleManagerTestCase.cs"
+                    RelPath = "Installer\DefaultComponentInstaller.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifestyle\Components\CustomComponent.cs"
+                    RelPath = "Installer\IComponentsInstaller.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifestyle\Components\IComponent.cs"
+                    RelPath = "Proxy\AbstractProxyFactory.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifestyle\Components\MyLifestyleHandler.cs"
+                    RelPath = "Proxy\ComponentRealProxy.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifestyle\Components\NoInfoComponent.cs"
+                    RelPath = "Proxy\DefaultMethodInvocation.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifestyle\Components\PerThreadComponent.cs"
+                    RelPath = "Proxy\DefaultProxyFactory.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifestyle\Components\SingletonComponent.cs"
+                    RelPath = "Proxy\InterceptorChain.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Lifestyle\Components\TransientComponent.cs"
+                    RelPath = "Proxy\MessageProxyInvocation.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Pools\MultithreadedPooledTestCase.cs"
+                    RelPath = "Proxy\ProxySmartFactory.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "Pools\PoolableComponent1.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Pools\PooledLifestyleManagerTestCase.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "RuntimeParameters\ComponentWithParameters.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SubContainers\SubContainersTestCase.cs"
+                    RelPath = "Proxy\RealProxyProxyFactory.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
