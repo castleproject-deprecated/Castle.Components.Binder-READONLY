@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <CSHARP
         ProjectType = "Local"
-        ProductVersion = "7.10.3077"
+        ProductVersion = "7.10.6030"
         SchemaVersion = "2.0"
         ProjectGuid = "{A2CE0F66-AD6F-4663-BBEC-C22A90CA3D35}"
     >
@@ -17,7 +17,7 @@
                 DelaySign = "false"
                 OutputType = "Library"
                 PreBuildEvent = ""
-                PostBuildEvent = ""
+                PostBuildEvent = "copy $(ProjectDir)App.config $(TargetPath).config"
                 RootNamespace = "AspectSharp.Tests"
                 RunPostBuildEvent = "OnBuildSuccess"
                 StartupObject = ""
@@ -90,11 +90,6 @@
                     Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
                 />
                 <Reference
-                    Name = "nunit.framework"
-                    AssemblyName = "nunit.framework"
-                    HintPath = "..\..\build\net-1.1\nunit.framework.dll"
-                />
-                <Reference
                     Name = "AopAlliance"
                     Project = "{74C3CE90-25AF-4998-9123-61D19041AF68}"
                     Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
@@ -102,17 +97,26 @@
                 <Reference
                     Name = "antlr.runtime"
                     AssemblyName = "antlr.runtime"
-                    HintPath = "..\lib\antlr.runtime.dll"
+                    HintPath = "..\..\build\net-1.1\antlr.runtime.dll"
                 />
                 <Reference
                     Name = "Castle.DynamicProxy"
                     AssemblyName = "Castle.DynamicProxy"
                     HintPath = "..\..\build\net-1.1\Castle.DynamicProxy.dll"
                 />
+                <Reference
+                    Name = "nunit.framework"
+                    AssemblyName = "nunit.framework"
+                    HintPath = "..\..\build\net-1.1\nunit.framework.dll"
+                />
             </References>
         </Build>
         <Files>
             <Include>
+                <File
+                    RelPath = "App.config"
+                    BuildAction = "None"
+                />
                 <File
                     RelPath = "AspectEngineBuilderTestCase.cs"
                     SubType = "Code"
@@ -122,10 +126,6 @@
                     RelPath = "AspectEngineTestCase.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "AspectSharp.Tests.dll.config"
-                    BuildAction = "None"
                 />
                 <File
                     RelPath = "AssemblyInfo.cs"
