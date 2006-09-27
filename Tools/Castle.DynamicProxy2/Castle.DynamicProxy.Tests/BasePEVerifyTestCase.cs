@@ -21,7 +21,7 @@ namespace Castle.DynamicProxy.Tests
 	public abstract class BasePEVerifyTestCase
 	{
 		[TearDown]
-		public void TestGeneratedAssembly()
+		public void RunPEVerifyOnGeneratedAssembly()
 		{
 			Process process = new Process();
 

@@ -14,10 +14,33 @@
 
 namespace Castle.DynamicProxy.Tests
 {
+	using Castle.DynamicProxy.Tests.Interceptors;
+	using Castle.DynamicProxy.Tests.InterClasses;
 	using NUnit.Framework;
 
 	[TestFixture]
 	public class BasicInterfaceProxyTestCase : BasePEVerifyTestCase
 	{
+		private ProxyGenerator generator;
+
+		[SetUp]
+		public void Init()
+		{
+			generator = new ProxyGenerator();
+		}
+
+		[Test]
+		public void BasicInterfaceProxyWithValidTarget()
+		{
+			LogInvocationInterceptor logger = new LogInvocationInterceptor();
+
+			IService service = (IService)
+				generator.CreateInterfaceProxyWithTarget(
+					typeof(IService), new ServiceImpl(), logger);
+
+			Assert.AreEqual(3, service.Sum(1, 2));
+			
+			Assert.AreEqual("Sum ", logger.LogContents);
+		}
 	}
 }
