@@ -7,7 +7,7 @@ namespace Castle.Windsor.Tests
 	{
 		public static string ResolveConfigPath(string configFilePath)
 		{
-#if DOTNET21
+#if DOTNET2
 			return Path.Combine(ConfigurationManager.AppSettings["tests.src"], configFilePath);
 #else
 			return Path.Combine(ConfigurationSettings.AppSettings["tests.src"], configFilePath);
