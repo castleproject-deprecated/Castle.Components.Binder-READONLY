@@ -18,71 +18,12 @@
 
 	<echo message="Using ${nunit-console}" />
 -->
-<!-- TODO: Remove?
-	<property name="dotnet.version" value="1" if="${framework::get-target-framework()=='net-1.0'}" />
-	<property name="dotnet.version" value="1" if="${framework::get-target-framework()=='net-1.1'}" />
-	<property name="dotnet.version" value="1" if="${framework::get-target-framework()=='mono-1.0'}" />
-	<property name="dotnet.version" value="2" if="${framework::get-target-framework()=='net-2.0'}" />
-	<property name="dotnet.version" value="2" if="${framework::get-target-framework()=='mono-2.0'}" />
-	<property name="dotnet.version" value="0" unless="${property::exists('dotnet.version')}" />
-	<property name="strong"		value="STRONG"		unless="${property::exists('strong')}" />
-	<property name="debug"		value="false"		unless="${property::exists('debug')}" />
-	<property name="optimize"	value="true"		unless="${property::exists('optimize')}" />
-	<property name="trace"	    value="true"		unless="${property::exists('trace')}" />
--->	
-
-<!--	<property name="doc.dir"	value="${base.dir}/docs" />-->
-
-<!-- TODO: Remove?
-	<property name="nunit.formatter" value="Plain"	unless="${property::exists('nunit.formatter')}" />
-	<property name="os" value="${operating-system::to-string(environment::get-operating-system())}" />
-	<property name="isWindows" value="${string::starts-with(os, 'Microsoft Windows')}" />
-	<property name="isMono" value="${string::starts-with(framework::get-target-framework(),'mono')}" />
--->
-
-	<!-- Global compilation defines
-	<property name="define"     value="TRACE"               if="${trace}" />
-	 -->
-	<!-- Framework 2.0 defines
-	<property name="define"     value="${define};DOTNET2"   if="${framework::get-target-framework()=='net-2.0'}"/>
-	 -->
-	<!-- Make sure the property exists
-	<property name="define"     value=""                    unless="${property::exists('define')}" />
-	 -->
 
 	<!-- properties used to connect to database for testing -->
 	<property name="ar.dialect" value="NHibernate.Dialect.MsSql2000Dialect" overwrite="false" />
 	<property name="ar.connection.driver_class" value="NHibernate.Driver.SqlClientDriver" overwrite="false" />
 	<property name="ar.connection.connection_string.1" value="Server=(local);initial catalog=test;Integrated Security=SSPI" overwrite="false" />
 	<property name="ar.connection.connection_string.2" value="Server=(local);initial catalog=test2;Integrated Security=SSPI" overwrite="false" />
-
-	<!-- find out where gacutil is
-
-	<property name="gacutil.framework.file" value="${framework::get-framework-directory( framework::get-target-framework() )}\gacutil.exe"/>
-	<property name="gacutil.sdk.file" value="${framework::get-sdk-directory( framework::get-target-framework() )}\gacutil.exe"/>
-
-	<description>Find "gacutil" and show error message if it was not found.</description>
-	<if test="${( not property::exists( 'gacutil.file' )) and file::exists( gacutil.framework.file )}">
-		<property name="gacutil.file" value="${gacutil.framework.file}"/>
-	</if>
-	<if test="${( not property::exists( 'gacutil.file' )) and file::exists( gacutil.sdk.file )}">
-		<property name="gacutil.file" value="${gacutil.sdk.file}"/>
-	</if>
-	<if test="${not property::exists( 'gacutil.file' )}">
-		<echo>Could not find "gacutil" to install Castle.MonoRail.TestSupport server to GAC.</echo>
-		<echo>To run the tests you have to install it manually: gacutil /i Castle.MonoRail.TestSupport</echo>
-	</if>
- -->
-	<!-- set up caspol.exe location
-
-	<property name="caspol.file" value="${framework::get-framework-directory( framework::get-target-framework() )}\caspol.exe"/>
-	 -->
-
-<!-- TODO: Remove?
-	<property name="nunit.framework.dll" value="${path::combine(build.dir, 'nunit.framework.dll')}" />
-
-	<property name="nant.tasks.nunit2" value="False" unless="${property::exists('nant.tasks.nunit2')}" />
--->
 
 	<!-- 
 		Path to the folder that contain the external assemblies.  For net-1.1 the values will
