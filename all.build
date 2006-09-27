@@ -39,7 +39,7 @@
 	</target>
 
 	<target name="facilities" depends="init">
-		<!--<nant buildfile="Facilities/facilities.build" target="build" inheritall="true" />-->
+		<nant buildfile="Facilities/facilities.build" target="build" inheritall="true" />
 	</target>
 
 	<target name="components" depends="init">
