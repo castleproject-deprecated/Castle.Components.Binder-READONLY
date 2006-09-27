@@ -8,8 +8,10 @@
 	<target name="build" depends="dynamicproxy2" />
 
 	<target name="dynamicproxy2" >
-		<nant buildfile="Castle.DynamicProxy/Castle.DynamicProxy.build" />
-		<nant buildfile="Castle.DynamicProxy.Tests/Castle.DynamicProxy.Tests.build" />
+		<if test="${nant.settings.currentframework=='net-2.0'}">
+			<nant buildfile="Castle.DynamicProxy/Castle.DynamicProxy.build" />
+			<nant buildfile="Castle.DynamicProxy.Tests/Castle.DynamicProxy.Tests.build" />
+		</if>
 	</target>
 
 </project>
