@@ -80,11 +80,6 @@
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
                 />
                 <Reference
-                    Name = "AspectSharp"
-                    Project = "{C50C59E8-410B-48C6-8CD0-DB351C0AB75E}"
-                    Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
-                />
-                <Reference
                     Name = "AspectSharp.Lang"
                     Project = "{6B00E2C0-C58E-4399-A323-A034415E67D4}"
                     Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
@@ -97,17 +92,22 @@
                 <Reference
                     Name = "antlr.runtime"
                     AssemblyName = "antlr.runtime"
-                    HintPath = "..\..\build\net-1.1\antlr.runtime.dll"
+                    HintPath = "..\..\build\net-1.1\debug\antlr.runtime.dll"
                 />
                 <Reference
                     Name = "Castle.DynamicProxy"
                     AssemblyName = "Castle.DynamicProxy"
-                    HintPath = "..\..\build\net-1.1\Castle.DynamicProxy.dll"
+                    HintPath = "..\..\build\net-1.1\debug\Castle.DynamicProxy.dll"
                 />
                 <Reference
                     Name = "nunit.framework"
                     AssemblyName = "nunit.framework"
-                    HintPath = "..\..\build\net-1.1\nunit.framework.dll"
+                    HintPath = "..\..\build\net-1.1\debug\nunit.framework.dll"
+                />
+                <Reference
+                    Name = "AspectSharp-vs2003"
+                    Project = "{C50C59E8-410B-48C6-8CD0-DB351C0AB75E}"
+                    Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
                 />
             </References>
         </Build>

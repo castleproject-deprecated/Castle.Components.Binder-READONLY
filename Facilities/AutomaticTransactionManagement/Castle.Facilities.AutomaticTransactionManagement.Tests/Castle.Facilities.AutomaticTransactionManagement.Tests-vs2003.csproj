@@ -16,8 +16,8 @@
                 DefaultTargetSchema = "IE50"
                 DelaySign = "false"
                 OutputType = "Library"
-                PreBuildEvent = "copy $(ProjectDir)\App.config $(TargetPath).config"
-                PostBuildEvent = ""
+                PreBuildEvent = ""
+                PostBuildEvent = 'copy "$(ProjectDir)\App.config" "$(TargetPath).config"'
                 RootNamespace = "Castle.Facilities.AutomaticTransactionManagement.Tests"
                 RunPostBuildEvent = "OnBuildSuccess"
                 StartupObject = ""

@@ -17,7 +17,7 @@
                 DelaySign = "false"
                 OutputType = "Library"
                 PreBuildEvent = ""
-                PostBuildEvent = ""
+                PostBuildEvent = 'copy "$(ProjectDir)\App.config" "$(TargetPath).config"'
                 RootNamespace = "Castle.Facilities.NHibernateIntegration.Tests"
                 RunPostBuildEvent = "OnBuildSuccess"
                 StartupObject = ""
@@ -168,7 +168,7 @@
                 />
                 <File
                     RelPath = "Common\Blog.hbm.xml"
-                    BuildAction = "Content"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "Common\BlogDao.cs"
@@ -182,7 +182,7 @@
                 />
                 <File
                     RelPath = "Common\BlogItem.hbm.xml"
-                    BuildAction = "Content"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "Common\BlogItemDao.cs"
@@ -196,7 +196,7 @@
                 />
                 <File
                     RelPath = "Common\BlogRef.hbm.xml"
-                    BuildAction = "Content"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "Common\DaoTestCase.cs"
@@ -210,7 +210,7 @@
                 />
                 <File
                     RelPath = "Common\Order.hbm.xml"
-                    BuildAction = "Content"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "Common\TestInterceptor.cs"
