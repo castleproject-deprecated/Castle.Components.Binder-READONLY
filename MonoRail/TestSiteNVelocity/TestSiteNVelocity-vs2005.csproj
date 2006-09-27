@@ -217,7 +217,7 @@
     <Compile Include="Controllers\ValidatedController.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="sample.build" />
+    <None Include="log4net.config" />
     <None Include="views\ajax\periodinvocation.vm" />
     <None Include="views\apppath\index.vm" />
     <None Include="views\components\SimpleInlineViewComponent2\mycompview1.vm" />

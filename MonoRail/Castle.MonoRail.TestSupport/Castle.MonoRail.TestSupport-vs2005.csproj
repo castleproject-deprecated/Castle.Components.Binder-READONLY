@@ -115,7 +115,6 @@
     <Compile Include="WebAppHost.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="default.build" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

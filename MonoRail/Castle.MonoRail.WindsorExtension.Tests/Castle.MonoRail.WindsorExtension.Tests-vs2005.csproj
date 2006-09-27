@@ -114,13 +114,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Compile Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="BasicFunctionalityTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="WindsorMonoRailSectionHandlerTestCase.cs" />
+    <Compile Include="WizardSupportTestCase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

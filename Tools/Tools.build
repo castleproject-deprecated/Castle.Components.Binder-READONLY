@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding='iso-8859-1' ?>
+<project
+	name="castle-tools"
+	default="build"
+	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
+>
+
+	<target name="build" depends="dynamicproxy,nvelocity" />
+	
+	<target name="dynamicproxy">
+		<nant buildfile="DynamicProxy/DynamicProxy.build" target="build" />
+	</target>
+	
+	<target name="nvelocity">
+		<nant buildfile="NVelocity/nvelocity.build" target="build" />
+	</target>
+	
+</project>

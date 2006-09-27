@@ -102,9 +102,6 @@
     <Compile Include="MultiThreadTestCase.cs" />
     <Compile Include="Test\AjaxHelper2.cs" />
     <Compile Include="Test\AmbiguousExceptionTestCase.cs" />
-    <Compile Include="Test\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Test\BaseTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -168,6 +165,9 @@
     <Compile Include="Test\VTLTest.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

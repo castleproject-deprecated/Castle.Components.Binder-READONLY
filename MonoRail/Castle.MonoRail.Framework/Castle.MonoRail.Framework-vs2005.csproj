@@ -378,6 +378,7 @@
     <Compile Include="MonoRailHttpHandlerFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MonoRailServiceContainer.cs" />
     <Compile Include="ProcessEngine.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -436,7 +437,6 @@
     <Compile Include="WizardStepPage.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="default.build" />
     <EmbeddedResource Include="Controllers\Ajax.resx" />
     <EmbeddedResource Include="Controllers\Behaviour.resx" />
     <EmbeddedResource Include="Controllers\Effects2.resx" />

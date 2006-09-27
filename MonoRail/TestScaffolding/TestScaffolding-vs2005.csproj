@@ -204,7 +204,6 @@
     <EmbeddedResource Include="global.asax.resx">
       <DependentUpon>global.asax.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="sample.build" />
     <None Include="Views\blogs\newBlog.vm.old" />
     <None Include="Views\layouts\scaffold.vm" />
     <None Include="Views\rescues\DataBinderValidateBadData.vm" />

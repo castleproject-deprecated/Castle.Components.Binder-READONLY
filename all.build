@@ -1,121 +1,33 @@
 <?xml version="1.0" encoding='iso-8859-1' ?>
-<project name="all" default="build">
+<project
+	name="Castle"
+	default="build"
+	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
+>
 
-	<property name="base.dir" value="${path::get-full-path( project::get-base-directory() )}" />
-	<property name="skipcaspol" value="true" />
-	<property name="sharedlibrary.dir" value="${base.dir}/SharedLibs" />
+	<property name="root.dir" value="." />
+	<include buildfile="${root.dir}/common.xml" />
+	
 	<property name="releasenotes.dir" value="ReleaseNotes" />
-	<property name="test.output.dir" value="${path::combine(base.dir, 'test-results')}" />
 
-	<include buildfile="common.xml" />
-	
-	<target name="build" depends="clean, init, core, services, tools, container, components, activerecord, monorail, aspectsharp, facilities, samples" />
+	<target name="build"
+		depends="init copy-referenced-assemblies core services tools container components activerecord monorail aspectsharp facilities samples"
+		description="Builds Castle in the current configuration" />
 
-	<target name="clean">
-		<delete dir="${build.dir}" failonerror="false" />
-		
-		<delete dir="${test.output.dir}" failonerror="false" />
-	</target>
-		
-	<target name="cleanall">
-		<delete dir="${build.dir}" failonerror="false" />
-		<nant buildfile="ActiveRecord/activerecord.build" target="clean" inheritall="true" />
-		<nant buildfile="Tools/DynamicProxy/DynamicProxy.build" target="clean" inheritall="true" />
-		<nant buildfile="Tools/NVelocity/nvelocity.build" target="clean" inheritall="true" />
-		<nant buildfile="InversionOfControl/container.build" target="clean" inheritall="true" />
-		<nant buildfile="Services/services.build" target="clean" inheritall="true" />
-		<nant buildfile="Facilities/facilities.build" target="clean" inheritall="true" />
-		<nant buildfile="Components/components.build" target="clean" inheritall="true" />
-		<nant buildfile="MonoRail/monorail.build" target="clean" inheritall="true" />
-		<nant buildfile="AspectSharp/aspectsharp.build" target="clean" inheritall="true" />
-	</target>
-	
-	<target name="init">
-		<mkdir dir="${build.dir}" />
-		<mkdir dir="${test.output.dir}" />
-		
-		<call target="copydistdependencies" />
-
-		<exec 
-			program="${nunit-console}" 
-			resultproperty="nunit.found"
-			failonerror="false" />
-
-		<echo message="nunit-console invocation result: ${nunit.found}" />
-
-		<property name="tests.disabled" value="false" />
-
-		<if test="${nunit.found!='0'}">
-			<property name="tests.disabled" value="true" />
-		</if>
-
-		<echo message="Tests with nunit-console are disabled?  ${tests.disabled}" />
-	</target>
-	
-	<target name="copydistdependencies">
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/boo">
-				<include name="*.dll" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/cassini">
-				<include name="*.*" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/ibatis/${framework::get-target-framework()}">
-				<include name="*.dll" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/log4net">
-				<include name="*.dll" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/netron">
-				<include name="*.dll" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/nhibernate">
-				<include name="*.*" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/nlog/${framework::get-target-framework()}">
-				<include name="*.*" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/nvelocity">
-				<include name="*.*" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/prevalence">
-				<include name="*.*" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset basedir="${sharedlibrary.dir}/nunit/${framework::get-target-framework()}">
-				<include name="*.*" />
-			</fileset>
-		</copy>
-	</target>
+	<target name="rebuild"
+		depends="init recreate-build-directory build"
+		description="Rebuilds Castle in the current configuration" />
 
 	<target name="activerecord" depends="init">
 		<nant buildfile="ActiveRecord/activerecord.build" target="build" inheritall="true" />
 	</target>
 	
 	<target name="tools" depends="init">
-		<nant buildfile="Tools/DynamicProxy/DynamicProxy.build" target="build" inheritall="true" />
-		<nant buildfile="Tools/NVelocity/nvelocity.build" target="build" inheritall="true" />
+		<nant buildfile="Tools/Tools.build" target="build" inheritall="true" />
 	</target>
 
 	<target name="container" depends="init">
-		<nant buildfile="InversionOfControl/container.build" target="build" inheritall="true" />
+		<nant buildfile="InversionOfControl/InversionOfControl.build" target="build" inheritall="true" />
 	</target>
 
 	<target name="services" depends="init">
@@ -127,7 +39,7 @@
 	</target>
 
 	<target name="facilities" depends="init">
-		<nant buildfile="Facilities/facilities.build" target="build" inheritall="true" />
+		<!--<nant buildfile="Facilities/facilities.build" target="build" inheritall="true" />-->
 	</target>
 
 	<target name="components" depends="init">
@@ -146,8 +58,147 @@
 
 	</target>
 
+	<target name="init" depends="common.init">
+		<!-- add SVN revision to builds -->
+		<property name="svn.revision" value="0" unless="${property::exists('svn.revision')}"/>
+		<!-- try to update the revision -->
+		<echo message="Retrieving Subversion revision number"/>
+		<exec
+			program="svn"
+			commandline='info "${project::get-base-directory()}" --xml'
+			output="_revision.xml"
+			failonerror="false"/>
+		<xmlpeek
+			file="_revision.xml"
+			xpath="/info/entry/commit/@revision"
+			property="svn.revision"
+			failonerror="false"/>
+		<delete file="_revision.xml" failonerror="false" />
+		<echo message="Using Subversion revision number: ${svn.revision}"/>
+
+		<exec 
+			program="${nunit-console}" 
+			resultproperty="nunit.found"
+			failonerror="false" />
+
+		<echo message="nunit-console invocation result: ${nunit.found}" />
+
+		<property name="tests.disabled" value="false" />
+
+		<if test="${nunit.found!='0'}">
+			<property name="tests.disabled" value="true" />
+		</if>
+
+		<echo message="Tests with nunit-console are disabled?  ${tests.disabled}" />
+	</target>
+	
+	<target name="clean" description="Deletes current build artifacts" depends="common.init">
+		<delete dir="${build.dir}" failonerror="false" />
+	</target>
+		
+    <target name="clean-vs" description="Delete Visual Studio artifacts" depends="common.init">
+        <!-- NB - this target will fail if you have a solution open in Visual Studio -->
+		<echo message="Gathering files for removal..." />
+        <foreach item="File" property="filename">
+            <in>
+                <items basedir=".">
+                    <include name="**/*.suo" />
+                    <include name="*/*.csproj.user" />
+                </items>
+            </in>
+            <do>
+                <delete file="${filename}" />
+            </do>
+        </foreach>
+		<echo message="Gathering folders for removal..." />
+        <foreach item="Folder" property="foldername">
+            <in>
+                <items basedir=".">
+                    <include name="**/obj" />
+                    <include name="**/_ReSharper*" />
+                </items>
+            </in>
+            <do>
+                <delete dir="${foldername}" failonerror="false" />
+            </do>
+        </foreach>
+    </target>
+
+	<target name="cleanall" description="Deletes all build artifacts" depends="common.init">
+		<echo message="Deleting all builds from all configurations" />
+		<delete dir="${build.base.dir}" failonerror="false" />
+		<call target="clean-vs" />
+	</target>
+	
+	<target name="recreate-build-directory">
+		<echo message="Current Directory is ${project::get-base-directory()}" />
+		<echo message="Build Directory is ${build.dir}" />
+
+		<!-- Prepare build directory -->
+		<delete dir="${build.dir}" failonerror="false" />
+		<mkdir dir="${build.dir}" />
+		<call target="copy-referenced-assemblies" />
+	</target>
+
+	<target name="copy-referenced-assemblies">
+		<!-- Copy framework-neutral libraries -->
+		<copy todir="${build.dir}" >
+			<fileset basedir="${lib.dir}">
+				<include name="*.dll" />
+				<include name="*.xml" />
+				<include name="*.license.txt" />
+			</fileset>
+		</copy>
+		
+		<!-- Copy family-specific libraries -->
+		<!-- 
+			The build of log4net works just fine for all versions of .NET.
+			When they do get framework specific extensions then we
+			can just move them to the framework specific section
+		-->
+		<copy todir="${build.dir}">
+			<fileset basedir="${lib.family.dir}">
+				<include name="*.dll" />
+				<include name="*.xml" />
+				<include name="*.license.txt" />
+			</fileset>
+		</copy>
+
+		<!-- Copy framework-specific libraries -->
+		<copy todir="${build.dir}">
+			<fileset basedir="${lib.framework.dir}">
+				<include name="*.dll" />
+				<include name="*.xml" />
+				<include name="*.license.txt" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build-all-frameworks" depends="init">
+		<!-- Save the current framework -->
+		<property name="current.framework.saved" value="${nant.settings.currentframework}" />
+
+		<!-- Execute build for each framework -->
+		<foreach item="String" delim=" " property="framework" in="net-1.1 net-2.0">
+			<call target="set-${framework}-framework-configuration" />
+			<call target="build" />
+		</foreach>
+
+		<!-- Reset the current framework to the saved value -->
+		<call target="set-${current.framework.saved}-framework-configuration" />
+	</target>
+
+	<target name="sources" depends="init">
+	</target>
 	<!-- Packaging related tasks -->
 	
+	<target name="package" depends="zip-build"
+		description="Creates Zip files for Release">
+
+		<echo message="Created a '${project.config}' package in file://${build-zipfile}" />
+
+	</target>
+
 	<target name="createreleasenotes">
 		<mkdir dir="${releasenotes.dir}" />
 		<delete dir="${releasenotes.dir}" />
@@ -215,8 +266,8 @@
 	</target>
 
 	<target name="zip_dependencies"  >
-		<zip zipfile="${base.dir}/build/${framework::get-target-framework()}/external-dependencies.zip">
-			<fileset basedir="${base.dir}/build/${framework::get-target-framework()}">
+		<zip zipfile="${build.dir}/external-dependencies.zip">
+			<fileset basedir="${build.dir}">
 				<include name="*.*" />
 				<exclude name="**/Castle*" />
 				<exclude name="**/AspectSharp*" />
@@ -227,14 +278,12 @@
 	</target>
 
 	<target name="zip-build" depends="build">
-		<property name="build-type" value="release" unless="${debug}" />
-		<property name="build-type" value="debug" if="${debug}"/>
-		<property name="build-zipfile" value="${base.dir}/castleproject-build_${CCNetLabel}-${framework::get-target-framework()}-${build-type}.zip" />
+		<property name="build-zipfile" value="${root.dir}/castleproject-build_${CCNetLabel}-${nant.settings.currentframework}-${project.config}.zip" />
 		
 		<delete>
-			<fileset basedir="${base.dir}">
+			<fileset basedir="${root.dir}">
 				<include name="*.zip" />
-				<include name="${base.dir}/build/${framework::get-target-framework()}/external-dependencies.zip" />
+				<include name="${build.dir}/external-dependencies.zip" />
 			</fileset>
 		</delete>
 
@@ -242,19 +291,19 @@
 		<call target="createreleasenotes" />
 
 		<!-- Include a zip file with all source code -->
-		<call target="zipsource" if="${debug}" />
+		<call target="zipsource" if="${build.debug}" />
 
 		<!-- Include a zip file with all dependencies -->
 		<call target="zip_dependencies" />
 
 		<!-- Create the master zip file with all files included -->
 		<zip zipfile="${build-zipfile}">
-			<fileset basedir="${base.dir}/build/">
+			<fileset basedir="${build.base.dir}">
 				<include name="${framework::get-target-framework()}/Castle*.*" />
 				<include name="${framework::get-target-framework()}/AspectSharp*.*" />
 				<include name="${framework::get-target-framework()}/external-dependencies.zip" />
 			</fileset>
-			<fileset basedir="${base.dir}">
+			<fileset basedir="${root.dir}">
 				<include name="ASL - Apache Software Foundation License.txt" />
 				<include name="Committers.txt" />
 				<include name="Castle main limitations.txt" />
@@ -274,16 +323,16 @@
 	</target>
 	
 	<target name="zipdoc">
-		<zip zipfile="${base.dir}/Castle-api-doc.zip">
-			<fileset basedir="${base.dir}/docs">
+		<zip zipfile="${root.dir}/Castle-api-doc.zip">
+			<fileset basedir="${root.dir}/docs">
 				<include name="Castle.chm" />
 			</fileset>
 		</zip>
 	</target>
 
 	<target name="zipsamples">
-		<zip zipfile="${base.dir}/Samples/ActiveRecord-Samples.zip">
-			<fileset basedir="${base.dir}/Samples/ActiveRecord">
+		<zip zipfile="${root.dir}/Samples/ActiveRecord-Samples.zip">
+			<fileset basedir="${root.dir}/Samples/ActiveRecord">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
 				<include name="**/*.cs" />
@@ -301,8 +350,8 @@
 				<exclude name="**\*.user" />
 			</fileset>
 		</zip>
-		<zip zipfile="${base.dir}/Samples/Facilities-Samples.zip">
-			<fileset basedir="${base.dir}/Samples/Facilities">
+		<zip zipfile="${root.dir}/Samples/Facilities-Samples.zip">
+			<fileset basedir="${root.dir}/Samples/Facilities">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
 				<include name="**/*.cs" />
@@ -320,8 +369,8 @@
 				<exclude name="**\*.user" />
 			</fileset>
 		</zip>
-		<zip zipfile="${base.dir}/Samples/InversionOfControl-Samples.zip">
-			<fileset basedir="${base.dir}/Samples/InversionOfControl">
+		<zip zipfile="${root.dir}/Samples/InversionOfControl-Samples.zip">
+			<fileset basedir="${root.dir}/Samples/InversionOfControl">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
 				<include name="**/*.cs" />
@@ -339,8 +388,8 @@
 				<exclude name="**\*.user" />
 			</fileset>
 		</zip>
-		<zip zipfile="${base.dir}/Samples/MonoRail-Samples.zip">
-			<fileset basedir="${base.dir}/Samples/MonoRail">
+		<zip zipfile="${root.dir}/Samples/MonoRail-Samples.zip">
+			<fileset basedir="${root.dir}/Samples/MonoRail">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
 				<include name="**/*.cs" />
@@ -363,8 +412,8 @@
 				<exclude name="**\*.user" />
 			</fileset>
 		</zip>
-		<zip zipfile="${base.dir}/Samples/Castle-Samples.zip">
-			<fileset basedir="${base.dir}/Samples/Castle">
+		<zip zipfile="${root.dir}/Samples/Castle-Samples.zip">
+			<fileset basedir="${root.dir}/Samples/Castle">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
 				<include name="**/*.cs" />
@@ -386,7 +435,7 @@
 	
 	<target name="zipsource">
 		<zip zipfile="castle-sourcecode.zip">
-			<fileset basedir="${base.dir}">
+			<fileset basedir="${root.dir}">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
 				<include name="**/*.cs" />
@@ -424,8 +473,8 @@
 		</zip>
 	</target>
 	
-	<description>Documentation generation.</description><property name="base.dir" value="." />
-	<property name="doc.dir" value="${base.dir}/docs" />
+	<description>Documentation generation.</description><property name="root.dir" value="." />
+	<property name="doc.dir" value="${root.dir}/docs" />
 	<property name="tempBin.dir" value="${doc.dir}/bin"/>
 	<property name="outputDocs.file" value="Castle"/>
 	

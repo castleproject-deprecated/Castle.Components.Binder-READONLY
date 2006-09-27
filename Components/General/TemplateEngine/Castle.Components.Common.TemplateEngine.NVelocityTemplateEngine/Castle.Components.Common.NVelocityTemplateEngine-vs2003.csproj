@@ -104,11 +104,6 @@
         <Files>
             <Include>
                 <File
-                    RelPath = "AssemblyInfo.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "NVelocityTemplateEngine.cs"
                     SubType = "Code"
                     BuildAction = "Compile"

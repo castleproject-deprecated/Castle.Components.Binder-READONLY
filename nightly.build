@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<project
+	name="Castle Nightly Build" 
+	default="package-all"
+	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"	
+>
+
+	<target name="package-all">
+		<call target="package-net-1.1" />
+		<call target="package-net-2.0" />
+	</target>
+	
+	<target name="package-net-1.1">
+		<!--
+			clean is first target executed so we can get rid of
+			any old assemblies
+		-->
+		<nant buildfile="all.build" target="clean package">
+			<properties>
+				<property name="nant.settings.currentframework" value="net-1.1" />
+				<property name="project.config" value="debug" />
+			</properties>
+		</nant>
+	</target>
+	
+	<target name="package-net-2.0">
+		<!--
+			clean is first target executed so we can get rid of
+			any old assemblies
+		-->
+		<nant buildfile="all.build" target="package">
+			<properties>
+				<property name="nant.settings.currentframework" value="net-2.0" />
+				<property name="project.config" value="debug" />
+			</properties>
+		</nant>
+	</target>
+	
+</project>

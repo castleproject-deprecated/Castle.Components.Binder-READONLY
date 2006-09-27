@@ -78,10 +78,6 @@
       <Name>Castle.ActiveRecord</Name>
       <HintPath>..\..\build\net-2.0\Castle.ActiveRecord.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Core">
-      <Name>Castle.Model</Name>
-      <HintPath>..\..\build\net-2.0\Castle.Core.dll</HintPath>
-    </Reference>
     <Reference Include="NHibernate">
       <Name>NHibernate</Name>
       <HintPath>..\..\build\net-2.0\NHibernate.dll</HintPath>
@@ -113,9 +109,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Compile Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ListActionTestCase.cs">
       <SubType>Code</SubType>
     </Compile>

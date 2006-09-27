@@ -106,9 +106,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ConverterTestCase.cs" />
     <Compile Include="DataBinderArrayTestCase.cs" />
     <Compile Include="DataBinderSingleValueTestCase.cs" />

@@ -118,15 +118,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Compile Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ComponentsTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DynamicActionProviderTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EmailTestCase.cs" />
+    <Compile Include="FormHelperTestCase.cs" />
     <Compile Include="NVelocityBasicFunctionalityTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -142,6 +141,7 @@
     <Compile Include="RoutingTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SmartController2TestCase.cs" />
     <Compile Include="SmartControllerTestCase.cs">
       <SubType>Code</SubType>
     </Compile>

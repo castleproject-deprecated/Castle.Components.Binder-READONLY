@@ -109,6 +109,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="contentinfs.vm" />
+    <EmbeddedResource Include="Content\contentinassembly.vm" />
+    <None Include="Content\notinassembly.vm" />
+    <Compile Include="AbstractTestCase.cs" />
     <Compile Include="AccessibleThroughTestCase.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>

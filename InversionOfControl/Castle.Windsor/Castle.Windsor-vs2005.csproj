@@ -116,9 +116,6 @@
     <Compile Include="Adapters\ComponentModel\ServiceCreatorCallbackActivator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="AsyncInitializationContainer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -243,7 +240,6 @@
     <Compile Include="WindsorContainer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="windsor.build" />
     <EmbeddedResource Include="Adapters\ComponentModel\ContainerAdapter.resx">
       <DependentUpon>ContainerAdapter.cs</DependentUpon>
     </EmbeddedResource>
