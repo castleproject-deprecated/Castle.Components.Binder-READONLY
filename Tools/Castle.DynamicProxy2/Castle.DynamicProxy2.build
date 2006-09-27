@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding='iso-8859-1' ?>
+<project
+	name="castle-dynamicproxy2"
+	default="build"
+	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
+>
+
+	<target name="build" depends="dynamicproxy2" />
+
+	<target name="dynamicproxy2" >
+		<nant buildfile="Castle.DynamicProxy/Castle.DynamicProxy.build" />
+		<nant buildfile="Castle.DynamicProxy.Tests/Castle.DynamicProxy.Tests.build" />
+	</target>
+
+</project>
