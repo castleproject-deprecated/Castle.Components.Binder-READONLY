@@ -258,7 +258,7 @@
 	</target>
 	
 	<target name="zip-build" depends="build">
-		<property name="build-zipfile" value="${root.dir}/castleproject-build_${CCNetLabel}-${nant.settings.currentframework}-${project.config}.zip" overwrite="false" dynamic="true" />
+		<property name="build-zipfile" value="${build.dir}/Castle-${framework::get-target-framework()}-${project.config}-${datetime::get-year(datetime::now())}-${datetime::get-month(datetime::now())}-${datetime::get-day(datetime::now())} (r${svn.revision}).zip" overwrite="false" dynamic="true" />
 		
 		<delete>
 			<fileset basedir="${root.dir}">
@@ -288,6 +288,7 @@
 				<include name="AspectSharp*.*" />
 				<include name="external-dependencies.zip" />
 				<include name="test-results.zip" />
+				<exclude name="castle-sourcecode.zip" />
 				<exclude name="*Tests.*" />
 			</fileset>
 			<fileset basedir="${root.dir}">
