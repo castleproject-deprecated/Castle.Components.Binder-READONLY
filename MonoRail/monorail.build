@@ -6,6 +6,7 @@
 >
 
 	<property name="monorail.test" value="true" unless="${property::exists('monorail.test')}" />
+	<property name="common.run-tests" value="${monorail.test}" />
 
 	<target name="build" depends="framework integration nvelocity brail composite arsupport arscaffold testsupport samples tests generator" />
 
@@ -53,7 +54,7 @@
 		-->
 	</target>
 
-	<target name="tests" if="${monorail.test}">
+	<target name="tests">
 		<nant buildfile="Castle.MonoRail.Framework.Tests/Castle.MonoRail.Framework.Tests.build" />
 		<nant buildfile="Castle.MonoRail.Framework.Views.NVelocity.Tests/Castle.MonoRail.Framework.Views.NVelocity.Tests.build" />
 		<nant buildfile="Castle.MonoRail.WindsorExtension.Tests/Castle.MonoRail.WindsorExtension.Tests.build" />
