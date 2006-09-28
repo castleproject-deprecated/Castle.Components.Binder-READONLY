@@ -8,8 +8,6 @@
 	<property name="root.dir" value="." />
 	<include buildfile="${root.dir}/common.xml" />
 	
-	<property name="releasenotes.dir" value="ReleaseNotes" />
-
 	<target name="build"
 		depends="init copy-referenced-assemblies core services tools container components activerecord monorail aspectsharp facilities samples"
 		description="Builds Castle in the current configuration" />
@@ -188,8 +186,6 @@
 		<call target="set-${current.framework.saved}-framework-configuration" />
 	</target>
 
-	<target name="sources" depends="init">
-	</target>
 	<!-- Packaging related tasks -->
 	
 	<target name="package" depends="zip-build"
@@ -261,24 +257,8 @@
 		</foreach>	
 	</target>
 	
-	<target name="deletereleasenotes">
-		<delete dir="${releasenotes.dir}" />
-	</target>
-
-	<target name="zip_dependencies"  >
-		<zip zipfile="${build.dir}/external-dependencies.zip">
-			<fileset basedir="${build.dir}">
-				<include name="*.*" />
-				<exclude name="**/Castle*" />
-				<exclude name="**/AspectSharp*" />
-				<exclude name="**/db4o.dll" />
-				<exclude name="**/EULA.rtf" />
-			</fileset>
-		</zip>
-	</target>
-
 	<target name="zip-build" depends="build">
-		<property name="build-zipfile" value="${root.dir}/castleproject-build_${CCNetLabel}-${nant.settings.currentframework}-${project.config}.zip" />
+		<property name="build-zipfile" value="${root.dir}/castleproject-build_${CCNetLabel}-${nant.settings.currentframework}-${project.config}.zip" overwrite="false" dynamic="true" />
 		
 		<delete>
 			<fileset basedir="${root.dir}">
@@ -287,42 +267,66 @@
 			</fileset>
 		</delete>
 
+		<property name="releasenotes.dir" value="${build.dir}/ReleaseNotes" />
+
 		<!-- Prepare release note files -->
 		<call target="createreleasenotes" />
 
 		<!-- Include a zip file with all source code -->
-		<call target="zipsource" if="${build.debug}" />
+		<call target="zip-source" if="${build.debug}" />
+
+		<!-- Include test results on debug builds -->
+		<call target="zip-testresults" if="${build.debug}" />
 
 		<!-- Include a zip file with all dependencies -->
-		<call target="zip_dependencies" />
+		<call target="zip-dependencies" />
 
 		<!-- Create the master zip file with all files included -->
 		<zip zipfile="${build-zipfile}">
-			<fileset basedir="${build.base.dir}">
-				<include name="${framework::get-target-framework()}/Castle*.*" />
-				<include name="${framework::get-target-framework()}/AspectSharp*.*" />
-				<include name="${framework::get-target-framework()}/external-dependencies.zip" />
+			<fileset basedir="${build.dir}" prefix="bin" >
+				<include name="Castle*.*" />
+				<include name="AspectSharp*.*" />
+				<include name="external-dependencies.zip" />
+				<include name="test-results.zip" />
+				<exclude name="*Tests.*" />
 			</fileset>
 			<fileset basedir="${root.dir}">
 				<include name="ASL - Apache Software Foundation License.txt" />
 				<include name="Committers.txt" />
 				<include name="Castle main limitations.txt" />
+			</fileset>
+			<fileset basedir="${build.dir}" >
 				<include name="castle-sourcecode.zip" />
 			</fileset>
-			<fileset>
-				<include name="${releasenotes.dir}/**/*.txt" />
+			<fileset basedir="${releasenotes.dir}" prefix="ReleaseNotes" >
+				<include name="**/*.txt" />
 			</fileset>
 		</zip>
 		
+		<delete file="${build.dir}/castle-sourcecode.zip" failonerror="false" />
+		<delete file="${build.dir}/test-results.zip" failonerror="false" />
+		<delete file="${build.dir}/external-dependencies.zip" failonerror="false" />
+
 		<if test="${property::exists('build.target.dir')}">
 			<copy file="${build-zipfile}" todir="${build.target.dir}" />
 		</if>
 		
-		<call target="deletereleasenotes" />
-	
 	</target>
 	
-	<target name="zipdoc">
+	<target name="zip-dependencies"  >
+		<zip zipfile="${build.dir}/external-dependencies.zip">
+			<fileset basedir="${build.dir}">
+				<include name="*.*" />
+				<exclude name="**/Castle*" />
+				<exclude name="**/AspectSharp*" />
+				<exclude name="**/db4o.dll" />
+				<exclude name="**/EULA.rtf" />
+				<exclude name="**/*.zip" />
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="zip-doc">
 		<zip zipfile="${root.dir}/Castle-api-doc.zip">
 			<fileset basedir="${root.dir}/docs">
 				<include name="Castle.chm" />
@@ -330,7 +334,7 @@
 		</zip>
 	</target>
 
-	<target name="zipsamples">
+	<target name="zip-samples">
 		<zip zipfile="${root.dir}/Samples/ActiveRecord-Samples.zip">
 			<fileset basedir="${root.dir}/Samples/ActiveRecord">
 				<include name="**/*.build" />
@@ -433,8 +437,8 @@
 		</zip>
 	</target>
 	
-	<target name="zipsource">
-		<zip zipfile="castle-sourcecode.zip">
+	<target name="zip-source">
+		<zip zipfile="${build.dir}/castle-sourcecode.zip">
 			<fileset basedir="${root.dir}">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -469,6 +473,14 @@
 				<exclude name="Tools/ManagedExtensions/**/*.*" />
 				<exclude name="Tools/Castle.DynamicProxy2/**/*.*" />
 				<exclude name="Tools/DynamicProxy2/**/*.*" />
+			</fileset>
+		</zip>
+	</target>
+	
+	<target name="zip-testresults">
+		<zip zipfile="${build.dir}\test-results.zip">
+			<fileset basedir="${testresults.dir}">
+				<include name="*.xml" />
 			</fileset>
 		</zip>
 	</target>
