@@ -195,19 +195,24 @@
 	<target name="common.run-tests"
 		description="Run NUnit tests">
 
-		<echo message="Running tests in '${project::get-name()}'" />
+		<if test="${common.run-tests}">
+			<echo message="Running tests in '${project::get-name()}'" />
 
-		<nunit2>
-			<formatter 
-				type="Xml" 
-				usefile="true" 
-				extension=".xml" 
-				outputdir="${testresults.dir}"
-			/>
-			<test
-				assemblyname="${build.dir}\${project::get-name()}.dll"
-				appconfig="${build.dir}\${project::get-name()}.dll.config" />
-		</nunit2>
+			<nunit2>
+				<formatter 
+					type="Xml" 
+					usefile="true" 
+					extension=".xml" 
+					outputdir="${testresults.dir}"
+				/>
+				<test
+					assemblyname="${build.dir}\${project::get-name()}.dll"
+					appconfig="${build.dir}\${project::get-name()}.dll.config" />
+			</nunit2>
+		</if>
+		<if test="${not common.run-tests}">
+			<echo message="Tests are disabled for '${project::get-name()}'" />
+		</if>
 
 	</target>
 
