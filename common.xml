@@ -76,8 +76,8 @@
 
 		<property name="src.dir" 			value="${path::get-full-path(project::get-base-directory())}" />
 		<property name="build.base.dir"		value="${root.dir}/build" />
-		<property name="build.root.dir"		value="${build.base.dir}/${nant.settings.currentframework}/${project.config}" />
-		<property name="build.dir" 			value="${path::get-full-path(build.root.dir)}" dynamic="true" />
+		<property name="build.family.dir"	value="${build.base.dir}/${nant.settings.currentframework}" />
+		<property name="build.dir" 			value="${path::get-full-path(path::combine(build.family.dir,project.config))}" dynamic="true" />
 		<property name="testresults.dir" 	value="${build.dir}/test-results" />
 	</target>
 
