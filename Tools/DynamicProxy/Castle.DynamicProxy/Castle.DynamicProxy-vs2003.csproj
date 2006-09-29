@@ -79,6 +79,10 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "DynProxy.snk"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "ICallable.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
