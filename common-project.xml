@@ -95,6 +95,7 @@
 			target="library" 
 			define="${current.build.defines}" 
 			debug="${build.debug}" 
+			optimize="${build.optimize}"
 			output="${build.dir}\${project::get-name()}.dll" 
 			doc="${build.dir}\${project::get-name()}.xml"
 		>
@@ -135,6 +136,7 @@
 			target="exe"
 			define="${current.build.defines}" 
 			debug="${build.debug}"
+			optimize="${build.optimize}"
 			output="${build.dir}\${project::get-name()}.exe" 
 		>
 			<nowarn>
