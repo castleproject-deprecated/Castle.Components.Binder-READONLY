@@ -53,7 +53,10 @@
 	</target>
 
 	<target name="samples" depends="init">
+	</target>
 
+	<target name="installer" depends="init createreleasenotes zip-source zip-samples">
+		<nant buildfile="Setup/Setup.build" />
 	</target>
 
 	<target name="init" depends="common.init">
@@ -202,6 +205,7 @@
 		<echo message="Top level projects Release notes" />
 
 		<copy file="ActiveRecord/Changes.txt" tofile="${releasenotes.dir}/ActiveRecord Release Notes.txt" />
+		<copy file="ActiveRecord/License.txt" tofile="${releasenotes.dir}/License.txt" />
 		<copy file="MonoRail/Changes.txt" tofile="${releasenotes.dir}/MonoRail Release Notes.txt" />
 		<copy file="InversionOfControl/Changes.txt" tofile="${releasenotes.dir}/InversionOfControl Release Notes.txt" />
 		<copy file="AspectSharp/Changes.txt" tofile="${releasenotes.dir}/AspectSharp Release Notes.txt" />
@@ -267,8 +271,6 @@
 			</fileset>
 		</delete>
 
-		<property name="releasenotes.dir" value="${build.dir}/ReleaseNotes" />
-
 		<!-- Prepare release note files -->
 		<call target="createreleasenotes" />
 
@@ -288,7 +290,6 @@
 				<include name="AspectSharp*.*" />
 				<include name="external-dependencies.zip" />
 				<include name="test-results.zip" />
-				<exclude name="castle-sourcecode.zip" />
 				<exclude name="*Tests.*" />
 			</fileset>
 			<fileset basedir="${root.dir}">
@@ -296,7 +297,7 @@
 				<include name="Committers.txt" />
 				<include name="Castle main limitations.txt" />
 			</fileset>
-			<fileset basedir="${build.dir}" >
+			<fileset basedir="${build.base.dir}" >
 				<include name="castle-sourcecode.zip" />
 			</fileset>
 			<fileset basedir="${releasenotes.dir}" prefix="ReleaseNotes" >
@@ -304,7 +305,7 @@
 			</fileset>
 		</zip>
 		
-		<delete file="${build.dir}/castle-sourcecode.zip" failonerror="false" />
+		<delete file="${build.base.dir}/castle-sourcecode.zip" failonerror="false" />
 		<delete file="${build.dir}/test-results.zip" failonerror="false" />
 		<delete file="${build.dir}/external-dependencies.zip" failonerror="false" />
 
@@ -336,7 +337,7 @@
 	</target>
 
 	<target name="zip-samples">
-		<zip zipfile="${root.dir}/Samples/ActiveRecord-Samples.zip">
+		<zip zipfile="${build.base.dir}/ActiveRecord-Samples.zip">
 			<fileset basedir="${root.dir}/Samples/ActiveRecord">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -350,12 +351,15 @@
 				<include name="**/*.inc" />
 				<include name="**/*.vm" />
 				<include name="*.snk" />
-				<exclude name="**\obj\Debug\*.*" />
-				<exclude name="**\bin\*.*" />
-				<exclude name="**\*.user" />
-			</fileset>
+				<exclude name="**/bin/*" />
+				<exclude name="**/bin/Debug/*" />
+				<exclude name="**/bin/Release/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**.user" />
+				<exclude name="**/_Resharper.*/*" />
+		</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/Samples/Facilities-Samples.zip">
+		<zip zipfile="${build.base.dir}/Facilities-Samples.zip">
 			<fileset basedir="${root.dir}/Samples/Facilities">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -369,12 +373,15 @@
 				<include name="**/*.inc" />
 				<include name="**/*.vm" />
 				<include name="*.snk" />
-				<exclude name="**\obj\Debug\*.*" />
-				<exclude name="**\bin\*.*" />
-				<exclude name="**\*.user" />
+				<exclude name="**/bin/*" />
+				<exclude name="**/bin/Debug/*" />
+				<exclude name="**/bin/Release/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**.user" />
+				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/Samples/InversionOfControl-Samples.zip">
+		<zip zipfile="${build.base.dir}/InversionOfControl-Samples.zip">
 			<fileset basedir="${root.dir}/Samples/InversionOfControl">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -388,12 +395,15 @@
 				<include name="**/*.inc" />
 				<include name="**/*.vm" />
 				<include name="*.snk" />
-				<exclude name="**\obj\Debug\*.*" />
-				<exclude name="**\bin\*.*" />
-				<exclude name="**\*.user" />
+				<exclude name="**/bin/*" />
+				<exclude name="**/bin/Debug/*" />
+				<exclude name="**/bin/Release/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**.user" />
+				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/Samples/MonoRail-Samples.zip">
+		<zip zipfile="${build.base.dir}/MonoRail-Samples.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -412,12 +422,15 @@
 				<include name="**/*.inc" />
 				<include name="**/*.vm" />
 				<include name="*.snk" />
-				<exclude name="**\obj\Debug\*.*" />
-				<exclude name="**\bin\*.*" />
-				<exclude name="**\*.user" />
+				<exclude name="**/bin/*" />
+				<exclude name="**/bin/Debug/*" />
+				<exclude name="**/bin/Release/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**.user" />
+				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/Samples/Castle-Samples.zip">
+		<zip zipfile="${build.base.dir}/Castle-Samples.zip">
 			<fileset basedir="${root.dir}/Samples/Castle">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -431,15 +444,18 @@
 				<include name="**/*.inc" />
 				<include name="**/*.vm" />
 				<include name="*.snk" />
-				<exclude name="**\obj\Debug\*.*" />
-				<exclude name="**\bin\*.*" />
-				<exclude name="**\*.user" />
+				<exclude name="**/bin/*" />
+				<exclude name="**/bin/Debug/*" />
+				<exclude name="**/bin/Release/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**.user" />
+				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
 	</target>
 	
 	<target name="zip-source">
-		<zip zipfile="${build.dir}/castle-sourcecode.zip">
+		<zip zipfile="${build.base.dir}/castle-sourcecode.zip">
 			<fileset basedir="${root.dir}">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />

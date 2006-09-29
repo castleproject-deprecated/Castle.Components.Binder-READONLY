@@ -39,6 +39,12 @@
 	<!-- 
 		Versioning
 	-->
+	<property name="project.version" 	value="1.0.0.0" overwrite="false" />
+	<property name="project.major" 		value="${version::get-major(version::parse(project.version))}" 		dynamic="true" />
+	<property name="project.minor" 		value="${version::get-minor(version::parse(project.version))}" 		dynamic="true" />
+	<property name="project.build"		value="${version::get-build(version::parse(project.version))}" 		dynamic="true" />
+	<property name="project.revision"	value="${svn.revision}" 											dynamic="true" />
+
 	<property name="assembly.major" 	value="${version::get-major(version::parse(assembly.version))}"		dynamic="true" />
 	<property name="assembly.minor" 	value="${version::get-minor(version::parse(assembly.version))}" 	dynamic="true" />
 	<property name="assembly.build"		value="${version::get-build(version::parse(assembly.version))}" 	dynamic="true" />
@@ -81,6 +87,7 @@
 		<property name="build.family.dir"	value="${build.base.dir}/${nant.settings.currentframework}" />
 		<property name="build.dir" 			value="${path::get-full-path(path::combine(build.family.dir,project.config))}" dynamic="true" />
 		<property name="testresults.dir" 	value="${build.dir}/test-results" />
+		<property name="releasenotes.dir"	value="${build.dir}/ReleaseNotes" />
 	</target>
 
 	<target name="set-framework-configuration">
@@ -88,7 +95,8 @@
 			<fail message="The '${framework::get-target-framework()}' framework is not supported by this version of Cast;e." />
 		</if>
 		<call target="set-${framework::get-target-framework()}-framework-configuration" />
-		<property name="nunit-console" readonly="false" value="nunit-console.exe" unless="${property::exists('nunit-console')}" />
+		<property name="nunit-console" value="nunit-console.exe" overwrite="false" />
+		<property name="wix.dir" value="C:\Program Files\WiX" overwrite="false" />
 	</target>
 
 	<target name="set-net-1.1-framework-configuration">
