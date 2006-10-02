@@ -28,7 +28,7 @@ namespace Castle.ActiveRecord.Queries
 	/// <typeparam name="T">The resulting object type</typeparam>
 	public class ScalarQuery<T> : ScalarQuery, IActiveRecordQuery<T>
 	{
-#region Constructors
+		#region Constructors
 		/// <summary>
 		/// Creates a new <c>ScalarQuery</c> for the giving <paramref name="hql"/>,
 		/// using the specified positional <paramref name="positionalParameters"/> and
@@ -54,10 +54,10 @@ namespace Castle.ActiveRecord.Queries
 		}
 		#endregion
 
-#region IActiveRecordQuery<T> implementation
+		#region IActiveRecordQuery<T> implementation
 		T IActiveRecordQuery<T>.Execute(ISession session)
 		{
-			return (T) InternalExecute(session);
+			return (T)InternalExecute(session);
 		}
 		#endregion
 
@@ -66,7 +66,7 @@ namespace Castle.ActiveRecord.Queries
 		/// </summary>
 		public T Execute()
 		{
-			return (T) ActiveRecordMediator.ExecuteQuery(this);
+			return (T)ActiveRecordMediator.ExecuteQuery(this);
 		}
 	}
 }
