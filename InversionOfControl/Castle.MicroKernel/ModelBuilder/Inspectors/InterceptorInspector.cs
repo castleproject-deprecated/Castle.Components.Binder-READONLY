@@ -53,7 +53,9 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 						"to a component (Currently {0})", 
 						value);
 
+#pragma warning disable 618
 					throw new ConfigurationException(message);
+#pragma warning restore 618
 				}
 
 				InterceptorReference interceptorRef = 

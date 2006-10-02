@@ -72,7 +72,10 @@ namespace Castle.Facilities.TypedFactory
 					}
 					catch(Exception ex)
 					{
-						throw new ConfigurationException("Invalid factory entry in configuration", ex);
+						string message = "Invalid factory entry in configuration";
+#pragma warning disable 618
+						throw new ConfigurationException(message, ex);
+#pragma warning restore 618
 					}
 				}
 			}

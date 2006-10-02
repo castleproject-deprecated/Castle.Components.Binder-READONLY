@@ -59,6 +59,7 @@
 			<sources refid="project.sources" />
 			<references refid="project.references" />
 			<resources refid="project.resources" />
+			<arg line="${csc.keyfile}" if="${assembly.sign}" />
 		</csc>
 
 		<!-- Check if there is a framework specific config file and use that -->
@@ -111,6 +112,7 @@
 			optimize="${build.optimize}"
 			output="${build.dir}\${project::get-name()}.dll" 
 			doc="${build.dir}\${project::get-name()}.xml"
+			warnaserror="${build.warnaserrors}"
 		>
 			<nowarn>
 				<warning number="1591" /> <!-- No XML comment for publicly visible member -->
@@ -118,6 +120,7 @@
 			<sources refid="project.sources" />
 			<references refid="project.references" />
 			<resources refid="project.resources" />
+			<arg line="${csc.keyfile}" if="${assembly.sign}" />
 		</csc>
 	</target>
 
@@ -151,6 +154,7 @@
 			debug="${build.debug}"
 			optimize="${build.optimize}"
 			output="${build.dir}\${project::get-name()}.exe" 
+			warnaserror="${build.warnaserrors}"
 		>
 			<nowarn>
 				<warning number="1591" /> <!-- No XML comment for publicly visible member -->
@@ -158,6 +162,7 @@
 			<sources refid="project.sources" />
 			<references refid="project.references" />
 			<resources refid="project.resources" />
+			<arg line="/keyfile:${key.file}" if="${assembly.sign}" />
 		</csc>
 	</target>
 
@@ -203,13 +208,17 @@
 				<attribute type="AssemblyVersionAttribute" value="${assembly.version}" />
 				<attribute type="AssemblyInformationalVersionAttribute" value="${assembly.version.informational}" />
 				<attribute type="AssemblyFileVersionAttribute" value="${assembly.version}" />
-				<attribute type="AssemblyKeyFileAttribute" value="${assembly.keyfile}" if="${assembly.sign}"/>
 				<attribute type="AssemblyDelaySignAttribute" value="false" />
 				
 				<!-- For some reason, NAnt doesn't detect that APTCA has a public no-argument constructor -->
 				<attribute asis="true" type="AllowPartiallyTrustedCallersAttribute" if="${assembly.allow-partially-trusted-callers}" />
 			</attributes>
 		</asminfo>
+		<if test="${assembly.sign}" >
+			<echo append="true" file="${assemblyinfo.cs}">#if !DOTNET2</echo>
+			<echo append="true" file="${assemblyinfo.cs}">[assembly: AssemblyKeyFileAttribute("${assembly.keyfile}")]</echo>
+			<echo append="true" file="${assemblyinfo.cs}">#endif</echo>
+		</if>
 	</target>
 
 	<target name="common.run-tests"

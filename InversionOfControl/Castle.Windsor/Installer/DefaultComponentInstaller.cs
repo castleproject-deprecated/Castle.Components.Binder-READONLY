@@ -93,7 +93,9 @@ namespace Castle.Windsor.Installer
 			if (type == null)
 			{
 				String message = String.Format("The type name {0} could not be located", typeName);
+#pragma warning disable 618
 				throw new ConfigurationException(message);
+#pragma warning restore 618
 			}
 
 			return type;
@@ -104,7 +106,9 @@ namespace Castle.Windsor.Installer
 			if (!typeof(IFacility).IsAssignableFrom( facilityType ))
 			{
 				String message = String.Format("Type {0} does not implement the interface IFacility", facilityType.FullName);
+#pragma warning disable 618
 				throw new ConfigurationException(message);
+#pragma warning restore 618
 			}
 
 			try
@@ -114,7 +118,9 @@ namespace Castle.Windsor.Installer
 			catch(Exception)
 			{
 				String message = String.Format("Could not instantiate {0}. Does it have a public default constructor?", facilityType.FullName);
+#pragma warning disable 618
 				throw new ConfigurationException(message);
+#pragma warning restore 618
 			}
 		}
 	}
