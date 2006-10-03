@@ -348,14 +348,15 @@ namespace Castle.ActiveRecord.Framework.Internal
 			String keyColumn = model.HasManyAtt.ColumnKey;
 			String[] compositeKeyColumnKeys = model.HasManyAtt.CompositeKeyColumnKeys;
 
-			ActiveRecordModel target = arCollection[model.HasManyAtt.MapType];
+			Type type = GuessType(model.HasManyAtt.MapType, model.Property.PropertyType);
+			ActiveRecordModel target = arCollection[type];
 
 			if ((table == null || (keyColumn == null && compositeKeyColumnKeys == null)) && target == null)
 			{
 				throw new ActiveRecordException(String.Format(
 					"ActiveRecord tried to infer details about the relation {0}.{1} but " +
 						"it could not find information about the specified target type {2}",
-					model.Property.DeclaringType.Name, model.Property.Name, model.HasManyAtt.MapType));
+					model.Property.DeclaringType.Name, model.Property.Name, type));
 			}
 
 			BelongsToModel targetBtModel = null;
@@ -378,7 +379,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 				throw new ActiveRecordException(String.Format(
 					"ActiveRecord tried to infer details about the relation {0}.{1} but " +
 						"it could not find a 'BelongsTo' mapped property in the target type {2}",
-					model.Property.DeclaringType.Name, model.Property.Name, model.HasManyAtt.MapType));
+					model.Property.DeclaringType.Name, model.Property.Name, type));
 			}
 
 			if (target != null) VisitModel(target);
@@ -416,7 +417,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 		{
 			model.HasManyAtt.RelationType = GuessRelation(model.Property, model.HasManyAtt.RelationType);
 
-			Type otherend = model.HasManyAtt.MapType;
+			Type otherend = GuessType(model.HasManyAtt.MapType, model.Property.PropertyType);
 
 			if (model.HasManyAtt.Table == null)
 			{
