@@ -72,15 +72,17 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 						model.LifestyleType = type;
 
 					}
-					catch(Exception ex)
+					catch(Exception)
 					{
 						String message = String.Format(
 							"Could not convert the specified attribute value " + 
 							"{0} to a valid LifestyleType enum type", lifestyle);
 
-#pragma warning disable 618
-						throw new ConfigurationException(message, ex);
-#pragma warning restore 618
+#if DOTNET2
+						throw new ConfigurationErrorsException(message);
+#else
+						throw new ConfigurationException(message);
+#endif
 					}
 
 					if (model.LifestyleType == LifestyleType.Pooled)
@@ -125,22 +127,26 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 				{
 					model.CustomLifestyle = Type.GetType(customLifestyleType, true, false);
 				}
-				catch(Exception ex)
+				catch(Exception)
 				{
 					String message = String.Format(
 						"The Type {0} specified  in the customLifestyleType attribute could not be loaded.", customLifestyleType);
 
-#pragma warning disable 618
-					throw new ConfigurationException(message, ex);
-#pragma warning restore 618
+#if DOTNET2
+					throw new ConfigurationErrorsException(message);
+#else
+					throw new ConfigurationException(message);
+#endif
 				}
 			}
 			else
 			{
 				string message = @"The attribute 'customLifestyleType' must be specified in conjunction with the 'lifestyle' attribute set to ""custom"".";
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 		}
 

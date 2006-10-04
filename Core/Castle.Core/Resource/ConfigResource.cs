@@ -48,9 +48,11 @@ namespace Castle.Core.Resource
 			{
 				String message = String.Format(
 					"Could not find section '{0}' in the configuration file associated with this domain.", sectionName);
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 
 			// TODO: Check whether it's CData section

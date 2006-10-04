@@ -70,12 +70,14 @@ namespace Castle.Facilities.TypedFactory
 						AddTypedFactoryEntry( 
 							new FactoryEntry(id, factoryType, creation, destruction) );
 					}
-					catch(Exception ex)
+					catch(Exception)
 					{
 						string message = "Invalid factory entry in configuration";
-#pragma warning disable 618
-						throw new ConfigurationException(message, ex);
-#pragma warning restore 618
+#if DOTNET2
+						throw new ConfigurationErrorsException(message);
+#else
+						throw new ConfigurationException(message);
+#endif
 					}
 				}
 			}

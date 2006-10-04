@@ -53,9 +53,11 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 						"to a component (Currently {0})", 
 						value);
 
-#pragma warning disable 618
+#if DOTNET2
+					throw new ConfigurationErrorsException(message);
+#else
 					throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 				}
 
 				InterceptorReference interceptorRef = 

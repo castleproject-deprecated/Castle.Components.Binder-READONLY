@@ -47,9 +47,11 @@ namespace Castle.MicroKernel.Lifestyle
 						typeof(PerWebRequestLifestyleModule).FullName +
 						"\r\nAdd '<add name=\"PerRequestLifestyle\" type=\"ClientService.RBT.Components.IoC.PerWebRequestLifestyleModule, ClientService.RBT.Components\" />' " +
                         "to the <httpModules> section on your web.config";
-#pragma warning disable 618
+#if DOTNET2
+					throw new ConfigurationErrorsException(message);
+#else
 					throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 				}
 
 				object instance = base.Resolve(context);

@@ -95,9 +95,11 @@ namespace Castle.Facilities.Remoting
 			if (!File.Exists(configurationFile))
 			{
 				String message = String.Format("Remoting configuration file '{0}' does not exist", configurationFile);
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 
 #if DOTNET2
@@ -119,9 +121,11 @@ namespace Castle.Facilities.Remoting
 			{
 				String message = "When the remote facility is configured as " + 
 					"server you must supply the URI for the component registry using the attribute 'registryUri'";
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 
 			RemotingServices.Marshal(localRegistry, kernelUri, typeof(RemotingRegistry));
@@ -137,9 +141,11 @@ namespace Castle.Facilities.Remoting
 			{
 				String message = "When the remote facility is configured as " + 
 					"client you must supply the URI for the kernel using the attribute 'remoteKernelUri'";
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 
 			remoteRegistry = (RemotingRegistry) 

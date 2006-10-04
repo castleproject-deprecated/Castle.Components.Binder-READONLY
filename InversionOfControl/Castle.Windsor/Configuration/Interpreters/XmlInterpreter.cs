@@ -84,12 +84,14 @@ namespace Castle.Windsor.Configuration.Interpreters
 
 				Deserialize(element, store);				
 			}
-			catch(XmlProcessorException e)
+			catch(XmlProcessorException)
 			{
 				string message = "Unable to process xml resource ";
-#pragma warning disable 618
-				throw new ConfigurationException(message, e);
-#pragma warning restore 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
+				throw new ConfigurationException(message);
+#endif
 			}
 		}
 
@@ -102,9 +104,11 @@ namespace Castle.Windsor.Configuration.Interpreters
 				if (IsTextNode(node))
 				{
 					string message = String.Format("{0} cannot contain text nodes", node.Name);
-#pragma warning disable 618
+#if DOTNET2
+					throw new ConfigurationErrorsException(message);
+#else
 					throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 				}
 				else if (node.NodeType == XmlNodeType.Element)
 				{
@@ -126,9 +130,11 @@ namespace Castle.Windsor.Configuration.Interpreters
 			else
 			{
 				string message = String.Format("DeserializeElement cannot process element {0}", node.Name);
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 		}
 
@@ -232,9 +238,11 @@ namespace Castle.Windsor.Configuration.Interpreters
 				String message = String.Format("{0} elements expects required non blank attribute {1}",
 				                               node.Name, attName);
 
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 
 			return value;
@@ -259,9 +267,11 @@ namespace Castle.Windsor.Configuration.Interpreters
 			if (content == null || content.Trim() == String.Empty)
 			{
 				string message = String.Format("{0} expects {1} attribute", parentName, attrName);
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 		}
 
@@ -272,9 +282,11 @@ namespace Castle.Windsor.Configuration.Interpreters
 				String message = String.Format("Unexpected node under '{0}': Expected '{1}' but found '{2}'",
 				                               expectedName, expectedName, node.Name);
 
-#pragma warning disable 618
+#if DOTNET2
+				throw new ConfigurationErrorsException(message);
+#else
 				throw new ConfigurationException(message);
-#pragma warning restore 618
+#endif
 			}
 		}
 	}
