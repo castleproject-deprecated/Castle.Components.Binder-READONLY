@@ -84,7 +84,8 @@
 		<if test="${not(target::exists('set-'+framework::get-target-framework()+'-framework-configuration'))}">
 			<fail message="The '${framework::get-target-framework()}' framework is not supported by this version of Cast;e." />
 		</if>
-		<property name="csc.keyfile" value="" />
+		<property name="csc.keyfile" 	value="" />
+		<property name="csc.args" 		value="" />
 		<call target="set-${framework::get-target-framework()}-framework-configuration" />
 
 		<!-- Where is nunit-console.exe ? -->
