@@ -4,12 +4,21 @@ See "Stabilizing and maintaining releases" in website/castle/hacking.html for
 details on how release lines and voting work, what kinds of bugs can
 delay a release, etc.
 
+NOTE:  This branch uses svnmerge.py for merge tracking.  Please familiarize yourself with that tool if you plan to actually merge
+changes here.
+
+
 Status of 1.0.0:
 ================
 
 Candidate changes:
 
-  No candidate changes at the moment!
+  * r2488
+    Anakia: Use TargetDir property instead of hardcoded path
+    Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2488
+    Votes:
+      +1: roelofb
 
 Approved changes:
 
