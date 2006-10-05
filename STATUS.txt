@@ -20,6 +20,13 @@ Candidate changes:
     Votes:
       +1: roelofb
 
+  * r2498
+    Remove unused build file copy-tasks.xml
+    Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2498
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   No approved changes at the moment!
