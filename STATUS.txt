@@ -38,6 +38,13 @@ Candidate changes:
     Votes:
        +1: roelofb
 
+  * r2503
+    <fileset id="project.sources"> is available in common.xml, no need to repeat.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2503
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   No approved changes at the moment!
