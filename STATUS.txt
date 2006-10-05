@@ -45,6 +45,13 @@ Candidate changes:
     Votes:
        +1: roelofb
 
+  * r2504
+    Applied (with reformatting) patch by William C. Pierce <wcpierce@gmail.com> adding PerWebRequestAttribute
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2504
+    Votes:
+       +1: roelofb
+	   
 Approved changes:
 
   No approved changes at the moment!
