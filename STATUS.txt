@@ -27,6 +27,17 @@ Candidate changes:
     Votes:
        +1: roelofb
 
+  * r2500
+    Treat compiler warnings as errors, except for warning CS1591 ('Missing XML comment for publicly visible type or member
+	'Type_or_Member'') and a few very specific warnings in specific projects (DP2).
+    On framework 2.0 it will throw ConfigurationErrorsException instead of the deprecated ConfigurationException. This is a
+	breaking change.
+    In general all deprecated code is modified to compile without warnings on 2.0.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2500
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   No approved changes at the moment!
