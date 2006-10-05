@@ -146,6 +146,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			Type otherend = type;
 			if(otherend==null)
 			{
+#if DOTNET2
 				//naive guessing of type if not specified
 				if(propertyType.IsGenericType)
 				{
@@ -153,6 +154,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 					if(arguments.Length==1)
 						otherend = arguments[0];
 				}
+#endif
 			}
 			return otherend;
 		}
