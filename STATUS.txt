@@ -75,6 +75,13 @@ Candidate changes:
     Votes:
        +1: roelofb
 
+  * r2538
+    TestSiteARSupport in build.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2538
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   No approved changes at the moment!
