@@ -15,7 +15,6 @@
 namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 {
 	using System;
-	using Castle.ActiveRecord.Tests.Model;
 
 	#region CompositeKey2
 
@@ -151,6 +150,43 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 		{
 			get { return this.key; }
 			set { this.key = value; }
+		}
+	}
+
+	[ActiveRecord("Product")]
+	public class Product : ActiveRecordBase
+	{
+		private int id;
+		private string product_name;
+		private float price;
+		private string serial_number;
+
+		[PrimaryKey(PrimaryKeyType.Native, "ProductID")]
+		public int ID
+		{
+			get { return this.id; }
+			set { this.id = value; }
+		}
+
+		[Property]
+		public string Name
+		{
+			get { return this.product_name; }
+			set { this.product_name = value; }
+		}
+
+		[Property]
+		public string SerialNumber
+		{
+			get { return this.serial_number; }
+			set { this.serial_number = value; }
+		}
+
+		[Property]
+		public float Price
+		{
+			get { return this.price; }
+			set { this.price = value; }
 		}
 	}
 }
