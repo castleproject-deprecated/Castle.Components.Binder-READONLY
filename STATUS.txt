@@ -45,8 +45,10 @@ Candidate changes:
     Votes:
        +1: roelofb
 
-  * r2504
+  * r2504,2543
     Applied (with reformatting) patch by William C. Pierce <wcpierce@gmail.com> adding PerWebRequestAttribute
+	Notes:
+      The change in 2504 fails the build because of a missing file, 2543 corrects this.
 	Trunk version of patch:
       http://fisheye3.cenqua.com/changelog/castleproject/?cs=2504
     Votes:
