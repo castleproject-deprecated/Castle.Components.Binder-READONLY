@@ -18,11 +18,13 @@ namespace Anakia
 	using System.Collections;
 	using System.IO;
 	using System.Xml;
+	using Anakia.DocData;
 	using Commons.Collections;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
 	using NVelocity;
 	using NVelocity.App;
+	using NVelocity.Context;
 
 	[TaskName("doctransform")]
 	public class NDocTransformTask : Task
@@ -33,7 +35,11 @@ namespace Anakia
 		private string nodcxmlfile;
 		private string templateFile;
 		private string inheritsFrom;
+		private string restrictToNs;
 		private XmlDocument projectDom;
+		private ArrayList types = new ArrayList();
+		private ArrayList enums = new ArrayList();
+		private int counter;
 
 		[TaskAttribute("templatefile")]
 		public String TemplateFile
@@ -62,7 +68,14 @@ namespace Anakia
 			get { return inheritsFrom; }
 			set { inheritsFrom = value; }
 		}
-		
+
+		[TaskAttribute("restrictToNs")]
+		public String RestrictToNs
+		{
+			get { return restrictToNs; }
+			set { restrictToNs = value; }
+		}
+
 		#region overrides
 
 		protected override void InitializeTask(XmlNode taskNode)
@@ -83,17 +96,35 @@ namespace Anakia
 
 		protected override void ExecuteTask()
 		{
+			targetDir.Create();
+			
 			projectDom = new XmlDocument();
 			projectDom.Load(NDocXmlFile);
+			
+			PerformReplaces(projectDom);
 
 			try
 			{
 				//T:System.Attribute
-				XmlNode baseNode = projectDom.SelectSingleNode("/hierarchyType/@id='T:System.Attribute'"); 
+				XmlNode baseElemNode = projectDom.SelectSingleNode("//hierarchyType[@id='" + InheritsFrom + "']"); 
 				
-				foreach(XmlNode child in baseNode)
+				// XmlElement namespaceHierarchyNode = (XmlElement) baseElemNode.ParentNode;
+				
+				BuildDocData((XmlElement)baseElemNode, baseElemNode.ChildNodes);
+				
+				foreach(ClassDocData classDoc in types)
 				{
+					String targetFileName = "Generated_" + classDoc.name + ".xml";
+					String targetFullname = Path.Combine(targetDir.FullName, targetFileName);
 					
+					File.Delete(targetFullname);
+					
+					IContext context = CreateContext(classDoc);
+					
+					using(StreamWriter writer = new StreamWriter(targetFullname, false))
+					{
+						template.Merge(context, writer);
+					}
 				}
 			}
 			catch(Exception ex)
@@ -104,5 +135,301 @@ namespace Anakia
 		}
 
 		#endregion
+
+		private IContext CreateContext(ClassDocData doc)
+		{
+			VelocityContext context = new VelocityContext();
+			
+			context.Put("doc", doc);
+			context.Put("counter", ++counter);
+			
+			return context;
+		}
+
+		private void BuildDocData(XmlElement node, XmlNodeList nodes)
+		{
+			String id = node.GetAttribute("id");
+			
+			if (id != InheritsFrom)
+			{
+				Console.WriteLine(id);
+				
+				XmlNode classNode = projectDom.SelectSingleNode("//class[@id='" + id + "']");
+				
+				if (classNode != null)
+				{
+					ClassDocData classDoc = new ClassDocData();
+					
+					PopulateClass(classDoc, (XmlElement) classNode);
+					
+					types.Add(classDoc);
+				}
+				
+				XmlNode enumNode = projectDom.SelectSingleNode("//enumeration[@id='" + id + "']");
+				
+				if (enumNode != null)
+				{
+					EnumDocData enumDoc = new EnumDocData();
+					
+					PopulateEnum(enumDoc, (XmlElement) enumNode);
+					
+					enums.Add(enumDoc);
+				}
+			}
+			
+			foreach(XmlElement elem in nodes)
+			{
+				BuildDocData(elem, elem.ChildNodes);
+			}
+		}
+
+		private void PopulateClass(ClassDocData doc, XmlElement node)
+		{			
+			String name = node.GetAttribute("name");
+			String id = node.GetAttribute("id");
+			String access = node.GetAttribute("access");
+			String baseType = node.GetAttribute("baseType");
+			
+			doc.name = name;
+			doc.id = id;
+			doc.access = (Visibility) Enum.Parse(typeof(Visibility), access);
+		
+			PopulateCommonDoc(doc, node);
+
+			// Constructors
+			
+			doc.constructors = CreateConstructors(node);
+			
+			// Properties
+			
+			doc.properties = CreateProperties(node);
+		}
+
+		private ConstructorDocData[] CreateConstructors(XmlElement node)
+		{
+			ArrayList constructorsCollected = new ArrayList();
+			
+			foreach(XmlElement constrElem in node.SelectNodes("constructor"))
+			{
+				String name = constrElem.GetAttribute("name");
+				String id = constrElem.GetAttribute("id");
+				Visibility access = (Visibility) Enum.Parse(typeof(Visibility), constrElem.GetAttribute("access"));
+
+				ConstructorDocData constr = new ConstructorDocData(name, id, access);
+				
+				PopulateCommonDoc(constr, constrElem);
+				
+				XmlNodeList parameters = constrElem.SelectNodes("parameter");
+				
+				constr.parameters = CreateParameters(parameters, constrElem.SelectSingleNode("documentation"));
+				
+				constructorsCollected.Add(constr);
+			}
+			
+			return (ConstructorDocData[]) constructorsCollected.ToArray(typeof(ConstructorDocData));
+		}
+
+		private PropertyDocData[] CreateProperties(XmlElement node)
+		{
+			ArrayList propertiesCollected = new ArrayList();
+			
+			foreach(XmlElement propElem in node.SelectNodes("property"))
+			{
+				if (IsFrameworkType(propElem.GetAttribute("declaringType")))
+				{
+					continue;
+				}
+				
+				XmlNodeList parameters = propElem.SelectNodes("parameter");
+				
+				ParameterDocData[] paramsDoc = CreateParameters(parameters, propElem.SelectSingleNode("documentation"));
+				
+				String name = propElem.GetAttribute("name");
+				String id = propElem.GetAttribute("id");
+				Visibility access = (Visibility) Enum.Parse(typeof(Visibility), propElem.GetAttribute("access"));
+				
+				PropertyDocData prop = new PropertyDocData(name, id, access, paramsDoc);
+				
+				PopulateCommonDoc(prop, propElem);
+
+				propertiesCollected.Add(prop);
+			}
+			
+			return (PropertyDocData[]) propertiesCollected.ToArray(typeof(PropertyDocData));
+		}
+
+		private bool IsFrameworkType(string type)
+		{
+			return type.StartsWith("System.");
+		}
+
+		private ParameterDocData[] CreateParameters(XmlNodeList parameters, XmlNode docNode)
+		{
+			ArrayList parametersCollected = new ArrayList();
+			
+			foreach(XmlElement paramNode in parameters)
+			{
+				// name="table" type="System.String"
+				
+				String name = paramNode.GetAttribute("name");
+				String type = paramNode.GetAttribute("type");
+				XmlElement paramDocNode = null;
+				
+				if (docNode != null)
+				{
+					// <param name="table"></param>
+					
+					paramDocNode = (XmlElement) 
+						docNode.SelectSingleNode("param[@name='" + name + "']");
+				}
+				
+				parametersCollected.Add(new ParameterDocData(name, type, paramDocNode));
+			}
+			
+			return (ParameterDocData[]) parametersCollected.ToArray(typeof(ParameterDocData));
+		}
+
+		private void PopulateEnum(EnumDocData doc, XmlElement node)
+		{
+			PopulateCommonDoc(doc, node);
+			
+			String name = node.GetAttribute("name");
+			String id = node.GetAttribute("id");
+			String access = node.GetAttribute("access");
+			String baseType = node.GetAttribute("baseType");
+			
+			doc.name = name;
+			doc.id = id;
+			doc.access = (Visibility) Enum.Parse(typeof(Visibility), access);
+			
+			// Fields
+		}
+
+		private void PopulateCommonDoc(CommonDocData doc, XmlElement node)
+		{
+			XmlNode docNode = node.SelectSingleNode("documentation");
+			
+			if (docNode != null)
+			{
+				foreach(XmlNode child in docNode.ChildNodes)
+				{
+					if (child.Name == "summary")
+					{
+						doc.summary = (XmlElement) child;
+					}
+					else if (child.Name == "remarks")
+					{
+						doc.remarks = (XmlElement) child;
+					}
+					else if (child.Name == "example")
+					{
+						doc.example = (XmlElement) child;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Replaces documentation nodes by their counter part
+		/// para -> p
+		/// code -> pre
+		/// see -> tt
+		/// </summary>
+		/// <param name="dom"></param>
+		private void PerformReplaces(XmlDocument dom)
+		{
+			XmlNodeList list = dom.DocumentElement.SelectNodes("//para");
+			
+			foreach(XmlNode paraNode in list)
+			{
+				XmlElement newPelem = dom.CreateElement("p");
+				
+				newPelem.InnerXml = paraNode.InnerXml;
+				
+				paraNode.ParentNode.ReplaceChild(newPelem, paraNode);
+			}
+			
+//			list = dom.DocumentElement.SelectNodes("//example");
+//			
+//			foreach(XmlNode example in list)
+//			{
+//				foreach(XmlNode child in example.ChildNodes)
+//				{
+//					if (child.NodeType == XmlNodeType.Text)
+//					{
+//						int i = child.ChildNodes.Count;
+//						
+//						XmlElement pElem = dom.CreateElement("p");
+//						pElem.InnerXml = child.Value;
+//						child.ParentNode.ReplaceChild(pElem, child);
+//					}
+//					if (child.NodeType == XmlNodeType.Element &&
+//						child.Name == "code")
+//					{
+//						XmlElement preElem = dom.CreateElement("pre");
+//						preElem.SetAttribute("format", "cs");
+//						preElem.InnerXml = child.InnerXml;
+//						child.ParentNode.ReplaceChild(preElem, child);
+//					}
+//				}
+//			}
+			
+			list = dom.DocumentElement.SelectNodes("//code");
+			
+			foreach(XmlNode codeNode in list)
+			{
+				if (codeNode.PreviousSibling != null && 
+				    codeNode.PreviousSibling.NodeType == XmlNodeType.Text)
+				{
+					XmlDocumentFragment fragment = dom.CreateDocumentFragment();
+					XmlElement pElem = dom.CreateElement("p");
+					pElem.InnerXml = codeNode.PreviousSibling.Value;
+					
+					fragment.AppendChild(pElem);
+					
+					XmlElement preElem = dom.CreateElement("pre");
+					preElem.SetAttribute("format", "cs");
+					preElem.InnerXml = codeNode.InnerXml;
+					
+					fragment.AppendChild(preElem);
+					
+					codeNode.ParentNode.ReplaceChild(fragment, codeNode.PreviousSibling);
+					codeNode.ParentNode.RemoveChild(codeNode);
+				}
+				else
+				{
+					XmlElement newPelem = dom.CreateElement("pre");
+					
+					newPelem.SetAttribute("format", "cs");
+				
+					newPelem.InnerXml = codeNode.InnerXml;
+					
+					codeNode.ParentNode.ReplaceChild(newPelem, codeNode);
+				}				
+			}
+			
+			list = dom.DocumentElement.SelectNodes("//see");
+			
+			foreach(XmlElement seeNode in list)
+			{
+				XmlElement newPelem = dom.CreateElement("tt");
+								
+				if (seeNode.HasAttribute("langword"))
+				{
+					newPelem.InnerXml = seeNode.GetAttribute("langword");
+				}
+				else if (seeNode.HasAttribute("cref"))
+				{
+					newPelem.InnerXml = NormalizeCRef(seeNode.GetAttribute("cref"));
+				}
+					
+				seeNode.ParentNode.ReplaceChild(newPelem, seeNode);
+			}
+		}
+
+		private string NormalizeCRef(string cref)
+		{
+			return cref.Substring(2);
+		}
 	}
 }

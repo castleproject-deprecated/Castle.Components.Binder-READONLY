@@ -183,7 +183,7 @@ namespace Anakia
 
 				siteMapDoc = CreateSiteMap();
 
-				siteMapDoc.Save(@"E:\dev\castleall\site\website\generatedsitemap.xml");
+				siteMapDoc.Save(Path.Combine(targetDir.FullName, "generatedsitemap.xml"));
 
 				ITreeWalker walker = new BreadthFirstWalker();
 
