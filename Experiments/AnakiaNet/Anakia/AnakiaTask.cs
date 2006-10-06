@@ -220,6 +220,8 @@ namespace Anakia
 			}
 		}
 
+		#endregion
+		
 		private void AssignNavigationDocToFolders(DocumentNode node)
 		{
 			if (node.NodeType != NodeType.Navigation)
@@ -229,8 +231,6 @@ namespace Anakia
 			
 			node.ParentFolder.NavigationNode = node;
 		}
-
-		#endregion
 
 		private bool IsStaticFile(string fileName)
 		{
