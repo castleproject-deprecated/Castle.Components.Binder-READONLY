@@ -59,3 +59,7 @@ If Foo itself contains collections, they will also need a composite foreign key.
 
 * Relations could use a different key than the PK optionally
 
+* Shouldnt ARBase<T> have a generic type for the PK? Is it worthwhile?
+
+
+
