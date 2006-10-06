@@ -82,6 +82,13 @@ Candidate changes:
     Votes:
        +1: roelofb
 
+  * r2551
+    Makes forced rebuilding work correct by instructing compilers to recompile always.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2551
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   No approved changes at the moment!
