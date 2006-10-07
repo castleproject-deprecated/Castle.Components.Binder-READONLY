@@ -15,8 +15,7 @@
 namespace Castle.ActiveRecord
 {
 	using System;
-	using NHibernate.Persister.Entity;
-
+	
 	/// <summary>
 	/// Associate meta information related to the
 	/// desired table mapping.
@@ -180,7 +179,7 @@ namespace Castle.ActiveRecord
 
 		/// <summary>
 		/// From NHibernate documentation:
-		/// Specifies a custom <see cref="IEntityPersister"/>.
+		/// Specifies a custom <see cref="NHibernate.Persister.IClassPersister"/>.
 		/// </summary>
 		public Type Persister
 		{
