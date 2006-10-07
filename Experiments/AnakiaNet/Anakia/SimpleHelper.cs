@@ -51,7 +51,7 @@ namespace Anakia
 					return String.Format(".{0}/{1}", newPath, page);
 				}
 			}
-			catch(Exception ex)
+			catch(Exception)
 			{
 				throw;
 			}

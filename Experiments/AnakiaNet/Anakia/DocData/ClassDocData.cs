@@ -20,7 +20,8 @@ namespace Anakia.DocData
 	{
 		Public,
 		NestedPublic,
-		Family
+		Family,
+		FamilyOrAssembly
 	}
 
 	public class ClassDocData : CommonDocData
@@ -31,6 +32,7 @@ namespace Anakia.DocData
 		
 		internal ConstructorDocData[] constructors;
 		internal PropertyDocData[] properties;
+		internal MethodDocData[] methods;
 
 		public string Name
 		{
@@ -55,6 +57,11 @@ namespace Anakia.DocData
 		public PropertyDocData[] Properties
 		{
 			get { return properties; }
+		}
+
+		public MethodDocData[] Methods
+		{
+			get { return methods; }
 		}
 	}
 }

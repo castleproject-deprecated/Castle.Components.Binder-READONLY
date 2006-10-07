@@ -150,31 +150,28 @@ namespace Anakia
 		{
 			String id = node.GetAttribute("id");
 			
-			if (id != InheritsFrom)
+			Console.WriteLine(id);
+			
+			XmlNode classNode = projectDom.SelectSingleNode("//class[@id='" + id + "']");
+			
+			if (classNode != null)
 			{
-				Console.WriteLine(id);
+				ClassDocData classDoc = new ClassDocData();
 				
-				XmlNode classNode = projectDom.SelectSingleNode("//class[@id='" + id + "']");
+				PopulateClass(classDoc, (XmlElement) classNode);
 				
-				if (classNode != null)
-				{
-					ClassDocData classDoc = new ClassDocData();
-					
-					PopulateClass(classDoc, (XmlElement) classNode);
-					
-					types.Add(classDoc);
-				}
+				types.Add(classDoc);
+			}
+			
+			XmlNode enumNode = projectDom.SelectSingleNode("//enumeration[@id='" + id + "']");
+			
+			if (enumNode != null)
+			{
+				EnumDocData enumDoc = new EnumDocData();
 				
-				XmlNode enumNode = projectDom.SelectSingleNode("//enumeration[@id='" + id + "']");
+				PopulateEnum(enumDoc, (XmlElement) enumNode);
 				
-				if (enumNode != null)
-				{
-					EnumDocData enumDoc = new EnumDocData();
-					
-					PopulateEnum(enumDoc, (XmlElement) enumNode);
-					
-					enums.Add(enumDoc);
-				}
+				enums.Add(enumDoc);
 			}
 			
 			foreach(XmlElement elem in nodes)
@@ -203,6 +200,10 @@ namespace Anakia
 			// Properties
 			
 			doc.properties = CreateProperties(node);
+			
+			// Methods
+			
+			doc.methods = CreateMethods(node);
 		}
 
 		private ConstructorDocData[] CreateConstructors(XmlElement node)
@@ -258,6 +259,36 @@ namespace Anakia
 			return (PropertyDocData[]) propertiesCollected.ToArray(typeof(PropertyDocData));
 		}
 
+		private MethodDocData[] CreateMethods(XmlElement node)
+		{
+			ArrayList methodsCollected = new ArrayList();
+			
+			foreach(XmlElement methodElem in node.SelectNodes("method"))
+			{
+				if (IsFrameworkType(methodElem.GetAttribute("declaringType")))
+				{
+					continue;
+				}
+				
+				XmlNodeList parameters = methodElem.SelectNodes("parameter");
+				
+				ParameterDocData[] paramsDoc = CreateParameters(parameters, methodElem.SelectSingleNode("documentation"));
+				
+				String name = methodElem.GetAttribute("name");
+				String id = methodElem.GetAttribute("id");
+				String returnType = methodElem.GetAttribute("returnType");
+				Visibility access = (Visibility) Enum.Parse(typeof(Visibility), methodElem.GetAttribute("access"));
+				
+				MethodDocData method = new MethodDocData(name, id, access, returnType, paramsDoc);
+				
+				PopulateCommonDoc(method, methodElem);
+
+				methodsCollected.Add(method);
+			}
+			
+			return (MethodDocData[]) methodsCollected.ToArray(typeof(MethodDocData));
+		}
+
 		private bool IsFrameworkType(string type)
 		{
 			return type.StartsWith("System.");
@@ -280,7 +311,7 @@ namespace Anakia
 					// <param name="table"></param>
 					
 					paramDocNode = (XmlElement) 
-						docNode.SelectSingleNode("param[@name='" + name + "']");
+					               docNode.SelectSingleNode("param[@name='" + name + "']");
 				}
 				
 				parametersCollected.Add(new ParameterDocData(name, type, paramDocNode));
@@ -334,6 +365,7 @@ namespace Anakia
 		/// para -> p
 		/// code -> pre
 		/// see -> tt
+		/// seealso is removed
 		/// </summary>
 		/// <param name="dom"></param>
 		private void PerformReplaces(XmlDocument dom)
@@ -389,7 +421,7 @@ namespace Anakia
 					
 					XmlElement preElem = dom.CreateElement("pre");
 					preElem.SetAttribute("format", "cs");
-					preElem.InnerXml = codeNode.InnerXml;
+					preElem.InnerXml = Environment.NewLine + codeNode.InnerXml;
 					
 					fragment.AppendChild(preElem);
 					
@@ -402,10 +434,17 @@ namespace Anakia
 					
 					newPelem.SetAttribute("format", "cs");
 				
-					newPelem.InnerXml = codeNode.InnerXml;
+					newPelem.InnerXml = Environment.NewLine + codeNode.InnerXml;
 					
 					codeNode.ParentNode.ReplaceChild(newPelem, codeNode);
 				}				
+			}
+			
+			list = dom.DocumentElement.SelectNodes("//seealso");
+
+			foreach(XmlElement seeNode in list)
+			{
+				seeNode.ParentNode.RemoveChild(seeNode);
 			}
 			
 			list = dom.DocumentElement.SelectNodes("//see");

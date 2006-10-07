@@ -16,18 +16,45 @@ namespace Anakia.DocData
 {
 	using System;
 
-	public class FieldDocData : CommonDocData
+	public class MethodDocData : CommonDocData
 	{
-		private String name;
+		private readonly string name, id;
+		private readonly string returnType;
+		private Visibility access;
+		private ParameterDocData[] parameters;
 
-		public FieldDocData(string name)
+		public MethodDocData(string name, string id, Visibility access, String returnType, ParameterDocData[] parameters)
 		{
 			this.name = name;
+			this.id = id;
+			this.access = access;
+			this.returnType = returnType;
+			this.parameters = parameters;
 		}
 
 		public string Name
 		{
 			get { return name; }
+		}
+
+		public string ReturnType
+		{
+			get { return returnType; }
+		}
+
+		public string Id
+		{
+			get { return id; }
+		}
+
+		public Visibility Access
+		{
+			get { return access; }
+		}
+
+		public ParameterDocData[] Parameters
+		{
+			get { return parameters; }
 		}
 	}
 }
