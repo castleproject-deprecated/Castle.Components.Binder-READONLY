@@ -91,6 +91,15 @@ Candidate changes:
     Votes:
        +1: roelofb
 
+  * r2572,r2573
+	Added logging to Brail, using Castle's logger, so it will be easier to see what it going on in there.
+	Fixed issue with cache key normalization where a subview would never be cached.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2572
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2573
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   No approved changes at the moment!
