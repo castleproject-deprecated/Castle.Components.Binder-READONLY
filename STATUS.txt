@@ -100,6 +100,14 @@ Candidate changes:
     Votes:
        +1: roelofb
 
+  * r2600,r2601
+	Remove StringTemplateViewEngine because it's in the Contrib project now.
+	Trunk version of patch:
+     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2600
+     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2601
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   No approved changes at the moment!
