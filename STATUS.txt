@@ -108,6 +108,13 @@ Candidate changes:
     Votes:
        +1: roelofb
 
+  * r2603
+	Remove db4o facility because it's in the Contrib project now.
+	Trunk version of patch:
+     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2603
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   No approved changes at the moment!
