@@ -36,6 +36,7 @@ namespace Anakia
 		private string templateFile;
 		private string inheritsFrom;
 		private string restrictToNs;
+		private string typelist;
 		private XmlDocument projectDom;
 		private ArrayList types = new ArrayList();
 		private ArrayList enums = new ArrayList();
@@ -76,6 +77,13 @@ namespace Anakia
 			set { restrictToNs = value; }
 		}
 
+		[TaskAttribute("typelist")]
+		public string TypeList
+		{
+			get { return typelist; }
+			set { typelist = value; }
+		}
+
 		#region overrides
 
 		protected override void InitializeTask(XmlNode taskNode)
@@ -105,12 +113,25 @@ namespace Anakia
 
 			try
 			{
-				//T:System.Attribute
-				XmlNode baseElemNode = projectDom.SelectSingleNode("//hierarchyType[@id='" + InheritsFrom + "']"); 
-				
-				// XmlElement namespaceHierarchyNode = (XmlElement) baseElemNode.ParentNode;
-				
-				BuildDocData((XmlElement)baseElemNode, baseElemNode.ChildNodes);
+				if (inheritsFrom != null)
+				{
+					XmlNode baseElemNode = projectDom.SelectSingleNode("//hierarchyType[@id='" + InheritsFrom + "']"); 
+								
+					BuildDocData((XmlElement)baseElemNode, baseElemNode.ChildNodes, true);
+				}
+				else if (typelist != null)
+				{
+					String[] list = typelist.Split(',');
+					
+					foreach(String type in list)
+					{
+						String typeName = type.Trim();
+						
+						XmlNode baseElemNode = projectDom.SelectSingleNode("//hierarchyType[@id='" + typeName + "']"); 
+								
+						BuildDocData((XmlElement)baseElemNode, baseElemNode.ChildNodes, false);
+					}
+				}
 				
 				foreach(ClassDocData classDoc in types)
 				{
@@ -146,7 +167,7 @@ namespace Anakia
 			return context;
 		}
 
-		private void BuildDocData(XmlElement node, XmlNodeList nodes)
+		private void BuildDocData(XmlElement node, XmlNodeList nodes, bool recurse)
 		{
 			String id = node.GetAttribute("id");
 			
@@ -156,9 +177,20 @@ namespace Anakia
 			
 			if (classNode != null)
 			{
-				ClassDocData classDoc = new ClassDocData();
+				ClassDocData classDoc = new ClassDocData(ClassType.Class);
 				
 				PopulateClass(classDoc, (XmlElement) classNode);
+				
+				types.Add(classDoc);
+			}
+			
+			XmlNode interfaceNode = projectDom.SelectSingleNode("//interface[@id='" + id + "']");
+			
+			if (interfaceNode != null)
+			{
+				ClassDocData classDoc = new ClassDocData(ClassType.Interface);
+				
+				PopulateClass(classDoc, (XmlElement) interfaceNode);
 				
 				types.Add(classDoc);
 			}
@@ -174,9 +206,12 @@ namespace Anakia
 				enums.Add(enumDoc);
 			}
 			
-			foreach(XmlElement elem in nodes)
+			if (recurse)
 			{
-				BuildDocData(elem, elem.ChildNodes);
+				foreach(XmlElement elem in nodes)
+				{
+					BuildDocData(elem, elem.ChildNodes, recurse);
+				}
 			}
 		}
 

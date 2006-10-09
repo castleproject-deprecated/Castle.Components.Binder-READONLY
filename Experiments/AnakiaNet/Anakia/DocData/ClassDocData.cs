@@ -23,9 +23,16 @@ namespace Anakia.DocData
 		Family,
 		FamilyOrAssembly
 	}
+	
+	public enum ClassType
+	{
+		Class,
+		Interface
+	}
 
 	public class ClassDocData : CommonDocData
 	{
+		private readonly ClassType classType;
 		internal string name;
 		internal string id;
 		internal Visibility access;
@@ -33,6 +40,16 @@ namespace Anakia.DocData
 		internal ConstructorDocData[] constructors;
 		internal PropertyDocData[] properties;
 		internal MethodDocData[] methods;
+
+		public ClassDocData(ClassType classType)
+		{
+			this.classType = classType;
+		}
+
+		public ClassType ClassType
+		{
+			get { return classType; }
+		}
 
 		public string Name
 		{
