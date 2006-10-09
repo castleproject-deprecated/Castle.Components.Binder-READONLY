@@ -145,16 +145,30 @@ namespace Castle.MonoRail.Framework
 			get { return metaDescriptor; }
 		}
 
+		/// <summary>
+		/// Gets the actions available in this controller.
+		/// </summary>
+		/// <remarks>It is supposed to be used by MonoRail infrastructure only</remarks>
+		/// <value>The actions.</value>
 		public ICollection Actions
 		{
 			get { return metaDescriptor.Actions.Values; }
 		}
 
+		/// <summary>
+		/// Gets a dicitionary of name/<see cref="IResource"/>
+		/// </summary>
+		/// <remarks>It is supposed to be used by MonoRail infrastructure only</remarks>
+		/// <value>The resources.</value>
 		public ResourceDictionary Resources
 		{
 			get { return resources; }
 		}
 
+		/// <summary>
+		/// Gets a dictionary of name/helper instance
+		/// </summary>
+		/// <value>The helpers.</value>
 		public IDictionary Helpers
 		{
 			get
