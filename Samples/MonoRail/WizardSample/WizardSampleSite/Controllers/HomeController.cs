@@ -23,7 +23,6 @@ namespace WizardSampleSite.Controllers
 	{
 		public void Index()
 		{
-			
 		}
 	}
 }
