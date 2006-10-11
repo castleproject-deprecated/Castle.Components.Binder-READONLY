@@ -17,19 +17,17 @@
 		<property name="assembly.is-cls-compliant" value="false" />
 		<property name="assembly.is-com-visible" value="true" />
 
-		<property name="public.dll.dir" value="${environment::get-variable('DevEnvDir')}\PublicAssemblies" />
-
-		<!-- 
 		<if test="${nant.settings.currentframework=='net-1.1'}">
 			<property name="extensibility.dll.dir" value="${environment::get-variable('DevEnvDir')}" />
 			<property name="public.dll.dir" value="${environment::get-variable('DevEnvDir')}\PublicAssemblies" />
+			<property name="envdte.dll.dir" value="" />
 		</if>
 		
 		<if test="${nant.settings.currentframework=='net-2.0'}">
 			<property name="extensibility.dll.dir" value="${environment::get-variable('DevEnvDir')}" />
 			<property name="public.dll.dir" value="${environment::get-variable('DevEnvDir')}\PublicAssemblies" />
+			<property name="envdte.dll.dir" value="${public.dll.dir}\" />
 		</if>
-		-->
 
 		<fileset id="project.sources">
 			<include name="${src.dir}/**/*.cs" />
@@ -39,10 +37,10 @@
 
 		<assemblyfileset id="project.references" basedir="${build.dir}">
 			<include name="Castle.VSNetIntegration.Shared.dll" />
-			<include name="EnvDTE.dll" />
 			<include name="System.Drawing.dll" />
 			<include name="System.Windows.Forms.dll" />
 			<include name="System.Xml.dll" />
+			<include name="${envdte.dll.dir}EnvDTE.dll" />
 			<include name="${public.dll.dir}\Extensibility.dll" />
 			<include name="${public.dll.dir}\VSLangProj.dll" />
 			<include name="${public.dll.dir}\VSLangProj2.dll" />
