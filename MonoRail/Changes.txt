@@ -4,6 +4,12 @@ Change history
 Release Candidate 1
 ===================
 
+- Started refactoring ARScaffold to rely on FormHelper
+
+- Small refactor on ARScaffold support to make it work with
+  . ARDataBinder
+  . The new Binder implementation
+
 - Changed MonoRailContainer to save the configuration. On mono
   a copy is created everytime the config is requested, leading a big problems
 
