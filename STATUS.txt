@@ -13,15 +13,6 @@ Status of 1.0.0:
 
 Candidate changes:
 
-  [This one was fixed]
-  * r2488
-    Anakia: Use TargetDir property instead of hardcoded path
-    Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2488
-    Votes:
-      +1: roelofb
-	   +1: fabiob
-
   * r2498
     Remove unused build file copy-tasks.xml
     Trunk version of patch:
