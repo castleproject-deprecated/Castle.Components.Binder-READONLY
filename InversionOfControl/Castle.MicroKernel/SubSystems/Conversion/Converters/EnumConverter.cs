@@ -35,9 +35,9 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 			{
 				return Enum.Parse( targetType, value, true );
 			}
-			catch(ConverterException ex)
+			catch(ConverterException)
 			{
-				throw ex;
+				throw;
 			}
 			catch(Exception ex)
 			{
