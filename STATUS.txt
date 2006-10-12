@@ -30,6 +30,7 @@ Candidate changes:
        +1: roelofb
 	   +1: hammett
 	   +1: fabiob
+       +1: kevin
 
   * r2500
     Treat compiler warnings as errors, except for warning CS1591 ('Missing XML comment for publicly visible type or member
@@ -42,6 +43,7 @@ Candidate changes:
     Votes:
        +1: roelofb
 	   -1: hammett (I think we need to experiment some more on the trunk)
+        0: kevin
 
   * r2503
     <fileset id="project.sources"> is available in common.xml, no need to repeat.
@@ -51,6 +53,7 @@ Candidate changes:
        +1: roelofb
 	   +1: hammett (this one is a minor change, does not need a vote IMHO)
 	   +1: fabiob
+       +1: kevin
 
   * r2504,2543
     Applied (with reformatting) patch by William C. Pierce <wcpierce@gmail.com> adding PerWebRequestAttribute
@@ -82,6 +85,7 @@ Candidate changes:
 	   +1: hammett
 	   +1: ayende
 	   +1: fabiob
+       +1: kevin
 
   * r2512
     Put a link to CastleKey.snk in VS2005 projects.
@@ -91,6 +95,7 @@ Candidate changes:
        +1: roelofb
        +0: ayende (are we really going to do much on-going development on the branch?)
 	   +0: hammett
+       +0: kevin
 
   * r2538
     TestSiteARSupport in build.
@@ -108,6 +113,7 @@ Candidate changes:
        +1: roelofb
 	   +1: hammett
 	   +1: ayende
+       +1: kevin
 
   * r2572,r2573
 	Added logging to Brail, using Castle's logger, so it will be easier to see what it going on in there.
@@ -120,6 +126,7 @@ Candidate changes:
 	   +1: hammett
 	   +1: ayende
 	   +1: fabiob
+       +1: kevin
 
   * r2600,r2601
 	Remove StringTemplateViewEngine because it's in the Contrib project now.
@@ -131,6 +138,7 @@ Candidate changes:
 	   +1: hammett
 	   +1: ayende
 	   +1: fabiob
+       +1: kevin
 
   * r2603
 	Remove db4o facility because it's in the Contrib project now.
@@ -141,6 +149,7 @@ Candidate changes:
 	   +1: hammett
 	   +1: ayende
 	   +1: fabiob
+       +1: kevin
 
   * r2622
 	Enhanced HqlBasedQuery.PrepareQueryForCount.
