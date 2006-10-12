@@ -76,6 +76,7 @@ Candidate changes:
     Votes:
        +1: roelofb
 	   +1: hammett
+	   +1: ayende
 
   * r2512
     Put a link to CastleKey.snk in VS2005 projects.
@@ -83,6 +84,7 @@ Candidate changes:
       http://fisheye3.cenqua.com/changelog/castleproject/?cs=2512
     Votes:
        +1: roelofb
+       +0: ayende (are we really going to do much on-going development on the branch?)
 	   +0: hammett
 
   * r2538
@@ -100,6 +102,7 @@ Candidate changes:
     Votes:
        +1: roelofb
 	   +1: hammett
+	   +1: ayende
 
   * r2572,r2573
 	Added logging to Brail, using Castle's logger, so it will be easier to see what it going on in there.
@@ -110,6 +113,7 @@ Candidate changes:
     Votes:
        +1: roelofb
 	   +1: hammett
+	   +1: ayende
 
   * r2600,r2601
 	Remove StringTemplateViewEngine because it's in the Contrib project now.
@@ -119,6 +123,7 @@ Candidate changes:
     Votes:
        +1: roelofb
 	   +1: hammett
+	   +1: ayende
 
   * r2603
 	Remove db4o facility because it's in the Contrib project now.
@@ -127,6 +132,7 @@ Candidate changes:
     Votes:
        +1: roelofb
 	   +1: hammett
+	   +1: ayende
 
 Approved changes:
 
