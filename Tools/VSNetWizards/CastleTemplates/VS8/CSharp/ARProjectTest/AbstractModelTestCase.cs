@@ -15,11 +15,11 @@
 namespace ARProjectTest
 {
 	using System;
-	using System.Configuration;
 
 	using Castle.ActiveRecord;
 	using Castle.ActiveRecord.Framework;
-	
+	using Castle.ActiveRecord.Framework.Config;
+
 	using NUnit.Framework;
 
 	/// <summary>
@@ -44,7 +44,7 @@ namespace ARProjectTest
 	/// Note that this class enables lazy classes and collections
 	/// by using a <see cref="SessionScope"/>.
 	/// This have side effects. Some of your test must 
-	/// invoke <see cref="FlushAndRecreateScope"/> sometimes
+	/// invoke <see cref="Flush"/> 
 	/// to persist the changes.
 	/// </remarks>
 	public abstract class AbstractModelTestCase
@@ -78,15 +78,14 @@ namespace ARProjectTest
 		{
 		}
 
-		protected void FlushAndRecreateScope()
+		protected void Flush()
 		{
-			DisposeScope();
-			CreateScope();
+			SessionScope.Current.Flush();
 		}
 
 		protected void CreateScope()
 		{
-			scope = new SessionScope();
+			scope = new SessionScope(FlushAction.Never);
 		}
 
 		protected void DisposeScope()
@@ -119,12 +118,15 @@ namespace ARProjectTest
 
 		protected virtual void InitFramework()
 		{
-			IConfigurationSource source = ConfigurationSettings.GetConfig("activerecord") as IConfigurationSource;
+			IConfigurationSource source = ActiveRecordSectionHandler.Instance;
 
 			ActiveRecordStarter.Initialize( source );
 
 			// Remember to add the types, for example
 			// ActiveRecordStarter.Initialize( source, typeof(Blog), typeof(Post) );
+			
+			// Or to use the assembly that holds the ActiveRecord types
+			// ActiveRecordStarter.Initialize(System.Reflection.Assembly.Load("MyARProject"), source);
 		}
 	}
 }

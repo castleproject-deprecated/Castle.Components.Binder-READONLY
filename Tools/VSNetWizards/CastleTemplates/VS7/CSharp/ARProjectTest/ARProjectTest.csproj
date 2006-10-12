@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <CSHARP
         ProjectType = "Local"
-        ProductVersion = "7.10.3077"
+        ProductVersion = "7.10.6030"
         SchemaVersion = "2.0"
         ProjectGuid = "{C0E756B5-A85F-4CB7-9BEB-5CF6A8F57407}"
     >
@@ -95,11 +95,6 @@
                     HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Castle.DynamicProxy.dll"
                 />
                 <Reference
-                    Name = "Castle.Model"
-                    AssemblyName = "Castle.Model"
-                    HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Castle.Model.dll"
-                />
-                <Reference
                     Name = "Iesi.Collections"
                     AssemblyName = "Iesi.Collections"
                     HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Iesi.Collections.dll"
@@ -124,6 +119,12 @@
                     AssemblyName = "nunit.framework"
                     HintPath = "C:\devtools\nunit\bin\nunit.framework.dll"
                     AssemblyFolderKey = "hklm\dn\nunit.framework"
+                />
+                <Reference
+                    Name = "Castle.Core"
+                    AssemblyName = "Castle.Core"
+                    HintPath = "..\..\..\..\..\..\build\net-1.1\debug\Castle.Core.dll"
+                    AssemblyFolderKey = "hklm\dn\castle"
                 />
             </References>
         </Build>

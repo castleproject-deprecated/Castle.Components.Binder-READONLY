@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <CSHARP
         ProjectType = "Local"
-        ProductVersion = "7.10.3077"
+        ProductVersion = "7.10.6030"
         SchemaVersion = "2.0"
         ProjectGuid = "{CAE54329-B09C-4997-BC3D-58BB1202882F}"
     >
@@ -76,13 +76,8 @@
                 />
                 <Reference
                     Name = "System.XML"
-                    AssemblyName = "System.XML"
+                    AssemblyName = "System.Xml"
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
-                />
-                <Reference
-                    Name = "Nullables.NHibernate"
-                    AssemblyName = "Nullables.NHibernate"
-                    HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Nullables.NHibernate.dll"
                 />
                 <Reference
                     Name = "Castle.ActiveRecord"
@@ -90,24 +85,9 @@
                     HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Castle.ActiveRecord.dll"
                 />
                 <Reference
-                    Name = "Castle.DynamicProxy"
-                    AssemblyName = "Castle.DynamicProxy"
-                    HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Castle.DynamicProxy.dll"
-                />
-                <Reference
-                    Name = "Castle.Model"
-                    AssemblyName = "Castle.Model"
-                    HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Castle.Model.dll"
-                />
-                <Reference
                     Name = "Iesi.Collections"
                     AssemblyName = "Iesi.Collections"
                     HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Iesi.Collections.dll"
-                />
-                <Reference
-                    Name = "log4net"
-                    AssemblyName = "log4net"
-                    HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\log4net.dll"
                 />
                 <Reference
                     Name = "NHibernate"
@@ -119,12 +99,27 @@
                     AssemblyName = "Nullables"
                     HintPath = "..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Nullables.dll"
                 />
+                <Reference
+                    Name = "Castle.Core"
+                    AssemblyName = "Castle.Core"
+                    HintPath = "..\..\..\..\..\..\build\net-1.1\debug\Castle.Core.dll"
+                    AssemblyFolderKey = "hklm\dn\castle"
+                />
             </References>
         </Build>
         <Files>
             <Include>
                 <File
                     RelPath = "AssemblyInfo.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Readme.txt"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "Sample.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

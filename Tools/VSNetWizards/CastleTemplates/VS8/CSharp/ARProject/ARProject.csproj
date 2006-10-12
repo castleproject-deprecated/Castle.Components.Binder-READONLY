@@ -78,33 +78,18 @@
       <Name>Castle.ActiveRecord</Name>
       <HintPath>..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Castle.ActiveRecord.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.DynamicProxy">
-      <Name>Castle.DynamicProxy</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Castle.DynamicProxy.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Model">
-      <Name>Castle.Model</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Castle.Model.dll</HintPath>
-    </Reference>
+    <Reference Include="Castle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="Iesi.Collections">
       <Name>Iesi.Collections</Name>
       <HintPath>..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Iesi.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="log4net">
-      <Name>log4net</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="NHibernate">
-      <Name>NHibernate</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\NHibernate.dll</HintPath>
+    <Reference Include="NHibernate, Version=1.0.2.0, Culture=neutral, PublicKeyToken=154fdcb44c4484fc">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\build\net-1.1\debug\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="Nullables">
       <Name>Nullables</Name>
       <HintPath>..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Nullables.dll</HintPath>
-    </Reference>
-    <Reference Include="Nullables.NHibernate">
-      <Name>Nullables.NHibernate</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\ActiveRecord\bin\Nullables.NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -120,6 +105,10 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Sample.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
