@@ -49,6 +49,9 @@ Candidate changes:
     Put a link to CastleKey.snk in VS2005 projects.
 	Trunk version of patch:
       http://fisheye3.cenqua.com/changelog/castleproject/?cs=2512
+	Justification:
+	It's part of the 'productizing' of this branch: make a good user experience. If the projects are complete and compile
+	right away in Studio it'll make us look good.
     Votes:
        +1: roelofb
        +0: ayende (are we really going to do much on-going development on the branch?)
@@ -69,6 +72,7 @@ Candidate changes:
      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2622
     Votes:
        +1: fabiob
+	   +1: roelofb
 
   * r2623
 	Introduced ARPagination.CreatePagination<T>(SimpleQuery<T>).
