@@ -30,10 +30,10 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 #if DOTNET2
 	[Guid("9FF77D9F-E4FC-47EE-8E8B-0079FC2F2478")]
-	[ProgId("Castle.MonoRailProjectWizardVS7")]
+	[ProgId("Castle.MonoRailProjectWizardVS8")]
 #else
 	[Guid("43C9796F-E6C8-460D-B722-204A7121A510")]
-	[ProgId("Castle.MonoRailProjectWizardVS8")]
+	[ProgId("Castle.MonoRailProjectWizardVS7")]
 #endif
 	public class MonoRailProjectWizard : BaseProjectWizard
 	{
