@@ -13,16 +13,6 @@ Status of 1.0.0:
 
 Candidate changes:
 
-  * r2498
-    Remove unused build file copy-tasks.xml
-    Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2498
-    Votes:
-       +1: roelofb
-	   +1: hammett
-	   +1: fabiob
-       +1: kevin
-
   * r2500
     Treat compiler warnings as errors, except for warning CS1591 ('Missing XML comment for publicly visible type or member
 	'Type_or_Member'') and a few very specific warnings in specific projects (DP2).
@@ -35,16 +25,6 @@ Candidate changes:
        +1: roelofb
 	   -1: hammett (I think we need to experiment some more on the trunk)
         0: kevin
-
-  * r2503
-    <fileset id="project.sources"> is available in common.xml, no need to repeat.
-	Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2503
-    Votes:
-       +1: roelofb
-	   +1: hammett (this one is a minor change, does not need a vote IMHO)
-	   +1: fabiob
-       +1: kevin
 
   * r2504,2543
     Applied (with reformatting) patch by William C. Pierce <wcpierce@gmail.com> adding PerWebRequestAttribute
@@ -65,19 +45,6 @@ Candidate changes:
 	   +1: hammett 
 	   +1: fabiob
 
-  * r2506,2514
-    Applied recommended practice to rethrow exceptions. 
-	Notes:
-      The change in 2506 fails the build, 2514 corrects this.
-	Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2506
-    Votes:
-       +1: roelofb
-	   +1: hammett
-	   +1: ayende
-	   +1: fabiob
-       +1: kevin
-
   * r2512
     Put a link to CastleKey.snk in VS2005 projects.
 	Trunk version of patch:
@@ -95,6 +62,55 @@ Candidate changes:
     Votes:
        +1: roelofb
 	   +1: hammett
+
+  * r2622
+	Enhanced HqlBasedQuery.PrepareQueryForCount.
+	Trunk version of patch:
+     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2622
+    Votes:
+       +1: fabiob
+
+  * r2623
+	Introduced ARPagination.CreatePagination<T>(SimpleQuery<T>).
+	Trunk version of patch:
+     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2623
+    Votes:
+       +1: fabiob
+
+Approved changes:
+
+  * r2498
+    Remove unused build file copy-tasks.xml
+    Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2498
+    Votes:
+       +1: roelofb
+	   +1: hammett
+	   +1: fabiob
+       +1: kevin
+
+  * r2503
+    <fileset id="project.sources"> is available in common.xml, no need to repeat.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2503
+    Votes:
+       +1: roelofb
+	   +1: hammett (this one is a minor change, does not need a vote IMHO)
+	   +1: fabiob
+       +1: kevin
+
+  * r2506,2514
+    Applied recommended practice to rethrow exceptions. 
+	Notes:
+      The change in 2506 fails the build, 2514 corrects this.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2506
+    Votes:
+       +1: roelofb
+	   +1: hammett
+	   +1: ayende
+	   +1: fabiob
+       +1: kevin
 
   * r2551
     Makes forced rebuilding work correct by instructing compilers to recompile always.
@@ -142,20 +158,3 @@ Candidate changes:
 	   +1: fabiob
        +1: kevin
 
-  * r2622
-	Enhanced HqlBasedQuery.PrepareQueryForCount.
-	Trunk version of patch:
-     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2622
-    Votes:
-       +1: fabiob
-
-  * r2623
-	Introduced ARPagination.CreatePagination<T>(SimpleQuery<T>).
-	Trunk version of patch:
-     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2623
-    Votes:
-       +1: fabiob
-
-Approved changes:
-
-  No approved changes at the moment!
