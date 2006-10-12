@@ -153,7 +153,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\ARIntegrationPanel.cs"
-                    SubType = "UserControl"
+                    SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
@@ -163,7 +163,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\ARPanel.cs"
-                    SubType = "UserControl"
+                    SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
@@ -173,7 +173,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\ConnStringPanel.cs"
-                    SubType = "UserControl"
+                    SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
@@ -183,7 +183,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\ContainerIntegrationPanel.cs"
-                    SubType = "UserControl"
+                    SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
@@ -193,7 +193,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\LoggingPanel.cs"
-                    SubType = "UserControl"
+                    SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
@@ -203,7 +203,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\MRPanel.cs"
-                    SubType = "UserControl"
+                    SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
@@ -213,7 +213,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\NHIntegrationPanel.cs"
-                    SubType = "UserControl"
+                    SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File

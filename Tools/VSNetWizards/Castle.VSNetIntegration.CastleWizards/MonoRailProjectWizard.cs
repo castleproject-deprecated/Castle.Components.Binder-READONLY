@@ -28,8 +28,13 @@ namespace Castle.VSNetIntegration.CastleWizards
 	using EnvDTE;
 	using EnvConstants = EnvDTE.Constants;
 
+#if DOTNET2
+	[Guid("9FF77D9F-E4FC-47EE-8E8B-0079FC2F2478")]
+	[ProgId("Castle.MonoRailProjectWizardVS7")]
+#else
 	[Guid("43C9796F-E6C8-460D-B722-204A7121A510")]
-	[ProgId("Castle.MonoRailProjectWizard")]
+	[ProgId("Castle.MonoRailProjectWizardVS8")]
+#endif
 	public class MonoRailProjectWizard : BaseProjectWizard
 	{
 		private ARPanel firstPanel = new ARPanel();

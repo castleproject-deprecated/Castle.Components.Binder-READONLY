@@ -24,8 +24,13 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 	using EnvDTE;
 
+#if DOTNET2	
+	[Guid("1D90721C-B0AA-4F9A-BDE5-A588911E38B6")]
+	[ProgId("Castle.ActiveRecordModelProjectWizardVS7")]
+#else
 	[Guid("50E5A1CA-8ABD-4AD2-8A60-176F5BFC9706")]
-	[ProgId("Castle.ActiveRecordModelProjectWizard")]
+	[ProgId("Castle.ActiveRecordModelProjectWizardVS8")]
+#endif
 	public class ActiveRecordModelProjectWizard : BaseProjectWizard
 	{
 		private ARPanel panel;
