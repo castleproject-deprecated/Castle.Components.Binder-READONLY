@@ -91,15 +91,3 @@ Approved changes:
 	   +1: ayende
 	   +1: fabiob
        +1: kevin
-
-
-	Remove db4o facility because it's in the Contrib project now.
-	Trunk version of patch:
-     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2603
-    Votes:
-       +1: roelofb
-	   +1: hammett
-	   +1: ayende
-	   +1: fabiob
-       +1: kevin
-
