@@ -41,7 +41,7 @@ Candidate changes:
 	Trunk version of patch:
       http://fisheye3.cenqua.com/changelog/castleproject/?cs=2505
     Votes:
-       0: roelofb
+       +1: roelofb
 	   +1: hammett 
 	   +1: fabiob
 
