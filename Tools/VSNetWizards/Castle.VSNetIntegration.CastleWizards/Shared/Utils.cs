@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CastleConstants = Castle.VSNetIntegration.CastleWizards.Constants;
-
-namespace Castle.VSNetIntegration.Shared
+namespace Castle.VSNetIntegration.CastleWizards.Shared
 {
 	using System;
 	using System.Collections;
@@ -68,7 +66,7 @@ namespace Castle.VSNetIntegration.Shared
 		public static void PerformReplacesOn(Project project, String projectName, 
 			String localProjectPath, ProjectItem item)
 		{
-			Window codeWindow = item.Open(Constants.vsViewKindTextView);
+			Window codeWindow = item.Open(EnvConstants.vsViewKindTextView);
 	
 			codeWindow.Activate();
 	
@@ -93,9 +91,9 @@ namespace Castle.VSNetIntegration.Shared
 
 		public static XmlDocument CreateXmlDomForConfig(ExtensionContext context, Project project, String file)
 		{
-			if (context.Properties[CastleConstants.ConfigFileList] == null)
+			if (context.Properties[Constants.ConfigFileList] == null)
 			{
-				context.Properties[CastleConstants.ConfigFileList] = new ArrayList();
+				context.Properties[Constants.ConfigFileList] = new ArrayList();
 			}
 
 			ProjectItem item = project.ProjectItems.Item(file);
@@ -118,7 +116,7 @@ namespace Castle.VSNetIntegration.Shared
 
 			context.Properties[file] = doc;
 
-			(context.Properties[CastleConstants.ConfigFileList] as IList).Add(file);
+			(context.Properties[Constants.ConfigFileList] as IList).Add(file);
 
 			return doc;
 		}

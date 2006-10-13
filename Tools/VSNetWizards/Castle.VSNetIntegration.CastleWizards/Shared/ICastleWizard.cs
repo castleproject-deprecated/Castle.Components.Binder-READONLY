@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.VSNetIntegration.Shared
+namespace Castle.VSNetIntegration.CastleWizards.Shared
 {
-	using System;
-	using Castle.VSNetIntegration.Shared.Dialogs;
+	using System.Runtime.InteropServices;
+	
+	using Castle.VSNetIntegration.CastleWizards.Shared.Dialogs;
 
-	/// <summary>
-	/// 
-	/// </summary>
+
+	
 	public delegate void WizardEventHandler(object sender, ExtensionContext context);
 
-	/// <summary>
-	/// 
-	/// </summary>
 	public delegate void WizardUIEventHandler(object sender, WizardDialog dlg, ExtensionContext context);
 
+	
+	[ComVisible(false)]
 	public interface ICastleWizard
 	{
 		event WizardEventHandler OnAddProjects;
@@ -40,7 +39,5 @@ namespace Castle.VSNetIntegration.Shared
 		event WizardEventHandler OnPostProcess;
 
 		event WizardUIEventHandler OnAddPanels;
-
-		
 	}
 }

@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Constants=Castle.VSNetIntegration.CastleWizards.Constants;
-
 namespace Castle.VSNetIntegration.CastleWizards
 {
 	using System;
 	using System.IO;
 	using Castle.VSNetIntegration.CastleWizards.Dialogs.Panels;
-	using Castle.VSNetIntegration.Shared;
-	using Castle.VSNetIntegration.Shared.Dialogs;
+	using Castle.VSNetIntegration.CastleWizards.Shared;
+	using Castle.VSNetIntegration.CastleWizards.Shared.Dialogs;
 	using EnvDTE;
+	using Constants=Castle.VSNetIntegration.CastleWizards.Shared.Constants;
 
 	[System.Runtime.InteropServices.ComVisible(false)]
 	public class TestProjectExtension : IWizardExtension

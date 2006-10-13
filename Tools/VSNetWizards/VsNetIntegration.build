@@ -8,7 +8,6 @@
 
 	<target name="vsnetwizard" >
 		<if test="${platform::is-win32() and property::exists('dev.env.dir')}">
-			<nant buildfile="Castle.VSNetIntegration.Shared/shared.build" />
 			<nant buildfile="Castle.VSNetIntegration.CastleWizards/wizards.build" />
 		</if>
 	</target>

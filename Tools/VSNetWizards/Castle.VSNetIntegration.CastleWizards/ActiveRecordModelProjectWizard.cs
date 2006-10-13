@@ -19,10 +19,12 @@ namespace Castle.VSNetIntegration.CastleWizards
 	using System.Runtime.InteropServices;
 
 	using Castle.VSNetIntegration.CastleWizards.Dialogs.Panels;
+	using Castle.VSNetIntegration.CastleWizards.Shared;
+	using Castle.VSNetIntegration.CastleWizards.Shared.Dialogs;
 	using Castle.VSNetIntegration.Shared;
-	using Castle.VSNetIntegration.Shared.Dialogs;
 
 	using EnvDTE;
+	using Constants=Castle.VSNetIntegration.CastleWizards.Shared.Constants;
 
 #if DOTNET2
 	[Guid("1D90721C-B0AA-4F9A-BDE5-A588911E38B6")]

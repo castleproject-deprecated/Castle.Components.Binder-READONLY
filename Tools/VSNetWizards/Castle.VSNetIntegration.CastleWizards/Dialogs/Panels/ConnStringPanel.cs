@@ -15,8 +15,7 @@
 namespace Castle.VSNetIntegration.CastleWizards.Dialogs.Panels
 {
 	using System;
-	using System.Windows.Forms;
-	using Castle.VSNetIntegration.Shared;
+	using Castle.VSNetIntegration.CastleWizards.Shared;
 
 	/// <summary>
 	/// Summary description for ConnStringPanel.
@@ -182,7 +181,7 @@ namespace Castle.VSNetIntegration.CastleWizards.Dialogs.Panels
 			
 			foreach(Pair pair in NHUtil.GetSampleConnectionStrings())
 			{
-				if (pair.First == selectedDb)
+				if (pair.First.ToString() == selectedDb)
 				{
 					connectionString.Text = pair.Second.ToString();
 					break;

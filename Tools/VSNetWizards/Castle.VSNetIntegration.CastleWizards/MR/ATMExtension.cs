@@ -15,10 +15,9 @@
 namespace Castle.VSNetIntegration.CastleWizards
 {
 	using System.Xml;
-
-	using Castle.VSNetIntegration.Shared;
-	
+	using Castle.VSNetIntegration.CastleWizards.Shared;
 	using EnvDTE;
+	using Constants=Castle.VSNetIntegration.CastleWizards.Shared.Constants;
 
 	[System.Runtime.InteropServices.ComVisible(false)]
 	public class ATMExtension : IWizardExtension

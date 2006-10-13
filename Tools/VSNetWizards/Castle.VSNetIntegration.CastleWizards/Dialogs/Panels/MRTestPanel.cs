@@ -14,7 +14,10 @@
 
 namespace Castle.VSNetIntegration.CastleWizards.Dialogs.Panels
 {
-	public class MRTestPanel : Castle.VSNetIntegration.Shared.WizardPanel
+	using Castle.VSNetIntegration.CastleWizards.Shared;
+
+	[System.Runtime.InteropServices.ComVisible(false)]
+	public class MRTestPanel : WizardPanel
 	{
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.Label label3;

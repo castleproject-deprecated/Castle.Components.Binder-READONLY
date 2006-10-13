@@ -34,7 +34,6 @@
 		</fileset>
 
 		<assemblyfileset id="project.references" basedir="${build.dir}">
-			<include name="Castle.VSNetIntegration.Shared.dll" />
 			<include name="System.Drawing.dll" />
 			<include name="System.Windows.Forms.dll" />
 			<include name="System.Xml.dll" />

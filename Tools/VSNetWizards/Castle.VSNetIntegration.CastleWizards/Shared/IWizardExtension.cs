@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.VSNetIntegration.CastleWizards
+namespace Castle.VSNetIntegration.CastleWizards.Shared
 {
 	using System;
+	using System.Runtime.InteropServices;
 
-	public sealed class Constants
+	[ComVisible(false)]
+	public interface IWizardExtension
 	{
-		public static readonly String ProjectMain = "main";
+		void Init(ICastleWizard wizard);
 
-		public static readonly String ProjectTest = "test.project";
-
-		public static readonly String ConfigFileList = "configfiles";
+		void Terminate(ICastleWizard wizard);
 	}
 }

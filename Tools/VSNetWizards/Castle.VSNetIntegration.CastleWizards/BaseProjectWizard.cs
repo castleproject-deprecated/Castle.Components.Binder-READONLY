@@ -16,20 +16,30 @@ namespace Castle.VSNetIntegration.Shared
 {
 	using System;
 	using System.Collections;
-	using System.IO;
+	using System.ComponentModel;
 	using System.Reflection;
+	using System.Runtime.InteropServices;
 	using System.Windows.Forms;
 
-	using Castle.VSNetIntegration.Shared.Dialogs;
-
+	using Castle.VSNetIntegration.CastleWizards.Shared;
+	using Castle.VSNetIntegration.CastleWizards.Shared.Dialogs;
+	
 	using EnvDTE;
 
 
 	/// <summary>
 	/// 
 	/// </summary>
+	[ComVisible(false)]
 	public abstract class BaseProjectWizard : IDTWizard, IWin32Window, ICastleWizard
 	{
+		private static readonly object AddProjectsEventKey = new object();
+		private static readonly object SetupProjectsPropertiesEventKey = new object();
+		private static readonly object AddReferencesEventKey = new object();
+		private static readonly object SetupBuildEventsEventKey = new object();
+		private static readonly object PostProcessEventKey = new object();
+		private static readonly object AddPanelsEventKey = new object();
+		
 		private int owner;
 		private DTE dteInstance;
 		private String projectName;
@@ -38,20 +48,45 @@ namespace Castle.VSNetIntegration.Shared
 		private String solutionName;
 		private bool exclusive;
 		private ExtensionContext context;
+		private EventHandlerList eventList = new EventHandlerList();
+		
+		#region ICastleWizard
 
-		#region Events
+		event WizardEventHandler ICastleWizard.OnAddProjects
+		{
+			add { eventList.AddHandler(AddProjectsEventKey, value); }
+			remove { eventList.RemoveHandler(AddProjectsEventKey, value); }
+		}
 
-		public event WizardEventHandler OnAddProjects;
+		event WizardEventHandler ICastleWizard.OnSetupProjectsProperties
+		{
+			add { eventList.AddHandler(SetupProjectsPropertiesEventKey, value); }
+			remove { eventList.RemoveHandler(SetupProjectsPropertiesEventKey, value); }
+		}
 
-		public event WizardEventHandler OnSetupProjectsProperties;
+		event WizardEventHandler ICastleWizard.OnAddReferences
+		{
+			add { eventList.AddHandler(AddReferencesEventKey, value); }
+			remove { eventList.RemoveHandler(AddReferencesEventKey, value); }
+		}
 
-		public event WizardEventHandler OnAddReferences;
+		event WizardEventHandler ICastleWizard.OnSetupBuildEvents
+		{
+			add { eventList.AddHandler(SetupBuildEventsEventKey, value); }
+			remove { eventList.RemoveHandler(SetupBuildEventsEventKey, value); }
+		}
 
-		public event WizardEventHandler OnSetupBuildEvents;
+		event WizardEventHandler ICastleWizard.OnPostProcess
+		{
+			add { eventList.AddHandler(PostProcessEventKey, value); }
+			remove { eventList.RemoveHandler(PostProcessEventKey, value); }
+		}
 
-		public event WizardEventHandler OnPostProcess;
-
-		public event WizardUIEventHandler OnAddPanels;
+		event WizardUIEventHandler ICastleWizard.OnAddPanels
+		{
+			add { eventList.AddHandler(AddPanelsEventKey, value); }
+			remove { eventList.RemoveHandler(AddPanelsEventKey, value); }
+		}
 
 		#endregion
 
@@ -96,9 +131,11 @@ namespace Castle.VSNetIntegration.Shared
 					
 					AddPanels(dlg);
 
-					if (OnAddPanels != null)
+					WizardUIEventHandler eventHandler = (WizardUIEventHandler) eventList[AddPanelsEventKey];
+					
+					if (eventHandler != null)
 					{
-						OnAddPanels(this, dlg, context);
+						eventHandler(this, dlg, context);
 					}
 
 					dlg.ShowDialog(this);
@@ -148,41 +185,51 @@ namespace Castle.VSNetIntegration.Shared
 
 		protected virtual void PostProcess(ExtensionContext context)
 		{
-			if (OnPostProcess != null)
+			WizardEventHandler eventHandler = (WizardEventHandler) eventList[PostProcessEventKey];
+					
+			if (eventHandler != null)
 			{
-				OnPostProcess(this, context);
+				eventHandler(this, context);
 			}
 		}
 
 		protected virtual void SetupBuildEvents(ExtensionContext context)
 		{
-			if (OnSetupBuildEvents != null)
+			WizardEventHandler eventHandler = (WizardEventHandler) eventList[SetupBuildEventsEventKey];
+					
+			if (eventHandler != null)
 			{
-				OnSetupBuildEvents(this, context);
+				eventHandler(this, context);
 			}
 		}
 
 		protected virtual void AddReferences(ExtensionContext context)
 		{
-			if (OnAddReferences != null)
+			WizardEventHandler eventHandler = (WizardEventHandler) eventList[AddReferencesEventKey];
+					
+			if (eventHandler != null)
 			{
-				OnAddReferences(this, context);
+				eventHandler(this, context);
 			}
 		}
 
 		protected virtual void SetupProjectsProperties(ExtensionContext context)
 		{
-			if (OnSetupProjectsProperties != null)
+			WizardEventHandler eventHandler = (WizardEventHandler) eventList[SetupProjectsPropertiesEventKey];
+					
+			if (eventHandler != null)
 			{
-				OnSetupProjectsProperties(this, context);
+				eventHandler(this, context);
 			}
 		}
 
 		protected virtual void AddProjects(ExtensionContext context)
 		{
-			if (OnAddProjects != null)
+			WizardEventHandler eventHandler = (WizardEventHandler) eventList[AddProjectsEventKey];
+					
+			if (eventHandler != null)
 			{
-				OnAddProjects(this, context);
+				eventHandler(this, context);
 			}
 		}
 

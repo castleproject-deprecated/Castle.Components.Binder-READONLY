@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.VSNetIntegration.Shared
+namespace Castle.VSNetIntegration.CastleWizards.Shared
 {
 	using System;
 	using System.Collections.Specialized;

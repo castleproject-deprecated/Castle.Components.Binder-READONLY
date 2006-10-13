@@ -22,10 +22,12 @@ namespace Castle.VSNetIntegration.CastleWizards
 	using System.Xml;
 
 	using Castle.VSNetIntegration.CastleWizards.Dialogs.Panels;
+	using Castle.VSNetIntegration.CastleWizards.Shared;
+	using Castle.VSNetIntegration.CastleWizards.Shared.Dialogs;
 	using Castle.VSNetIntegration.Shared;
-	using Castle.VSNetIntegration.Shared.Dialogs;
 
 	using EnvDTE;
+	using Constants=Castle.VSNetIntegration.CastleWizards.Shared.Constants;
 	using EnvConstants = EnvDTE.Constants;
 
 #if DOTNET2

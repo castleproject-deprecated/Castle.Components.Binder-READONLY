@@ -16,7 +16,7 @@ namespace Castle.VSNetIntegration.CastleWizards.Dialogs.Panels
 {
 	using System;
 
-	using Castle.VSNetIntegration.Shared;
+	using Castle.VSNetIntegration.CastleWizards.Shared;
 
 	/// <summary>
 	/// Summary description for LoggingPanel.

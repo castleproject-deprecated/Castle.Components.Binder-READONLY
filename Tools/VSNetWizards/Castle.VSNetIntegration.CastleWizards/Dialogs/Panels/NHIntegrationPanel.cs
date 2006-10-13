@@ -17,8 +17,7 @@ namespace Castle.VSNetIntegration.CastleWizards.Dialogs.Panels
 	using System;
 	using System.Collections;
 	using System.Windows.Forms;
-	
-	using Castle.VSNetIntegration.Shared;
+	using Castle.VSNetIntegration.CastleWizards.Shared;
 
 	/// <summary>
 	/// Summary description for NHIntegrationPanel.
