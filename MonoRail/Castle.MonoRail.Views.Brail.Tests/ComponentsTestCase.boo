@@ -78,3 +78,7 @@ class ComponentsTestCase(AbstractTestCase):
 		DoGet('usingcomponents/captureFor.rails')
 		AssertReplyEqualTo("\r\n1234 Foo, Bar")
 	
+	[Test]
+	def UsingCaptureForWithLayout():
+		DoGet('usingcomponents/captureForWithLayout.rails')
+		AssertReplyEqualTo("Numbers: 1234\r\n")
