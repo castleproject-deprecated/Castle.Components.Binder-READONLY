@@ -52,12 +52,6 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		protected override void AddProjects(ExtensionContext context)
 		{
-			System.Windows.Forms.MessageBox.Show(context.DteInstance.Version);
-			
-			String version = context.DteInstance.Version.Substring(0, 1);
-			
-			System.Windows.Forms.MessageBox.Show(version);
-			
 			String projectFile = context.GetTemplateFileName(@"CSharp\ARProject\ARProject.csproj");
 			String testProjectFile = context.GetTemplateFileName(@"CSharp\ARProjectTest\ARProjectTest.csproj");
 

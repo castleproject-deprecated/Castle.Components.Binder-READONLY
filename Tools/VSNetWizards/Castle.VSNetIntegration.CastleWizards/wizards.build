@@ -42,6 +42,11 @@
 			<include name="${public.dll.dir}\VSLangProj.dll" />
 			<include name="${public.dll.dir}\VSLangProj2.dll" />
 		</assemblyfileset>
+		
+		<resourcefileset id="project.resources" prefix="${project::get-name()}" dynamicprefix="true">
+			<include name="**/*.resx" />
+			<exclude name="obj/**" />
+		</resourcefileset>
 	</target>
 
 	<target name="generate-assemblyinfo" depends="init common.generate-assemblyinfo" />
