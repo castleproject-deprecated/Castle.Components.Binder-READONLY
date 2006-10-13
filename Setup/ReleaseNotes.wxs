@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+<!--
+
+Files and directories to include:
+
+ActiveRecord Release Notes.txt
+AspectSharp Release Notes.txt
+Core Release Notes.txt
+DynamicProxy Release Notes.txt
+InversionOfControl Release Notes.txt
+MonoRail Release Notes.txt
+Components\AssemblyResolverDialog Release Notes.txt
+Components\Binder Release Notes.txt
+Components\EmailSender Release Notes.txt
+Components\TemplateEngine Release Notes.txt
+Facilities\ActiveRecordIntegration Release Notes.txt
+Facilities\AspectSharp Release Notes.txt
+Facilities\AutomaticTransactionManagement Release Notes.txt
+Facilities\BatchRegistration Release Notes.txt
+Facilities\Cache Release Notes.txt
+Facilities\Db4o Release Notes.txt
+Facilities\IBatisNet Release Notes.txt
+Facilities\Logging Release Notes.txt
+Facilities\ManagementExtensions Release Notes.txt
+Facilities\NHibernateIntegration Release Notes.txt
+Facilities\Prevalence Release Notes.txt
+Services\Logging Release Notes.txt
+Services\TransactionMangement Release Notes.txt
+
+-->
+
+<?include Includes.wxi?>
+
+<Fragment Id='FragmentReleaseNotes'>
+
+<DirectoryRef Id="INSTALLLOCATION">
+	<Component Id="BasicComponent" DiskId="1" Guid="FE2A0429-0F49-46F5-9969-470A50B5D65F">
+
+		<File 
+			Id="relnote1" 
+			Name="ActiveRecord Release Notes.txt" 
+			Source="$(var.ReleaseNotesDir)\ActiveRecord Release Notes.txt" />
+
+	
+	<!--
+	
+		<File Id="bcfile0" Name="ActiveRecord Release Notes.txt" Source="$(var.ReleaseNotesDir)\ActiveRecord Release Notes.txt" />
+		<File Id="bcfile1" Name="InversionOfControl Release Notes.txt" Source="$(var.ReleaseNotesDir)\InversionOfControl Release Notes.txt" />
+		<File Id="bcfile2" Name="MonoRail Release Notes.txt" Source="$(var.ReleaseNotesDir)\MonoRail Release Notes.txt" />
+		<File Id="bcfile3" Name="DynamicProxy Release Notes.txt" Source="$(var.ReleaseNotesDir)\DynamicProxy Release Notes.txt" />
+		<File Id="bcfile4" Name="License.txt" Source="$(var.ReleaseNotesDir)\License.txt" />
+		<File Id="bcfile5" Name="AspectSharp Release Notes.txt" Source="$(var.ReleaseNotesDir)\AspectSharp Release Notes.txt" />
+		<File Id="bcfile6" Name="Core Release Notes.txt" Source="$(var.ReleaseNotesDir)\Core Release Notes.txt" />
+		
+	-->
+	</Component>
+</DirectoryRef>
+
+	
+</Fragment>
+</Wix>
