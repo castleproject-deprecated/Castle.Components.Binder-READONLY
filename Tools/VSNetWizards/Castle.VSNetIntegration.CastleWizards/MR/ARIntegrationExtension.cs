@@ -23,12 +23,13 @@ namespace Castle.VSNetIntegration.CastleWizards
 	
 	using EnvDTE;
 
+	[System.Runtime.InteropServices.ComVisible(false)]
 	public class ARIntegrationExtension : IWizardExtension
 	{
 		private ARIntegrationPanel panel = new ARIntegrationPanel();
 		private ConnStringPanel connPanel = new ConnStringPanel();
 
-		public void Init(BaseProjectWizard wizard)
+		public void Init(ICastleWizard wizard)
 		{
 			wizard.OnAddPanels += new WizardUIEventHandler(AddPanels);
 			wizard.OnAddReferences += new WizardEventHandler(OnAddReferences);
@@ -38,7 +39,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			connPanel.Title = "ActiveRecord Integration";
 		}
 
-		public void Terminate(BaseProjectWizard wizard)
+		public void Terminate(ICastleWizard wizard)
 		{
 			wizard.OnAddPanels -= new WizardUIEventHandler(AddPanels);
 			wizard.OnAddReferences -= new WizardEventHandler(OnAddReferences);

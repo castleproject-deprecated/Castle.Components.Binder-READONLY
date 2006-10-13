@@ -36,7 +36,7 @@
                     NoStdLib = "false"
                     NoWarn = ""
                     Optimize = "false"
-                    OutputPath = "C:\Program Files\Castle\Wizard Templates\"
+                    OutputPath = "..\bin\"
                     RegisterForComInterop = "true"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -132,6 +132,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "BaseProjectWizard.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "MonoRailProjectWizard.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -153,7 +158,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\ARIntegrationPanel.cs"
-                    SubType = "Code"
+                    SubType = "UserControl"
                     BuildAction = "Compile"
                 />
                 <File
@@ -163,7 +168,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\ARPanel.cs"
-                    SubType = "Code"
+                    SubType = "UserControl"
                     BuildAction = "Compile"
                 />
                 <File
@@ -173,7 +178,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\ConnStringPanel.cs"
-                    SubType = "Code"
+                    SubType = "UserControl"
                     BuildAction = "Compile"
                 />
                 <File
@@ -183,7 +188,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\ContainerIntegrationPanel.cs"
-                    SubType = "Code"
+                    SubType = "UserControl"
                     BuildAction = "Compile"
                 />
                 <File
@@ -193,7 +198,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\LoggingPanel.cs"
-                    SubType = "Code"
+                    SubType = "UserControl"
                     BuildAction = "Compile"
                 />
                 <File
@@ -203,7 +208,7 @@
                 />
                 <File
                     RelPath = "Dialogs\Panels\MRPanel.cs"
-                    SubType = "Code"
+                    SubType = "UserControl"
                     BuildAction = "Compile"
                 />
                 <File
@@ -212,8 +217,18 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "Dialogs\Panels\MRTestPanel.cs"
+                    SubType = "UserControl"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Dialogs\Panels\MRTestPanel.resx"
+                    DependentUpon = "MRTestPanel.cs"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "Dialogs\Panels\NHIntegrationPanel.cs"
-                    SubType = "Code"
+                    SubType = "UserControl"
                     BuildAction = "Compile"
                 />
                 <File
@@ -238,6 +253,11 @@
                 />
                 <File
                     RelPath = "MR\NHIntegrationExtension.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "MR\TestProjectExtension.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

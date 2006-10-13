@@ -24,7 +24,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 	using EnvDTE;
 
-#if DOTNET2	
+#if DOTNET2
 	[Guid("1D90721C-B0AA-4F9A-BDE5-A588911E38B6")]
 	[ProgId("Castle.ActiveRecordModelProjectWizardVS8")]
 #else
@@ -49,14 +49,20 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		protected override void AddProjects(ExtensionContext context)
 		{
-			String projectFile = context.GetTemplateFileName(@"CSharp\ARProject.csproj");
-			String testProjectFile = context.GetTemplateFileName(@"CSharp\ARProjectTest.csproj");
+			System.Windows.Forms.MessageBox.Show(context.DteInstance.Version);
+			
+			String version = context.DteInstance.Version.Substring(0, 1);
+			
+			System.Windows.Forms.MessageBox.Show(version);
+			
+			String projectFile = context.GetTemplateFileName(@"CSharp\ARProject\ARProject.csproj");
+			String testProjectFile = context.GetTemplateFileName(@"CSharp\ARProjectTest\ARProjectTest.csproj");
 
 			String localTestProjectPath = Path.Combine(LocalProjectPath, @"..\" + ProjectName + ".Tests");
 			localTestProjectPath = new DirectoryInfo(localTestProjectPath).FullName;
 
-			EnsureDirExists(LocalProjectPath);
-			EnsureDirExists(localTestProjectPath);
+			Utils.EnsureDirExists(LocalProjectPath);
+			Utils.EnsureDirExists(localTestProjectPath);
 
 			Project project = 
 				context.DteInstance.Solution.AddFromTemplate(projectFile, LocalProjectPath, ProjectName + ".csproj", Exclusive);

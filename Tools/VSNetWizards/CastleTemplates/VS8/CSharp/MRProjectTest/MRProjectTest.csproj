@@ -74,14 +74,7 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.MonoRail.Framework">
-      <Name>Castle.MonoRail.Framework</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\MonoRail\bin\Castle.MonoRail.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.MonoRail.TestSupport">
-      <Name>Castle.MonoRail.TestSupport</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\MonoRail\bin\Castle.MonoRail.TestSupport.dll</HintPath>
-    </Reference>
+    <Reference Include="Castle.MonoRail.TestSupport, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="nunit.framework">
       <Name>nunit.framework</Name>
       <HintPath>C:\devtools\nunit\bin\nunit.framework.dll</HintPath>

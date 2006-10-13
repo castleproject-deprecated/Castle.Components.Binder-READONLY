@@ -74,18 +74,10 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Components.Common.EmailSender">
-      <Name>Castle.Components.Common.EmailSender</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\MonoRail\bin\Castle.Components.Common.EmailSender.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Components.Common.EmailSender.SmtpEmailSender">
-      <Name>Castle.Components.Common.EmailSender.SmtpEmailSender</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\MonoRail\bin\Castle.Components.Common.EmailSender.SmtpEmailSender.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.MonoRail.Framework">
-      <Name>Castle.MonoRail.Framework</Name>
-      <HintPath>..\..\..\..\..\..\..\castleall\trunk\MonoRail\bin\Castle.MonoRail.Framework.dll</HintPath>
-    </Reference>
+    <Reference Include="Castle.Components.Binder, Version=0.0.1.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
+    <Reference Include="Castle.Components.Common.EmailSender, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
+    <Reference Include="Castle.Components.Common.EmailSender.SmtpEmailSender, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
+    <Reference Include="Castle.MonoRail.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -106,11 +98,15 @@
     <Compile Include="Controllers\HomeController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Content Include="default.aspx" />
     <Content Include="global.asax" />
+    <Content Include="Readme.txt" />
     <None Include="Web.config" />
-    <Folder Include="Content\css" />
-    <Folder Include="Content\images" />
-    <Folder Include="Views\Home" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\css\" />
+    <Folder Include="Content\images\" />
+    <Folder Include="Views\Home\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

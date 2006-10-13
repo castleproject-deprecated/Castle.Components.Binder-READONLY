@@ -5,7 +5,7 @@ namespace !NAMESPACE!.Controllers
 	using Castle.MonoRail.Framework;
 
 
-	public class HomeController : Controller
+	public class HomeController : SmartDispatcherController
 	{
 		public void Index()
 		{

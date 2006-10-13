@@ -23,12 +23,13 @@ namespace Castle.VSNetIntegration.CastleWizards
 	
 	using EnvDTE;
 
+	[System.Runtime.InteropServices.ComVisible(false)]
 	public class NHIntegrationExtension : IWizardExtension
 	{
 		private NHIntegrationPanel panel = new NHIntegrationPanel();
 		private ConnStringPanel connPanel = new ConnStringPanel();
 
-		public void Init(BaseProjectWizard wizard)
+		public void Init(ICastleWizard wizard)
 		{
 			wizard.OnAddPanels += new WizardUIEventHandler(AddPanels);
 			wizard.OnAddReferences += new WizardEventHandler(OnAddReferences);
@@ -38,7 +39,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			connPanel.Title = "NHibernate Integration";
 		}
 
-		public void Terminate(BaseProjectWizard wizard)
+		public void Terminate(ICastleWizard wizard)
 		{
 			wizard.OnAddPanels -= new WizardUIEventHandler(AddPanels);
 			wizard.OnAddReferences -= new WizardEventHandler(OnAddReferences);
@@ -186,9 +187,9 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		private bool HasSelected(ExtensionContext context)
 		{
-			return ((bool) context.Properties["enableWindsorIntegration"]) == true &&
-				context.Properties.Contains("ActiveRecord Integration") &&
-				((bool) context.Properties["ActiveRecord Integration"]) == true;
+			return ((bool) context.Properties["enableWindsorIntegration"]) &&
+				context.Properties.Contains("NHibernate Integration") &&
+				((bool) context.Properties["NHibernate Integration"]);
 		}
 	}
 }

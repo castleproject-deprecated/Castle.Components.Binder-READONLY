@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <CSHARP
         ProjectType = "Local"
-        ProductVersion = "7.10.3077"
+        ProductVersion = "7.10.6030"
         SchemaVersion = "2.0"
         ProjectGuid = "{315C710A-8072-48DE-9982-65455F0AA414}"
     >
@@ -80,29 +80,39 @@
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
                 />
                 <Reference
-                    Name = "Castle.MonoRail.Framework"
-                    AssemblyName = "Castle.MonoRail.Framework"
-                    HintPath = "..\..\..\..\..\..\..\castleall\trunk\MonoRail\bin\Castle.MonoRail.Framework.dll"
-                />
-                <Reference
-                    Name = "Castle.Components.Common.EmailSender"
-                    AssemblyName = "Castle.Components.Common.EmailSender"
-                    HintPath = "..\..\..\..\..\..\..\castleall\trunk\MonoRail\bin\Castle.Components.Common.EmailSender.dll"
-                />
-                <Reference
-                    Name = "Castle.Components.Common.EmailSender.SmtpEmailSender"
-                    AssemblyName = "Castle.Components.Common.EmailSender.SmtpEmailSender"
-                    HintPath = "..\..\..\..\..\..\..\castleall\trunk\MonoRail\bin\Castle.Components.Common.EmailSender.SmtpEmailSender.dll"
-                />
-                <Reference
                     Name = "System.Web"
                     AssemblyName = "System.Web"
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Web.dll"
                 />
                 <Reference
+                    Name = "Castle.Components.Common.EmailSender"
+                    AssemblyName = "Castle.Components.Common.EmailSender"
+                    HintPath = "..\..\..\..\..\..\build\net-1.1\debug\Castle.Components.Common.EmailSender.dll"
+                    AssemblyFolderKey = "hklm\dn\castle"
+                />
+                <Reference
+                    Name = "Castle.Components.Common.EmailSender.SmtpEmailSender"
+                    AssemblyName = "Castle.Components.Common.EmailSender.SmtpEmailSender"
+                    HintPath = "..\..\..\..\..\..\build\net-1.1\debug\Castle.Components.Common.EmailSender.SmtpEmailSender.dll"
+                    AssemblyFolderKey = "hklm\dn\castle"
+                />
+                <Reference
+                    Name = "Castle.Core"
+                    AssemblyName = "Castle.Core"
+                    HintPath = "..\..\..\..\..\..\build\net-1.1\debug\Castle.Core.dll"
+                    AssemblyFolderKey = "hklm\dn\castle"
+                />
+                <Reference
+                    Name = "Castle.MonoRail.Framework"
+                    AssemblyName = "Castle.MonoRail.Framework"
+                    HintPath = "..\..\..\..\..\..\build\net-1.1\debug\Castle.MonoRail.Framework.dll"
+                    AssemblyFolderKey = "hklm\dn\castle"
+                />
+                <Reference
                     Name = "Castle.Components.Binder"
                     AssemblyName = "Castle.Components.Binder"
-                    HintPath = "..\..\..\..\..\..\MonoRail\bin\Castle.Components.Binder.dll"
+                    HintPath = "..\..\..\..\..\..\build\net-1.1\debug\Castle.Components.Binder.dll"
+                    AssemblyFolderKey = "hklm\dn\castle"
                 />
             </References>
         </Build>
@@ -114,7 +124,15 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "default.aspx"
+                    BuildAction = "Content"
+                />
+                <File
                     RelPath = "global.asax"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "Readme.txt"
                     BuildAction = "Content"
                 />
                 <File

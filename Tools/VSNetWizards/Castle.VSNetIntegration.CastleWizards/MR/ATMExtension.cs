@@ -20,15 +20,16 @@ namespace Castle.VSNetIntegration.CastleWizards
 	
 	using EnvDTE;
 
+	[System.Runtime.InteropServices.ComVisible(false)]
 	public class ATMExtension : IWizardExtension
 	{
-		public void Init(BaseProjectWizard wizard)
+		public void Init(ICastleWizard wizard)
 		{
 			wizard.OnAddReferences += new WizardEventHandler(OnAddReferences);
 			wizard.OnPostProcess += new WizardEventHandler(OnPostProcess);
 		}
 
-		public void Terminate(BaseProjectWizard wizard)
+		public void Terminate(ICastleWizard wizard)
 		{
 			wizard.OnAddReferences -= new WizardEventHandler(OnAddReferences);
 			wizard.OnPostProcess -= new WizardEventHandler(OnPostProcess);

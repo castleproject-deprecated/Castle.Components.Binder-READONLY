@@ -24,20 +24,11 @@ namespace Castle.VSNetIntegration.Shared
 
 	using EnvDTE;
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public delegate void WizardEventHandler(object sender, ExtensionContext context);
 
 	/// <summary>
 	/// 
 	/// </summary>
-	public delegate void WizardUIEventHandler(object sender, WizardDialog dlg, ExtensionContext context);
-
-	/// <summary>
-	/// 
-	/// </summary>
-	public abstract class BaseProjectWizard : IDTWizard, IWin32Window
+	public abstract class BaseProjectWizard : IDTWizard, IWin32Window, ICastleWizard
 	{
 		private int owner;
 		private DTE dteInstance;
@@ -123,6 +114,15 @@ namespace Castle.VSNetIntegration.Shared
 						return;
 					}
 				}
+			}
+			catch(Exception ex)
+			{
+				String message = ex.GetType().Name + "\r\n\r\n" + ex.Message + "\r\n\r\n" + ex.StackTrace;
+				
+				MessageBox.Show(this, "Exception during project creation. \r\n" + message, 
+					"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				
+				throw;
 			}
 			finally
 			{
@@ -224,14 +224,6 @@ namespace Castle.VSNetIntegration.Shared
 		public bool Exclusive
 		{
 			get { return exclusive; }
-		}
-
-		protected void EnsureDirExists(string path)
-		{
-			if (!Directory.Exists(path))
-			{
-				Directory.CreateDirectory(path);
-			}
 		}
 
 		#endregion

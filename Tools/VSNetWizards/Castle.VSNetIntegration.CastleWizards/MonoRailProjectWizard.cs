@@ -37,15 +37,11 @@ namespace Castle.VSNetIntegration.CastleWizards
 #endif
 	public class MonoRailProjectWizard : BaseProjectWizard
 	{
-		private ARPanel firstPanel = new ARPanel();
 		private MRPanel optionsPanel = new MRPanel();
 		private ContainerIntegrationPanel integrationPanel = new ContainerIntegrationPanel();
 
 		protected override void AddPanels(WizardDialog dlg)
 		{
-			firstPanel.TestOptionEnabled = true;
-
-			dlg.AddPanel(firstPanel);
 			dlg.AddPanel(optionsPanel);
 			dlg.AddPanel(integrationPanel);
 		}
@@ -57,6 +53,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		protected override void AddExtensions(IList extensions)
 		{
+			extensions.Add(new TestProjectExtension());
 			extensions.Add(new ATMExtension());
 			extensions.Add(new ARIntegrationExtension());
 			extensions.Add(new NHIntegrationExtension());
@@ -67,7 +64,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 		{
 			String projectFile = context.GetTemplateFileName(@"CSharp\MRProject\MRProject.csproj");
 
-			EnsureDirExists(LocalProjectPath);
+			Utils.EnsureDirExists(LocalProjectPath);
 
 			Project project = 
 				context.DteInstance.Solution.AddFromTemplate(projectFile, LocalProjectPath, ProjectName + ".csproj", Exclusive);
@@ -86,7 +83,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			
 			UpdateReferences(project);
 			UpdateProjectToUseCassini(project);
-
+			
 			base.AddProjects(context);
 		}
 
@@ -103,7 +100,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 		{
 			Project project = Context.Projects[Constants.ProjectMain];
 			XmlDocument webConfigDoc = (XmlDocument) Context.Properties[MRConfigConstants.Web];
-			XmlElement mrNode = (XmlElement) webConfigDoc.SelectSingleNode("configuration/monoRail");
+			XmlElement mrNode = (XmlElement) webConfigDoc.SelectSingleNode("configuration/monorail");
 
 			if (!HasEnabledWindsorIntegration)
 			{
@@ -162,18 +159,25 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 				CreateXmlDomForConfig(project, MRConfigConstants.Properties);
 				CreateXmlDomForConfig(project, MRConfigConstants.Facilities);
-				CreateXmlDomForConfig(project, MRConfigConstants.Controllers);
 				CreateXmlDomForConfig(project, MRConfigConstants.Components);
-
-//				(Context.Properties[Constants.ConfigFileList] as IList).Add(MRConfigConstants.Properties);
-//				(Context.Properties[Constants.ConfigFileList] as IList).Add(MRConfigConstants.Facilities);
-//				(Context.Properties[Constants.ConfigFileList] as IList).Add(MRConfigConstants.Controllers);
-//				(Context.Properties[Constants.ConfigFileList] as IList).Add(MRConfigConstants.Components);
+				XmlDocument controllersDom = CreateXmlDomForConfig(project, MRConfigConstants.Controllers);
+				
+				RegisterController(controllersDom);
 			}
 
 			AddViewEngineConfiguration(webConfigDoc, mrNode);
 
 			AddRoutingConfiguration(webConfigDoc, mrNode);
+		}
+
+		private void RegisterController(XmlDocument dom)
+		{
+			XmlElement compElem = dom.CreateElement("component");
+			
+			compElem.SetAttribute("id", "home.controller");
+			compElem.SetAttribute("type", String.Format("{0}.Controllers.HomeController, {0}", Context.ProjectName));
+			
+			dom.DocumentElement.SelectSingleNode("components").AppendChild(compElem);
 		}
 
 		private void AddRoutingConfiguration(XmlDocument webConfigDoc, XmlElement mrNode)
