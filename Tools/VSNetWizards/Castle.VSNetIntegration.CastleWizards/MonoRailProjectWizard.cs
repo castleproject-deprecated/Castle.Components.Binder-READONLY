@@ -37,6 +37,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 	[Guid("43C9796F-E6C8-460D-B722-204A7121A510")]
 	[ProgId("Castle.MonoRailProjectWizardVS7")]
 #endif
+	[ComVisibleAttribute(true)]
 	public class MonoRailProjectWizard : BaseProjectWizard
 	{
 		private MRPanel optionsPanel = new MRPanel();

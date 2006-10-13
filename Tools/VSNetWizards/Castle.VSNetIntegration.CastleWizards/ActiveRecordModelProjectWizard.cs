@@ -33,6 +33,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 	[Guid("50E5A1CA-8ABD-4AD2-8A60-176F5BFC9706")]
 	[ProgId("Castle.ActiveRecordModelProjectWizardVS7")]
 #endif
+	[ComVisibleAttribute(true)]
 	public class ActiveRecordModelProjectWizard : BaseProjectWizard
 	{
 		private ARPanel panel;

@@ -15,7 +15,7 @@
 		<property name="assembly.allow-partially-trusted-callers" value="true" />
 
 		<property name="assembly.is-cls-compliant" value="false" />
-		<property name="assembly.is-com-visible" value="true" />
+		<property name="assembly.is-com-visible" value="false" />
 
 		<if test="${nant.settings.currentframework=='net-1.1'}">
 			<property name="extensibility.dll.dir" value="${dev.env.dir}" />
