@@ -109,7 +109,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			if (!HasEnabledWindsorIntegration)
 			{
 				XmlElement controllersElem = webConfigDoc.CreateElement("controllers");
-				XmlElement assemblyElem = webConfigDoc.CreateElement("controllers");
+				XmlElement assemblyElem = webConfigDoc.CreateElement("assembly");
 
 				controllersElem.AppendChild(assemblyElem);
 				assemblyElem.AppendChild(webConfigDoc.CreateTextNode(ProjectName));
