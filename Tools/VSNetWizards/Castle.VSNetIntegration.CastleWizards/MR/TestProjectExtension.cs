@@ -93,6 +93,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 		
 		private void OnSetupBuildEvent(object sender, ExtensionContext context)
 		{
+			if (!panel.WantsTestProject) return;
+			
 			Project testProject = context.Projects[Constants.ProjectTest];
 
 			Utils.AddCommonPostBuildEvent(testProject);
