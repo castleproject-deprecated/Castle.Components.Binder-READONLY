@@ -75,13 +75,14 @@ namespace Castle.VSNetIntegration.CastleWizards
 		private void OnPostProcess(object sender, ExtensionContext context)
 		{
 			if (!panel.WantsTestProject) return;
-			
+
+			Project project = context.Projects[Constants.ProjectMain];
 			Project testProject = context.Projects[Constants.ProjectTest];
-			
-			String name = testProject.Name;
+
+			String name = project.Name;
 			
 			Utils.PerformReplacesOn(testProject, name, localTestProjectPath, "HomeControllerTestCase.cs");
-			Utils.PerformReplacesOn(testProject, name, localTestProjectPath, "App.config");
+			Utils.PerformReplacesOn(testProject, name, context.LocalProjectPath, "App.config");
 		}
 		
 		private void AddPanels(object sender, WizardDialog dlg, ExtensionContext context)

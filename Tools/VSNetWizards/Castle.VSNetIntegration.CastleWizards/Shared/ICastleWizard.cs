@@ -24,8 +24,12 @@ namespace Castle.VSNetIntegration.CastleWizards.Shared
 
 	public delegate void WizardUIEventHandler(object sender, WizardDialog dlg, ExtensionContext context);
 
-	
+
+#if DOTNET2
+	[ComVisible(true)]
+#else
 	[ComVisible(false)]
+#endif
 	public interface ICastleWizard
 	{
 		event WizardEventHandler OnAddProjects;

@@ -17,7 +17,8 @@ namespace Castle.VSNetIntegration.CastleWizards.Shared
 	using System;
 	using System.Runtime.InteropServices;
 
-	[ComVisible(false)]
+	[ComVisible(true)]
+	[InterfaceType(ComInterfaceType.InterfaceIsDual)]
 	public interface IWizardExtension
 	{
 		void Init(ICastleWizard wizard);

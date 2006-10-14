@@ -52,37 +52,37 @@ namespace Castle.VSNetIntegration.Shared
 		
 		#region ICastleWizard
 
-		event WizardEventHandler ICastleWizard.OnAddProjects
+		public event WizardEventHandler OnAddProjects
 		{
 			add { eventList.AddHandler(AddProjectsEventKey, value); }
 			remove { eventList.RemoveHandler(AddProjectsEventKey, value); }
 		}
 
-		event WizardEventHandler ICastleWizard.OnSetupProjectsProperties
+		public event WizardEventHandler OnSetupProjectsProperties
 		{
 			add { eventList.AddHandler(SetupProjectsPropertiesEventKey, value); }
 			remove { eventList.RemoveHandler(SetupProjectsPropertiesEventKey, value); }
 		}
 
-		event WizardEventHandler ICastleWizard.OnAddReferences
+		public event WizardEventHandler OnAddReferences
 		{
 			add { eventList.AddHandler(AddReferencesEventKey, value); }
 			remove { eventList.RemoveHandler(AddReferencesEventKey, value); }
 		}
 
-		event WizardEventHandler ICastleWizard.OnSetupBuildEvents
+		public event WizardEventHandler OnSetupBuildEvents
 		{
 			add { eventList.AddHandler(SetupBuildEventsEventKey, value); }
 			remove { eventList.RemoveHandler(SetupBuildEventsEventKey, value); }
 		}
 
-		event WizardEventHandler ICastleWizard.OnPostProcess
+		public event WizardEventHandler OnPostProcess
 		{
 			add { eventList.AddHandler(PostProcessEventKey, value); }
 			remove { eventList.RemoveHandler(PostProcessEventKey, value); }
 		}
 
-		event WizardUIEventHandler ICastleWizard.OnAddPanels
+		public event WizardUIEventHandler OnAddPanels
 		{
 			add { eventList.AddHandler(AddPanelsEventKey, value); }
 			remove { eventList.RemoveHandler(AddPanelsEventKey, value); }
