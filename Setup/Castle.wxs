@@ -54,6 +54,8 @@
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLLOCATION" Name="CastleProject">
 					
+					<Directory Id="ReleaseNotesDir" Name="ReleaseNotes"/>
+					
 					<Directory Id="BinDir" Name="Bin" />
 					
 					<Directory Id="DocsDir" Name="Docs" />
@@ -91,7 +93,11 @@
 				Id='MainProgram' Title='Binaries' 
 				Description='Castle assemblies and dependencies' Level='1'>
 				
-				<ComponentRef Id="BasicComponent" />
+				<ComponentRef Id="ReleaseNotesRoot" />
+				<ComponentRef Id="ReleaseNotesComps" />
+				<ComponentRef Id="ReleaseNotesFacilities" />
+				<ComponentRef Id="ReleaseNotesServices" />
+				
 				<ComponentRef Id="ProductComponent11" />
 				<ComponentRef Id="ProductComponent20" />
 				<ComponentRef Id="ProductComponentGac" />
@@ -130,6 +136,9 @@
 				<ComponentRef Id='componentvs2003_ARProjectTest' />
 				<ComponentRef Id='componentvs2003_MRProject' />
 				<ComponentRef Id='componentvs2003_MRProject1' />
+				<ComponentRef Id='componentvs2003_MRProject2' />
+				<ComponentRef Id='componentvs2003_MRProject3' />
+				<ComponentRef Id='componentvs2003_MRProject4' />
 				<ComponentRef Id='componentvs2003_MRProjectTest' />
 			</Feature>
 
@@ -143,6 +152,9 @@
 				<ComponentRef Id='componentvs2005_ARProjectTest' />
 				<ComponentRef Id='componentvs2005_MRProject' />
 				<ComponentRef Id='componentvs2005_MRProject1' />
+				<ComponentRef Id='componentvs2005_MRProject2' />
+				<ComponentRef Id='componentvs2005_MRProject3' />
+				<ComponentRef Id='componentvs2005_MRProject4' />
 				<ComponentRef Id='componentvs2005_MRProjectTest' />
 			</Feature>
 
