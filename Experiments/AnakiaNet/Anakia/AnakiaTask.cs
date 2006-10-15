@@ -489,49 +489,56 @@ namespace Anakia
 		{
 			if (node.NodeType == NodeType.Navigation) return;
 
-			XmlDocumentFragment fragment = node.XmlDoc.CreateDocumentFragment();
+			try
+			{
+				XmlDocumentFragment fragment = node.XmlDoc.CreateDocumentFragment();
 
-			XmlNode parent = fragment;
+				XmlNode parent = fragment;
 			
-			int level = node.ParentFolder.Level;
+				int level = node.ParentFolder.Level;
 
-			if (node.NodeType == NodeType.Ordinary)
-			{
-				level++;
-				
-				parent = node.XmlDoc.CreateElement(Path.GetFileNameWithoutExtension(node.Filename).Replace(' ', '_'));
-
-				((XmlElement) parent).SetAttribute("level", node.ParentFolder.Level.ToString());
-				((XmlElement) parent).SetAttribute("page", node.TargetFilename);
-				((XmlElement) parent).SetAttribute("title", node.Meta.Title);
-				((XmlElement) parent).SetAttribute("issubpage", "true");
-				((XmlElement) parent).SetAttribute("path", node.ParentFolder.Path);
-
-				fragment.AppendChild(parent);
-			}
-
-			foreach(XmlElement section in node.XmlDoc.SelectNodes("document/body/section"))
-			{
-				XmlElement newSection = CreateSectionXmlElement(level, node, section);
-				
-				parent.AppendChild(newSection);
-				
-				foreach(XmlElement secSectionLevel in section.SelectNodes("section"))
+				if (node.NodeType == NodeType.Ordinary)
 				{
-					XmlElement newSectionSecLevel = CreateSectionXmlElement(level + 1, node, secSectionLevel);
+					level++;
 				
-					newSection.AppendChild(newSectionSecLevel);
-					
-					foreach(XmlElement thirdSectionLevel in secSectionLevel.SelectNodes("section"))
+					parent = node.XmlDoc.CreateElement(Path.GetFileNameWithoutExtension(node.Filename).Replace(' ', '_'));
+
+					((XmlElement) parent).SetAttribute("level", node.ParentFolder.Level.ToString());
+					((XmlElement) parent).SetAttribute("page", node.TargetFilename);
+					((XmlElement) parent).SetAttribute("title", node.Meta.Title);
+					((XmlElement) parent).SetAttribute("issubpage", "true");
+					((XmlElement) parent).SetAttribute("path", node.ParentFolder.Path);
+
+					fragment.AppendChild(parent);
+				}
+
+				foreach(XmlElement section in node.XmlDoc.SelectNodes("document/body/section"))
+				{
+					XmlElement newSection = CreateSectionXmlElement(level, node, section);
+				
+					parent.AppendChild(newSection);
+				
+					foreach(XmlElement secSectionLevel in section.SelectNodes("section"))
 					{
-						XmlElement newSectionThrdLevel = CreateSectionXmlElement(level + 2, node, thirdSectionLevel);
+						XmlElement newSectionSecLevel = CreateSectionXmlElement(level + 1, node, secSectionLevel);
 				
-						newSectionSecLevel.AppendChild(newSectionThrdLevel);
+						newSection.AppendChild(newSectionSecLevel);
+					
+						foreach(XmlElement thirdSectionLevel in secSectionLevel.SelectNodes("section"))
+						{
+							XmlElement newSectionThrdLevel = CreateSectionXmlElement(level + 2, node, thirdSectionLevel);
+				
+							newSectionSecLevel.AppendChild(newSectionThrdLevel);
+						}
 					}
 				}
-			}
 
-			node.ParentFolder.SectionFragments.Add(fragment);
+				node.ParentFolder.SectionFragments.Add(fragment);
+			}
+			catch(Exception ex)
+			{
+				throw new Exception("Error creating site map fragments for " + node.Path + "\\" + node.Filename, ex);
+			}
 		}
 
 		private static XmlElement CreateSectionXmlElement(int level, DocumentNode node, XmlElement section)
