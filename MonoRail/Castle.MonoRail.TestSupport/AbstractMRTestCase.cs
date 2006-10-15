@@ -140,8 +140,11 @@ namespace Castle.MonoRail.TestSupport
 		#region Actions
 
 		/// <summary>
-		/// Performs a GET operation on 
+		/// Performs a GET operation on the specified path.
 		/// </summary>
+		/// <example>
+		/// DoGet("home/index.rails");
+		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="queryStringParams">A list of key/value pair, for example <c>name=johndoe</c></param>
 		public void DoGet(String path, params String[] queryStringParams)
@@ -150,8 +153,11 @@ namespace Castle.MonoRail.TestSupport
 		}
 
 		/// <summary>
-		/// Performs a GET operation on
+		/// Performs a GET operation on the specified path.
 		/// </summary>
+		/// <example>
+		/// DoGet("home/index.rails");
+		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="resendCookies">if set to <c>true</c> [resend cookies].</param>
 		/// <param name="queryStringParams">A list of key/value pair, for example <c>name=johndoe</c></param>
@@ -181,8 +187,11 @@ namespace Castle.MonoRail.TestSupport
 		}
 
 		/// <summary>
-		/// Performs a Post operation on 
+		/// Performs a POST operation on the specified path.
 		/// </summary>
+		/// <example>
+		/// DoPost("producto/search.rails", "name=mac", "page=1");
+		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="postStringParams">A list of key/value pair, for example <c>name=johndoe</c></param>
 		public void DoPost(String path, params String[] postStringParams)
@@ -191,8 +200,11 @@ namespace Castle.MonoRail.TestSupport
 		}
 
 		/// <summary>
-		/// Performs a Post operation on
+		/// Performs a POST operation on the specified path.
 		/// </summary>
+		/// <example>
+		/// DoPost("producto/search.rails", "name=mac", "page=1");
+		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="resendCookies">if set to <c>true</c> [resend cookies].</param>
 		/// <param name="postStringParams">A list of key/value pair, for example <c>name=johndoe</c></param>
@@ -237,8 +249,11 @@ namespace Castle.MonoRail.TestSupport
 		}
 
 		/// <summary>
-		/// Performs a Head operation on 
+		/// Performs a HEAD operation on the specified path.
 		/// </summary>
+		/// <example>
+		/// DoHead("producto/search.rails", "name=mac", "page=1");
+		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="postStringParams">A list of key/value pair, for example <c>name=johndoe</c></param>
 		public void DoHead(String path, params String[] postStringParams)
@@ -272,32 +287,29 @@ namespace Castle.MonoRail.TestSupport
 			SendRequest();
 		}
 
-		private void AssertPathIsValid(string path)
-		{
-			if (path == null)
-				throw new ArgumentNullException("path", "Can't test a null path");
-			if (path.Length == 0)
-				throw new ArgumentException("Can't test an empty path", "path");
-			if (path[0] == '/')
-				throw new ArgumentException("Path cannot start with a '/'");
-			// if (path.IndexOf('?') != -1)
-			//	throw new ArgumentException("Path cannot contain query parameters! Pass them seperatedly", "path");
-		}
-
 		#endregion
 
 		#region Properties
 
+		/// <summary>
+		/// Gets the <c>TestRequest</c>
+		/// </summary>
 		public TestRequest Request
 		{
 			get { return request; }
 		}
 
+		/// <summary>
+		/// Gets the <c>TestResponse</c>
+		/// </summary>
 		public TestResponse Response
 		{
 			get { return response; }
 		}
 
+		/// <summary>
+		/// Gets the request response
+		/// </summary>
 		public String Output
 		{
 			get { return outputBuffer.ToString(); }
@@ -493,30 +505,53 @@ namespace Castle.MonoRail.TestSupport
 			Assert.AreEqual(url, Response.Headers["Location"]);
 		}
 
+		/// <summary>
+		/// Asserts that the content-type header is equals to the specified
+		/// value
+		/// </summary>
+		/// <param name="expectedContentType">value to assert to</param>
 		protected void AssertContentTypeEqualsTo(String expectedContentType)
 		{
 			AssertHasHeader("Content-Type");
 			Assert.AreEqual(expectedContentType, Response.Headers["Content-Type"]);
 		}
 
+		/// <summary>
+		/// Asserts that the content-type header starts with to the specified
+		/// value
+		/// </summary>
+		/// <param name="expectedContentType">value to assert to</param>
 		protected void AssertContentTypeStartsWith(String expectedContentType)
 		{
 			AssertHasHeader("Content-Type");
 			Assert.IsTrue(Response.Headers["Content-Type"].ToString().StartsWith(expectedContentType));
 		}
 
+		/// <summary>
+		/// Asserts that the content-type header ends with the specified
+		/// value
+		/// </summary>
+		/// <param name="expectedContentType">value to assert to</param>
 		protected void AssertContentTypeEndsWith(String expectedContentType)
 		{
 			AssertHasHeader("Content-Type");
 			Assert.IsTrue(Response.Headers["Content-Type"].ToString().EndsWith(expectedContentType));
 		}
 
+		/// <summary>
+		/// Asserts that response contains the specified header.
+		/// </summary>
+		/// <param name="headerName">value to assert to</param>
 		protected void AssertHasHeader(String headerName)
 		{
 			Assert.IsTrue(Response.Headers[headerName] != null,
 			              "Header '{0}' was not found", headerName);
 		}
 
+		/// <summary>
+		/// Asserts that PropertyBag contains the specified key.
+		/// </summary>
+		/// <param name="entryKey">key name</param>
 		protected void AssertPropertyBagContains(String entryKey)
 		{
 			Assert.IsNotNull(response.PropertyBag,
@@ -524,12 +559,21 @@ namespace Castle.MonoRail.TestSupport
 			Assert.IsTrue(response.PropertyBag.Contains(entryKey), "Entry {0} was not on PropertyBag", entryKey);
 		}
 
+		/// <summary>
+		/// Asserts that PropertyBag's entry value equals to the specified value.
+		/// </summary>
+		/// <param name="entryKey">key name</param>
+		/// <param name="entryKey">value to assert to</param>
 		protected void AssertPropertyBagEntryEquals(String entryKey, object expectedValue)
 		{
 			AssertPropertyBagContains(entryKey);
 			Assert.AreEqual(expectedValue, response.PropertyBag[entryKey], "PropertyBag entry differs from the expected");
 		}
 
+		/// <summary>
+		/// Asserts that Flash contains the specified key.
+		/// </summary>
+		/// <param name="entryKey">key name</param>
 		protected void AssertFlashContains(String entryKey)
 		{
 			Assert.IsNotNull(response.Flash,
@@ -537,6 +581,10 @@ namespace Castle.MonoRail.TestSupport
 			Assert.IsTrue(response.Flash.Contains(entryKey), "Entry {0} was not on Flash", entryKey);
 		}
 
+		/// <summary>
+		/// Asserts that Flash does not contains the specified key.
+		/// </summary>
+		/// <param name="entryKey">key name</param>
 		protected void AssertFlashDoesNotContain(String entryKey)
 		{
 			Assert.IsNotNull(response.Flash,
@@ -544,12 +592,21 @@ namespace Castle.MonoRail.TestSupport
 			Assert.IsFalse(response.Flash.Contains(entryKey), "Entry {0} was on Flash", entryKey);
 		}
 
+		/// <summary>
+		/// Asserts that Flash's entry value equals to the specified value.
+		/// </summary>
+		/// <param name="entryKey">key name</param>
+		/// <param name="entryKey">value to assert to</param>
 		protected void AssertFlashEntryEquals(String entryKey, object expectedValue)
 		{
 			AssertFlashContains(entryKey);
 			Assert.AreEqual(expectedValue, response.Flash[entryKey], "Flash entry differs from the expected");
 		}
 
+		/// <summary>
+		/// Asserts that Session contains the specified key.
+		/// </summary>
+		/// <param name="entryKey">key name</param>
 		protected void AssertSessionContains(String entryKey)
 		{
 			Assert.IsNotNull(response.Session,
@@ -557,6 +614,10 @@ namespace Castle.MonoRail.TestSupport
 			Assert.IsTrue(response.Session.Contains(entryKey), "Entry {0} was not on Session", entryKey);
 		}
 
+		/// <summary>
+		/// Asserts that Session does not contains the specified key.
+		/// </summary>
+		/// <param name="entryKey">key name</param>
 		protected void AssertSessionDoesNotContain(String entryKey)
 		{
 			Assert.IsNotNull(response.Session,
@@ -564,12 +625,21 @@ namespace Castle.MonoRail.TestSupport
 			Assert.IsFalse(response.Session.Contains(entryKey), "Entry {0} was on Session", entryKey);
 		}
 
+		/// <summary>
+		/// Asserts that Session's entry value equals to the specified value.
+		/// </summary>
+		/// <param name="entryKey">key name</param>
+		/// <param name="entryKey">value to assert to</param>
 		protected void AssertSessionEntryEqualsTo(String entryKey, object expectedValue)
 		{
 			AssertSessionContains(entryKey);
 			Assert.AreEqual(expectedValue, response.Session[entryKey], "Session entry differs from the expected");
 		}
 
+		/// <summary>
+		/// Asserts that the response contains the specified cookie.
+		/// </summary>
+		/// <param name="cookieName">cookie name</param>
 		protected void AssertHasCookie(String cookieName)
 		{
 			CookieCollection cookies = Response.Cookies.GetCookies(new Uri("http://localhost"));
@@ -582,6 +652,11 @@ namespace Castle.MonoRail.TestSupport
 			Assert.Fail("Cookie '{0}' was not found", cookieName);
 		}
 
+		/// <summary>
+		/// Asserts that Response cookie entry value equals to the specified value.
+		/// </summary>
+		/// <param name="cookieName">cookie name</param>
+		/// <param name="expectedValue">value to assert to</param>
 		protected void AssertCookieValueEqualsTo(String cookieName, String expectedValue)
 		{
 			AssertHasCookie(cookieName);
@@ -598,6 +673,11 @@ namespace Castle.MonoRail.TestSupport
 			}
 		}
 
+		/// <summary>
+		/// Asserts that the response cookie has the specified expiration.
+		/// </summary>
+		/// <param name="cookieName">cookie name</param>
+		/// <param name="expectedExpiration">value to assert to</param>
 		protected void AssertCookieExpirationEqualsTo(String cookieName, DateTime expectedExpiration)
 		{
 			AssertHasCookie(cookieName);
@@ -703,6 +783,16 @@ namespace Castle.MonoRail.TestSupport
 			response = host.Process(Request, writer);
 			
 			writer.Close();
+		}
+		
+		private void AssertPathIsValid(string path)
+		{
+			if (path == null)
+				throw new ArgumentNullException("path", "Can't test a null path");
+			if (path.Length == 0)
+				throw new ArgumentException("Can't test an empty path", "path");
+			if (path[0] == '/')
+				throw new ArgumentException("Path cannot start with a '/'");
 		}
 	}
 }
