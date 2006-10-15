@@ -143,7 +143,9 @@ namespace Castle.MonoRail.TestSupport
 		/// Performs a GET operation on the specified path.
 		/// </summary>
 		/// <example>
+		/// <code>
 		/// DoGet("home/index.rails");
+		/// </code>
 		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="queryStringParams">A list of key/value pair, for example <c>name=johndoe</c></param>
@@ -155,8 +157,8 @@ namespace Castle.MonoRail.TestSupport
 		/// <summary>
 		/// Performs a GET operation on the specified path.
 		/// </summary>
-		/// <example>
-		/// DoGet("home/index.rails");
+		/// <example><code>
+		/// DoGet("home/index.rails");</code>
 		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="resendCookies">if set to <c>true</c> [resend cookies].</param>
@@ -190,7 +192,9 @@ namespace Castle.MonoRail.TestSupport
 		/// Performs a POST operation on the specified path.
 		/// </summary>
 		/// <example>
+		/// <code>
 		/// DoPost("producto/search.rails", "name=mac", "page=1");
+		/// </code>
 		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="postStringParams">A list of key/value pair, for example <c>name=johndoe</c></param>
@@ -203,7 +207,9 @@ namespace Castle.MonoRail.TestSupport
 		/// Performs a POST operation on the specified path.
 		/// </summary>
 		/// <example>
+		/// <code>
 		/// DoPost("producto/search.rails", "name=mac", "page=1");
+		/// </code>
 		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="resendCookies">if set to <c>true</c> [resend cookies].</param>
@@ -252,7 +258,9 @@ namespace Castle.MonoRail.TestSupport
 		/// Performs a HEAD operation on the specified path.
 		/// </summary>
 		/// <example>
+		/// <code>
 		/// DoHead("producto/search.rails", "name=mac", "page=1");
+		/// </code>
 		/// </example>
 		/// <param name="path">The resource being request, for example <c>home/index.rails</c></param>
 		/// <param name="postStringParams">A list of key/value pair, for example <c>name=johndoe</c></param>
