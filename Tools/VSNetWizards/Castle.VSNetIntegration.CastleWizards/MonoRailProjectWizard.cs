@@ -82,6 +82,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 			AddGlobalApplication(project);
 			AddView(project);
+			AddLayout(project);
+			AddRescue(project);
 			
 			CreateXmlDomForConfig(project, MRConfigConstants.Web);
 			
@@ -299,8 +301,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		private void AddView(Project project)
 		{
-			String viewTemplateFile = null;
-			String viewFile = null;
+			String viewTemplateFile;
+			String viewFile;
 
 			if (optionsPanel.VeNVelocity)
 			{
@@ -320,6 +322,58 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 			project.ProjectItems.Item("Views").
 				ProjectItems.Item("Home").
+				ProjectItems.AddFromTemplate(viewTemplateFile, viewFile);
+		}
+
+		private void AddRescue(Project project)
+		{
+			String viewTemplateFile;
+			String viewFile;
+
+			if (optionsPanel.VeNVelocity)
+			{
+				viewFile = "generalerror.vm";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\rescue_default.vm");
+			}
+			else if (optionsPanel.VeBrail)
+			{
+				viewFile = "generalerror.boo";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\rescue_default.boo");
+			}
+			else
+			{
+				viewFile = "generalerror.aspx";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\rescue_default.aspx");
+			}
+
+			project.ProjectItems.Item("Views").
+				ProjectItems.Item("rescues").
+				ProjectItems.AddFromTemplate(viewTemplateFile, viewFile);
+		}
+
+		private void AddLayout(Project project)
+		{
+			String viewTemplateFile;
+			String viewFile;
+
+			if (optionsPanel.VeNVelocity)
+			{
+				viewFile = "default.vm";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\layout_default.vm");
+			}
+			else if (optionsPanel.VeBrail)
+			{
+				viewFile = "default.boo";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\layout_default.boo");
+			}
+			else
+			{
+				viewFile = "default.aspx";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\layout_default.aspx");
+			}
+
+			project.ProjectItems.Item("Views").
+				ProjectItems.Item("layouts").
 				ProjectItems.AddFromTemplate(viewTemplateFile, viewFile);
 		}
 
@@ -381,8 +435,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 				XmlTextWriter writer = new XmlTextWriter(tempFile, Encoding.UTF8);
 				writer.Formatting = Formatting.Indented;
-				writer.Indentation = 4;
-				writer.IndentChar = ' ';
+				writer.Indentation = 1;
+				writer.IndentChar = '\t';
 
 				webConfigDoc.Save(writer);
 				writer.Close();
@@ -397,7 +451,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		private bool HasEnabledWindsorIntegration
 		{
-			get { return ((bool) Context.Properties["enableWindsorIntegration"]) == true; }
+			get { return ((bool) Context.Properties["enableWindsorIntegration"]); }
 		}
 	}
 }
