@@ -6,11 +6,19 @@
 <Fragment Id='FragmentBin'>
 
 <DirectoryRef Id="BinDir">
-	<Component Id="ProductComponentGac" DiskId="1" Guid="49ABA8A2-D8C0-456A-8E80-6AEAD79DF1B7">
+
+	<Component Id="ProductComponentGac1" DiskId="1" Guid="49ABA8A2-D8C0-456A-8E80-6AEAD79DF1B7">
 		<File Id="file22A" 
 			Name="Castle.MonoRail.TestSupport.dll" 
 			KeyPath="yes" Assembly=".net" AssemblyManifest="file22A"
 			Source="$(var.BuildNet11Dir)\Castle.MonoRail.TestSupport.dll" />
+	</Component>
+
+	<Component Id="ProductComponentGac2" DiskId="1" Guid="A4F709E3-0343-41B0-AA18-270012EE4DCC">
+		<File Id="file90A" 
+			Name="Cassini.dll" 
+			KeyPath="yes" Assembly=".net" AssemblyManifest="file90A"
+			Source="$(var.BuildNet11Dir)\Cassini.dll" />
 	</Component>
 	
 	<Directory Id="net11dir" Name="net-1.1">
@@ -79,30 +87,42 @@
 			<File Id="file51" Name="Castle.Facilities.AutomaticTransactionManagement.dll" Source="$(var.BuildNet11Dir)\Castle.Facilities.AutomaticTransactionManagement.dll" />
 
 			<!-- Distributable Dependencies -->
-			<File Id="file0"  Name="anrControls.Markdown.NET.dll"			Source="$(var.BuildNet11Dir)\anrControls.Markdown.NET.dll" />
+			<File Id="file0"  Name="anrControls.Markdown.NET.dll"		Source="$(var.BuildNet11Dir)\anrControls.Markdown.NET.dll" />
 			<File Id="file1"  Name="Boo.Lang.Compiler.dll"				Source="$(var.BuildNet11Dir)\Boo.Lang.Compiler.dll" />
 			<File Id="file2"  Name="Boo.Lang.dll"							Source="$(var.BuildNet11Dir)\Boo.Lang.dll" />
 			<File Id="file3"  Name="Boo.Lang.Parser.dll"					Source="$(var.BuildNet11Dir)\Boo.Lang.Parser.dll" />
-			<File Id="file60" Name="log4net.dll"													Source="$(var.BuildNet11Dir)\log4net.dll" />
-			<File Id="file80" Name="IBatisNet.Common.dll"					Source="$(var.BuildNet11Dir)\IBatisNet.Common.dll" />
-			<File Id="file82" Name="IBatisNet.DataMapper.dll"				Source="$(var.BuildNet11Dir)\IBatisNet.DataMapper.dll" />
+			<File Id="file60" Name="log4net.dll"							Source="$(var.BuildNet11Dir)\log4net.dll" />
+			<File Id="file80" Name="IBatisNet.Common.dll"				Source="$(var.BuildNet11Dir)\IBatisNet.Common.dll" />
+			<File Id="file82" Name="IBatisNet.DataMapper.dll"			Source="$(var.BuildNet11Dir)\IBatisNet.DataMapper.dll" />
 
 			<File Id="file83" Name="NVelocity.dll"						Source="$(var.BuildNet11Dir)\NVelocity.dll" />
 			
-			<File Id="file61" Name="NLog.dll"														Source="$(var.BuildNet11Dir)\NLog.dll" />
+			<File Id="file61" Name="NLog.dll"								Source="$(var.BuildNet11Dir)\NLog.dll" />
 			<File Id="file85" Name="NLog.license.txt"						Source="$(var.BuildNet11Dir)\NLog.license.txt" />
 			<File Id="file63" Name="Bamboo.Prevalence.Collections.dll"	Source="$(var.BuildNet11Dir)\Bamboo.Prevalence.Collections.dll" />
 			<File Id="file64" Name="Bamboo.Prevalence.dll"				Source="$(var.BuildNet11Dir)\Bamboo.Prevalence.dll" />
 			<File Id="file65" Name="Bamboo.Prevalence.Indexing.dll"		Source="$(var.BuildNet11Dir)\Bamboo.Prevalence.Indexing.dll" />
 			<File Id="file66" Name="Bamboo.Prevalence.Util.dll"			Source="$(var.BuildNet11Dir)\Bamboo.Prevalence.Util.dll" />
 			<File Id="file67" Name="Bamboo.Prevalence.XPath.dll"			Source="$(var.BuildNet11Dir)\Bamboo.Prevalence.XPath.dll" />
-			<File Id="file69" Name="Iesi.Collections.dll"					Source="$(var.BuildNet11Dir)\Iesi.Collections.dll" />
-			<File Id="file76" Name="Iesi.Collections.license.txt"			Source="$(var.BuildNet11Dir)\Iesi.Collections.license.txt" />
+			<File Id="file69" Name="Iesi.Collections.dll"				Source="$(var.BuildNet11Dir)\Iesi.Collections.dll" />
+			<File Id="file76" Name="Iesi.Collections.license.txt"		Source="$(var.BuildNet11Dir)\Iesi.Collections.license.txt" />
 			<File Id="file71" Name="NHibernate.dll"						Source="$(var.BuildNet11Dir)\NHibernate.dll" />
 			<File Id="file75" Name="NHibernate.license.txt"				Source="$(var.BuildNet11Dir)\NHibernate.license.txt" />
 			<File Id="file72" Name="Nullables.dll"						Source="$(var.BuildNet11Dir)\Nullables.dll" />
-			<File Id="file73" Name="Nullables.NHibernate.dll"				Source="$(var.BuildNet11Dir)\Nullables.NHibernate.dll" />
-<!--			<File Id="file90" Name="NetronGraphLib.dll"					Source="$(var.BuildNet11Dir)\NetronGraphLib.dll" />
+			<File Id="file73" Name="Nullables.NHibernate.dll"			Source="$(var.BuildNet11Dir)\Nullables.NHibernate.dll" />
+			
+			<File 
+				Id="file90" 
+				Name="Cassini.dll"
+				Source="$(var.SharedLibs)\net\Cassini.dll" />
+
+			<File 
+				Id="file91" 
+				Name="CassiniWebServer.exe"
+				Source="$(var.SharedLibs)\net\CassiniWebServer.exe" />
+
+<!--			
+			<File Id="file90" Name="NetronGraphLib.dll"					Source="$(var.BuildNet11Dir)\NetronGraphLib.dll" />
 			<File Id="file91" Name="NetronMaths.dll"						Source="$(var.BuildNet11Dir)\NetronMaths.dll" />
 			-->
 
@@ -111,6 +131,17 @@
 				Root="HKLM" 
 				Key="SOFTWARE\Microsoft\.NETFramework\AssemblyFolders\castle">
 				<RegistryValue Action="write" Type="string" Value="[net11dir]" />
+			</RegistryKey>
+
+			<RegistryKey 
+				Action="createAndRemoveOnUninstall" 
+				Root="HKLM" 
+				Key="SOFTWARE\Castle">
+				
+				<RegistryValue 
+					Action="write" 
+					Name="cassinilocation" 
+					Type="string" Value="[net11dir]CassiniWebServer.exe" />
 			</RegistryKey>
 			
 			<!--
@@ -219,12 +250,38 @@
 <!--			<File Id="n2file90" Name="NETRON1.DLL"	Name="NetronGraphLib.dll"					Source="$(var.BuildNet20Dir)\NetronGraphLib.dll" />
 			<File Id="n2file91" Name="NETRON2.DLL"	Name="NetronMaths.dll"						Source="$(var.BuildNet20Dir)\NetronMaths.dll" />
 			-->
+			
+			<File 
+				Id="n2file90" 
+				Name="Cassini.dll"
+				Source="$(var.SharedLibs)\net\Cassini.dll" />
+
+			<File 
+				Id="n2file91" 
+				Name="CassiniWebServer2.exe"
+				Source="$(var.SharedLibs)\net\CassiniWebServer2.exe" />
+
+			<File 
+				Id="n2file92" 
+				Name="CassiniWebServer2.exe.config"
+				Source="$(var.SharedLibs)\net\CassiniWebServer2.exe.config" />
 
 			<RegistryKey 
 				Action="createAndRemoveOnUninstall" 
 				Root="HKLM" 
 				Key="SOFTWARE\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\castle">
 				<RegistryValue Action="write" Type="string" Value="[net20dir]" />
+			</RegistryKey>
+
+			<RegistryKey 
+				Action="createAndRemoveOnUninstall" 
+				Root="HKLM" 
+				Key="SOFTWARE\Castle">
+				
+				<RegistryValue 
+					Action="write" 
+					Name="cassini2location" 
+					Type="string" Value="[net20dir]CassiniWebServer2.exe" />
 			</RegistryKey>
 
 		</Component>
