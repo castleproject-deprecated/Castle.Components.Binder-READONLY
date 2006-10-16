@@ -63,12 +63,12 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// <remarks>
 	/// The following libraries are exposed:
 	/// <list type="table">
-	/// <item><term>Prototype</term>
-	/// <description>Simplify ajax programming, among other goodies 
+	/// <item><term> Prototype </term>
+	/// <description> Simplify ajax programming, among other goodies 
 	/// <seealso cref="http://prototype.conio.net/"/>
 	/// </description></item>
-	/// <item><term>Behaviour</term>
-	/// <description>Uses css selectors to bind javascript code to DOM elements 
+	/// <item><term> Behaviour </term>
+	/// <description> Uses css selectors to bind javascript code to DOM elements 
 	/// <seealso cref="http://bennolan.com/behaviour/"/>
 	/// </description></item>
 	/// </list>

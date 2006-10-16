@@ -3,6 +3,9 @@ Change history
 
 Release Candidate 1
 ===================
+
+- Fixed binder problem (MR-161)
+
 - Fixed Perfomance issue with Brail and sub views due to cache key normalization issues.
 
 - Added logging to Brail, configured using the normal Castle's cofniguration mechansim

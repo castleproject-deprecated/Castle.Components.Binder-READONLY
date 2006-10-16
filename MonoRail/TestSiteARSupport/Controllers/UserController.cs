@@ -12,32 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace TestSiteARSupport
+namespace TestSiteARSupport.Controllers
 {
 	using System;
-	using System.Web;
-	using Castle.ActiveRecord;
-	using Castle.ActiveRecord.Framework;
-	using Castle.ActiveRecord.Framework.Config;
+	using Castle.Components.Binder;
+	using Castle.MonoRail.ActiveRecordSupport;
+	using Castle.MonoRail.Framework;
 	using TestSiteARSupport.Model;
 
-	public class MyHttpApplication : HttpApplication
+	public class UserController : ARSmartDispatcherController
 	{
-		protected void Application_Start(Object sender, EventArgs e)
+		public void New()
 		{
-			IConfigurationSource source = ActiveRecordSectionHandler.Instance;
-
-			ActiveRecordStarter.Initialize( source, 
-				typeof(Account), 
-				typeof(AccountPermission), 
-				typeof(ProductLicense),
-				typeof(SimplePerson), 
-				typeof(Category),
-				typeof(User), 
-				typeof(PersonBase),
-				typeof(PersonUser));
-			
-			ActiveRecordStarter.CreateSchema();
 		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void Insert([ARDataBind("user", AutoLoad=AutoLoadBehavior.OnlyNested)] User user)
+		{
+			ErrorList errorList = (ErrorList) BoundInstanceErrors[user];
+			
+			PropertyBag.Add("errorlist", errorList);
+			
+			if (errorList.Count == 0)
+			{
+				user.Create();
+				
+				PropertyBag.Add("user", user);
+			}
+		}
+
 	}
 }

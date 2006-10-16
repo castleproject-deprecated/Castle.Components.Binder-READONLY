@@ -12,32 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace TestSiteARSupport
+namespace TestSiteARSupport.Model
 {
 	using System;
-	using System.Web;
 	using Castle.ActiveRecord;
-	using Castle.ActiveRecord.Framework;
-	using Castle.ActiveRecord.Framework.Config;
-	using TestSiteARSupport.Model;
 
-	public class MyHttpApplication : HttpApplication
+	[ActiveRecord("TSAS_User")]
+	public class User : ActiveRecordBase
 	{
-		protected void Application_Start(Object sender, EventArgs e)
-		{
-			IConfigurationSource source = ActiveRecordSectionHandler.Instance;
+		private int id;
+		private String name;
 
-			ActiveRecordStarter.Initialize( source, 
-				typeof(Account), 
-				typeof(AccountPermission), 
-				typeof(ProductLicense),
-				typeof(SimplePerson), 
-				typeof(Category),
-				typeof(User), 
-				typeof(PersonBase),
-				typeof(PersonUser));
-			
-			ActiveRecordStarter.CreateSchema();
+		[PrimaryKey]
+		public int Id
+		{
+			get { return id; }
+			set { id = value; }
+		}
+
+		[Property]
+		public string Name
+		{
+			get { return name; }
+			set { name = value; }
 		}
 	}
 }
