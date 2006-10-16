@@ -26,6 +26,7 @@ Candidate changes:
 	   -1: hammett (I think we need to experiment some more on the trunk)
         0: kevin
 	0: hconceicao
+	   +1: fabiob
 
   * r2504,2543
     Applied (with reformatting) patch by William C. Pierce <wcpierce@gmail.com> adding PerWebRequestAttribute
@@ -87,5 +88,12 @@ Candidate changes:
     Votes:
        +1: fabiob
 	0: hconceicao
+
+  * r2677
+	Fixed a bug in ActiveRecordBaseQuery.Clone().
+	Trunk version of patch:
+     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2677
+    Votes:
+       +1: fabiob
 
 Approved changes:
