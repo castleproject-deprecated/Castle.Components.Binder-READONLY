@@ -75,6 +75,7 @@
 <File Id="Castle.MonoRail.Views.Brail.dll" Name="Castle.MonoRail.Views.Brail.dll" Source="$(var.BuildNet11Dir)\Castle.MonoRail.Views.Brail.dll" />
 <File Id="Castle.MonoRail.WindsorExtension.dll" Name="Castle.MonoRail.WindsorExtension.dll" Source="$(var.BuildNet11Dir)\Castle.MonoRail.WindsorExtension.dll" />
 <File Id="Castle.Services.Logging.Log4netIntegration.dll" Name="Castle.Services.Logging.Log4netIntegration.dll" Source="$(var.BuildNet11Dir)\Castle.Services.Logging.Log4netIntegration.dll" />
+<File Id="Castle.Services.Logging.NLogIntegration.dll" Name="Castle.Services.Logging.NLogIntegration.dll" Source="$(var.BuildNet11Dir)\Castle.Services.Logging.NLogIntegration.dll" />
 <File Id="Castle.Services.Transaction.dll" Name="Castle.Services.Transaction.dll" Source="$(var.BuildNet11Dir)\Castle.Services.Transaction.dll" />
 <File Id="IBatisNet.Common.dll" Name="IBatisNet.Common.dll" Source="$(var.BuildNet11Dir)\IBatisNet.Common.dll" />
 <File Id="IBatisNet.DataMapper.dll" Name="IBatisNet.DataMapper.dll" Source="$(var.BuildNet11Dir)\IBatisNet.DataMapper.dll" />
@@ -187,6 +188,7 @@
 <File Id="N20Castle.Components.Common.EmailSender.MockSender.dll" Name="Castle.Components.Common.EmailSender.MockSender.dll" Source="$(var.BuildNet20Dir)\Castle.Components.Common.EmailSender.MockSender.dll" />
 <File Id="N20Castle.Components.Common.EmailSender.SmtpEmailSender.dll" Name="Castle.Components.Common.EmailSender.SmtpEmailSender.dll" Source="$(var.BuildNet20Dir)\Castle.Components.Common.EmailSender.SmtpEmailSender.dll" />
 <File Id="N20Castle.Components.Common.TemplateEngine.dll" Name="Castle.Components.Common.TemplateEngine.dll" Source="$(var.BuildNet20Dir)\Castle.Components.Common.TemplateEngine.dll" />
+<File Id="N20Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.dll" Name="Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.dll" Source="$(var.BuildNet20Dir)\Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.dll" />
 <File Id="N20Castle.Components.Winforms.AssemblyResolver.dll" Name="Castle.Components.Winforms.AssemblyResolver.dll" Source="$(var.BuildNet20Dir)\Castle.Components.Winforms.AssemblyResolver.dll" />
 <File Id="N20Castle.Core.dll" Name="Castle.Core.dll" Source="$(var.BuildNet20Dir)\Castle.Core.dll" />
 <File Id="N20Castle.DynamicProxy.dll" Name="Castle.DynamicProxy.dll" Source="$(var.BuildNet20Dir)\Castle.DynamicProxy.dll" />
