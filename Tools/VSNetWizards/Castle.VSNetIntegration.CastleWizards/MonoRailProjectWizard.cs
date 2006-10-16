@@ -295,7 +295,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 				configuration.Properties.Item("StartProgram").Value = Context.CassiniLocation;
 
 				configuration.Properties.Item("StartArguments").Value = 
-					String.Format("{0} {1} {2}", LocalProjectPath, 81, "/");
+					String.Format("\"{0}\" {1} {2}", LocalProjectPath, 81, "/");
 			}
 		}
 

@@ -90,6 +90,7 @@
 <File Id="Nullables.dll" Name="Nullables.dll" Source="$(var.BuildNet11Dir)\Nullables.dll" />
 <File Id="Nullables.NHibernate.dll" Name="Nullables.NHibernate.dll" Source="$(var.BuildNet11Dir)\Nullables.NHibernate.dll" />
 <File Id="NVelocity.dll" Name="NVelocity.dll" Source="$(var.BuildNet11Dir)\NVelocity.dll" />
+<File Id="nunit.framework.dll" Name="nunit.framework.dll" Source="$(var.BuildNet11Dir)\nunit.framework.dll" />
 
 			<File 
 				Id="file90" 
@@ -230,6 +231,7 @@
 <File Id="N20Nullables.dll" Name="Nullables.dll" Source="$(var.BuildNet20Dir)\Nullables.dll" />
 <File Id="N20Nullables.NHibernate.dll" Name="Nullables.NHibernate.dll" Source="$(var.BuildNet20Dir)\Nullables.NHibernate.dll" />
 <File Id="N20NVelocity.dll" Name="NVelocity.dll" Source="$(var.BuildNet20Dir)\NVelocity.dll" />
+<File Id="N20nunit.framework.dll" Name="nunit.framework.dll" Source="$(var.BuildNet20Dir)\nunit.framework.dll" />
 			
 
 		</Component>
