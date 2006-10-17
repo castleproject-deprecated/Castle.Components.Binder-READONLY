@@ -177,6 +177,16 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "Controllers\ConditionController.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Controllers\ConditionTypeController.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "Controllers\PersonUserController.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -203,6 +213,21 @@
                 />
                 <File
                     RelPath = "Model\Category.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Model\Comment.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Model\Condition.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Model\ConditionType.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -305,6 +330,30 @@
                 />
                 <File
                     RelPath = "Views\Category\update.vm"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "Views\Condition\edit.vm"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "Views\Condition\insert.vm"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "Views\Condition\new.vm"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "Views\Condition\update.vm"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "Views\ConditionType\insert.vm"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "Views\ConditionType\new.vm"
                     BuildAction = "None"
                 />
                 <File

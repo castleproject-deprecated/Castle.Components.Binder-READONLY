@@ -4,6 +4,9 @@ Change history
 Release Candidate 1
 ===================
 
+- ARDataBinder was ovewriting ids on belongs to relations causing
+  NHibernate to throw exception. Fixed and added test cases
+
 - Fixed binder problem (MR-161)
 
 - Fixed Perfomance issue with Brail and sub views due to cache key normalization issues.
