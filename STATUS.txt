@@ -39,16 +39,6 @@ Candidate changes:
 	   -1: hammett (we have not tested it)
 	-1: hconceicao (not tested, it isn't a demand)
 	   
-  * r2505
-    Reapplied locking on MR ServiceContainer initialization.
-	Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2505
-    Votes:
-       +1: roelofb
-	   +1: hammett 
-	   +1: fabiob
-	   +1: hconceicao
-
   * r2512
     Put a link to CastleKey.snk in VS2005 projects.
 	Trunk version of patch:
@@ -95,5 +85,17 @@ Candidate changes:
      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2677
     Votes:
        +1: fabiob
+	   +1: roelofb
 
 Approved changes:
+
+  * r2505
+    Reapplied locking on MR ServiceContainer initialization.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2505
+    Votes:
+       +1: roelofb
+	   +1: hammett 
+	   +1: fabiob
+	   +1: hconceicao
+
