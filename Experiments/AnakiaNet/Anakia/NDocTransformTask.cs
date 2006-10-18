@@ -41,6 +41,9 @@ namespace Anakia
 		private ArrayList types = new ArrayList();
 		private ArrayList enums = new ArrayList();
 		private int counter;
+		private int startOrder;
+		private bool ignoresuperclasses;
+		private SimpleHelper helper = new SimpleHelper();
 
 		[TaskAttribute("templatefile")]
 		public String TemplateFile
@@ -70,6 +73,13 @@ namespace Anakia
 			set { inheritsFrom = value; }
 		}
 
+		[TaskAttribute("startorder")]
+		public int StartOrder
+		{
+			get { return startOrder; }
+			set { startOrder = value; }
+		}
+
 		[TaskAttribute("restrictToNs")]
 		public String RestrictToNs
 		{
@@ -82,6 +92,13 @@ namespace Anakia
 		{
 			get { return typelist; }
 			set { typelist = value; }
+		}
+
+		[TaskAttribute("ignoresuperclasses")]
+		public bool IgnoreSuperClasses
+		{
+			get { return ignoresuperclasses; }
+			set { ignoresuperclasses = value; }
 		}
 
 		#region overrides
@@ -100,6 +117,8 @@ namespace Anakia
 			template = velocity.GetTemplate(templateFile);
 
 			// TODO: validate all arguments are present
+			
+			counter = startOrder + 1;
 		}
 
 		protected override void ExecuteTask()
@@ -162,8 +181,9 @@ namespace Anakia
 			VelocityContext context = new VelocityContext();
 			
 			context.Put("doc", doc);
-			context.Put("counter", ++counter);
-			
+			context.Put("counter", counter++);
+			context.Put("helper", helper);
+						
 			return context;
 		}
 
@@ -275,6 +295,15 @@ namespace Anakia
 				{
 					continue;
 				}
+				if (ignoresuperclasses)
+				{
+					String declaringType = propElem.GetAttribute("declaringType");
+					
+					if (declaringType != String.Empty)
+					{
+						continue;
+					}
+				}
 				
 				XmlNodeList parameters = propElem.SelectNodes("parameter");
 				
@@ -282,9 +311,10 @@ namespace Anakia
 				
 				String name = propElem.GetAttribute("name");
 				String id = propElem.GetAttribute("id");
+				String type = propElem.GetAttribute("type");
 				Visibility access = (Visibility) Enum.Parse(typeof(Visibility), propElem.GetAttribute("access"));
 				
-				PropertyDocData prop = new PropertyDocData(name, id, access, paramsDoc);
+				PropertyDocData prop = new PropertyDocData(name, id, type, access, paramsDoc);
 				
 				PopulateCommonDoc(prop, propElem);
 
@@ -303,6 +333,15 @@ namespace Anakia
 				if (IsFrameworkType(methodElem.GetAttribute("declaringType")))
 				{
 					continue;
+				}
+				if (ignoresuperclasses)
+				{
+					String declaringType = methodElem.GetAttribute("declaringType");
+					
+					if (declaringType != String.Empty)
+					{
+						continue;
+					}
 				}
 				
 				XmlNodeList parameters = methodElem.SelectNodes("parameter");
@@ -498,6 +537,31 @@ namespace Anakia
 				}
 					
 				seeNode.ParentNode.ReplaceChild(newPelem, seeNode);
+			}
+			
+			list = dom.DocumentElement.SelectNodes("//paramref");
+			
+			foreach(XmlElement seeNode in list)
+			{
+				XmlElement newPelem = dom.CreateElement("tt");
+								
+				if (seeNode.HasAttribute("name"))
+				{
+					newPelem.InnerXml = seeNode.GetAttribute("name");
+				}
+					
+				seeNode.ParentNode.ReplaceChild(newPelem, seeNode);
+			}
+			
+			list = dom.DocumentElement.SelectNodes("//c");
+			
+			foreach(XmlElement cNode in list)
+			{
+				XmlElement newPelem = dom.CreateElement("tt");
+							
+				newPelem.InnerXml = cNode.InnerXml;
+					
+				cNode.ParentNode.ReplaceChild(newPelem, cNode);
 			}
 		}
 
