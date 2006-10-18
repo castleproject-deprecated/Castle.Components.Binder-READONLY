@@ -1,4 +1,4 @@
-<h2>Unexpected error happenend</h3>
+<h2>Unexpected error happened</h3>
 
 <p> This is the rescue page. See the exception details below </p>
 
