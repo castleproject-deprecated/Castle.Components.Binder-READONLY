@@ -53,19 +53,23 @@ Candidate changes:
        +0: kevin
 	+0: hconceicao
 
-  * r2538
-    TestSiteARSupport in build.
-	Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2538
-    Votes:
-       +1: roelofb
-	   +1: hammett
-	+1: hconceicao
+  * r2546
+    Applied recommended practice to rethrow exceptions, in order to fix SERVICES-5.
+  Trunk version of patch:
+    http://fisheye3.cenqua.com/changelog/castleproject/?cs=2546
+  Justification:
+    SERVICES-5 was about exceptions thrown by AutomaticTransactionFacility
+    losing their stack traces. I think this one is quite serious.
+  Votes:
+    +1: fabiob
 
   * r2622
 	Enhanced HqlBasedQuery.PrepareQueryForCount.
 	Trunk version of patch:
      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2622
+	Justification:
+	Needed so HqlBasedQuery.Count() can strips "fetch" joins.
+	In HQL, "fetch" joins crashes when used together with "select count(*)".
     Votes:
        +1: fabiob
 	   +1: roelofb
@@ -75,6 +79,9 @@ Candidate changes:
 	Introduced ARPagination.CreatePagination<T>(SimpleQuery<T>).
 	Trunk version of patch:
      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2623
+	Justification:
+	A simpler way to perform pagination with complex data, generated
+	from an HQL query.
     Votes:
        +1: fabiob
 	0: hconceicao
@@ -83,13 +90,34 @@ Candidate changes:
 	Fixed a bug in ActiveRecordBaseQuery.Clone().
 	Trunk version of patch:
      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2677
+	Justification:
+	The bug is somewhat serious: if a query does not have any modifiers
+	(such as parameters or ranges), trying to clone it throws a NullReferenceException.
     Votes:
        +1: fabiob
 	   +1: roelofb
 
+  * r2770
+    Added ActiveRecordMediator.Refresh(), both generic and non-generic.
+  Trunk version of patch:
+    http://fisheye3.cenqua.com/changelog/castleproject/?cs=2770
+  Justification:
+    ActiveRecordBase already contains that method.
+  Votes:
+    +1: fabiob
+
+  * r2771
+    Fixed a bug in PaginationHelper.CreatePageLink(): the dictionary received 
+    as parameter could be a read-only dictionary, in which case, a new one 
+    must be created. Quite an unusual scenario, but real.
+  Trunk version of patch:
+    http://fisheye3.cenqua.com/changelog/castleproject/?cs=2771
+  Votes:
+    +1: fabiob
+
 Approved changes:
 
-  * r2505
+  * r2505 (merged in r2769)
     Reapplied locking on MR ServiceContainer initialization.
 	Trunk version of patch:
       http://fisheye3.cenqua.com/changelog/castleproject/?cs=2505
@@ -98,4 +126,14 @@ Approved changes:
 	   +1: hammett 
 	   +1: fabiob
 	   +1: hconceicao
+
+  * r2538
+    TestSiteARSupport in build.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2538
+    Votes:
+       +1: roelofb
+	   +1: hammett
+	+1: hconceicao
+	+1: fabiob
 
