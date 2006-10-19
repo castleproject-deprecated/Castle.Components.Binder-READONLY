@@ -26,10 +26,7 @@ namespace Castle.MonoRail.Framework
 	/// Represents a wizard step. 
 	/// </summary>
 	/// <remarks>
-	/// Implementors are required to implement 
-	/// <see cref="WizardStepPage.Process"/> in order 
-	/// to perform the step processment.
-	/// They can optionally also override <see cref="WizardStepPage.ActionName"/>
+	/// Implementors can optionally override <see cref="WizardStepPage.ActionName"/>
 	/// to customize the accessible action name and 
 	/// <see cref="WizardStepPage.RenderWizardView"/> in order to define which view 
 	/// should be used (defaults to the step name)

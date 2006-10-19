@@ -74,7 +74,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <summary>
 		/// Gets or Sets the Virtual Directory the scripts are in.
 		/// </summary>
-		/// <remarks>The default is <see cref="Controller.Context.ApplicationPath"/>.</remarks>
+		/// <remarks>The default is <see cref="IRailsEngineContext.ApplicationPath"/>.</remarks>
 		public virtual String VirtualDir
 		{
 			get

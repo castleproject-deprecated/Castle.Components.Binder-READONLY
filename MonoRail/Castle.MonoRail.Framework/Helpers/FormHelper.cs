@@ -35,7 +35,7 @@ namespace Castle.MonoRail.Framework.Helpers
 	}
 
 	/// <summary>
-	/// The FormHelper allow you to output Html Input elements using the 
+	/// The FormHelper allows you to output Html Input elements using the 
 	/// conventions necessary to use the DataBinder on the server side. 
 	/// <para>
 	/// It also query the objects available on the context to show property 
@@ -621,6 +621,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// The target can also be a set. In this case the intersection will be 
 		/// the initially selected elements.
 		/// </para>
+		/// </summary>
 		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
 		/// <param name="dataSource">The set of available elements</param>
 		/// <returns>The generated form element</returns>
@@ -649,6 +650,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// The target can also be a set. In this case the intersection will be 
 		/// the initially selected elements.
 		/// </para>
+		/// </summary>
 		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
 		/// <param name="dataSource">The set of available elements</param>
 		/// <param name="attributes">Attributes for the FormHelper method and for the html element it generates</param>

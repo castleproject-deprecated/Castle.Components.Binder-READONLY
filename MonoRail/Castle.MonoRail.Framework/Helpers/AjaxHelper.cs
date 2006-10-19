@@ -65,11 +65,9 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// <list type="table">
 	/// <item><term> Prototype </term>
 	/// <description> Simplify ajax programming, among other goodies 
-	/// <seealso cref="http://prototype.conio.net/"/>
 	/// </description></item>
 	/// <item><term> Behaviour </term>
 	/// <description> Uses css selectors to bind javascript code to DOM elements 
-	/// <seealso cref="http://bennolan.com/behaviour/"/>
 	/// </description></item>
 	/// </list>
 	/// </remarks>
@@ -755,6 +753,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <term>url</term>
 		/// <description>url to to call when the field has changed</description>
 		/// </item>
+		/// </list>
 		/// </summary>
 		/// <remarks>
 		/// it is assumed that the url invoked returns an unordered list.
