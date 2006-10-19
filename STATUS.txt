@@ -115,6 +115,17 @@ Candidate changes:
   Votes:
     +1: fabiob
 
+  * r2778
+    Fixed a bug in the System.Net.Mail (.NET 2.0) version of the SmtpSender, regarding empty CC and BCC fields.
+    Also added some new configurable functionality for .NET 2.0:
+      Ability to send emails asyncronously (AsyncSend property);
+      Configurable SMTP port (Port property);
+      Configurable timeout for syncronous send (Timeout property);
+  Trunk version of patch:
+    http://fisheye3.cenqua.com/changelog/castleproject/?cs=2778
+  Votes:
+    +1: fabiob
+
 Approved changes:
 
   * r2505 (merged in r2769)
