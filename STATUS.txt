@@ -129,7 +129,7 @@ Candidate changes:
   * r2780
     Proposed fix for IOC-33.
   Trunk version of patch:
-    http://fisheye3.cenqua.com/changelog/castleproject/?cs=2778
+    http://fisheye3.cenqua.com/changelog/castleproject/?cs=2780
   Justification:
     IOC-33 was about exceptions thrown by MarshalByRefObject proxies
     losing their stack traces. I'm not sure of the side-effects
