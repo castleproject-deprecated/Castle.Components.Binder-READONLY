@@ -147,6 +147,11 @@ namespace Anakia
 						String typeName = type.Trim();
 						
 						XmlNode baseElemNode = projectDom.SelectSingleNode("//hierarchyType[@id='" + typeName + "']"); 
+						
+						if (baseElemNode == null)
+						{
+							throw new Exception("Could not find hierarchyType for " + typeName);
+						}
 								
 						BuildDocData((XmlElement)baseElemNode, baseElemNode.ChildNodes, false);
 					}
@@ -259,6 +264,10 @@ namespace Anakia
 			// Methods
 			
 			doc.methods = CreateMethods(node);
+			
+			// Events
+			
+			doc.events = CreateEvents(node);
 		}
 
 		private ConstructorDocData[] CreateConstructors(XmlElement node)
@@ -363,15 +372,66 @@ namespace Anakia
 			return (MethodDocData[]) methodsCollected.ToArray(typeof(MethodDocData));
 		}
 
+		private EventDocData[] CreateEvents(XmlElement node)
+		{
+			ArrayList eventsCollected = new ArrayList();
+			
+			foreach(XmlElement eventElem in node.SelectNodes("event"))
+			{
+				if (IsFrameworkType(eventElem.GetAttribute("declaringType")))
+				{
+					continue;
+				}
+				if (ignoresuperclasses)
+				{
+					String declaringType = eventElem.GetAttribute("declaringType");
+					
+					if (declaringType != String.Empty)
+					{
+						continue;
+					}
+				}
+												
+				String name = eventElem.GetAttribute("name");
+				String id = eventElem.GetAttribute("id");
+				String type = eventElem.GetAttribute("type");
+				Visibility access = (Visibility) Enum.Parse(typeof(Visibility), eventElem.GetAttribute("access"));
+				
+				// Find delegate
+				
+				XmlElement delegateNode = (XmlElement) 
+					eventElem.ParentNode.SelectSingleNode("//delegate[@id='T:" + type + "']");
+				
+				String delegateName = delegateNode != null ? delegateNode.GetAttribute("name") : type;
+				String returnType = delegateNode != null ? delegateNode.GetAttribute("returnType") : "System.Void";
+				XmlNodeList parameters = delegateNode != null ? delegateNode.SelectNodes("parameter") : null;
+
+				ParameterDocData[] paramsDoc = CreateParameters(parameters, eventElem.SelectSingleNode("documentation"));
+
+				EventDocData eventDocData = new EventDocData(name, delegateName, id, access, returnType, paramsDoc);
+				
+				PopulateCommonDoc(eventDocData, eventElem);
+
+				eventsCollected.Add(eventDocData);
+			}
+			
+			return (EventDocData[]) eventsCollected.ToArray(typeof(EventDocData));
+		}
+
 		private bool IsFrameworkType(string type)
 		{
 			return type.StartsWith("System.");
 		}
 
 		private ParameterDocData[] CreateParameters(XmlNodeList parameters, XmlNode docNode)
-		{
+		{			
+			if (parameters == null)
+			{
+				return new ParameterDocData[0];
+			}
+		
 			ArrayList parametersCollected = new ArrayList();
-			
+
 			foreach(XmlElement paramNode in parameters)
 			{
 				// name="table" type="System.String"
