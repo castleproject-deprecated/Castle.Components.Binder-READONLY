@@ -331,9 +331,9 @@ namespace Castle.MicroKernel
 		IHandler[] GetAssignableHandlers(Type service);
 
 		/// <summary>
-		/// Returns the implementation for <see cref="IReleasePolicy"/>
+		/// Gets or sets the implementation for <see cref="IReleasePolicy"/>
 		/// </summary>
-		IReleasePolicy ReleasePolicy { get; }
+		IReleasePolicy ReleasePolicy { get; set; }
 
 		/// <summary>
 		/// Returns the implementation for <see cref="IDependencyResolver"/>
