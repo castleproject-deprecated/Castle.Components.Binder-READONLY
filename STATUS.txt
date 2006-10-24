@@ -140,6 +140,14 @@ Candidate changes:
   Votes:
     +1: fabiob (althrough I'm not sure if it is the best fix, it's better than what the previous code)
 
+  * r2787,2791
+    Fixing IoC-34 - the check made will be a stricter one, including the method that is requested as well.
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2787
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2791
+    Votes:
+       +1: roelofb
+
 Approved changes:
 
   * r2538
