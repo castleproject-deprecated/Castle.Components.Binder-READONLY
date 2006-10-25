@@ -174,8 +174,6 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 		private static void AddTransactionInterceptorIfIsTransactional(ComponentModel model, 
 		                                                               TransactionMetaInfoStore store)
 		{
-			if (model.Service == null || model.Service.IsInterface) return;
-
 			TransactionMetaInfo meta = store.GetMetaFor(model.Implementation);
 
 			if (meta == null) return;
