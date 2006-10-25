@@ -23,11 +23,18 @@ namespace Castle.Core
 	[Serializable]
 	public class PropertySetCollection : ReadOnlyCollectionBase
 	{
+		/// <summary>
+		/// Adds the specified property.
+		/// </summary>
+		/// <param name="property">The property.</param>
 		public void Add(PropertySet property)
 		{
 			InnerList.Add(property);
 		}
 
+		/// <summary>
+		/// Clears this instance.
+		/// </summary>
 		public void Clear()
 		{
 			InnerList.Clear();
