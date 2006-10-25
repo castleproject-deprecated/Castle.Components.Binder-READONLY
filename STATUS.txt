@@ -96,7 +96,8 @@ Candidate changes:
 	(such as parameters or ranges), trying to clone it throws a NullReferenceException.
     Votes:
        +1: fabiob
-	   +1: roelofb
+       +1: roelofb
+       +1: hconceicao
 
   * r2770
     Added ActiveRecordMediator.Refresh(), both generic and non-generic.
@@ -107,6 +108,7 @@ Candidate changes:
     Votes:
       +1: fabiob
       +1: roelofb
+       +1: hconceicao
 
   * r2771
     Fixed a bug in PaginationHelper.CreatePageLink(): the dictionary received 
@@ -117,6 +119,7 @@ Candidate changes:
     Votes:
       +1: fabiob
       +1: roelofb
+       +1: hconceicao
 
   * r2778
     Fixed a bug in the System.Net.Mail (.NET 2.0) version of the SmtpSender, regarding empty CC and BCC fields.
@@ -147,5 +150,12 @@ Candidate changes:
       http://fisheye3.cenqua.com/changelog/castleproject/?cs=2791
     Votes:
        +1: roelofb
+
+  * r2814
+	Bug: GenerateJSProxy was sending AreaName as 'null' instead string.Empty.
+	Trunk version of patch:
+     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2814
+    Votes:
+       +1: hconceicao
 
 Approved changes:
