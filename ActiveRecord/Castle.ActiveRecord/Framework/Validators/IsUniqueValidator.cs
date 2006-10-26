@@ -15,19 +15,17 @@
 namespace Castle.ActiveRecord.Framework.Validators
 {
 	using System;
-	
 	using Castle.ActiveRecord.Framework.Internal;
 	using Castle.ActiveRecord.Framework.Scopes;
-
 	using NHibernate;
 	using NHibernate.Expression;
-
 
 	[Serializable]
 	public class IsUniqueValidator : AbstractValidator
 	{
 		[ThreadStatic]
 		private static object _fieldValue;
+
 		[ThreadStatic]
 		private static PrimaryKeyModel _pkModel;
 
@@ -40,7 +38,7 @@ namespace Castle.ActiveRecord.Framework.Validators
 			Type instanceType = instance.GetType();
 			ActiveRecordModel model = ActiveRecordBase.GetModel(instance.GetType());
 
-			while (model != null)
+			while(model != null)
 			{
 				if (model.PrimaryKey != null)
 				{
@@ -52,18 +50,20 @@ namespace Castle.ActiveRecord.Framework.Validators
 
 			if (_pkModel == null)
 			{
-				throw new ValidationFailure("We couldn't find the primary key for " + instanceType.FullName + 
-					" so we can't ensure the uniqueness of any field. Validatior failed");
+				throw new ValidationFailure("We couldn't find the primary key for " + instanceType.FullName +
+				                            " so we can't ensure the uniqueness of any field. Validatior failed");
 			}
-			
+
 			_fieldValue = fieldValue;
-			
+
 			SessionScope scope = null;
-			if (ThreadScopeAccessor.Instance.GetRegisteredScope() == null
-				|| ThreadScopeAccessor.Instance.GetRegisteredScope().GetType() != typeof(TransactionScope))
+			
+			if (SessionScope.Current == null || 
+			    SessionScope.Current.ScopeType != SessionScopeType.Transactional)
 			{
 				scope = new SessionScope();
 			}
+			
 			try
 			{
 				return (bool) ActiveRecordMediator.Execute(instanceType, new NHibernateDelegate(CheckUniqueness), instance);
@@ -76,7 +76,7 @@ namespace Castle.ActiveRecord.Framework.Validators
 
 		private object CheckUniqueness(ISession session, object instance)
 		{
-			ICriteria criteria = session.CreateCriteria( instance.GetType() );
+			ICriteria criteria = session.CreateCriteria(instance.GetType());
 #if DOTNET2
 			if (Property.Name.Equals(_pkModel.Property.Name, StringComparison.InvariantCultureIgnoreCase))
 #else
@@ -89,7 +89,8 @@ namespace Castle.ActiveRecord.Framework.Validators
 			else
 			{
 				object id = _pkModel.Property.GetValue(instance, new object[0]);
-				criteria.Add(Expression.And(Expression.Eq(Property.Name, _fieldValue), Expression.Not(Expression.Eq(_pkModel.Property.Name, id))));
+				criteria.Add(
+					Expression.And(Expression.Eq(Property.Name, _fieldValue), Expression.Not(Expression.Eq(_pkModel.Property.Name, id))));
 			}
 			return criteria.List().Count == 0;
 		}
