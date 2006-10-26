@@ -571,7 +571,7 @@ namespace Castle.MonoRail.TestSupport
 		/// Asserts that PropertyBag's entry value equals to the specified value.
 		/// </summary>
 		/// <param name="entryKey">key name</param>
-		/// <param name="entryKey">value to assert to</param>
+		/// <param name="expectedValue">value to assert to</param>
 		protected void AssertPropertyBagEntryEquals(String entryKey, object expectedValue)
 		{
 			AssertPropertyBagContains(entryKey);
@@ -604,7 +604,7 @@ namespace Castle.MonoRail.TestSupport
 		/// Asserts that Flash's entry value equals to the specified value.
 		/// </summary>
 		/// <param name="entryKey">key name</param>
-		/// <param name="entryKey">value to assert to</param>
+		/// <param name="expectedValue">value to assert to</param>
 		protected void AssertFlashEntryEquals(String entryKey, object expectedValue)
 		{
 			AssertFlashContains(entryKey);
@@ -637,7 +637,7 @@ namespace Castle.MonoRail.TestSupport
 		/// Asserts that Session's entry value equals to the specified value.
 		/// </summary>
 		/// <param name="entryKey">key name</param>
-		/// <param name="entryKey">value to assert to</param>
+		/// <param name="expectedValue">value to assert to</param>
 		protected void AssertSessionEntryEqualsTo(String entryKey, object expectedValue)
 		{
 			AssertSessionContains(entryKey);
@@ -788,6 +788,8 @@ namespace Castle.MonoRail.TestSupport
 
 			StringWriter writer = new StringWriter(outputBuffer);
 
+			Request.Headers.Add("IsTestWorkerRequest", "true");
+			
 			response = host.Process(Request, writer);
 			
 			writer.Close();
