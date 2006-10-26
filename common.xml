@@ -89,7 +89,7 @@
 		<!-- Where is nunit-console.exe ? -->
 		<property name="nunit-console" value="nunit-console.exe" overwrite="false" />
 		<!-- Where is WiX? -->
-		<property name="wix.dir" value="C:\Program Files\wix" overwrite="false" />
+		<property name="wix.dir" value="%ProgramFiles%\wix" overwrite="false" />
 	</target>
 
 	<target name="set-net-1.1-framework-configuration">
@@ -102,7 +102,7 @@
 			<property name="dev.env.dir" value="${environment::get-variable('DevEnvDir')}" />
 		</if>
 		<if test="${not environment::variable-exists('DevEnvDir')}">
-			<property name="default.dev.env.dir" value="C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE" />
+			<property name="default.dev.env.dir" value="%ProgramFiles%\Microsoft Visual Studio .NET 2003\Common7\IDE" />
 			<if test="${directory::exists(default.dev.env.dir)}">
 				<property name="dev.env.dir" value="${default.dev.env.dir}" />
 			</if>
@@ -119,7 +119,7 @@
 			<property name="dev.env.dir" value="${environment::get-variable('DevEnvDir')}" />
 		</if>
 		<if test="${not environment::variable-exists('DevEnvDir')}">
-			<property name="default.dev.env.dir" value="C:\Program Files\Microsoft Visual Studio 8\Common7\IDE" />
+			<property name="default.dev.env.dir" value="%ProgramFiles%\Microsoft Visual Studio 8\Common7\IDE" />
 			<if test="${directory::exists(default.dev.env.dir)}">
 				<property name="dev.env.dir" value="${default.dev.env.dir}" />
 			</if>
