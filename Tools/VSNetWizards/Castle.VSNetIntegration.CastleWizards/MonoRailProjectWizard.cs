@@ -238,7 +238,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			XmlElement castleSectionElem = webConfigDoc.CreateElement("section");
 
 			castleSectionElem.SetAttribute("name", "Brail");
-			castleSectionElem.SetAttribute("type", "Brail.BrailConfigurationSection, Brail");
+			castleSectionElem.SetAttribute("type", "Castle.MonoRail.Views.Brail.BrailConfigurationSection, Castle.MonoRail.Views.Brail");
 
 			configSectionsNode.AppendChild(castleSectionElem);
 
