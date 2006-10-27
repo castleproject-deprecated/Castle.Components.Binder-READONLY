@@ -16,6 +16,7 @@ namespace Castle.Core
 {
 	using System;
 	using System.Collections;
+	using System.Reflection;
 
 	/// <summary>
 	/// Collection of <see cref="PropertySet"/>
@@ -38,6 +39,24 @@ namespace Castle.Core
 		public void Clear()
 		{
 			InnerList.Clear();
+		}
+		
+		/// <summary>
+		/// Finds a PropertySet the by PropertyInfo.
+		/// </summary>
+		/// <param name="info">The info.</param>
+		/// <returns></returns>
+		public PropertySet FindByPropertyInfo(PropertyInfo info)
+		{
+			foreach(PropertySet prop in InnerList)
+			{
+				if (info == prop.Property)
+				{
+					return prop;
+				}
+			}
+			
+			return null;
 		}
 	}
 }
