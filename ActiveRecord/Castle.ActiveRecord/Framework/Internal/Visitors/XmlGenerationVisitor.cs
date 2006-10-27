@@ -50,7 +50,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 			if (ActiveRecordModel.isDebug) 
 			{
-				String file = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, model.Type.Name + ".mapping.xml");
+				String file = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, model.Type.Name + ".hbm.xml");
 
 				System.IO.File.Delete(file);
 
