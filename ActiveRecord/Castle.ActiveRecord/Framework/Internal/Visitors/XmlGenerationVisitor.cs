@@ -50,7 +50,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 			if (ActiveRecordModel.isDebug) 
 			{
-				String file = model.Type.Name + ".mapping.xml";
+				String file = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, model.Type.Name + ".mapping.xml");
 
 				System.IO.File.Delete(file);
 
@@ -964,7 +964,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 		private String WriteIfFalse(String attName, bool value)
 		{
-			if (value == true) return String.Empty;
+			if (value) return String.Empty;
 			return MakeAtt(attName, value);
 		}
 
