@@ -110,7 +110,13 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		private static bool IsSet(object initialSelection)
 		{
-			return (initialSelection is IEnumerable);
+			if (initialSelection == null)
+			{
+				return false;
+			}
+
+			return initialSelection.GetType() != typeof(String) && 
+			       initialSelection is IEnumerable;
 		}
 	}
 
