@@ -77,6 +77,10 @@ namespace Castle.MonoRail.Framework.Helpers
 			{
 				return null;
 			}
+			else if (source is String)
+			{
+				return typeof(String);
+			}
 			else if (source is IEnumerable)
 			{
 				return ExtractType(source as IEnumerable);
