@@ -158,4 +158,11 @@ Candidate changes:
     Votes:
        +1: hconceicao
 
+  * r2840
+	Bug: Conflict between the Array.reduce function of Prototype e fValidate scripts (MR-166).
+	Trunk version of patch:
+     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2840
+    Votes:
+       +1: hconceicao
+
 Approved changes:
