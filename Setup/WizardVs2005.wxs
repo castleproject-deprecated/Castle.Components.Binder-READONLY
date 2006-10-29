@@ -137,17 +137,17 @@
 		  <File Id="filecs8_52" Name="rescue_default.boo" Source="$(var.VSTemplates80)\CSharp\MRProject\rescue_default.boo" />
 		  <File Id="filecs8_53" Name="rescue_default.vm" Source="$(var.VSTemplates80)\CSharp\MRProject\rescue_default.vm" />
 		</Component>
+		<Directory Id="directoryvs8_73" Name="Properties">
+		  <Component Id="componentvs2005_MRProject7" DiskId="1" Guid="CB98F3C2-FCC2-403C-B6FE-EE200A3E7F95">
+			<File Id="filecs8_86" Name="AssemblyInfo.cs" Source="$(var.VSTemplates80)\CSharp\MRProject\Properties\AssemblyInfo.cs" />
+		  </Component>
+		</Directory>
 		<Directory Id="directoryvs8_72" Name="Controllers">
 		  <Component Id="componentvs2005_MRProject1" DiskId="1" Guid="2978313B-8887-4BD8-8280-CFB06E5B08A6">
 			<File Id="filecs8_76" Name="HomeController.cs" Source="$(var.VSTemplates80)\CSharp\MRProject\Controllers\HomeController.cs" />
 		  </Component>
 		</Directory>
 		<Directory Id="directoryvs8_81" Name="Views">
-			<Directory Id="directoryvs8_73" Name="Properties">
-			  <Component Id="componentvs2005_MRProject7" DiskId="1" Guid="CB98F3C2-FCC2-403C-B6FE-EE200A3E7F95">
-			    <File Id="filecs8_86" Name="AssemblyInfo.cs" Source="$(var.VSTemplates80)\CSharp\MRProject\Properties\AssemblyInfo.cs" />
-			  </Component>
-			</Directory>
 			<Directory Id="directoryvs8_90" Name="Home">
 				<Component Id="componentvs2005_MRProject2" DiskId="1" Guid="2DC6C695-42C5-437B-BCFF-D3A945821A3C">
 					<File Id="filecs8_77" Name="empty.txt" Source="$(var.VSTemplates80)\CSharp\MRProject\Views\Home\empty.txt" />
