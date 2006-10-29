@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <CSHARP
         ProjectType = "Local"
-        ProductVersion = "7.10.3077"
+        ProductVersion = "7.10.6030"
         SchemaVersion = "2.0"
         ProjectGuid = "{19F55512-3F9D-4032-B195-223E51F47635}"
     >
@@ -95,17 +95,17 @@
                     HintPath = "C:\devtools\nant\bin\lib\net\1.1\nunit.framework.dll"
                 />
                 <Reference
-                    Name = "Castle.MicroKernel"
+                    Name = "Castle.Core-vs2003"
+                    Project = "{C3D02148-5E0F-4C35-A38E-D59308AA4DAC}"
+                    Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
+                />
+                <Reference
+                    Name = "Castle.MicroKernel-vs2003"
                     Project = "{8C6AADEB-D099-4D2A-8F5B-4EBC12AC9159}"
                     Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
                 />
                 <Reference
-                    Name = "Castle.Model"
-                    Project = "{6F052973-C8E0-41EB-BAAF-B052509B5597}"
-                    Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
-                />
-                <Reference
-                    Name = "Castle.Windsor"
+                    Name = "Castle.Windsor-vs2003"
                     Project = "{60EFCB9B-E3FF-46A5-A2D2-D9F0EF75D5FE}"
                     Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
                 />
