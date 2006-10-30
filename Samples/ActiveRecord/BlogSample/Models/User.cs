@@ -12,28 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace MoreComplexSample
+namespace BlogSample
 {
 	using System;
 	using Castle.ActiveRecord;
-	using Iesi.Collections;
 
-	[ActiveRecord]
-	public class Category : ActiveRecordBase
+	using NHibernate.Expression;
+
+	[ActiveRecord("[User]")]
+	public class User : ActiveRecordBase
 	{
 		private int id;
-		private String name;
-		private Category parent;
-		private ISet children = new HashedSet();
-		private ISet products = new HashedSet();
+		private string username;
+		private string password;
 
-		public Category()
+		public User()
 		{
+			
 		}
 
-		public Category(string name)
+		public User(string username, string password)
 		{
-			this.name = name;
+			this.username = username;
+			this.password = password;
 		}
 
 		[PrimaryKey]
@@ -44,33 +45,28 @@ namespace MoreComplexSample
 		}
 
 		[Property]
-		public string Name
+		public string Username
 		{
-			get { return name; }
-			set { name = value; }
+			get { return username; }
+			set { username = value; }
 		}
 
-		[BelongsTo("ParentId")]
-		public Category Parent
+		[Property]
+		public string Password
 		{
-			get { return parent; }
-			set { parent = value; }
-		}
-
-		[HasMany(typeof(Category), Lazy=true, Inverse=true)]
-		public ISet Children
-		{
-			get { return children; }
-			set { children = value; }
+			get { return password; }
+			set { password = value; }
 		}
 		
-		[HasAndBelongsToMany(typeof(Product), 
-			Table="ProductCategory", ColumnKey="CategoryId", ColumnRef="ProductId", 
-			Inverse=true, Lazy=true)]
-		public ISet Products
+		public static int GetUsersCount()
 		{
-			get { return products; }
-			set { products = value; }
+			return CountAll(typeof(User));
+		}
+
+		public static User FindByUserName(string userName)
+		{
+			// Note that we use the property name, _not_ the column name
+			return (User) FindOne(typeof(User), Expression.Eq("Username", userName));
 		}
 	}
 }

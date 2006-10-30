@@ -15,88 +15,81 @@
 namespace BlogSample
 {
 	using System;
-	using System.Collections;
 
 	using Castle.ActiveRecord;
 
 
-	[ActiveRecord("Posts")]
+	[ActiveRecord]
 	public class Post : ActiveRecordBase
 	{
-		private int _id;
-		private String _title;
-		private String _contents;
-		private String _category;
-		private DateTime _created;
-		private bool _published;
-		private Blog _blog;
+		private int id;
+		private String title;
+		private String contents;
+		private String category;
+		private DateTime created;
+		private bool published;
+		private Blog blog;
 
 		public Post()
 		{
-			_created = DateTime.Now;
+			created = DateTime.Now;
 		}
 
 		public Post(Blog blog, String title, String contents, String category) : this()
 		{
-			_blog = blog;
-			_title = title;
-			_contents = contents;
-			_category = category;
+			this.blog = blog;
+			this.title = title;
+			this.contents = contents;
+			this.category = category;
 		}
 
-		[PrimaryKey(PrimaryKeyType.Native)]
+		[PrimaryKey]
 		public int Id
 		{
-			get { return _id; }
-			set { _id = value; }
+			get { return id; }
+			set { id = value; }
 		}
 
 		[Property]
 		public String Title
 		{
-			get { return _title; }
-			set { _title = value; }
+			get { return title; }
+			set { title = value; }
 		}
 
 		[Property(ColumnType="StringClob")]
 		public String Contents
 		{
-			get { return _contents; }
-			set { _contents = value; }
+			get { return contents; }
+			set { contents = value; }
 		}
 
 		[Property]
 		public String Category
 		{
-			get { return _category; }
-			set { _category = value; }
+			get { return category; }
+			set { category = value; }
 		}
 
 		[BelongsTo("blogid")]
 		public Blog Blog
 		{
-			get { return _blog; }
-			set { _blog = value; }
+			get { return blog; }
+			set { blog = value; }
 		}
 
 		[Property("created")]
 		public DateTime Created
 		{
-			get { return _created; }
-			set { _created = value; }
+			get { return created; }
+			set { created = value; }
 		}
 
 		[Property("published")]
 		public bool Published
 		{
-			get { return _published; }
-			set { _published = value; }
-		}
-
-		protected override bool BeforeSave(IDictionary state)
-		{
-			state["Created"] = DateTime.Now;
-			return true;
+			get { return published; }
+			set { published = value; }
 		}
 
 		public static void DeleteAll()
