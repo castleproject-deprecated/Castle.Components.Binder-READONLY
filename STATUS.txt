@@ -25,7 +25,7 @@ Candidate changes:
        +1: roelofb
 	   -1: hammett (I think we need to experiment some more on the trunk)
         0: kevin
-	0: hconceicao
+	   0: hconceicao
 	   +1: fabiob
 
   * r2504,2543
@@ -37,7 +37,7 @@ Candidate changes:
     Votes:
        +1: roelofb
 	   -1: hammett (we have not tested it)
-	-1: hconceicao (not tested, it isn't a demand)
+	   -1: hconceicao (not tested, it isn't a demand)
 	   
   * r2512
     Put a link to CastleKey.snk in VS2005 projects.
@@ -51,7 +51,7 @@ Candidate changes:
        +0: ayende (are we really going to do much on-going development on the branch?)
 	   +0: hammett
        +0: kevin
-	+0: hconceicao
+	   +0: hconceicao
 
   * r2546
     Applied recommended practice to rethrow exceptions, in order to fix SERVICES-5.
@@ -63,6 +63,7 @@ Candidate changes:
     Votes:
       +1: fabiob
       +1: roelofb
+	  +1: hammett
 
   * r2622
 	Enhanced HqlBasedQuery.PrepareQueryForCount.
@@ -74,7 +75,8 @@ Candidate changes:
     Votes:
        +1: fabiob
 	   +1: roelofb
-	0: hconceicao
+        0: hconceicao
+       +1: hammett
 
   * r2623
 	Introduced ARPagination.CreatePagination<T>(SimpleQuery<T>).
@@ -85,7 +87,8 @@ Candidate changes:
 	from an HQL query.
     Votes:
        +1: fabiob
-	0: hconceicao
+        0: hconceicao
+       -1: hammett (not documented)
 
   * r2778
     Fixed a bug in the System.Net.Mail (.NET 2.0) version of the SmtpSender, regarding empty CC and BCC fields.
@@ -96,7 +99,9 @@ Candidate changes:
   Trunk version of patch:
     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2778
   Votes:
-    +1: fabiob
+       +1: fabiob
+       -1: hammett (this SmtpSender should not be a separated project, we need to merge them)
+
 
   * r2780
     Proposed fix for IOC-33.
@@ -107,7 +112,8 @@ Candidate changes:
     losing their stack traces. I'm not sure of the side-effects
     of the fix, thought.
   Votes:
-    +1: fabiob (althrough I'm not sure if it is the best fix, it's better than what the previous code)
+       +1: fabiob (althrough I'm not sure if it is the best fix, it's better than what the previous code)
+       -1: hammett (lets test it then)
 
   * r2787,2791
     Fixing IoC-34 - the check made will be a stricter one, including the method that is requested as well.
@@ -116,6 +122,7 @@ Candidate changes:
       http://fisheye3.cenqua.com/changelog/castleproject/?cs=2791
     Votes:
        +1: roelofb
+       +1: hammett
 
   * r2814
 	Bug: GenerateJSProxy was sending AreaName as 'null' instead string.Empty.
@@ -123,6 +130,7 @@ Candidate changes:
      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2814
     Votes:
        +1: hconceicao
+       +1: hammett
 
   * r2840
 	Bug: Conflict between the Array.reduce function of Prototype e fValidate scripts (MR-166).
@@ -130,6 +138,7 @@ Candidate changes:
      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2840
     Votes:
        +1: hconceicao
+       +1: hammett
 
 Approved changes:
 
