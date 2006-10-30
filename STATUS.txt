@@ -87,40 +87,6 @@ Candidate changes:
        +1: fabiob
 	0: hconceicao
 
-  * r2677
-	Fixed a bug in ActiveRecordBaseQuery.Clone().
-	Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2677
-	Justification:
-	The bug is somewhat serious: if a query does not have any modifiers
-	(such as parameters or ranges), trying to clone it throws a NullReferenceException.
-    Votes:
-       +1: fabiob
-       +1: roelofb
-       +1: hconceicao
-
-  * r2770
-    Added ActiveRecordMediator.Refresh(), both generic and non-generic.
-    Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2770
-    Justification:
-    ActiveRecordBase already contains that method.
-    Votes:
-      +1: fabiob
-      +1: roelofb
-       +1: hconceicao
-
-  * r2771
-    Fixed a bug in PaginationHelper.CreatePageLink(): the dictionary received 
-    as parameter could be a read-only dictionary, in which case, a new one 
-    must be created. Quite an unusual scenario, but real.
-    Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2771
-    Votes:
-      +1: fabiob
-      +1: roelofb
-       +1: hconceicao
-
   * r2778
     Fixed a bug in the System.Net.Mail (.NET 2.0) version of the SmtpSender, regarding empty CC and BCC fields.
     Also added some new configurable functionality for .NET 2.0:
@@ -166,3 +132,38 @@ Candidate changes:
        +1: hconceicao
 
 Approved changes:
+
+  * r2677
+	Fixed a bug in ActiveRecordBaseQuery.Clone().
+	Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2677
+	Justification:
+	The bug is somewhat serious: if a query does not have any modifiers
+	(such as parameters or ranges), trying to clone it throws a NullReferenceException.
+    Votes:
+       +1: fabiob
+       +1: roelofb
+       +1: hconceicao
+
+  * r2770
+    Added ActiveRecordMediator.Refresh(), both generic and non-generic.
+    Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2770
+    Justification:
+    ActiveRecordBase already contains that method.
+    Votes:
+      +1: fabiob
+      +1: roelofb
+      +1: hconceicao
+
+  * r2771
+    Fixed a bug in PaginationHelper.CreatePageLink(): the dictionary received 
+    as parameter could be a read-only dictionary, in which case, a new one 
+    must be created. Quite an unusual scenario, but real.
+    Trunk version of patch:
+      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2771
+    Votes:
+      +1: fabiob
+      +1: roelofb
+      +1: hconceicao
+
