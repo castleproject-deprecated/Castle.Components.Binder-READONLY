@@ -35,6 +35,7 @@ Candidate changes:
     Votes:
        +1: roelofb
        +1: hammett
+       +1: ayende
 
   * r2814
 	Bug: GenerateJSProxy was sending AreaName as 'null' instead string.Empty.
@@ -43,6 +44,7 @@ Candidate changes:
     Votes:
        +1: hconceicao
        +1: hammett
+       +1: ayende
 
   * r2840
 	Bug: Conflict between the Array.reduce function of Prototype e fValidate scripts (MR-166).
@@ -51,6 +53,7 @@ Candidate changes:
     Votes:
        +1: hconceicao
        +1: hammett
+       +1: ayende
 
 Approved changes:
 
