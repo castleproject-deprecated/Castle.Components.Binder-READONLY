@@ -27,33 +27,4 @@ Candidate changes:
        +0: kevin
 	   +0: hconceicao
 
-  * r2787,2791
-    Fixing IoC-34 - the check made will be a stricter one, including the method that is requested as well.
-	Trunk version of patch:
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2787
-      http://fisheye3.cenqua.com/changelog/castleproject/?cs=2791
-    Votes:
-       +1: roelofb
-       +1: hammett
-       +1: ayende
-
-  * r2814
-	Bug: GenerateJSProxy was sending AreaName as 'null' instead string.Empty.
-	Trunk version of patch:
-     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2814
-    Votes:
-       +1: hconceicao
-       +1: hammett
-       +1: ayende
-
-  * r2840
-	Bug: Conflict between the Array.reduce function of Prototype e fValidate scripts (MR-166).
-	Trunk version of patch:
-     http://fisheye3.cenqua.com/changelog/castleproject/?cs=2840
-    Votes:
-       +1: hconceicao
-       +1: hammett
-       +1: ayende
-
 Approved changes:
-
