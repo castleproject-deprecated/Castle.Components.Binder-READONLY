@@ -337,6 +337,7 @@
     <Compile Include="Internal\UrlTokenizerException.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Internal\ViewEngineInfo.cs" />
     <Compile Include="Internal\WizardUtils.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -366,6 +367,7 @@
     </Compile>
     <Compile Include="IViewComponentFactory.cs" />
     <Compile Include="IViewEngine.cs" />
+    <Compile Include="IViewEngineManager.cs" />
     <Compile Include="IViewSource.cs" />
     <Compile Include="IViewSourceLoader.cs" />
     <Compile Include="IWizardController.cs">
@@ -398,6 +400,7 @@
     <Compile Include="Services\DefaultFilterFactory.cs" />
     <Compile Include="Services\DefaultResourceFactory.cs" />
     <Compile Include="Services\DefaultViewComponentFactory.cs" />
+    <Compile Include="Services\DefaultViewEngineManager.cs" />
     <Compile Include="Services\EmailTemplateService.cs" />
     <Compile Include="Services\MonoRailSmtpSender.cs" />
     <Compile Include="Services\Utils\ControllerInspectionUtil.cs" />

@@ -41,6 +41,21 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			return ViewSourceLoader.HasTemplate(templateName + ".aspx");
 		}
 
+		public override bool SupportsJSGeneration
+		{
+			get { return false; }
+		}
+
+		public override string ViewFileExtension
+		{
+			get { return ".aspx"; }
+		}
+
+		public override string JSGeneratorFileExtension
+		{
+			get { throw new NotImplementedException(); }
+		}
+
 		/// <summary>
 		/// Obtains the aspx Page from the view name dispatch
 		/// its execution using the standard ASP.Net API.
@@ -246,29 +261,20 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			
 			if (masterHandler != null && HasLayout(controller))
 			{
-//				if (httpContext.Response.StatusCode == 200)
-//				{
-					byte[] contents = RestoreFilter(httpContext.Response);
+				byte[] contents = RestoreFilter(httpContext.Response);
 
-					// Checks if its only returning from a inner process invocation
-					if (!Convert.ToBoolean(httpContext.Items["rails.layout.processed"]))
-					{
-						httpContext.Items.Add("rails.contents", contents);
-						httpContext.Items.Add("rails.child", childPage);
+				// Checks if its only returning from a inner process invocation
+				if (!Convert.ToBoolean(httpContext.Items["rails.layout.processed"]))
+				{
+					httpContext.Items.Add("rails.contents", contents);
+					httpContext.Items.Add("rails.child", childPage);
 
-						httpContext.Items["rails.layout.processed"] = true;
+					httpContext.Items["rails.layout.processed"] = true;
+				}
 
-						httpContext.Response.RedirectLocation = "foo";
-					}
+				ProcessPage(controller, masterHandler, httpContext);
 
-					ProcessPage(controller, masterHandler, httpContext);
-
-					return true;
-//				}
-//				else
-//				{
-//					WriteBuffered(httpContext.Response);
-//				}
+				return true;
 			}
 
 			return false;
@@ -278,19 +284,6 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		{
 			return controller.LayoutName != null;
 		}
-
-//		private void WriteBuffered(HttpResponse response)
-//		{
-//			// response.Flush();
-//
-//			// Restores the original stream
-//			DelegateMemoryStream filter = (DelegateMemoryStream) response.Filter;
-//			response.Filter = filter.OriginalStream;
-//			
-//			// Writes the buffered contents
-//			byte[] buffer = filter.GetBuffer();
-//			response.OutputStream.Write(buffer, 0, buffer.Length);
-//		}
 
 		private byte[] RestoreFilter(HttpResponse response)
 		{

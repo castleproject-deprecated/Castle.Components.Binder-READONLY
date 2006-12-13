@@ -40,9 +40,9 @@ namespace Castle.MonoRail.Framework
 		private ILogger logger = NullLogger.Instance;
 
 		/// <summary>
-		/// The reference to the <see cref="IViewEngine"/> instance
+		/// The reference to the <see cref="IViewEngineManager"/> instance
 		/// </summary>
-		private IViewEngine viewEngine;
+		private IViewEngineManager viewEngineManager;
 
 		private IResourceFactory resourceFactory;
 		private IScaffoldingSupport scaffoldSupport;
@@ -88,7 +88,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="provider">The service proviver</param>
 		public void Service(IServiceProvider provider)
 		{
-			viewEngine = (IViewEngine) provider.GetService(typeof(IViewEngine));
+			viewEngineManager = (IViewEngineManager) provider.GetService(typeof(IViewEngineManager));
 			filterFactory = (IFilterFactory) provider.GetService(typeof(IFilterFactory));
 			resourceFactory = (IResourceFactory) provider.GetService(typeof(IResourceFactory));
 			scaffoldSupport = (IScaffoldingSupport) provider.GetService(typeof(IScaffoldingSupport));
@@ -396,7 +396,7 @@ namespace Castle.MonoRail.Framework
 
 			metaDescriptor = controller.metaDescriptor;
 
-			controller.viewEngine = viewEngine;
+			controller.viewEngineManager = viewEngineManager;
 
 			ILoggerFactory loggerFactory = (ILoggerFactory) context.GetService(typeof(ILoggerFactory));
 
@@ -572,11 +572,6 @@ namespace Castle.MonoRail.Framework
 
 				scaffoldSupport.Process(controller);
 			}
-		}
-
-		private bool IsClientConnected
-		{
-			get { return context.Response.IsClientConnected; }
 		}
 
 		#region Resources
@@ -767,7 +762,7 @@ namespace Castle.MonoRail.Framework
 		{
 			if (controller._selectedViewName != null)
 			{
-				viewEngine.Process(context, controller, controller._selectedViewName);
+				viewEngineManager.Process(context, controller, controller._selectedViewName);
 			}
 		}
 

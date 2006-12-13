@@ -24,6 +24,18 @@ namespace Castle.MonoRail.Framework
 	public interface IViewEngine
 	{
 		/// <summary>
+		/// Gets a value indicating whether the view engine
+		/// support the generation of JS.
+		/// </summary>
+		/// <value>
+		/// <c>true</c> if JS generation is supported; otherwise, <c>false</c>.
+		/// </value>
+		bool SupportsJSGeneration { get; }
+		bool XHtmlRendering { get; set; }
+		String ViewFileExtension { get; }
+		String JSGeneratorFileExtension { get; }
+		
+		/// <summary>
 		/// Evaluates whether the specified template exists.
 		/// </summary>
 		/// <returns><c>true</c> if it exists</returns>

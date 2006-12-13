@@ -87,6 +87,21 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 		#region IViewEngine implementation
 
+		public override bool SupportsJSGeneration
+		{
+			get { return true; }
+		}
+
+		public override string ViewFileExtension
+		{
+			get { return ".vm"; }
+		}
+
+		public override string JSGeneratorFileExtension
+		{
+			get { return ".njs"; }
+		}
+
 		public override bool HasTemplate(String templateName)
 		{
 			return ViewSourceLoader.HasTemplate(ResolveTemplateName(templateName));
