@@ -44,6 +44,8 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		void Process(TextWriter output, IRailsEngineContext context, Controller controller, String templateName);
 
+		void ProcessPartial(TextWriter output, IRailsEngineContext context, Controller controller, String partialName);
+
 		/// <summary>
 		/// Wraps the specified content in the layout using 
 		/// the context to output the result.

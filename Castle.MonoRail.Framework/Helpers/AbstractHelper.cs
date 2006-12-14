@@ -201,6 +201,9 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <summary>
 		/// Escapes JavaScript with Url encoding and returns the encoded string.  
 		/// </summary>
+		/// <remarks>
+		/// Converts quotes, single quotes and CR/LFs to their representation as an escape character.
+		/// </remarks>
 		/// <param name="content">The text to URL encode and escape JavaScript within.</param>
 		/// <returns>The URL encoded and JavaScript escaped text.</returns>
 		public String JavaScriptEscape(String content)

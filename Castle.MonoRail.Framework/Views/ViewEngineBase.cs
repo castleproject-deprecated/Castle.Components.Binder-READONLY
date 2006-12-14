@@ -72,6 +72,16 @@ namespace Castle.MonoRail.Framework
 		public abstract string JSGeneratorFileExtension { get; }
 
 		/// <summary>
+		/// Gets/sets whether rendering should aim 
+		/// to be XHTML compliant, obtained from the configuration.
+		/// </summary>
+		public bool XHtmlRendering
+		{
+			get { return xhtmlRendering; }
+			set { xhtmlRendering = value; }
+		}
+
+		/// <summary>
 		/// Evaluates whether the specified template exists.
 		/// </summary>
 		/// <returns><c>true</c> if it exists</returns>
@@ -84,31 +94,24 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		public abstract void Process(IRailsEngineContext context, Controller controller, String templateName);
 
-		/// <summary>
-		/// Wraps the specified content in the layout using the 
-		/// context to output the result.
-		/// </summary>
-		public abstract void ProcessContents(IRailsEngineContext context, Controller controller, String contents);
-
-		/// <summary>
-		/// Gets/sets whether rendering should aim 
-		/// to be XHTML compliant, obtained from the configuration.
-		/// </summary>
-		public bool XHtmlRendering
-		{
-			get { return xhtmlRendering; }
-			set { xhtmlRendering = value; }
-		}
-
 		///<summary>
 		/// Processes the view - using the templateName 
 		/// to obtain the correct template
 		/// and writes the results to the System.IO.TextWriter.
 		/// </summary>
-		public virtual void Process(TextWriter output, IRailsEngineContext context, Controller controller, String templateName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract void Process(TextWriter output, IRailsEngineContext context, Controller controller, String templateName);
+
+		public abstract void ProcessPartial(TextWriter output, IRailsEngineContext context, Controller controller, string partialName);
+
+		public abstract void GenerateJS(IRailsEngineContext context, Controller controller, string templateName);
+
+		public abstract void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller, string templateName);
+
+		/// <summary>
+		/// Wraps the specified content in the layout using the 
+		/// context to output the result.
+		/// </summary>
+		public abstract void ProcessContents(IRailsEngineContext context, Controller controller, String contents);
 
 		protected virtual void PreSendView(Controller controller, object view)
 		{
@@ -163,6 +166,14 @@ namespace Castle.MonoRail.Framework
 				//Just use HTML
 				context.Response.ContentType = "text/html";
 			}
+		}
+
+		/// <summary>
+		/// Sets the HTTP Content-Type header to <c>text/javascript</c>
+		/// </summary>
+		protected void AdjustJavascriptContentType(IRailsEngineContext context)
+		{
+			context.Response.ContentType = "text/javascript";
 		}
 
 		#endregion

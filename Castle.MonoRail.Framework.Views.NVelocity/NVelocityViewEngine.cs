@@ -31,10 +31,9 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	public class NVelocityViewEngine : ViewEngineBase, IInitializable
 	{
 		internal const String TemplateExtension = ".vm";
+		internal const String JsTemplateExtension = ".njs";
 
 		internal const String ServiceProvider = "service.provider";
-
-		// private const String TemplatePathPattern = "{0}{1}{2}";
 
 		private IServiceProvider provider;
 
@@ -186,6 +185,66 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 		}
 
+		public override void ProcessPartial(TextWriter output, IRailsEngineContext context, 
+		                                    Controller controller, string partialName)
+		{
+			IContext ctx = CreateContext(context, controller);
+			String view = ResolveTemplateName(partialName);
+
+			try
+			{
+				Template template = velocity.GetTemplate(view);
+				template.Merge(ctx, output);
+			}
+			catch(Exception ex)
+			{
+				throw new RailsException("Could not obtain view: " + view, ex);
+			}
+		}
+
+		public override void GenerateJS(IRailsEngineContext context, Controller controller, string templateName)
+		{
+			IContext ctx = CreateContext(context, controller);
+
+			AdjustJavascriptContentType(context);
+
+			String view = ResolveJSTemplateName(templateName);
+
+			try
+			{
+				Template template = velocity.GetTemplate(view);
+
+				BeforeMerge(velocity, template, ctx);
+				template.Merge(ctx, context.Response.Output);
+			}
+			catch(Exception ex)
+			{
+				throw new RailsException("Could not obtain view: " + templateName, ex);
+			}
+		}
+
+		public override void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller,
+		                                string templateName)
+		{
+			IContext ctx = CreateContext(context, controller);
+
+			AdjustJavascriptContentType(context);
+
+			String view = ResolveJSTemplateName(templateName);
+
+			try
+			{
+				Template template = velocity.GetTemplate(view);
+
+				BeforeMerge(velocity, template, ctx);
+				template.Merge(ctx, output);
+			}
+			catch(Exception ex)
+			{
+				throw new RailsException("Could not obtain view: " + templateName, ex);
+			}
+		}
+
 		public override void ProcessContents(IRailsEngineContext context, Controller controller, String contents)
 		{
 			IContext ctx = CreateContext(context, controller);
@@ -221,20 +280,44 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		/// <summary>
 		/// Resolves the template name into a velocity template file name.
 		/// </summary>
-		protected virtual string ResolveTemplateName(string templateName)
+		protected string ResolveTemplateName(string templateName)
 		{
-			return templateName + TemplateExtension;
+			if (Path.HasExtension(templateName))
+			{
+				return templateName;
+			}
+			else
+			{
+				return templateName + TemplateExtension;
+			}
+		}
+
+		/// <summary>
+		/// Resolves the template name into a velocity JS template file name.
+		/// </summary>
+		protected string ResolveJSTemplateName(string templateName)
+		{
+			if (Path.HasExtension(templateName))
+			{
+				return templateName;
+			}
+			else
+			{
+				return templateName + JsTemplateExtension;
+			}
 		}
 
 		/// <summary>
 		/// Resolves the template name into a velocity template file name.
 		/// </summary>
-		protected virtual string ResolveTemplateName(string area, string templateName)
+		protected string ResolveTemplateName(string area, string templateName)
 		{
-			return String.Format("{0}{1}{2}", area, Path.DirectorySeparatorChar, ResolveTemplateName(templateName));
+			return String.Format("{0}{1}{2}",
+			                     area, Path.DirectorySeparatorChar,
+			                     ResolveTemplateName(templateName));
 		}
 
-		protected virtual void BeforeMerge(VelocityEngine velocity, Template template, IContext context)
+		protected virtual void BeforeMerge(VelocityEngine velocityEngine, Template template, IContext context)
 		{
 		}
 

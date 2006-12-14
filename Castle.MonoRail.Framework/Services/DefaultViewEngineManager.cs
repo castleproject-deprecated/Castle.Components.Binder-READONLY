@@ -16,6 +16,8 @@ namespace Castle.MonoRail.Framework.Services
 		private MonoRailConfiguration config;
 		private IServiceProvider provider;
 		private IDictionary ext2ViewEngine;
+		private IViewSourceLoader viewSourceLoader;
+		private IDictionary jsgFastLookup;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultViewEngineManager"/> class.
@@ -23,10 +25,11 @@ namespace Castle.MonoRail.Framework.Services
 		public DefaultViewEngineManager()
 		{
 			ext2ViewEngine = new HybridDictionary(true);
+			jsgFastLookup = new HybridDictionary(true);
 		}
 
 		#region IInitializable
-		
+
 		public void Initialize()
 		{
 			foreach(ViewEngineInfo info in config.ViewEngineConfig.ViewEngines)
@@ -40,7 +43,7 @@ namespace Castle.MonoRail.Framework.Services
 					engine.XHtmlRendering = info.XhtmlRendering;
 
 					IServiceEnabledComponent serviceEnabled = engine as IServiceEnabledComponent;
-					
+
 					if (serviceEnabled != null)
 					{
 						serviceEnabled.Service(provider);
@@ -70,11 +73,12 @@ namespace Castle.MonoRail.Framework.Services
 
 		#region IServiceEnabledComponent
 
-		public void Service(IServiceProvider provider)
+		public void Service(IServiceProvider serviceProvider)
 		{
-			this.provider = provider;
-			
+			provider = serviceProvider;
+
 			config = (MonoRailConfiguration) provider.GetService(typeof(MonoRailConfiguration));
+			viewSourceLoader = (IViewSourceLoader) provider.GetService(typeof(IViewSourceLoader));
 		}
 
 		#endregion
@@ -88,21 +92,54 @@ namespace Castle.MonoRail.Framework.Services
 		/// <returns><c>true</c> if it exists</returns>
 		public bool HasTemplate(string templateName)
 		{
-			return ResolveEngine(templateName, false) != null;
+			return FindExistingTemplate(templateName) != null;
 		}
 
 		public void Process(IRailsEngineContext context, Controller controller, string templateName)
 		{
-			IViewEngine engine = ResolveEngine(templateName);
-			
-			engine.Process(context, controller, templateName);
+			String resolvedTemplateName = FindExistingTemplate(templateName);
+
+			AssertTemplateExists(resolvedTemplateName, templateName);
+
+			IViewEngine engine = ResolveEngine(resolvedTemplateName);
+
+			if (jsgFastLookup.Contains(Path.GetExtension(resolvedTemplateName)))
+			{
+				engine.GenerateJS(context, controller, resolvedTemplateName);
+			}
+			else
+			{
+				engine.Process(context, controller, templateName);
+			}
 		}
 
 		public void Process(TextWriter output, IRailsEngineContext context, Controller controller, string templateName)
 		{
-			IViewEngine engine = ResolveEngine(templateName);
+			String resolvedTemplateName = FindExistingTemplate(templateName);
 
-			engine.Process(output, context, controller, templateName);
+			AssertTemplateExists(resolvedTemplateName, templateName);
+
+			IViewEngine engine = ResolveEngine(resolvedTemplateName);
+
+			if (jsgFastLookup.Contains(Path.GetExtension(resolvedTemplateName)))
+			{
+				engine.GenerateJS(output, context, controller, resolvedTemplateName);
+			}
+			else
+			{
+				engine.Process(output, context, controller, templateName);
+			}
+		}
+
+		public void ProcessPartial(TextWriter output, IRailsEngineContext context, Controller controller, string partialName)
+		{
+			String resolvedTemplateName = FindExistingTemplate(partialName);
+
+			AssertTemplateExists(resolvedTemplateName, partialName);
+
+			IViewEngine engine = ResolveEngine(resolvedTemplateName);
+
+			engine.ProcessPartial(output, context, controller, resolvedTemplateName);
 		}
 
 		/// <summary>
@@ -116,61 +153,65 @@ namespace Castle.MonoRail.Framework.Services
 				throw new RailsException("ProcessContents can only work with a layout");
 			}
 
-			IViewEngine engine = ResolveEngine(Path.Combine("layouts", controller.LayoutName));
+			String templateName = Path.Combine("layouts", controller.LayoutName);
+			String resolvedTemplateName = FindExistingTemplate(templateName);
+
+			AssertTemplateExists(resolvedTemplateName, templateName);
+
+			IViewEngine engine = ResolveEngine(templateName);
 
 			engine.ProcessContents(context, controller, contents);
 		}
 
 		#endregion
 
-		private IViewEngine ResolveEngine(string viewName)
+		private String FindExistingTemplate(string templateName)
 		{
-			return ResolveEngine(viewName, true);
+			if (Path.HasExtension(templateName))
+			{
+				return viewSourceLoader.HasTemplate(templateName) ? templateName : null;
+			}
+			else
+			{
+				foreach(String ext in ext2ViewEngine.Keys)
+				{
+					String tempTemplateName = templateName + ext;
+
+					if (viewSourceLoader.HasTemplate(tempTemplateName))
+					{
+						return tempTemplateName;
+					}
+				}
+
+				return null;
+			}
 		}
-		
+
 		/// <summary>
 		/// The view can be informed with an extension. If so, we use it
 		/// to discover the extension. Otherwise, we use the view source
 		/// to find out the file that exists there, and hence the view 
 		/// engine instance
 		/// </summary>
-		/// <param name="viewName">View name</param>
-		/// <param name="throwException"><c>true</c> if an exception should be threw if no match is found</param>
+		/// <param name="templateName">View name</param>
 		/// <returns>A view engine instance</returns>
-		private IViewEngine ResolveEngine(string viewName, bool throwException)
+		private IViewEngine ResolveEngine(string templateName)
 		{
-			if (Path.HasExtension(viewName))
+			if (!Path.HasExtension(templateName))
 			{
-				String extension = Path.GetExtension(viewName);
-				
-				IViewEngine engine = (IViewEngine) ext2ViewEngine[extension];
-
-				if (engine != null) return engine;
-
-				if (!throwException) return null;
-
-				throw new RailsException(
-					"Could not find a suitable View engine to " +
-					"handle view template with extension " + extension + ". View template: " + viewName);
+				throw new ArgumentException("ResolveEngine only works with a template " +
+				                            "name with extension. templateName " + templateName);
 			}
-			else
-			{
-				foreach(IViewEngine engine in ext2ViewEngine.Values)
-				{
-					if (engine.HasTemplate(viewName))
-					{
-						return engine;
-					}
-				}
 
-				if (!throwException) return null;
+			String extension = Path.GetExtension(templateName);
 
-				throw new RailsException(
-					"Could not find a suitable View engine to " +
-					"handle view template or maybe there " + 
-					"are no views on the folder that matches the name. View template: " + viewName);
+			IViewEngine engine = (IViewEngine) ext2ViewEngine[extension];
 
-			}
+			if (engine != null) return engine;
+
+			throw new RailsException(
+				"Could not find a suitable View engine to " +
+				"handle view template with extension " + extension + ". View template: " + templateName);
 		}
 
 		/// <summary>
@@ -182,11 +223,11 @@ namespace Castle.MonoRail.Framework.Services
 			if (ext2ViewEngine.Contains(engine.ViewFileExtension))
 			{
 				IViewEngine existing = (IViewEngine) ext2ViewEngine[engine.ViewFileExtension];
-				
+
 				throw new RailsException(
-					"At least two view engines are handling the same file extension. " + 
-					"This isn't going to work. Extension: " + engine.ViewFileExtension + 
-					" View Engine 1: " + existing.GetType() + 
+					"At least two view engines are handling the same file extension. " +
+					"This isn't going to work. Extension: " + engine.ViewFileExtension +
+					" View Engine 1: " + existing.GetType() +
 					" View Engine 2: " + engine.GetType());
 			}
 
@@ -195,7 +236,7 @@ namespace Castle.MonoRail.Framework.Services
 			                   	: "." + engine.ViewFileExtension;
 
 			ext2ViewEngine[extension] = engine;
-			
+
 			if (engine.SupportsJSGeneration && ext2ViewEngine.Contains(engine.JSGeneratorFileExtension))
 			{
 				IViewEngine existing = (IViewEngine) ext2ViewEngine[engine.JSGeneratorFileExtension];
@@ -206,14 +247,23 @@ namespace Castle.MonoRail.Framework.Services
 					" View Engine 1: " + existing.GetType() +
 					" View Engine 2: " + engine.GetType());
 			}
-						
+
 			if (engine.SupportsJSGeneration)
 			{
 				extension = engine.JSGeneratorFileExtension.StartsWith(".")
-								? engine.JSGeneratorFileExtension
-								: "." + engine.JSGeneratorFileExtension;
+				            	? engine.JSGeneratorFileExtension
+				            	: "." + engine.JSGeneratorFileExtension;
 
 				ext2ViewEngine[extension] = engine;
+				jsgFastLookup[extension] = engine;
+			}
+		}
+
+		private void AssertTemplateExists(string resolvedTemplateName, string templateName)
+		{
+			if (resolvedTemplateName == null)
+			{
+				throw new RailsException("Could not find view template: " + templateName);
 			}
 		}
 	}

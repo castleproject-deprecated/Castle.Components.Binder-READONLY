@@ -36,10 +36,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		{
 		}
 
-		public override bool HasTemplate(String templateName)
-		{
-			return ViewSourceLoader.HasTemplate(templateName + ".aspx");
-		}
+		#region ViewEngineBase overrides
 
 		public override bool SupportsJSGeneration
 		{
@@ -54,6 +51,11 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		public override string JSGeneratorFileExtension
 		{
 			get { throw new NotImplementedException(); }
+		}
+
+		public override bool HasTemplate(String templateName)
+		{
+			return ViewSourceLoader.HasTemplate(templateName + ".aspx");
 		}
 
 		/// <summary>
@@ -89,7 +91,30 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 			ProcessInlineView(controller, viewName, httpContext);	
 		}
-		
+
+		public override void Process(TextWriter output, IRailsEngineContext context, Controller controller,
+		                             string templateName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void ProcessPartial(TextWriter output, IRailsEngineContext context, Controller controller,
+		                                    string partialName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void GenerateJS(IRailsEngineContext context, Controller controller, string templateName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller,
+		                                string templateName)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override void ProcessContents(IRailsEngineContext context, Controller controller, String contents)
 		{
 			AdjustContentType(context);
@@ -102,7 +127,9 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 			ProcessPage(controller, masterHandler, httpContext);
 		}
-		
+
+		#endregion
+
 		private void ProcessInlineView(Controller controller, String viewName, HttpContext httpContext)
 		{
 			PrepareLayout(controller, httpContext);
@@ -327,7 +354,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			response.BufferOutput = true;
 		}
 
-		protected void ProcessPropertyBag(IDictionary bag, IHttpHandler handler)
+		private void ProcessPropertyBag(IDictionary bag, IHttpHandler handler)
 		{
 			foreach(DictionaryEntry entry in bag)
 			{
@@ -335,7 +362,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			}
 		}
 
-		protected void SetPropertyValue(IHttpHandler handler, object key, object value)
+		private void SetPropertyValue(IHttpHandler handler, object key, object value)
 		{
 			if (value == null) return;
 
@@ -423,7 +450,6 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 			}
 		}
-	
 #endif
 	}
 

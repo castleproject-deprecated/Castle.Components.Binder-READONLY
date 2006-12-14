@@ -80,7 +80,6 @@ namespace Castle.MonoRail.Views.Brail
 			ViewSourceLoader.ViewChanged += new FileSystemEventHandler(OnViewChanged);
 		}
 
-
     	public override bool SupportsJSGeneration
     	{
 			get { return true; }
@@ -95,6 +94,69 @@ namespace Castle.MonoRail.Views.Brail
     	{
     		get { return ".boojs"; }
     	}
+
+		public override bool HasTemplate(string templateName)
+		{
+			return ViewSourceLoader.HasTemplate(GetTemplateName(templateName));
+		}
+
+		// Process a template name and output the results to the user
+		// This may throw if an error occured and the user is not local (which would 
+		// cause the yellow screen of death)
+		public override void Process(IRailsEngineContext context, Controller controller, string templateName)
+		{
+			Process(context.Response.Output, context, controller, templateName);
+		}
+
+		public override void Process(TextWriter output, IRailsEngineContext context, Controller controller,
+									 string templateName)
+		{
+			Log("Starting to process request for {0}", templateName);
+			string file = GetTemplateName(templateName);
+			BrailBase view;
+			// Output may be the layout's child output if a layout exists
+			// or the context.Response.Output if the layout is null
+			LayoutViewOutput layoutViewOutput = GetOutput(output, context, controller);
+			// Will compile on first time, then save the assembly on the cache.
+			view = GetCompiledScriptInstance(file, layoutViewOutput.Output, context, controller);
+			controller.PreSendView(view);
+			Log("Executing view {0}", templateName);
+			view.Run();
+			if (layoutViewOutput.Layout != null)
+			{
+				layoutViewOutput.Layout.SetParent(view);
+				layoutViewOutput.Layout.Run();
+			}
+			Log("Finished executing view {0}", templateName);
+			controller.PostSendView(view);
+		}
+
+		public override void ProcessPartial(TextWriter output, IRailsEngineContext context, Controller controller,
+									string partialName)
+		{
+			throw new NotImplementedException();
+		}
+
+    	public override void GenerateJS(IRailsEngineContext context, Controller controller, string templateName)
+    	{
+    		throw new NotImplementedException();
+    	}
+
+    	public override void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller,
+    	                                string templateName)
+    	{
+    		throw new NotImplementedException();
+    	}
+
+    	// Send the contents text directly to the user, only adding the layout if neccecary
+		public override void ProcessContents(IRailsEngineContext context, Controller controller, string contents)
+		{
+			LayoutViewOutput layoutViewOutput = GetOutput(controller.Response.Output, context, controller);
+			layoutViewOutput.Output.Write(contents);
+			// here we don't need to pass parameters from the layout to the view, 
+			if (layoutViewOutput.Layout != null)
+				layoutViewOutput.Layout.Run();
+		}
 
     	private void OnViewChanged(object sender, FileSystemEventArgs e)
 		{
@@ -124,51 +186,7 @@ namespace Castle.MonoRail.Views.Brail
 				logger = loggerFactory.Create(GetType().Name);
 		}
 
-		public override bool HasTemplate(string templateName)
-		{
-			return ViewSourceLoader.HasTemplate(GetTemplateName(templateName));
-		}
-
-		// Process a template name and output the results to the user
-		// This may throw if an error occured and the user is not local (which would 
-		// cause the yellow screen of death)
-		public override void Process(IRailsEngineContext context, Controller controller, string templateName)
-		{
-			Process(context.Response.Output, context, controller, templateName);
-		}
-
-		public override void Process(TextWriter output, IRailsEngineContext context, Controller controller,
-		                             string templateName)
-		{
-			Log("Starting to process request for {0}", templateName);
-			string file = GetTemplateName(templateName);
-			BrailBase view;
-			// Output may be the layout's child output if a layout exists
-			// or the context.Response.Output if the layout is null
-			LayoutViewOutput layoutViewOutput = GetOutput(output, context, controller);
-			// Will compile on first time, then save the assembly on the cache.
-			view = GetCompiledScriptInstance(file, layoutViewOutput.Output, context, controller);
-			controller.PreSendView(view);
-			Log("Executing view {0}", templateName);
-			view.Run();
-			if (layoutViewOutput.Layout != null)
-			{
-				layoutViewOutput.Layout.SetParent(view);
-				layoutViewOutput.Layout.Run();
-			}
-			Log("Finished executing view {0}", templateName);
-			controller.PostSendView(view);
-		}
-
-		// Send the contents text directly to the user, only adding the layout if neccecary
-		public override void ProcessContents(IRailsEngineContext context, Controller controller, string contents)
-		{
-			LayoutViewOutput layoutViewOutput = GetOutput(controller.Response.Output, context, controller);
-			layoutViewOutput.Output.Write(contents);
-			// here we don't need to pass parameters from the layout to the view, 
-			if (layoutViewOutput.Layout != null)
-				layoutViewOutput.Layout.Run();
-		}
+		
 
 		// Check if a layout has been defined. If it was, then the layout would be created
 		// and will take over the output, otherwise, the context.Reposne.Output is used, 
