@@ -23,6 +23,8 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	using System.IO;
 	using System.Collections;
 	using Castle.Core;
+	using Castle.MonoRail.Framework.Helpers;
+	using Castle.MonoRail.Framework.Views.NVelocity.JSGeneration;
 	using Commons.Collections;
 
 	/// <summary>
@@ -112,8 +114,6 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 			AdjustContentType(context);
 
-			Template template;
-
 			bool hasLayout = controller.LayoutName != null;
 
 			TextWriter writer;
@@ -131,27 +131,14 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 			String view = ResolveTemplateName(viewName);
 
-			try
-			{
-				template = velocity.GetTemplate(view);
+			Template template = velocity.GetTemplate(view);
 
-				PreSendView(controller, template);
+			PreSendView(controller, template);
 
-				BeforeMerge(velocity, template, ctx);
-				template.Merge(ctx, writer);
+			BeforeMerge(velocity, template, ctx);
+			template.Merge(ctx, writer);
 
-				PostSendView(controller, template);
-			}
-			catch(Exception)
-			{
-				if (hasLayout)
-				{
-					// Restore original writer
-					writer = context.Response.Output;
-				}
-
-				throw;
-			}
+			PostSendView(controller, template);
 
 			if (hasLayout)
 			{
@@ -204,23 +191,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 		public override void GenerateJS(IRailsEngineContext context, Controller controller, string templateName)
 		{
-			IContext ctx = CreateContext(context, controller);
-
-			AdjustJavascriptContentType(context);
-
-			String view = ResolveJSTemplateName(templateName);
-
-			try
-			{
-				Template template = velocity.GetTemplate(view);
-
-				BeforeMerge(velocity, template, ctx);
-				template.Merge(ctx, context.Response.Output);
-			}
-			catch(Exception ex)
-			{
-				throw new RailsException("Could not obtain view: " + templateName, ex);
-			}
+			GenerateJS(context.Response.Output, context, controller, templateName);
 		}
 
 		public override void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller,
@@ -228,6 +199,9 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		{
 			IContext ctx = CreateContext(context, controller);
 
+			PrototypeHelper.JSGenerator generator = new PrototypeHelper.JSGenerator();
+			ctx.Put("page", new JSGeneratorDuck(generator));
+
 			AdjustJavascriptContentType(context);
 
 			String view = ResolveJSTemplateName(templateName);
@@ -236,12 +210,11 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			{
 				Template template = velocity.GetTemplate(view);
 
-				BeforeMerge(velocity, template, ctx);
 				template.Merge(ctx, output);
 			}
-			catch(Exception ex)
+			catch(Exception)
 			{
-				throw new RailsException("Could not obtain view: " + templateName, ex);
+				throw new RailsException("Error generating JS. Template " + templateName);
 			}
 		}
 
