@@ -413,6 +413,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewComponentException.cs" />
+    <Compile Include="ViewComponents\AuthenticatedContent.cs" />
     <Compile Include="ViewComponents\CaptureFor.cs" />
     <Compile Include="ViewComponents\ChildContentComponent.cs" />
     <Compile Include="ViewComponents\SecurityComponent.cs" />

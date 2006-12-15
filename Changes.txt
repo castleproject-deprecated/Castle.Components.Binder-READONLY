@@ -4,6 +4,9 @@ Change history
 Release Candidate 3
 ===================
 
+- Added AuthenticatedContent ViewComponent that allows context to be 
+  render based on the user state (authenticated or anonymous)
+
 - Removed CompositeViewEngine as it's useless now that we support multiple view engines
 
 - Introduced IViewEngineManager that sits between the controller and the view engines
