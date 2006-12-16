@@ -516,7 +516,7 @@ namespace Castle.MonoRail.Framework
 			AbstractHelper[] builtInHelpers =
 				new AbstractHelper[]
 					{
-						new AjaxHelper(),
+						new AjaxHelper(), new UrlForHelper(), 
 						new EffectsFatHelper(), new Effects2Helper(),
 						new DateFormatHelper(), new HtmlHelper(),
 						new ValidationHelper(), new DictHelper(),
@@ -532,6 +532,13 @@ namespace Castle.MonoRail.Framework
 				if (!helpers.Contains(helperName))
 				{
 					helpers[helperName] = helper;
+				}
+
+				// Also makes the helper available with a less verbose name
+				// FormHelper and Form, AjaxHelper and Ajax
+				if (helperName.EndsWith("Helper"))
+				{
+					helpers[helperName.Substring(0, helperName.Length - 6)] = helper;
 				}
 
 				PerformAdditionalHelperInitialization(helper);

@@ -82,6 +82,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Nullables.dll</HintPath>
     </Reference>
+    <Reference Include="NVelocity, Version=0.5.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -97,10 +98,6 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <ProjectReference Include="..\..\Tools\NVelocity\src\NVelocity\NVelocity-vs2005.csproj">
-      <Project>{10AE9F9A-C23F-44D0-9E78-B4C125597ECE}</Project>
-      <Name>NVelocity-vs2005</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Castle.MonoRail.Framework.Views.NVelocity\Castle.MonoRail.Framework.Views.NVelocity-vs2005.csproj">
       <Name>Castle.MonoRail.Framework.Views.NVelocity-vs2005</Name>
       <Project>{ECCA4D19-65D7-4EED-B8EC-56AF79F41E69}</Project>
@@ -229,6 +226,7 @@
     <None Include="views\flash\flashIt.vm" />
     <None Include="views\flash\validateRequest.vm" />
     <None Include="views\formhelper\index.vm" />
+    <None Include="views\formhelper\numbersonly.vm" />
     <None Include="views\formhelper\useparamstofillinputs.vm" />
     <None Include="views\helper\DictHelperUsage.vm" />
     <None Include="views\home\display.vm" />
@@ -281,7 +279,9 @@
     <None Include="views\wizard\testwizardwitharea\page3.vm" />
     <None Include="views\wizard\testwizardwitharea\page4.vm" />
     <None Include="web.config" />
-    <EmbeddedResource Include="Controllers\ResourceFile.resx" />
+    <EmbeddedResource Include="Controllers\ResourceFile.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Content Include="views\ajax\autocom.vm" />
     <Content Include="views\ajax\index.vm" />
     <Content Include="views\filter\index.vm" />

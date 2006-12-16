@@ -4,6 +4,23 @@ Change history
 Release Candidate 3
 ===================
 
+- Added FormHelper.NumberField() which renders a 'input text' with a javascript that
+  prevents chars other than numbers (and period) from being entered.
+
+	You can optionally pass an <c>exceptions</c> value through the dictionary.
+	It must be a comma separated list of chars that can be accepted on the field. 
+
+- Added FormHelper scripts:
+
+  View must use FormHelper.InstallScripts()
+
+- Refactored generation of script blocks
+
+- Created stub for UrlForHelper
+
+- Helpers are added with a less verbose name 
+  FormHelper and Form, AjaxHelper and Ajax are made available to the view
+
 - Added AuthenticatedContent ViewComponent that allows context to be 
   render based on the user state (authenticated or anonymous)
 

@@ -30,6 +30,10 @@ namespace TestSiteNVelocity.Controllers
 		
 		public void UseParamsToFillInputs()
 		{
+		}
+
+		public void NumbersOnly()
+		{
 			
 		}
 	}

@@ -27,6 +27,8 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// </summary>
 	public abstract class AbstractHelper : IControllerAware
 	{
+		private const string MonoRailVersion = "RC3_0001";
+
 		#region Controller Reference
 
 		/// <summary>
@@ -82,6 +84,32 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		#region Helper methods
+
+		/// <summary>
+		/// Renders the a script block with a <c>src</c> attribute
+		/// pointing to the url. The url must not have an extension. 
+		/// <para>
+		/// For example, suppose you invoke it like:
+		/// <code>
+		/// RenderScriptBlockToSource("/my/url/to/my/scripts");
+		/// </code>
+		/// </para>
+		/// <para>
+		/// That will render
+		/// <code><![CDATA[
+		/// <script type="text/javascript" src="/my/url/to/my/scripts.rails?VERSIONID"></script>
+		/// ]]>
+		/// </code>
+		/// As you see the file extension will be inferred
+		/// </para>
+		/// </summary>
+		/// <param name="url">The url for the scripts (should start with a '/')</param>
+		/// <returns>An empty script block</returns>
+		protected string RenderScriptBlockToSource(string url)
+		{
+			return String.Format("<script type=\"text/javascript\" src=\"{0}.{1}?" + MonoRailVersion + "\"></script>",
+				Controller.Context.ApplicationPath + url, Controller.Context.UrlInfo.Extension);
+		}
 
 		/// <summary>
 		/// Generates HTML element attributes string from <paramref name="attributes"/>.
@@ -141,16 +169,14 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		/// <summary>
-		/// 
+		/// Concat two string in a query string format (<c>key=value&amp;key2=value2</c>) 
+		/// building a third string with the result
 		/// </summary>
-		/// <param name="leftParams"></param>
-		/// <param name="rightParams"></param>
-		/// <returns></returns>
+		/// <param name="leftParams">key values</param>
+		/// <param name="rightParams">key values</param>
+		/// <returns>The concatenation result</returns>
 		protected String ConcatQueryString(String leftParams, String rightParams)
 		{
-			// x=y    w=10
-			// x=y&w=10
-
 			if (leftParams == null || leftParams.Length == 0)
 			{
 				return rightParams;
@@ -214,16 +240,16 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <summary>
 		/// Generates script block.
 		/// <code>
-		/// &lt;script&gt;
+		/// &lt;script type=\"text/javascript\"&gt;
 		/// scriptContents
 		/// &lt;/script&gt;
 		/// </code>
 		/// </summary>
 		/// <param name="scriptContents">The script contents.</param>
 		/// <returns><paramref name="scriptContents"/> placed inside <b>script</b> tags.</returns>
-		protected String ScriptBlock( String scriptContents )
+		protected String ScriptBlock(String scriptContents)
 		{
-			return String.Format( "\r\n<script>\r\n{0}</script>\r\n", scriptContents );
+			return String.Format("\r\n<script type=\"text/javascript\">\r\n{0}</script>\r\n", scriptContents);
 		}
 
 		#endregion 
