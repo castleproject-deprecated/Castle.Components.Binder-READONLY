@@ -155,6 +155,7 @@
     <Compile Include="Filter.cs" />
     <Compile Include="Helpers\PrototypeHelper.cs" />
     <Compile Include="Helpers\UrlForHelper.cs" />
+    <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="ICachePolicyConfigurer.cs" />
     <Compile Include="Configuration\ControllersConfig.cs" />
     <Compile Include="Configuration\ExtensionEntry.cs" />

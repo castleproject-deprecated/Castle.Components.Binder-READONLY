@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 namespace Castle.MonoRail.Views.Brail.Tests
 {
-    using System.Threading;
-    using Castle.MonoRail.Framework.Tests;
+	using Castle.MonoRail.Framework.Tests;
 	using NUnit.Framework;
 
 	[TestFixture]
-	public class ResourceTestCase : AbstractTestCase
+	public class HappenedOnTheFieldFixture : AbstractTestCase
 	{
 		[Test]
-		public void GetResources()
+		public void UsingEmptyComponent()
 		{
-		    Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-            Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
-			string expected = "testValue";
-			DoGet("resourced/getresources.rails");
-			AssertReplyEqualTo(expected);
+			DoGet("happenedOnTheField/JustComponent.rails");
+			AssertSuccess();
 		}
 	}
 }

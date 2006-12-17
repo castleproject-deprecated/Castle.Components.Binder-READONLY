@@ -15,7 +15,7 @@
 namespace Castle.MonoRail.Framework.Helpers
 {
 	using System;
-	using System.Web;
+	using System.Globalization;
 	using System.Text;
 	using System.Collections;
 
@@ -35,7 +35,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// Store's <see cref="Controller"/> for the current view.
 		/// </summary>
 		private Controller controller;
-
+		
 		/// <summary>
 		/// Sets the controller.
 		/// </summary>
@@ -77,10 +77,10 @@ namespace Castle.MonoRail.Framework.Helpers
 				}
 			}
 		}
-
-		protected static HttpContext CurrentContext
+		
+		protected IRailsEngineContext CurrentContext
 		{
-			get { return HttpContext.Current; }
+			get { return this.controller.Context; }
 		}
 
 		#region Helper methods
@@ -147,22 +147,48 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		/// <summary>
-		/// 
+		/// Builds a query string.
 		/// </summary>
-		/// <param name="paramMap"></param>
-		/// <returns></returns>
-		protected String BuildQueryString(IDictionary paramMap)
+		/// <remarks>
+		/// Supports multi-value query strings, using any
+		/// <see cref="IEnumerable"/> as a value.
+		/// <example>
+		///	<code>
+		/// IDictionary dict = new Hashtable();
+		/// dict.Add("id", 5);
+		/// dict.Add("selectedItem", new int[] { 2, 4, 99 });
+		/// string queryString = BuildQueryString(dict);
+		/// // should result in: "id=5&amp;selectedItem=2&amp;selectedItem=4&amp;selectedItem=99&amp;"
+		/// </code>
+		/// </example>
+		/// </remarks>
+		/// <param name="parameters">The parameters</param>
+		protected String BuildQueryString(IDictionary parameters)
 		{
-			if (paramMap == null) return String.Empty;
+			if (parameters == null) return String.Empty;
 
+			Object[] singleValueEntry = new Object[1];
 			StringBuilder sb = new StringBuilder();
 
-			foreach(DictionaryEntry entry in paramMap)
+			foreach(DictionaryEntry entry in parameters)
 			{
 				if (entry.Value == null) continue;
 
-				sb.AppendFormat( "{0}={1}&amp;", 
-					UrlEncode(entry.Key.ToString()), UrlEncode(entry.Value.ToString()) );
+				IEnumerable values = singleValueEntry;
+				if (!(entry.Value is String) && (entry.Value is IEnumerable))
+					values = (IEnumerable) entry.Value;
+				else
+					singleValueEntry[0] = entry.Value;
+
+				foreach(object value in values)
+				{
+					string encoded = UrlEncode(Convert.ToString(value, CultureInfo.CurrentCulture));
+
+					sb.Append(entry.Key)
+						.Append('=')
+						.Append(encoded)
+						.Append("&amp;");
+				}
 			}
 
 			return sb.ToString();
@@ -186,7 +212,7 @@ namespace Castle.MonoRail.Framework.Helpers
 				return leftParams;
 			}
 
-			if (leftParams.EndsWith("&"))
+			if (leftParams.EndsWith("&") || leftParams.EndsWith("&amp;"))
 			{
 				leftParams = leftParams.Substring( 0, leftParams.Length - 1 );
 			}
@@ -199,7 +225,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </summary>
 		/// <param name="content">The text string to HTML encode.</param>
 		/// <returns>The HTML encoded text.</returns>
-		public String HtmlEncode(String content)
+		public virtual String HtmlEncode(String content)
 		{
 			return controller.Context.Server.HtmlEncode(content);
 		}
@@ -209,7 +235,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </summary>
 		/// <param name="content">The text to URL encode.</param>
 		/// <returns>The URL encoded text.</returns>
-		public String UrlEncode(String content)
+		public virtual String UrlEncode(String content)
 		{
 			return controller.Context.Server.UrlEncode(content);
 		}

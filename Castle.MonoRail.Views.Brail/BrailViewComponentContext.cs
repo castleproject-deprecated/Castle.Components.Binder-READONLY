@@ -14,93 +14,102 @@
 
 namespace Castle.MonoRail.Views.Brail
 {
-	using System;
-	using System.Collections;
-	using System.IO;
-	using Boo.Lang;
-	using Castle.MonoRail.Framework;
+    using System;
+    using System.Collections;
+    using System.IO;
+    using Boo.Lang;
+    using Castle.MonoRail.Framework;
 
-	public class BrailViewComponentContext : IViewComponentContext
-	{
-		private readonly TextWriter default_writer;
-		private IDictionary componentParameters;
-		private string viewToRender;
-		private ICallable body;
-		private string componentName;
-		private IDictionary contextVars = new Hashtable(
+    public class BrailViewComponentContext : IViewComponentContext
+    {
+        string componentName;
+        IDictionary contextVars = new Hashtable(
 #if DOTNET2
 StringComparer.InvariantCultureIgnoreCase
 #else
 				CaseInsensitiveHashCodeProvider.Default,
 				CaseInsensitiveComparer.Default
 #endif
-				);
+);
 
-		public BrailViewComponentContext(ICallable body, string name, TextWriter text, IDictionary parameters)
-		{
-			this.body = body;
-			this.componentName = name;
-			this.default_writer = text;
-			this.componentParameters = parameters;
-		}
+        IDictionary componentParameters;
+        IDictionary sections;
+        string viewToRender;
 
-		public string ComponentName
-		{
-			get { return componentName; }
-		}
+        ICallable body;
+        private readonly TextWriter default_writer;
 
-		public IDictionary ContextVars
-		{
-			get { return contextVars; }
-		}
+        public string ComponentName
+        {
+            get { return componentName; }
+        }
 
-		public IDictionary ComponentParameters
-		{
-			get { return componentParameters; }
-		}
+        public IDictionary ContextVars
+        {
+            get { return contextVars; }
+        }
 
-		public string ViewToRender
-		{
-			get { return viewToRender; }
-			set { viewToRender = value; }
-		}
+        public IDictionary ComponentParameters
+        {
+            get { return componentParameters; }
+        }
 
-		public ICallable Body
-		{
-			get { return body; }
-			set { body = value; }
-		}
+        public string ViewToRender
+        {
+            get { return viewToRender; }
+            set { viewToRender = value; }
+        }
 
-		public TextWriter Writer
-		{
-			get { return default_writer; }
-		}
+        public ICallable Body
+        {
+            get { return body; }
+            set { body = value; }
+        }
 
-		public void RenderBody()
-		{
-			RenderBody(default_writer);
-		}
-		
-		public void RenderBody(TextWriter writer)
-		{
-			if (body == null)
-				throw new RailsException("This component does not have a body content to be rendered");
-			body.Call(new object[] { writer });
-		}
+        public TextWriter Writer
+        {
+            get { return default_writer; }
+        }
 
-		public bool HasSection(string sectionName)
-		{
-			return false;
-		}
+        public BrailViewComponentContext(BrailBase parent, ICallable body, string name, TextWriter text, IDictionary parameters)
+        {
+            parent.ExtendDictionaryWithProperties(contextVars);
+            this.body = body;
+            this.componentName = name;
+            this.default_writer = text;
+            this.componentParameters = parameters;
+        }
 
-		public void RenderSection(string sectionName)
-		{
-			throw new NotImplementedException();
-		}
+        public void RenderBody()
+        {
+            RenderBody(default_writer);
+        }
 
-		public IViewEngine ViewEngine
-		{
-			get { throw new NotImplementedException(); }
-		}
-	}
+        public void RenderBody(TextWriter writer)
+        {
+            if (body == null)
+                throw new RailsException("This component does not have a body content to be rendered");
+            body.Call(new object[] { writer });
+        }
+
+        public bool HasSection(string sectionName)
+        {
+            return sections != null && sections.Contains(sectionName);
+        }
+
+        public void RenderSection(string sectionName)
+        {
+            if (HasSection(sectionName) == false)
+                return;//matching the NVelocity behavior, but maybe should throw?
+            ICallable callable = (ICallable)sections[sectionName];
+            callable.Call(new object[] { default_writer });
+        }
+
+        public void RegisterSection(string name, ICallable section)
+        {
+            if (sections == null)
+                sections = new Hashtable();
+            sections[name] = section;
+        }
+    }
 }

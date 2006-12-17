@@ -303,8 +303,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 					httpContext.Items["rails.layout.processed"] = true;
 				}
-
-				ProcessPage(controller, masterHandler, httpContext);
+					}
 
 				return true;
 			}
