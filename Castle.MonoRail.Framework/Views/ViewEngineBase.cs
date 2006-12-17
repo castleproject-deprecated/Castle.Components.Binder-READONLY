@@ -103,6 +103,8 @@ namespace Castle.MonoRail.Framework
 
 		public abstract void ProcessPartial(TextWriter output, IRailsEngineContext context, Controller controller, string partialName);
 
+		public abstract object CreateJSGenerator(IRailsEngineContext context);
+
 		public abstract void GenerateJS(IRailsEngineContext context, Controller controller, string templateName);
 
 		public abstract void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller, string templateName);

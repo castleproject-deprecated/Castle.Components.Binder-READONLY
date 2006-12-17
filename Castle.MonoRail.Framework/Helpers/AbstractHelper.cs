@@ -247,9 +247,9 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </summary>
 		/// <param name="scriptContents">The script contents.</param>
 		/// <returns><paramref name="scriptContents"/> placed inside <b>script</b> tags.</returns>
-		protected String ScriptBlock(String scriptContents)
+		protected internal static String ScriptBlock(String scriptContents)
 		{
-			return String.Format("\r\n<script type=\"text/javascript\">\r\n{0}</script>\r\n", scriptContents);
+			return "\r\n<script type=\"text/javascript\">\r\n" + scriptContents + "</script>\r\n";
 		}
 
 		#endregion 

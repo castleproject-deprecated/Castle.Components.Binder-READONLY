@@ -189,6 +189,11 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 		}
 
+		public override object CreateJSGenerator(IRailsEngineContext context)
+		{
+			return new JSGeneratorDuck(new PrototypeHelper.JSGenerator(context.Server));
+		}
+
 		public override void GenerateJS(IRailsEngineContext context, Controller controller, string templateName)
 		{
 			GenerateJS(context.Response.Output, context, controller, templateName);
@@ -199,8 +204,9 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		{
 			IContext ctx = CreateContext(context, controller);
 
-			PrototypeHelper.JSGenerator generator = new PrototypeHelper.JSGenerator();
-			ctx.Put("page", new JSGeneratorDuck(generator));
+			object generator = CreateJSGenerator(context);
+
+			ctx.Put("page", generator);
 
 			AdjustJavascriptContentType(context);
 
@@ -211,10 +217,15 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 				Template template = velocity.GetTemplate(view);
 
 				template.Merge(ctx, output);
+
+				output.WriteLine();
+				output.WriteLine();
+
+				output.WriteLine(generator);
 			}
-			catch(Exception)
+			catch(Exception ex)
 			{
-				throw new RailsException("Error generating JS. Template " + templateName);
+				throw new RailsException("Error generating JS. Template " + templateName, ex);
 			}
 		}
 

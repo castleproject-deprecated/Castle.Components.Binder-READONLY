@@ -137,6 +137,11 @@ namespace Castle.MonoRail.Views.Brail
 			throw new NotImplementedException();
 		}
 
+    	public override object CreateJSGenerator(IRailsEngineContext context)
+    	{
+    		throw new NotImplementedException();
+    	}
+
     	public override void GenerateJS(IRailsEngineContext context, Controller controller, string templateName)
     	{
     		throw new NotImplementedException();
@@ -185,8 +190,6 @@ namespace Castle.MonoRail.Views.Brail
 			if (loggerFactory == null)
 				logger = loggerFactory.Create(GetType().Name);
 		}
-
-		
 
 		// Check if a layout has been defined. If it was, then the layout would be created
 		// and will take over the output, otherwise, the context.Reposne.Output is used, 

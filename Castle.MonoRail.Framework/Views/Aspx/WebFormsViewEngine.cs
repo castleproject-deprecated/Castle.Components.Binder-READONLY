@@ -104,6 +104,11 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			throw new NotImplementedException();
 		}
 
+		public override object CreateJSGenerator(IRailsEngineContext context)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override void GenerateJS(IRailsEngineContext context, Controller controller, string templateName)
 		{
 			throw new NotImplementedException();

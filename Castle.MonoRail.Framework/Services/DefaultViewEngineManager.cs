@@ -103,6 +103,8 @@ namespace Castle.MonoRail.Framework.Services
 
 			IViewEngine engine = ResolveEngine(resolvedTemplateName);
 
+			ContextualizeViewEngine(engine);
+
 			if (jsgFastLookup.Contains(Path.GetExtension(resolvedTemplateName)))
 			{
 				engine.GenerateJS(context, controller, resolvedTemplateName);
@@ -120,6 +122,8 @@ namespace Castle.MonoRail.Framework.Services
 			AssertTemplateExists(resolvedTemplateName, templateName);
 
 			IViewEngine engine = ResolveEngine(resolvedTemplateName);
+
+			ContextualizeViewEngine(engine);
 
 			if (jsgFastLookup.Contains(Path.GetExtension(resolvedTemplateName)))
 			{
@@ -158,7 +162,7 @@ namespace Castle.MonoRail.Framework.Services
 
 			AssertTemplateExists(resolvedTemplateName, templateName);
 
-			IViewEngine engine = ResolveEngine(templateName);
+			IViewEngine engine = ResolveEngine(resolvedTemplateName);
 
 			engine.ProcessContents(context, controller, contents);
 		}
@@ -185,6 +189,11 @@ namespace Castle.MonoRail.Framework.Services
 
 				return null;
 			}
+		}
+
+		private void ContextualizeViewEngine(IViewEngine engine)
+		{
+			MonoRailHttpHandler.CurrentContext.AddService(typeof(IViewEngine), engine);
 		}
 
 		/// <summary>

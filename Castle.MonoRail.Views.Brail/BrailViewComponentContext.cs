@@ -22,8 +22,12 @@ namespace Castle.MonoRail.Views.Brail
 
 	public class BrailViewComponentContext : IViewComponentContext
 	{
-		string componentName;
-		IDictionary contextVars = 	new Hashtable(
+		private readonly TextWriter default_writer;
+		private IDictionary componentParameters;
+		private string viewToRender;
+		private ICallable body;
+		private string componentName;
+		private IDictionary contextVars = new Hashtable(
 #if DOTNET2
 StringComparer.InvariantCultureIgnoreCase
 #else
@@ -32,12 +36,13 @@ StringComparer.InvariantCultureIgnoreCase
 #endif
 				);
 
-		IDictionary componentParameters;
-
-		string viewToRender;
-
-		ICallable body;
-		private readonly TextWriter default_writer;
+		public BrailViewComponentContext(ICallable body, string name, TextWriter text, IDictionary parameters)
+		{
+			this.body = body;
+			this.componentName = name;
+			this.default_writer = text;
+			this.componentParameters = parameters;
+		}
 
 		public string ComponentName
 		{
@@ -71,14 +76,6 @@ StringComparer.InvariantCultureIgnoreCase
 			get { return default_writer; }
 		}
 
-		public BrailViewComponentContext(ICallable body, string name, TextWriter text, IDictionary parameters)
-		{
-			this.body = body;
-			this.componentName = name;
-			this.default_writer = text;
-			this.componentParameters = parameters;
-		}
-		
 		public void RenderBody()
 		{
 			RenderBody(default_writer);
@@ -99,6 +96,11 @@ StringComparer.InvariantCultureIgnoreCase
 		public void RenderSection(string sectionName)
 		{
 			throw new NotImplementedException();
+		}
+
+		public IViewEngine ViewEngine
+		{
+			get { throw new NotImplementedException(); }
 		}
 	}
 }

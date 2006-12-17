@@ -24,9 +24,15 @@ namespace Castle.MonoRail.Framework.Helpers
 	{
 		public class JSGenerator
 		{
-			private StringBuilder lines = new StringBuilder();
 			private static IDictionary GeneratorMethods;
+			private readonly IServerUtility serverUtility;
+			private StringBuilder lines = new StringBuilder();
 
+			#region Type Constructor
+
+			/// <summary>
+			/// Collects the public methods
+			/// </summary>
 			static JSGenerator()
 			{
 				GeneratorMethods = new HybridDictionary(true);
@@ -36,31 +42,65 @@ namespace Castle.MonoRail.Framework.Helpers
 
 				foreach(MethodInfo method in methods)
 				{
-					GeneratorMethods[method.Name] = String.Empty;
+					GeneratorMethods[method.Name] = method;
 				}
 			}
 
-			public void ReplaceHtml(String id, IDictionary renderOptions)
+			#endregion
+
+			#region Constructor
+
+			/// <summary>
+			/// Initializes a new instance of the <see cref="JSGenerator"/> class.
+			/// </summary>
+			/// <param name="serverUtility">The server utility instance.</param>
+			public JSGenerator(IServerUtility serverUtility)
 			{
-				Call("Element.update", id);
+				this.serverUtility = serverUtility;
+			}
+
+			#endregion
+
+			public void ReplaceHtml(String id, object renderOptions)
+			{
+				Call(this, "Element.update", Quote(id), Render(renderOptions));
 			}
 
 			public override string ToString()
 			{
-				return lines.ToString();
+				return @"try " +
+					"\r\n{\r\n" + lines + 
+					"}\r\n" + 
+					"catch(e)\r\n" + 
+					"{\r\n" + 
+					"alert('Generated javascript threw an error: ' + e.toString() + '\\r\\n\\r\\n" +
+					"Generated content: \\r\\n' + '" + JsEscape(lines.ToString()) + "');\r\n}";
 			}
 
-			private void Call(object function, params string[] args)
+			#region Static members
+
+			public static void Call(JSGenerator gen, object function, params object[] args)
 			{
-				Record(function + "(" + BuildJSArguments(args) + ")");
+				Record(gen, function + "(" + BuildJSArguments(args) + ")");
 			}
 
-			private void Record(string line)
+			public static void Record(JSGenerator gen, string line)
 			{
-				lines.AppendFormat("{0};\r\n", line);
+				gen.lines.AppendFormat("{0};\r\n", line);
 			}
 
-			private static string BuildJSArguments(string[] args)
+			/// <summary>
+			/// Writes the content specified to the generator instance
+			/// </summary>
+			/// <param name="generator">The generator.</param>
+			/// <param name="content">The content.</param>
+			/// <returns></returns>
+			public static void Write(JSGenerator generator, String content)
+			{
+				generator.lines.Append(content);
+			}
+
+			public static string BuildJSArguments(object[] args)
 			{
 				if (args == null || args.Length == 0) return String.Empty;
 
@@ -87,8 +127,68 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			public static void Dispatch(JSGenerator generator, string method, params object[] args)
 			{
-				// TODO: Dispatch implementation
+				MethodInfo methInfo = (MethodInfo) GeneratorMethods[method];
+
+				int expectedParameterCount = methInfo.GetParameters().Length;
+
+				if (args.Length < expectedParameterCount)
+				{
+					// Complete with nulls, assuming that parameters are optional
+
+					object[] newArgs = new object[expectedParameterCount];
+
+					Array.Copy(args, newArgs, args.Length);
+
+					args = newArgs;
+				}
+
+				methInfo.Invoke(generator, args);
 			}
+
+			public static void ReplaceTailByPeriod(JSGenerator generator)
+			{
+				int len = generator.lines.Length;
+
+				if (len > 3)
+				{
+					if (generator.lines[len-3] == ';')
+					{
+						generator.lines.Length = len - 3;
+					}
+					generator.lines.Append('.');
+				}
+			}
+
+			#endregion
+
+			#region Internal and private methods
+
+			internal object Render(object renderOptions)
+			{
+				if (renderOptions == null)
+				{
+					throw new ArgumentNullException("renderOptions",
+						"renderOptions cannot be null. Must be a string or a dictionary");
+				}
+				else
+				{
+					// TODO: add support for partial rendering
+				}
+
+				return Quote(JsEscape(renderOptions.ToString()));
+			}
+
+			private string JsEscape(string content)
+			{
+				return serverUtility.JavaScriptEscape(content);
+			}
+
+			private static string Quote(string content)
+			{
+				return "'" + content + "'";
+			}
+
+			#endregion
 		}
 	}
 }

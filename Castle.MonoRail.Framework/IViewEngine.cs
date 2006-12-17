@@ -56,6 +56,8 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		void Process(TextWriter output, IRailsEngineContext context, Controller controller, String templateName);
 
+		object CreateJSGenerator(IRailsEngineContext context);
+
 		void GenerateJS(IRailsEngineContext context, Controller controller, String templateName);
 		
 		void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller, String templateName);

@@ -41,7 +41,8 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 		/// <returns>value back to the template</returns>
 		public object GetInvoke(string propName)
 		{
-			return new JSElementGeneratorDuck(generator, propName);
+			// return new JSElementGeneratorDuck(generator, propName);
+			return null;
 		}
 
 		/// <summary>
@@ -62,25 +63,57 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 		/// <returns>value back to the template</returns>
 		public object Invoke(string method, params object[] args)
 		{
+			if (method == "el")
+			{
+				if (args == null || args.Length != 1)
+				{
+					throw new ArgumentException("el() method must be invoked with the element name as an argument");
+				}
+				if (args[0] == null)
+				{
+					throw new ArgumentNullException("el() method null invoked with a null argument");
+				}
+
+				return new JSElementGeneratorDuck(this, generator, args[0].ToString());
+			}
+
 			if (PrototypeHelper.JSGenerator.IsGeneratorMethod(method))
 			{
 				PrototypeHelper.JSGenerator.Dispatch(generator, method, args);
-			}
-			else
-			{
-				throw new RailsException("Invalid method invoked on JSGenerator: " + method);
 			}
 
 			return null;
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Delegates to the generator
+		/// </summary>
+		/// <returns>
+		/// A <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
+		/// </returns>
+		public override string ToString()
+		{
+			return generator.ToString();
+		}
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public class JSElementGeneratorDuck : IDuck
 	{
-		public JSElementGeneratorDuck(PrototypeHelper.JSGenerator generator, string root)
+		private readonly IDuck parent;
+		private readonly PrototypeHelper.JSGenerator generator;
+
+		public JSElementGeneratorDuck(IDuck parent, PrototypeHelper.JSGenerator generator, string root)
 		{
+			this.parent = parent;
+
+			this.generator = generator;
+
+			PrototypeHelper.JSGenerator.Write(generator, "$('" + root + "')");
 		}
 
 		#region IDuck
@@ -92,9 +125,10 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 		/// <returns>value back to the template</returns>
 		public object GetInvoke(string propName)
 		{
-			// Chain call ?
+			PrototypeHelper.JSGenerator.ReplaceTailByPeriod(generator);
+			PrototypeHelper.JSGenerator.Write(generator, propName);
 
-			return null;
+			return this;
 		}
 
 		/// <summary>
@@ -115,16 +149,27 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 		/// <returns>value back to the template</returns>
 		public object Invoke(string method, params object[] args)
 		{
-			if (method == "set") // $page.element
+			if (method == "set")
 			{
-				// assign
+				PrototypeHelper.JSGenerator.Write(generator, " = " + args[0]);
+
+				return null;
 			}
 			else
 			{
-				// chain?
-			}
+				PrototypeHelper.JSGenerator.ReplaceTailByPeriod(generator);
 
-			return null;
+				if (PrototypeHelper.JSGenerator.IsGeneratorMethod(method))
+				{
+					PrototypeHelper.JSGenerator.Dispatch(generator, method, args);
+				}
+				else
+				{
+					PrototypeHelper.JSGenerator.Call(generator, method, args);
+				}
+
+				return this;
+			}
 		}
 
 		#endregion
