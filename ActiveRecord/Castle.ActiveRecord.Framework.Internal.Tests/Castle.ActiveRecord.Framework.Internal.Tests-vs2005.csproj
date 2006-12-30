@@ -87,6 +87,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Iesi.Collections.dll</HintPath>
     </Reference>
+    <Reference Include="NHibernate, Version=1.2.0.2002, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\net-2.0\debug\NHibernate.dll</HintPath>
+    </Reference>
     <Reference Include="Nullables, Version=1.0.1.0, Culture=neutral, PublicKeyToken=154fdcb44c4484fc">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Nullables.dll</HintPath>
@@ -110,10 +114,6 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <ProjectReference Include="..\..\..\nhibernate\src\NHibernate\NHibernate-2.0.csproj">
-      <Project>{5909BFE7-93CF-4E5F-BE22-6293368AF01D}</Project>
-      <Name>NHibernate-2.0</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Castle.ActiveRecord.Tests\Castle.ActiveRecord.Tests-vs2005.csproj">
       <Name>Castle.ActiveRecord.Tests</Name>
       <Project>{DA3F2E47-AB8A-4CEC-9EDE-81DFC029E53F}</Project>

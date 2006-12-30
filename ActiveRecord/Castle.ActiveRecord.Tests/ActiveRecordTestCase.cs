@@ -19,14 +19,12 @@ namespace Castle.ActiveRecord.Tests
 	using Castle.ActiveRecord.Framework;
 	using Castle.ActiveRecord.Tests.Model;
 	using Castle.ActiveRecord.Tests.Model.CompositeModel;
-	using log4net;
 	using NHibernate.Expression;
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class ActiveRecordTestCase : AbstractActiveRecordTest
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(ActiveRecordTestCase));
-
 		[Test,
 		 ExpectedException(typeof(ActiveRecordInitializationException),
 		 	"You can't invoke ActiveRecordStarter.Initialize more than once")]
