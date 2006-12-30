@@ -17,10 +17,9 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System;
 	using System.Collections;
 	using System.Globalization;
+	using System.IO;
 	using System.Reflection;
 	using System.Text;
-
-	using Castle.ActiveRecord;
 
 	/// <summary>
 	/// Traverse the tree emitting proper xml configuration
@@ -55,26 +54,24 @@ namespace Castle.ActiveRecord.Framework.Internal
 		{
 			CreateXmlPI();
 			StartMappingNode(model.UseAutoImport);
-			Ident();
+			Indent();
 			VisitModel(model);
 			Dedent();
 			EndMappingNode();
 
-			if (ActiveRecordModel.isDebug) 
+			if (ActiveRecordModel.isDebug)
 			{
-				String file = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, model.Type.Name + ".hbm.xml");
+				String file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, model.Type.Name + ".hbm.xml");
 
-				System.IO.File.Delete(file);
+				File.Delete(file);
 
-				using(System.IO.FileStream fs = System.IO.File.OpenWrite(file))
+				using(FileStream fs = File.OpenWrite(file))
 				{
-					String xml = Xml;
-
-					byte[] ba = System.Text.ASCIIEncoding.Unicode.GetBytes(xml);
-
-					fs.Write(ba, 0, ba.Length);
-
-					fs.Flush();
+					using(TextWriter textWriter = new StreamWriter(fs, Encoding.Unicode))
+					{
+						String xml = Xml;
+						textWriter.Write(xml);
+					}
 				}
 			}
 		}
@@ -97,7 +94,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 				        MakeAtt("lazy", model.ActiveRecordAtt.Lazy, model.ActiveRecordAtt.LazySpecified),
 				        WriteIfTrue("dynamic-update", model.ActiveRecordAtt.DynamicUpdate),
 				        WriteIfTrue("dynamic-insert", model.ActiveRecordAtt.DynamicInsert));
-				Ident();
+				Indent();
 				VisitNode(model.Key);
 				VisitNodes(model.Fields);
 				VisitNodes(model.Properties);
@@ -121,7 +118,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 				        MakeAtt("lazy", model.ActiveRecordAtt.Lazy, model.ActiveRecordAtt.LazySpecified),
 				        WriteIfTrue("dynamic-update", model.ActiveRecordAtt.DynamicUpdate),
 				        WriteIfTrue("dynamic-insert", model.ActiveRecordAtt.DynamicInsert));
-				Ident();
+				Indent();
 				VisitNodes(model.Fields);
 				VisitNodes(model.Properties);
 				VisitNodes(model.BelongsTo);
@@ -137,7 +134,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 			else if (model.IsNestedType)
 			{
-				Ident();
+				Indent();
 				VisitNodes(model.Fields);
 				VisitNodes(model.Properties);
 				VisitNodes(model.BelongsTo);
@@ -160,13 +157,16 @@ namespace Castle.ActiveRecord.Framework.Internal
 				        WriteIfTrue("dynamic-update", model.ActiveRecordAtt.DynamicUpdate),
 				        WriteIfTrue("dynamic-insert", model.ActiveRecordAtt.DynamicInsert),
 				        WriteIfTrue("select-before-update", model.ActiveRecordAtt.SelectBeforeUpdate),
-				        ConditionalWrite("polymorphism", model.ActiveRecordAtt.Polymorphism.ToString().ToLower(), model.ActiveRecordAtt.Polymorphism != Polymorphism.Implicit),
+				        ConditionalWrite("polymorphism", model.ActiveRecordAtt.Polymorphism.ToString().ToLower(),
+				                         model.ActiveRecordAtt.Polymorphism != Polymorphism.Implicit),
 				        WriteIfNonNull("where", model.ActiveRecordAtt.Where),
 				        WriteIfNonNull("persister", MakeTypeName(model.ActiveRecordAtt.Persister)),
-				        ConditionalWrite("batch-size", model.ActiveRecordAtt.BatchSize.ToString(), model.ActiveRecordAtt.BatchSize > 1),
-				        ConditionalWrite("optimistic-lock", model.ActiveRecordAtt.Locking.ToString().ToLower(), model.ActiveRecordAtt.Locking != OptimisticLocking.Version),
+				        ConditionalWrite("batch-size", model.ActiveRecordAtt.BatchSize.ToString(),
+				                         model.ActiveRecordAtt.BatchSize > 1),
+				        ConditionalWrite("optimistic-lock", model.ActiveRecordAtt.Locking.ToString().ToLower(),
+				                         model.ActiveRecordAtt.Locking != OptimisticLocking.Version),
 				        MakeAtt("lazy", model.ActiveRecordAtt.Lazy, model.ActiveRecordAtt.LazySpecified));
-				Ident();
+				Indent();
 				WriteCache(model.ActiveRecordAtt.Cache);
 				VisitNode(model.PrimaryKey);
 				VisitNode(model.CompositeKey);
@@ -211,14 +211,14 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 
 			AppendF("<id{0}{1}{2}{3}{4}{5}>",
-				MakeAtt("name", model.Property.Name),
-				MakeAtt("access", model.PrimaryKeyAtt.AccessString),
-				MakeAtt("column", model.PrimaryKeyAtt.Column),
-				MakeTypeAtt(model.Property.PropertyType, model.PrimaryKeyAtt.ColumnType),
-				WriteIfNotZero("length", model.PrimaryKeyAtt.Length),
-				WriteIfNonNull("unsaved-value", unsavedVal));
+			        MakeAtt("name", model.Property.Name),
+			        MakeAtt("access", model.PrimaryKeyAtt.AccessString),
+			        MakeAtt("column", model.PrimaryKeyAtt.Column),
+			        MakeTypeAtt(model.Property.PropertyType, model.PrimaryKeyAtt.ColumnType),
+			        WriteIfNotZero("length", model.PrimaryKeyAtt.Length),
+			        WriteIfNonNull("unsaved-value", unsavedVal));
 
-			Ident();
+			Indent();
 
 			String className = null;
 
@@ -261,13 +261,13 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 			if (model.PrimaryKeyAtt.SequenceName != null)
 			{
-				Ident();
+				Indent();
 				AppendF("<param name=\"sequence\">{0}</param>", model.PrimaryKeyAtt.SequenceName);
 				Dedent();
 			}
 			if (model.PrimaryKeyAtt.Params != null)
 			{
-				Ident();
+				Indent();
 
 				String[] paras = model.PrimaryKeyAtt.Params.Split(',');
 
@@ -281,7 +281,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 				Dedent();
 			}
 			AppendF("</generator>");
-			
+
 
 			Dedent();
 			Append("</id>");
@@ -294,46 +294,63 @@ namespace Castle.ActiveRecord.Framework.Internal
 		public override void VisitCompositePrimaryKey(CompositeKeyModel model)
 		{
 			CompositeKeyAttribute att = model.CompositeKeyAtt;
-			
+
 			string unsavedVal = att.UnsavedValue;
-			
+
 			if (unsavedVal == null)
 			{
 				unsavedVal = "none";
 			}
 
 			AppendF("<composite-id{0}{1}{2}{3}>",
-				MakeAtt("name", model.Property.Name),
-				MakeClassAtt(model.Property.PropertyType),
-				WriteIfNonNull("unsaved-value", unsavedVal),
-				MakeAtt("access", att.AccessString));
+			        MakeAtt("name", model.Property.Name),
+			        MakeClassAtt(model.Property.PropertyType),
+			        WriteIfNonNull("unsaved-value", unsavedVal),
+			        MakeAtt("access", att.AccessString));
 
-			Ident();
+			Indent();
 
-			PropertyInfo[] keyProps = model.Property.PropertyType.GetProperties();
-			
-			foreach(PropertyInfo keyProp in keyProps)
+			PropertyInfo[] props = model.Property.PropertyType.GetProperties();
+
+			foreach(PropertyInfo prop in props)
 			{
-				KeyPropertyAttribute keyPropAttr = keyProp.GetCustomAttributes(
-					typeof(KeyPropertyAttribute), false)[0] as KeyPropertyAttribute;
-				
-				if (keyPropAttr.Column == null)
+				KeyPropertyAttribute[] keyPropAttribs =
+					prop.GetCustomAttributes(typeof(KeyPropertyAttribute), false) as KeyPropertyAttribute[];
+
+				if (keyPropAttribs != null && keyPropAttribs.Length > 0)
 				{
-					keyPropAttr.Column = keyProp.Name;
+					KeyPropertyAttribute keyPropAttr = keyPropAttribs[0];
+
+					if (keyPropAttr.Column == null)
+					{
+						keyPropAttr.Column = prop.Name;
+					}
+
+					AppendF("<key-property{0}{1}{2}{3}{4} />",
+					        MakeAtt("name", prop.Name),
+					        MakeAtt("access", keyPropAttr.AccessString),
+					        MakeAtt("column", keyPropAttr.Column),
+					        MakeTypeAtt(prop.PropertyType, keyPropAttr.ColumnType),
+					        WriteIfNotZero("length", keyPropAttr.Length));
 				}
 
-				AppendF("<key-property{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10} />",
-					MakeAtt("name", keyProp.Name),
-					MakeAtt("access", keyPropAttr.AccessString),
-					MakeAtt("column", keyPropAttr.Column),
-					MakeTypeAtt(keyProp.PropertyType, keyPropAttr.ColumnType),
-					WriteIfNotZero("length", keyPropAttr.Length),
-					WriteIfNonNull("unsaved-value", keyPropAttr.UnsavedValue),
-					WriteIfTrue("not-null", keyPropAttr.NotNull),
-					WriteIfTrue("unique", keyPropAttr.Unique),
-					WriteIfFalse("insert", keyPropAttr.Insert),
-					WriteIfFalse("update", keyPropAttr.Update),
-					WriteIfNonNull("formula", keyPropAttr.Formula));
+				BelongsToAttribute[] belongsToAttribs =
+					prop.GetCustomAttributes(typeof(BelongsToAttribute), false) as BelongsToAttribute[];
+
+				if (belongsToAttribs != null && belongsToAttribs.Length > 0)
+				{
+					BelongsToAttribute belongsToAttr = belongsToAttribs[0];
+					if (belongsToAttr.Column == null)
+					{
+						belongsToAttr.Column = prop.Name;
+					}
+
+					AppendF("<key-many-to-one{0}{1}{2}{3} />",
+					        MakeAtt("name", prop.Name),
+					        MakeAtt("access", belongsToAttr.AccessString),
+					        MakeAtt("column", belongsToAttr.Column),
+					        MakeAtt("class", MakeTypeName(model.BelongsToModel.BelongsToAtt.Type)));
+				}
 			}
 
 			Dedent();
@@ -358,11 +375,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 		public override void VisitProperty(PropertyModel model)
 		{
 			PropertyAttribute att = model.PropertyAtt;
-			
+
 			WriteProperty(model.Property.Name, model.Property.PropertyType, att.AccessString,
-				att.ColumnType, att.Insert, 
-				att.Update, att.Formula, att.Column, 
-				att.Length, att.NotNull, att.Unique, att.UniqueKey, att.SqlType, att.Index, att.Check);
+			              att.ColumnType, att.Insert,
+			              att.Update, att.Formula, att.Column,
+			              att.Length, att.NotNull, att.Unique, att.UniqueKey, att.SqlType, att.Index, att.Check);
 		}
 
 		/// <summary>
@@ -372,11 +389,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 		public override void VisitField(FieldModel model)
 		{
 			FieldAttribute att = model.FieldAtt;
-			
+
 			WriteProperty(model.Field.Name, model.Field.FieldType, att.AccessString,
-				att.ColumnType, att.Insert, 
-				att.Update, att.Formula, att.Column, 
-				att.Length, att.NotNull, att.Unique, att.UniqueKey, att.SqlType, att.Index, att.Check);
+			              att.ColumnType, att.Insert,
+			              att.Update, att.Formula, att.Column,
+			              att.Length, att.NotNull, att.Unique, att.UniqueKey, att.SqlType, att.Index, att.Check);
 		}
 
 		/// <summary>
@@ -396,8 +413,8 @@ namespace Castle.ActiveRecord.Framework.Internal
 			        WriteIfFalse("update", model.AnyAtt.Update),
 			        WriteIfNonNull("index", model.AnyAtt.Index),
 			        WriteIfNonNull("cascade", cascade),
-					WriteIfTrue("not-null",model.AnyAtt.NotNull));
-			Ident();
+			        WriteIfTrue("not-null", model.AnyAtt.NotNull));
+			Indent();
 			foreach(Any.MetaValueAttribute meta in model.MetaValues)
 			{
 				AppendF("<meta-value{0}{1} />",
@@ -414,7 +431,6 @@ namespace Castle.ActiveRecord.Framework.Internal
 				);
 			Dedent();
 			Append("</any>");
-
 		}
 
 		/// <summary>
@@ -428,7 +444,8 @@ namespace Castle.ActiveRecord.Framework.Internal
 			Type mapType = GuessType(att.MapType, model.Property.PropertyType);
 			WriteCollection(att.Cascade, mapType, att.RelationType, model.Property.Name,
 			                model.HasManyToAnyAtt.AccessString, att.Table, att.Schema, att.Lazy, att.Inverse, att.OrderBy,
-			                att.Where, att.Sort, att.ColumnKey,null, null, null, null, model.Configuration, att.Index, att.IndexType,
+			                att.Where, att.Sort, att.ColumnKey, null, null, null, null, model.Configuration, att.Index,
+			                att.IndexType,
 			                att.Cache, att.NotFoundBehaviour);
 		}
 
@@ -440,27 +457,27 @@ namespace Castle.ActiveRecord.Framework.Internal
 		{
 			HasManyToAnyAttribute att = model.Parent.HasManyToAnyAtt;
 			AppendF("<many-to-any{0}{1}>",
-					MakeCustomTypeAtt("id-type", att.IdType),
-					MakeCustomTypeAttIfNotNull("meta-type", att.MetaType));
-			Ident();
+			        MakeCustomTypeAtt("id-type", att.IdType),
+			        MakeCustomTypeAttIfNotNull("meta-type", att.MetaType));
+			Indent();
 
 			// This is here so the XmlGenerationVisitor will always
 			// output the meta-values in consistent order, to aid the tests,
 			// MetaValueAttribute implements IComparable
 			ArrayList sortedMetaValues = new ArrayList(model.Parent.MetaValues);
 			sortedMetaValues.Sort();
-			foreach (Any.MetaValueAttribute meta in sortedMetaValues)
+			foreach(Any.MetaValueAttribute meta in sortedMetaValues)
 			{
 				AppendF("<meta-value{0}{1} />",
-						MakeAtt("value", meta.Value),
-						MakeCustomTypeAtt("class", meta.Class)
+				        MakeAtt("value", meta.Value),
+				        MakeCustomTypeAtt("class", meta.Class)
 					);
 			}
-			
+
 			AppendF("<column{0} />",
-					MakeAtt("name", att.TypeColumn));
+			        MakeAtt("name", att.TypeColumn));
 			AppendF("<column{0} />",
-					MakeAtt("name", att.IdColumn));
+			        MakeAtt("name", att.IdColumn));
 			Dedent();
 			AppendF("</many-to-any>");
 		}
@@ -533,17 +550,17 @@ namespace Castle.ActiveRecord.Framework.Internal
 			if (model.BelongsToAtt.Column == null)
 			{
 				AppendF("<many-to-one{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}>",
-						MakeAtt("name", model.Property.Name),
-						MakeAtt("access", model.BelongsToAtt.AccessString),
-						MakeAtt("class", MakeTypeName(model.BelongsToAtt.Type)),
-						WriteIfFalse("insert", model.BelongsToAtt.Insert),
-						WriteIfFalse("update", model.BelongsToAtt.Update),
-						WriteIfTrue("not-null", model.BelongsToAtt.NotNull),
-						WriteIfTrue("unique", model.BelongsToAtt.Unique),
-						WriteIfNonNull("cascade", cascade),
-						WriteIfNonNull("outer-join", outerJoin),
-						WriteIfNonNull("not-found", notFoundMode));
-				Ident();
+				        MakeAtt("name", model.Property.Name),
+				        MakeAtt("access", model.BelongsToAtt.AccessString),
+				        MakeAtt("class", MakeTypeName(model.BelongsToAtt.Type)),
+				        WriteIfFalse("insert", model.BelongsToAtt.Insert),
+				        WriteIfFalse("update", model.BelongsToAtt.Update),
+				        WriteIfTrue("not-null", model.BelongsToAtt.NotNull),
+				        WriteIfTrue("unique", model.BelongsToAtt.Unique),
+				        WriteIfNonNull("cascade", cascade),
+				        WriteIfNonNull("outer-join", outerJoin),
+				        WriteIfNonNull("not-found", notFoundMode));
+				Indent();
 				WriteCompositeColumns(model.BelongsToAtt.CompositeKeyColumns);
 				Dedent();
 				Append("</many-to-one>");
@@ -551,17 +568,17 @@ namespace Castle.ActiveRecord.Framework.Internal
 			else
 			{
 				AppendF("<many-to-one{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10} />",
-						MakeAtt("name", model.Property.Name),
-						MakeAtt("access", model.BelongsToAtt.AccessString),
-						MakeAtt("class", MakeTypeName(model.BelongsToAtt.Type)),
-						MakeAtt("column", model.BelongsToAtt.Column),
-						WriteIfFalse("insert", model.BelongsToAtt.Insert),
-						WriteIfFalse("update", model.BelongsToAtt.Update),
-						WriteIfTrue("not-null", model.BelongsToAtt.NotNull),
-						WriteIfTrue("unique", model.BelongsToAtt.Unique),
-						WriteIfNonNull("cascade", cascade),
-						WriteIfNonNull("outer-join", outerJoin),
-						WriteIfNonNull("not-found", notFoundMode));
+				        MakeAtt("name", model.Property.Name),
+				        MakeAtt("access", model.BelongsToAtt.AccessString),
+				        MakeAtt("class", MakeTypeName(model.BelongsToAtt.Type)),
+				        MakeAtt("column", model.BelongsToAtt.Column),
+				        WriteIfFalse("insert", model.BelongsToAtt.Insert),
+				        WriteIfFalse("update", model.BelongsToAtt.Update),
+				        WriteIfTrue("not-null", model.BelongsToAtt.NotNull),
+				        WriteIfTrue("unique", model.BelongsToAtt.Unique),
+				        WriteIfNonNull("cascade", cascade),
+				        WriteIfNonNull("outer-join", outerJoin),
+				        WriteIfNonNull("not-found", notFoundMode));
 			}
 		}
 
@@ -576,8 +593,9 @@ namespace Castle.ActiveRecord.Framework.Internal
 			Type mapType = GuessType(att.MapType, model.Property.PropertyType);
 			WriteCollection(att.Cascade, mapType, att.RelationType, model.Property.Name,
 			                model.HasManyAtt.AccessString, att.Table, att.Schema, att.Lazy, att.Inverse, att.OrderBy,
-			                att.Where, att.Sort, att.ColumnKey, att.CompositeKeyColumnKeys, att.Element, null, null, null, att.Index, att.IndexType,
-							att.Cache, att.NotFoundBehaviour);
+			                att.Where, att.Sort, att.ColumnKey, att.CompositeKeyColumnKeys, att.Element, null, null, null,
+			                att.Index, att.IndexType,
+			                att.Cache, att.NotFoundBehaviour);
 		}
 
 		/// <summary>
@@ -592,7 +610,8 @@ namespace Castle.ActiveRecord.Framework.Internal
 			WriteCollection(att.Cascade, mapType, att.RelationType, model.Property.Name,
 			                att.AccessString, att.Table, att.Schema, att.Lazy, att.Inverse, att.OrderBy,
 			                att.Where, att.Sort, att.ColumnKey, att.CompositeKeyColumnKeys, null, att.ColumnRef,
-							att.CompositeKeyColumnRefs, model.CollectionID, att.Index, att.IndexType, att.Cache, att.NotFoundBehaviour);
+			                att.CompositeKeyColumnRefs, model.CollectionID, att.Index, att.IndexType, att.Cache,
+			                att.NotFoundBehaviour);
 		}
 
 		/// <summary>
@@ -605,7 +624,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			        MakeAtt("name", model.Property.Name),
 			        WriteIfFalse("update", model.NestedAtt.Update),
 			        WriteIfFalse("insert", model.NestedAtt.Insert),
-					WriteIfNonNull("class", MakeTypeName(model.NestedAtt.MapType)));
+			        WriteIfNonNull("class", MakeTypeName(model.NestedAtt.MapType)));
 
 			base.VisitNested(model);
 
@@ -621,10 +640,10 @@ namespace Castle.ActiveRecord.Framework.Internal
 			AppendF("<collection-id{0}{1}>",
 			        MakeAtt("type", model.CollectionIDAtt.ColumnType),
 			        MakeAtt("column", model.CollectionIDAtt.Column));
-			Ident();
+			Indent();
 			AppendF("<generator{0}>",
 			        MakeAtt("class", model.CollectionIDAtt.Generator.ToString().ToLower()));
-			Ident();
+			Indent();
 			base.VisitCollectionID(model);
 			Dedent();
 			Append("</generator>");
@@ -644,16 +663,17 @@ namespace Castle.ActiveRecord.Framework.Internal
 		}
 
 		private void WriteCollection(ManyRelationCascadeEnum cascadeEnum,
-																 Type targetType, RelationType type, string name,
-																 string accessString, string table, string schema, bool lazy,
-																 bool inverse, string orderBy, string where, string sort,
-																 string columnKey, string[] compositeKeyColumnKeys, string element,
-																 string columnRef, string[] compositeKeyColumnRefs,
-																 IVisitable extraModel, string index, string indexType, CacheEnum cache, NotFoundBehaviour notFoundBehaviour)
+		                             Type targetType, RelationType type, string name,
+		                             string accessString, string table, string schema, bool lazy,
+		                             bool inverse, string orderBy, string where, string sort,
+		                             string columnKey, string[] compositeKeyColumnKeys, string element,
+		                             string columnRef, string[] compositeKeyColumnRefs,
+		                             IVisitable extraModel, string index, string indexType, CacheEnum cache,
+		                             NotFoundBehaviour notFoundBehaviour)
 		{
 			String cascade = TranslateCascadeEnum(cascadeEnum);
 			String notFoundMode = TranslateNotFoundBehaviourEnum(notFoundBehaviour);
-			
+
 			String closingTag = null;
 
 			if (type == RelationType.Guess)
@@ -664,45 +684,45 @@ namespace Castle.ActiveRecord.Framework.Internal
 				closingTag = "</bag>";
 
 				AppendF("<bag{0}{1}{2}{3}{4}{5}{6}{7}{8}>",
-								MakeAtt("name", name),
-								MakeAtt("access", accessString),
-								WriteIfNonNull("table", table),
-								WriteIfNonNull("schema", schema),
-								MakeAtt("lazy", lazy),
-								WriteIfTrue("inverse", inverse),
-								WriteIfNonNull("cascade", cascade),
-								WriteIfNonNull("order-by", orderBy),
-								WriteIfNonNull("where", where));
+				        MakeAtt("name", name),
+				        MakeAtt("access", accessString),
+				        WriteIfNonNull("table", table),
+				        WriteIfNonNull("schema", schema),
+				        MakeAtt("lazy", lazy),
+				        WriteIfTrue("inverse", inverse),
+				        WriteIfNonNull("cascade", cascade),
+				        WriteIfNonNull("order-by", orderBy),
+				        WriteIfNonNull("where", where));
 			}
 			else if (type == RelationType.Set)
 			{
 				closingTag = "</set>";
 
 				AppendF("<set{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}>",
-								MakeAtt("name", name),
-								MakeAtt("access", accessString),
-								WriteIfNonNull("table", table),
-								WriteIfNonNull("schema", schema),
-								MakeAtt("lazy", lazy),
-								WriteIfTrue("inverse", inverse),
-								WriteIfNonNull("cascade", cascade),
-								WriteIfNonNull("order-by", orderBy),
-								WriteIfNonNull("where", where),
-								WriteIfNonNull("sort", sort));
+				        MakeAtt("name", name),
+				        MakeAtt("access", accessString),
+				        WriteIfNonNull("table", table),
+				        WriteIfNonNull("schema", schema),
+				        MakeAtt("lazy", lazy),
+				        WriteIfTrue("inverse", inverse),
+				        WriteIfNonNull("cascade", cascade),
+				        WriteIfNonNull("order-by", orderBy),
+				        WriteIfNonNull("where", where),
+				        WriteIfNonNull("sort", sort));
 			}
 			else if (type == RelationType.IdBag)
 			{
 				closingTag = "</idbag>";
 
 				AppendF("<idbag{0}{1}{2}{3}{4}{5}{6}{7}>",
-								MakeAtt("name", name),
-								MakeAtt("access", accessString),
-								WriteIfNonNull("table", table),
-								WriteIfNonNull("schema", schema),
-								MakeAtt("lazy", lazy),
-								WriteIfNonNull("cascade", cascade),
-								WriteIfNonNull("order-by", orderBy),
-								WriteIfNonNull("where", where));
+				        MakeAtt("name", name),
+				        MakeAtt("access", accessString),
+				        WriteIfNonNull("table", table),
+				        WriteIfNonNull("schema", schema),
+				        MakeAtt("lazy", lazy),
+				        WriteIfNonNull("cascade", cascade),
+				        WriteIfNonNull("order-by", orderBy),
+				        WriteIfNonNull("where", where));
 
 				VisitNode(extraModel);
 			}
@@ -711,39 +731,39 @@ namespace Castle.ActiveRecord.Framework.Internal
 				closingTag = "</map>";
 
 				AppendF("<map{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}>",
-								MakeAtt("name", name),
-								MakeAtt("access", accessString),
-								WriteIfNonNull("table", table),
-								WriteIfNonNull("schema", schema),
-								MakeAtt("lazy", lazy),
-								WriteIfTrue("inverse", inverse),
-								WriteIfNonNull("cascade", cascade),
-								WriteIfNonNull("order-by", orderBy),
-								WriteIfNonNull("where", where),
-								WriteIfNonNull("sort", sort));
+				        MakeAtt("name", name),
+				        MakeAtt("access", accessString),
+				        WriteIfNonNull("table", table),
+				        WriteIfNonNull("schema", schema),
+				        MakeAtt("lazy", lazy),
+				        WriteIfTrue("inverse", inverse),
+				        WriteIfNonNull("cascade", cascade),
+				        WriteIfNonNull("order-by", orderBy),
+				        WriteIfNonNull("where", where),
+				        WriteIfNonNull("sort", sort));
 			}
 			else if (type == RelationType.List)
 			{
 				closingTag = "</list>";
-				AppendF("<list{0}{1}{2}{3}{4}{5}{6}{7}>", 
-				        MakeAtt("name", name), 
-				        MakeAtt("access", accessString), 
-				        WriteIfNonNull("table", table), 
-				        WriteIfNonNull("schema", schema), 
-				        MakeAtt("lazy", lazy), 
-				        WriteIfTrue("inverse", inverse), 
-				        WriteIfNonNull("cascade", cascade), 
+				AppendF("<list{0}{1}{2}{3}{4}{5}{6}{7}>",
+				        MakeAtt("name", name),
+				        MakeAtt("access", accessString),
+				        WriteIfNonNull("table", table),
+				        WriteIfNonNull("schema", schema),
+				        MakeAtt("lazy", lazy),
+				        WriteIfTrue("inverse", inverse),
+				        WriteIfNonNull("cascade", cascade),
 				        WriteIfNonNull("where", where));
 			}
 
 
-			Ident();
+			Indent();
 
 			WriteJcsCache(cache);
 			if (columnKey == null)
 			{
 				Append("<key>");
-				Ident();
+				Indent();
 				WriteCompositeColumns(compositeKeyColumnKeys);
 				Dedent();
 				Append("</key>");
@@ -792,7 +812,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 		private static string TranslateNotFoundBehaviourEnum(NotFoundBehaviour notFoundBehaviourEnum)
 		{
-			switch (notFoundBehaviourEnum)
+			switch(notFoundBehaviourEnum)
 			{
 				case NotFoundBehaviour.Default:
 					return null;
@@ -804,7 +824,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 					return null;
 			}
 		}
-		
+
 		private static string TranslateCascadeEnum(CascadeEnum cascadeEnum)
 		{
 			String cascade = null;
@@ -873,7 +893,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 					return null;
 			}
 		}
-		
+
 		private static string TranslateOuterJoin(OuterJoinEnum ojEnum)
 		{
 			String outerJoin = null;
@@ -882,7 +902,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			{
 				outerJoin = ojEnum.ToString().ToLower();
 			}
-			
+
 			return outerJoin;
 		}
 
@@ -926,7 +946,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 		private String MakeCustomTypeAttIfNotNull(String attName, Type type)
 		{
 			if (type == null) return String.Empty;
-			
+
 			return MakeCustomTypeAtt(attName, type);
 		}
 
@@ -953,8 +973,8 @@ namespace Castle.ActiveRecord.Framework.Internal
 		private void WriteElement(string element, Type targetType)
 		{
 			AppendF("<element {0} {1}/>",
-					MakeAtt("column", element),
-					MakeAtt("type", MakeTypeName(targetType)));
+			        MakeAtt("column", element),
+			        MakeAtt("type", MakeTypeName(targetType)));
 		}
 
 		private void WriteOneToMany(Type type, String notFoundMode)
@@ -965,17 +985,17 @@ namespace Castle.ActiveRecord.Framework.Internal
 		private void WriteManyToMany(Type type, String columnRef, String notFoundMode)
 		{
 			AppendF("<many-to-many{0}{1}{2}/>",
-							MakeAtt("class", MakeTypeName(type)),
-							MakeAtt("column", columnRef), 
-							WriteIfNonNull("not-found", notFoundMode));
+			        MakeAtt("class", MakeTypeName(type)),
+			        MakeAtt("column", columnRef),
+			        WriteIfNonNull("not-found", notFoundMode));
 		}
 
 		private void WriteManyToMany(Type type, String[] compositeKeyColumnRefs, String notFoundMode)
 		{
 			AppendF("<many-to-many{0}{1}>",
-							MakeAtt("class", MakeTypeName(type)),
-							WriteIfNonNull("not-found", notFoundMode));
-			Ident();
+			        MakeAtt("class", MakeTypeName(type)),
+			        WriteIfNonNull("not-found", notFoundMode));
+			Indent();
 			WriteCompositeColumns(compositeKeyColumnRefs);
 			Dedent();
 			Append("</many-to-many>");
@@ -988,7 +1008,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 		private void WriteCompositeColumns(String[] columns)
 		{
-			foreach (string column in columns)
+			foreach(string column in columns)
 			{
 				AppendF("<column{0} />", MakeAtt("name", column));
 			}
@@ -1024,10 +1044,10 @@ namespace Castle.ActiveRecord.Framework.Internal
 				        WriteIfNonNull("type", model.ActiveRecordAtt.DiscriminatorType));
 			}
 		}
-		
-		private void WriteProperty(String name, Type propType, String accessString, String columnType, 
-		                           bool insert, bool update, String formula, 
-		                           String column, int length, bool notNull, bool unique, 
+
+		private void WriteProperty(String name, Type propType, String accessString, String columnType,
+		                           bool insert, bool update, String formula,
+		                           String column, int length, bool notNull, bool unique,
 		                           String uniqueKey, String sqlType, String index, String check)
 		{
 			AppendF("<property{0}{1}{2}{3}{4}{5}>",
@@ -1037,7 +1057,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			        WriteIfFalse("insert", insert),
 			        WriteIfFalse("update", update),
 			        WriteIfNonNull("formula", formula));
-			Ident();
+			Indent();
 			AppendF("<column{0}{1}{2}{3}{4}{5}{6}{7}/>",
 			        MakeAtt("name", column),
 			        WriteIfNotZero("length", length),
@@ -1061,9 +1081,9 @@ namespace Castle.ActiveRecord.Framework.Internal
 		private void StartMappingNode(bool useAutoImport)
 		{
 			AppendF("<hibernate-mapping {0}{1} xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
-				"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:nhibernate-mapping-2.2\">", 
+			        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:nhibernate-mapping-2.2\">",
 			        MakeAtt("auto-import", useAutoImport),
-				MakeAtt("default-lazy", ActiveRecordModel.isLazyByDefault));
+			        MakeAtt("default-lazy", ActiveRecordModel.isLazyByDefault));
 		}
 
 		private void EndMappingNode()
@@ -1081,7 +1101,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 		#endregion
 
 		#region String builder helpers
-		
+
 		private String ConditionalWrite(string attName, string value, bool condition)
 		{
 			if (condition)
@@ -1127,7 +1147,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 		private String MakeAtt(String attName, bool value, bool output)
 		{
-			if(!output)
+			if (!output)
 				return String.Empty;
 			return String.Format(" {0}=\"{1}\"", attName, value.ToString().ToLower());
 		}
@@ -1154,7 +1174,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 		}
 
-		private void Ident()
+		private void Indent()
 		{
 			identLevel++;
 		}

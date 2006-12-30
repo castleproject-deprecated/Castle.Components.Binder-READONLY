@@ -367,7 +367,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests
 			Assert.AreEqual(expected, xml);
 		}
 
-		[Test, Ignore("This is not implemented yet")]
+		[Test, Ignore("This is implemented, but not yet working.")]
 		public void CompositeClassWithBelongsTo()
 		{
 			ActiveRecordModelBuilder builder = new ActiveRecordModelBuilder();
@@ -379,16 +379,52 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests
 				"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n" +
 				"<hibernate-mapping  auto-import=\"true\" default-lazy=\"false\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:nhibernate-mapping-2.2\">\r\n" +
 				"  <class name=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.ClassWithCompositeKey3, Castle.ActiveRecord.Framework.Internal.Tests\" table=\"ClassWithCompositeKey3\" lazy=\"false\">\r\n" +
-				"    <composite-id name=\"Key\" class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.CompositeKey2, Castle.ActiveRecord.Framework.Internal.Tests\" unsaved-value=\"none\" access=\"property\">\r\n" +
-				"      <key-property name=\"Key1\" access=\"property\" column=\"Key1\" type=\"Int32\" />\r\n" +
-				"      <key-many-to-one name=\"Key2\" access=\"property\" column=\"Key2\" type=\"String\" />\r\n" +
+				"    <composite-id name=\"Key\" class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.CompositeKey3, Castle.ActiveRecord.Framework.Internal.Tests\" unsaved-value=\"none\" access=\"property\">\r\n" +
+				"      <key-many-to-one name=\"Product\" access=\"property\" column=\"Product\" class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.Product, Castle.ActiveRecord.Framework.Internal.Tests\" />\r\n" +
+				"      <key-property name=\"SomeOtherKey\" access=\"property\" column=\"SomeOtherKey\" type=\"Int32\" />\r\n" +
 				"    </composite-id>\r\n" +
 				"  </class>\r\n" +
 				"</hibernate-mapping>\r\n";
 
 			Assert.AreEqual(expected, xml);
 		}
-		
+
+		[Test, Ignore("This is implemented, but not yet working.")]
+		public void CompositeClassWithHasMany()
+		{
+			ActiveRecordModelBuilder builder = new ActiveRecordModelBuilder();
+			builder.Create(typeof(ClassWithCompositeKey3));
+			ActiveRecordModel model = builder.Create(typeof(Product));
+			Assert.IsNotNull(model);
+
+			String xml = Process(builder, model);
+			String expected =
+				"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n" +
+				"<hibernate-mapping  auto-import=\"true\" default-lazy=\"false\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:nhibernate-mapping-2.2\">\r\n" +
+				"  <class name=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.Product, Castle.ActiveRecord.Framework.Internal.Tests\" table=\"Product\" lazy=\"false\">\r\n" +
+				"    <id name=\"ID\" access=\"property\" column=\"ProductID\" type=\"Int32\" unsaved-value=\"0\">\r\n" +
+				"      <generator class=\"native\">\r\n" +
+				"      </generator>\r\n" +
+				"    </id>\r\n" +
+				"    <property name=\"Name\" access=\"property\" type=\"String\">\r\n" +
+				"      <column name=\"Name\"/>\r\n" +
+				"    </property>\r\n" +
+				"    <property name=\"SerialNumber\" access=\"property\" type=\"String\">\r\n" +
+				"      <column name=\"SerialNumber\"/>\r\n" +
+				"    </property>\r\n" +
+				"    <property name=\"Price\" access=\"property\" type=\"Single\">\r\n" +
+				"      <column name=\"Price\"/>\r\n" +
+				"    </property>\r\n" +
+				"    <bag name=\"ClassesWithCompositeKey3\" access=\"property\" table=\"ClassWithCompositeKey3\" lazy=\"false\">\r\n" +
+				"      <key column=\"Product\" />\r\n" +
+				"      <one-to-many class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.ClassWithCompositeKey3, Castle.ActiveRecord.Framework.Internal.Tests\" />\r\n" +
+				"    </bag>\r\n" +
+				"  </class>\r\n" +
+				"</hibernate-mapping>\r\n";
+
+			Assert.AreEqual(expected, xml);
+		}
+
 		[Test]
 		public void SimpleClassWithElementList()
 		{
@@ -875,7 +911,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests
 
 			Assert.AreEqual(expected, xml);
 		}
-
+		
 		[Test]
 		public void NotFoundBehaviourClass()
 		{

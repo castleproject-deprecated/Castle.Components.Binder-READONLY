@@ -15,6 +15,7 @@
 namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 {
 	using System;
+	using System.Collections;
 
 	#region CompositeKey2
 
@@ -160,6 +161,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 		private string product_name;
 		private float price;
 		private string serial_number;
+		private IList classesWithCompositeKey3 = new ArrayList();
 
 		[PrimaryKey(PrimaryKeyType.Native, "ProductID")]
 		public int ID
@@ -167,6 +169,13 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 			get { return this.id; }
 			set { this.id = value; }
 		}
+
+		[HasMany(typeof(ClassWithCompositeKey3), "Product", "ClassWithCompositeKey3")]
+		public IList ClassesWithCompositeKey3
+		{
+			get { return classesWithCompositeKey3; }
+		}
+
 
 		[Property]
 		public string Name

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.ActiveRecord.Tests.Model.CompositeModel
+namespace Castle.ActiveRecord.Tests.Model.CompositeWithClassModel
 {
 	using System;
 	using System.Collections;
@@ -127,6 +127,29 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 			Save();
 
 			throw new ApplicationException("Fake Exception");
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (null == obj)
+			{
+				return false;
+			}
+			if (ReferenceEquals(this, obj))
+			{
+				return true;
+			}
+			if (!(obj is Org))
+			{
+				return false;
+			}
+			Org rhs = (Org)obj;
+			return (this.Id == rhs.Id || (this.Id != null && this.Id.Equals(rhs.Id)));
+		}
+
+		public override int GetHashCode()
+		{
+			return (Id.GetHashCode());
 		}
 	}
 }

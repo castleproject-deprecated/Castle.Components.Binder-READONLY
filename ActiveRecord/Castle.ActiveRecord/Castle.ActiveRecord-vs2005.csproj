@@ -96,10 +96,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="NHibernate, Version=1.0.1.0, Culture=neutral, PublicKeyToken=154fdcb44c4484fc">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build\net-2.0\debug\NHibernate.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -407,6 +403,12 @@
       <Link>CastleKey.snk</Link>
     </None>
     <None Include="Diagrams\Queries.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\nhibernate\src\NHibernate\NHibernate-2.0.csproj">
+      <Project>{5909BFE7-93CF-4E5F-BE22-6293368AF01D}</Project>
+      <Name>NHibernate-2.0</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

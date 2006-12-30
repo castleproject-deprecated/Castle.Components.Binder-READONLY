@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.ActiveRecord.Tests.Model.CompositeModel
+namespace Castle.ActiveRecord.Tests.Model.CompositeWithClassModel
 {
 	using System;
 	using System.Collections;
@@ -192,6 +192,29 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 		internal static ISessionFactoryHolder Holder
 		{
 			get { return ActiveRecordMediator.GetSessionFactoryHolder(); }
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (null == obj)
+			{
+				return false;
+			}
+			if (ReferenceEquals(this, obj))
+			{
+				return true;
+			}
+			if (!(obj is Group))
+			{
+				return false;
+			}
+			Group rhs = (Group)obj;
+			return (this.Id == rhs.Id);
+		}
+
+		public override int GetHashCode()
+		{
+			return (Id.GetHashCode());
 		}
 	}
 }

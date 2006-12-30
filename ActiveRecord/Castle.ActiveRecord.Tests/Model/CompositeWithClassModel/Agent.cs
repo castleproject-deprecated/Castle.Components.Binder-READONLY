@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.ActiveRecord.Tests.Model.CompositeModel
+namespace Castle.ActiveRecord.Tests.Model.CompositeWithClassModel
 {
 	using System;
 	using System.Collections;
@@ -23,7 +23,6 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 	public class Agent : ActiveRecordBase
 	{
 		private AgentKey agentKey;
-		private Org org;
 		private IList groups;
 		private int version;
 
@@ -45,9 +44,9 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 			set { agentKey = value; }
 		}
 
-		public String OrgId
+		public string OrgId
 		{
-			get { return agentKey.OrgId; }
+			get { return agentKey.Org.Id; }
 		}
 
 		public String Name
@@ -60,13 +59,6 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 		{
 			get { return version; }
 			set { version = value; }
-		}
-
-		[BelongsTo("OrgId", Insert=false, Update=false)]
-		public Org Org
-		{
-			get { return org; }
-			set { org = value; }
 		}
 
 		[HasAndBelongsToMany(typeof(Group),
@@ -115,6 +107,29 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 			session.Flush();
 
 			return null;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (null == obj)
+			{
+				return false;
+			}
+			if (ReferenceEquals(this, obj))
+			{
+				return true;
+			}
+			if (!(obj is Agent))
+			{
+				return false;
+			}
+			Agent rhs = (Agent)obj;
+			return (this.Key == rhs.Key || (this.Key != null && this.Key.Equals(rhs.Key)));
+		}
+
+		public override int GetHashCode()
+		{
+			return (Key.GetHashCode());
 		}
 	}
 }

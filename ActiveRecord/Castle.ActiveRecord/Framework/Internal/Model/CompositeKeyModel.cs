@@ -25,6 +25,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly CompositeKeyAttribute pkAtt;
+		private BelongsToModel belongsToModel;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CompositeKeyModel"/> class.
@@ -56,6 +57,15 @@ namespace Castle.ActiveRecord.Framework.Internal
 		public CompositeKeyAttribute CompositeKeyAtt
 		{
 			get { return pkAtt; }
+		}
+
+		/// <summary>
+		/// Used to hold a reference to a BelongsTo property of the composite key.
+		/// </summary>
+		public BelongsToModel BelongsToModel
+		{
+			get { return belongsToModel; }
+			set { belongsToModel = value; }
 		}
 
 		#region IVisitable Members

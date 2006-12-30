@@ -15,18 +15,16 @@
 namespace Castle.ActiveRecord.Tests
 {
 	using System;
-
-	using NUnit.Framework;
-
+	using System.Configuration;
 	using Castle.ActiveRecord.Framework;
-
+	using NUnit.Framework;
 
 	public abstract class AbstractActiveRecordTest
 	{
 		protected IConfigurationSource GetConfigSource()
 		{
 #if DOTNET2
-            return System.Configuration.ConfigurationManager.GetSection("activerecord") as IConfigurationSource;
+			return ConfigurationManager.GetSection("activerecord") as IConfigurationSource;
 #else
 			return System.Configuration.ConfigurationSettings.GetConfig("activerecord") as IConfigurationSource;
 #endif
@@ -36,7 +34,7 @@ namespace Castle.ActiveRecord.Tests
 		{
 			ActiveRecordStarter.CreateSchema();
 		}
-		
+
 		[SetUp]
 		public void Init()
 		{
@@ -52,7 +50,6 @@ namespace Castle.ActiveRecord.Tests
 			}
 			catch(Exception)
 			{
-				
 			}
 		}
 	}

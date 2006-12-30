@@ -183,7 +183,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 							CompositeKeyAttribute cAtt = att[0] as CompositeKeyAttribute;
 
-							model.CompositeKey = new CompositeKeyModel(prop, cAtt);
+							model.CompositeKey = CreateCompositeKeyModel(prop, cAtt);
 						}
 						else
 						{
@@ -195,7 +195,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 						CompositeKeyAttribute propAtt = attribute as CompositeKeyAttribute;
 						isArProperty = true;
 
-						model.CompositeKey = new CompositeKeyModel(prop, propAtt);
+						model.CompositeKey = CreateCompositeKeyModel(prop, propAtt);
 					}
 					else if (attribute is AnyAttribute)
 					{
@@ -336,20 +336,39 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 		}
 
-		private void CollectMetaValues(IList metaStore,PropertyInfo prop)
+		private void CollectMetaValues(IList metaStore, PropertyInfo prop)
 		{
 			if (metaStore == null)
 				throw new ArgumentNullException("metaStore");
-			
-			Any.MetaValueAttribute[] metaValues = prop.GetCustomAttributes(typeof(Any.MetaValueAttribute), false) as Any.MetaValueAttribute[];
-			
+
+			Any.MetaValueAttribute[] metaValues =
+				prop.GetCustomAttributes(typeof(Any.MetaValueAttribute), false) as Any.MetaValueAttribute[];
+
 			if (metaValues == null || metaValues.Length == 0)
 				return;
-			
+
 			foreach(Any.MetaValueAttribute attribute in metaValues)
 			{
 				metaStore.Add(attribute);
 			}
+		}
+
+		private CompositeKeyModel CreateCompositeKeyModel(PropertyInfo propertyInfo, CompositeKeyAttribute compositeKeyAttr)
+		{
+			Type compositeKeyClassType = propertyInfo.PropertyType;
+			CompositeKeyModel compositeKeyModel = new CompositeKeyModel(propertyInfo, compositeKeyAttr);
+			PropertyInfo[] props = compositeKeyClassType.GetProperties();
+
+			foreach(PropertyInfo prop in props)
+			{
+				if (prop.IsDefined(typeof(BelongsToAttribute), false))
+				{
+					BelongsToAttribute belongsToAttr =
+						prop.GetCustomAttributes(typeof(BelongsToAttribute), false)[0] as BelongsToAttribute;
+					compositeKeyModel.BelongsToModel = new BelongsToModel(prop, belongsToAttr);
+				}
+			}
+			return compositeKeyModel;
 		}
 
 		private static bool ShouldCheckBase(Type type)

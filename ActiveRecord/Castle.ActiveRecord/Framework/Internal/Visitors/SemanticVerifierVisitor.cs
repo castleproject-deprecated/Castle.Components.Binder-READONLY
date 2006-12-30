@@ -194,8 +194,13 @@ namespace Castle.ActiveRecord.Framework.Internal
 		/// Visits the composite primary key.
 		/// </summary>
 		/// <remarks>
+		/// <para>
 		/// Validate that the composite key type is implementing GetHashCode() and Equals(), is mark serializable.
-		/// Validate that the compose key is compose of two or more columns
+		/// </para>
+		/// <para>
+		/// Validate that the compose key is composed of two or more columns, of which one or more should be
+		/// either a <see cref="KeyPropertyAttribute"/> or a <see cref="BelongsToAttribute"/>.
+		/// </para>
 		/// </remarks>
 		/// <param name="model">The model.</param>
 		public override void VisitCompositePrimaryKey(CompositeKeyModel model)
@@ -220,6 +225,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 
 			int keyPropAttrCount = 0;
+			int belongsToAttrCount = 0;
 
 			PropertyInfo[] compositeKeyProps = compositeKeyClassType.GetProperties();
 
@@ -229,12 +235,22 @@ namespace Castle.ActiveRecord.Framework.Internal
 				{
 					keyPropAttrCount++;
 				}
+				else if (keyProp.GetCustomAttributes(typeof(BelongsToAttribute), false).Length > 0)
+				{
+					belongsToAttrCount++;
+					VisitBelongsTo(model.BelongsToModel);
+				}
 			}
 
-			if (keyPropAttrCount < 2)
+			if (keyPropAttrCount < 2 && belongsToAttrCount < 1)
 			{
 				throw new ActiveRecordException(String.Format("To use type '{0}' as a composite " +
-					"id it must have two or more properties marked with the [KeyProperty] attribute.", model.Property.PropertyType.Name));
+					"id it must have two or more properties marked with the [KeyProperty] or the [BelongsTo] attribute.", model.Property.PropertyType.Name));
+			}
+			else if (keyPropAttrCount < 1 && belongsToAttrCount < 2)
+			{
+				throw new ActiveRecordException(String.Format("To use type '{0}' as a composite " +
+					"id it must have two or more properties marked with the [KeyProperty] or the [BelongsTo] attribute.", model.Property.PropertyType.Name));
 			}
 		}
 

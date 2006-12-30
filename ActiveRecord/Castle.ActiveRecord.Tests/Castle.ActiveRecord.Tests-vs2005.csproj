@@ -91,10 +91,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="NHibernate, Version=1.0.1.0, Culture=neutral, PublicKeyToken=154fdcb44c4484fc">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build\net-2.0\debug\NHibernate.dll</HintPath>
-    </Reference>
     <Reference Include="Nullables, Version=1.0.1.0, Culture=neutral, PublicKeyToken=154fdcb44c4484fc">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Nullables.dll</HintPath>
@@ -117,6 +113,10 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
+    <ProjectReference Include="..\..\..\nhibernate\src\NHibernate\NHibernate-2.0.csproj">
+      <Project>{5909BFE7-93CF-4E5F-BE22-6293368AF01D}</Project>
+      <Name>NHibernate-2.0</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Castle.ActiveRecord\Castle.ActiveRecord-vs2005.csproj">
       <Name>Castle.ActiveRecord</Name>
       <Project>{652F95D4-86E2-40B6-919D-CFC6E449386B}</Project>
@@ -302,6 +302,10 @@
     <Compile Include="AnyRelationTestCase.cs" />
     <Compile Include="LazyTestCase.cs" />
     <Compile Include="Model\AnyModel\Models.cs" />
+    <Compile Include="Model\CompositeWithClassModel\Agent.cs" />
+    <Compile Include="Model\CompositeWithClassModel\AgentKey.cs" />
+    <Compile Include="Model\CompositeWithClassModel\Group.cs" />
+    <Compile Include="Model\CompositeWithClassModel\Org.cs" />
     <Compile Include="Model\Octopus.cs" />
     <Compile Include="PluralizationTestCase.cs" />
   </ItemGroup>

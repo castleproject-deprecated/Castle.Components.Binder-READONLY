@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.ActiveRecord.Tests.Model.CompositeModel
+namespace Castle.ActiveRecord.Tests.Model.CompositeWithClassModel
 {
 	using System;
 
 	[Serializable]
 	public class AgentKey
 	{
-		private string orgId;
+		private Org org;
 		private string name;
 
 		public AgentKey()
 		{
 		}
 
-		public AgentKey(string orgId, string name)
+		public AgentKey(Org org, string name)
 		{
-			this.orgId = orgId;
+			this.org = org;
 			this.name = name;
 		}
 
-		[KeyProperty]
-		public virtual string OrgId
+		[BelongsTo("OrgId")]
+		public virtual Org Org
 		{
-			get { return orgId; }
-			set { orgId = value; }
+			get { return org; }
+			set { org = value; }
 		}
 
 		[KeyProperty]
@@ -48,7 +48,7 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 
 		public override string ToString()
 		{
-			return String.Join(":", new string[] {orgId, name});
+			return String.Join(":", new string[] {org.Id, name});
 		}
 
 		public override bool Equals(object obj)
@@ -66,13 +66,13 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 				return false;
 			}
 			AgentKey rhs = (AgentKey) obj;
-			return (OrgId == rhs.OrgId || (OrgId != null && OrgId.Equals(rhs.OrgId))) &&
+			return (Org.Id == rhs.Org.Id || (Org.Id != null && Org.Id.Equals(rhs.Org.Id))) &&
 			       (Name == rhs.Name || (Name != null && Name.Equals(rhs.Name)));
 		}
 
 		public override int GetHashCode()
 		{
-			return (OrgId.GetHashCode() ^ Name.GetHashCode());
+			return (Org.Id.GetHashCode() ^ Name.GetHashCode());
 		}
 	}
 }
