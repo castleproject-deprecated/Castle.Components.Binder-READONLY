@@ -37,13 +37,19 @@ namespace Castle.MonoRail.Framework
 
 		private DataBinder binder;
 		private TreeBuilder treeBuilder = new TreeBuilder();
-	
 		private CompositeNode paramsNode, formNode, queryStringNode;
 
-		public SmartDispatcherController() : this(new DataBinder())
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SmartDispatcherController"/> class.
+		/// </summary>
+		protected SmartDispatcherController() : this(new DataBinder())
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SmartDispatcherController"/> class.
+		/// </summary>
+		/// <param name="binder">The binder.</param>
 		protected SmartDispatcherController(DataBinder binder)
 		{
 			this.binder = binder;
@@ -58,10 +64,6 @@ namespace Castle.MonoRail.Framework
 		{
 			get { return boundInstances; }
 			set { boundInstances = value; }
-		}
-
-		protected override void Initialize()
-		{
 		}
 
 		protected internal override void InvokeMethod(MethodInfo method, IRequest request, IDictionary actionArgs)

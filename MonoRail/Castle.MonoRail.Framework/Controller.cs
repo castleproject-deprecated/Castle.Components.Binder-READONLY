@@ -24,6 +24,7 @@ namespace Castle.MonoRail.Framework
 	using System.Globalization;
 
 	using Castle.Components.Common.EmailSender;
+	using Castle.Components.Validator;
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Helpers;
@@ -102,7 +103,6 @@ namespace Castle.MonoRail.Framework
 		/// Reference to the <see cref="IResourceFactory"/> instance
 		/// </summary>
 		// internal IResourceFactory resourceFactory;
-
 		internal IDictionary _dynamicActions = new HybridDictionary(true);
 
 		// internal IScaffoldingSupport scaffoldSupport;
@@ -112,6 +112,8 @@ namespace Castle.MonoRail.Framework
 		internal ControllerMetaDescriptor metaDescriptor;
 
 		internal IServiceProvider serviceProvider;
+
+		internal Validator validatorEngine;
 
 		#endregion
 
@@ -352,6 +354,16 @@ namespace Castle.MonoRail.Framework
 		public IDictionary CustomActions
 		{
 			get { return _dynamicActions; }
+		}
+
+		/// <summary>
+		/// Gets the validator engine.
+		/// </summary>
+		/// <value>The validator engine.</value>
+		public Validator ValidatorEngine
+		{
+			get { return validatorEngine; }
+			set { validatorEngine = value; }
 		}
 
 		/// <summary>
@@ -1046,6 +1058,8 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected virtual void Initialize()
 		{
+			// TODO: PropertyBasedRegistry must come from the service container
+			validatorEngine = new Validator(new PropertyBasedRegistry());
 		}
 
 		/// <summary>

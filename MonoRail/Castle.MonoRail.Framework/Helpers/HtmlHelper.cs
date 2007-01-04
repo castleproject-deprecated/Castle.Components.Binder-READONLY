@@ -624,7 +624,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		/// <summary>
-		/// Creates an anchor (link) to the <paramref name="action"/> on the specified <paramref name="controller"/> that posts
+		/// Creates an anchor (link) to the <paramref name="action"/> 
+		/// on the specified <paramref name="controller"/> that posts
 		/// using a hidden form element.
 		/// </summary>
 		/// <param name="name">Name for the link.</param>
@@ -636,12 +637,14 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>HTML string with anchor that posts to the specified <paramref name="controller"/></returns>
 		public String LinkToWithPostAttributed(String name, String controller, String action, object id, String confirm, IDictionary attributes)
 		{
-			IDictionary formAttributes
-				= DictHelper.Create("style=display:inline;margin:0;");
+			IDictionary formAttributes = DictHelper.Create("style=display:inline;margin:0;");
 
-			string onclickAttribute = !String.IsNullOrEmpty(confirm)
-				? String.Format("if(confirm('{0}')){{this.parentNode.submit();}};return false;", confirm)
-				: "this.parentNode.submit();return false;";
+			string onclickAttribute = "this.parentNode.submit();return false;";
+
+			if (confirm != null && confirm != "")
+			{
+				onclickAttribute = "if(confirm('" + confirm + "')){{this.parentNode.submit();}};return false;";
+			}
 
 			if (attributes == null)
 			{

@@ -21,9 +21,12 @@ namespace Castle.MonoRail.Framework.Helpers
 	using System.IO;
 	using System.Reflection;
 	using System.Text;
-	using System.Web.UI;
-
+	using Castle.Core;
+	using Castle.Core.Logging;
+	using Castle.MonoRail.Framework.Helpers.ValidationStrategy;
+	using HtmlTextWriter = System.Web.UI.HtmlTextWriter;
 	using Castle.Components.Binder;
+	using Castle.Components.Validator;
 
 	public enum RequestContext
 	{
@@ -47,16 +50,51 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// <b>Mask support</b>. 
 	/// For most elements, you can use 
 	/// the entries <c>mask</c> and optionally <c>mask_separator</c> to define a 
-	/// mask for your inputs. Credits to mordechai Sandhaus - 52action.com
+	/// mask for your inputs. Kudos to mordechai Sandhaus - 52action.com
 	/// </para>
 	/// <para>
 	/// For example: mask='2,5',mask_separator='/' will mask the content to '12/34/1234'
 	/// </para>
 	/// </summary>
-	public class FormHelper : AbstractHelper
+	public class FormHelper : AbstractHelper, IServiceEnabledComponent
 	{
 		protected static readonly BindingFlags PropertyFlags = BindingFlags.GetProperty|BindingFlags.Public|BindingFlags.Instance|BindingFlags.IgnoreCase;
 		protected static readonly BindingFlags FieldFlags = BindingFlags.GetField|BindingFlags.Public|BindingFlags.Instance|BindingFlags.IgnoreCase;
+
+		private int formCount;
+		private Stack objectStack = new Stack();
+		private IWebValidatorProvider validatorProvider = new PrototypeWebValidator();
+		private WebValidationConfiguration validationConfig = new WebValidationConfiguration();
+
+		protected ILogger logger = NullLogger.Instance;
+		private string currentFormId;
+
+		#region IServiceEnabledComponent implementation
+
+		/// <summary>
+		/// Invoked by the framework in order to give a chance to
+		/// obtain other services
+		/// </summary>
+		/// <param name="provider">The service proviver</param>
+		public void Service(IServiceProvider provider)
+		{
+			ILoggerFactory loggerFactory = (ILoggerFactory) provider.GetService(typeof(ILoggerFactory));
+
+			if (loggerFactory != null)
+			{
+				logger = loggerFactory.Create(typeof(FormHelper));
+			}
+
+			IWebValidatorProvider validatorProv = (IWebValidatorProvider)
+				provider.GetService(typeof(IWebValidatorProvider));
+
+			if (validatorProv != null)
+			{
+				validatorProvider = validatorProv;
+			}
+		}
+
+		#endregion
 
 		/// <summary>
 		/// Renders a Javascript library inside a single script tag.
@@ -65,6 +103,71 @@ namespace Castle.MonoRail.Framework.Helpers
 		public String InstallScripts()
 		{
 			return RenderScriptBlockToSource("/MonoRail/Files/FormHelperScript");
+		}
+
+		/// <summary>
+		/// Creates a form tag based on the parameters.
+		/// Pendent: more documentation
+		/// </summary>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		public string FormTag(IDictionary parameters)
+		{
+			String action = ObtainEntryAndRemove(parameters, "action");
+			currentFormId = ObtainEntryAndRemove(parameters, "id", "form" + ++formCount);
+
+			validationConfig = validatorProvider.CreateConfiguration(parameters);
+
+			String afterFormTag = validationConfig.CreateAfterFormOpened(currentFormId);
+
+			String formContent = "<form action='" + action + 
+				"' method='post' id='" + currentFormId + "' " + GetAttributes(parameters) + ">";
+
+			return formContent + afterFormTag;
+		}
+
+		public string EndFormTag()
+		{
+			String beforeEndTag = validationConfig.CreateBeforeFormClosed(currentFormId);
+
+			return  beforeEndTag + "</form>";
+		}
+
+		public void Push(string target)
+		{
+			object value = ObtainValue(target);
+
+			if (value == null)
+			{
+				throw new ArgumentException("target could not be evaluated during Push operation. Target: " + target);
+			}
+
+			objectStack.Push(target);
+		}
+
+		public void Pop()
+		{
+			objectStack.Pop();
+		}
+
+		public string Submit(string value)
+		{
+			return Submit(value, null);
+		}
+
+		public string Submit(string value, IDictionary attributes)
+		{
+			return CreateInputElement("submit", value, attributes);
+		}
+
+		public string Button(string value)
+		{
+			return Submit(value, null);
+		}
+
+		public string Button(string value, IDictionary attributes)
+		{
+			return CreateInputElement("button", value, attributes);
 		}
 
 		#region TextFieldValue
@@ -122,7 +225,11 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String TextField(String target, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
+
+			ApplyValidation(InputElementType.Text, ObtainTargetProperty(RequestContext.All, target), ref attributes);
 
 			return CreateInputElement("text", target, value, attributes);
 		}
@@ -181,6 +288,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </remarks>
 		public String NumberField(String target, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 
 			attributes = attributes != null ? attributes : new Hashtable();
@@ -218,6 +327,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String TextArea(String target, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 
 			value = value == null ? "" : HtmlEncode(value.ToString());
@@ -250,6 +361,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String PasswordField(String target, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 
 			return CreateInputElement("password", target, value, attributes);
@@ -309,6 +422,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String PasswordNumberField(String target, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 
 			attributes = attributes != null ? attributes : new Hashtable();
@@ -352,6 +467,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		[Obsolete("Use the attribute 'textformat' instead")]
 		public String TextFieldFormat(String target, String formatString, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 
 			if (value != null)
@@ -391,6 +508,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String LabelFor(String target, String label, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			String id = CreateHtmlId(attributes, target);
 
 			StringBuilder sb = new StringBuilder();
@@ -421,6 +540,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String HiddenField(String target)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 
 			return CreateInputElement("hidden", target, value, null);
@@ -451,6 +572,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String HiddenField(String target, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 			
 			String id = CreateHtmlId(attributes, target);
@@ -516,6 +639,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public CheckboxList CreateCheckboxList(String target, IEnumerable dataSource, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 			
 			return new CheckboxList(this, target, value, dataSource, attributes);
@@ -674,6 +799,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String CheckboxField(String target, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 			
 			String trueValue = ObtainEntryAndRemove(attributes, "trueValue", "true");
@@ -741,6 +868,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String RadioField(String target, object valueToSend, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object value = ObtainValue(target);
 
 			bool isChecked = AreEqual(valueToSend, value);
@@ -820,6 +949,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		public String Select(String target, IEnumerable dataSource, IDictionary attributes)
 		{
+			target = RewriteTargetIfWithinObjectScope(target);
+
 			object selectedValue = ObtainValue(target);
 
 			return Select(target, selectedValue, dataSource, attributes);
@@ -925,7 +1056,56 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		#endregion
 
+		#region Validation
+
+		/// <summary>
+		/// Configures the use of fValidate for form fields validation
+		/// </summary>
+		public void UsefValidate()
+		{
+			validatorProvider = new FValidateWebValidator();
+		}
+
+		private void ApplyValidation(InputElementType inputType, PropertyInfo property, ref IDictionary attributes)
+		{
+			if (attributes == null)
+			{
+				attributes = new HybridDictionary(true);
+			}
+
+			if (Controller.ValidatorEngine == null)
+			{
+				return;
+			}
+
+			IValidator[] validators = Controller.ValidatorEngine.GetValidators(property.DeclaringType, property);
+
+			IWebValidationGenerator generator = validatorProvider.CreateGenerator(inputType, attributes);
+
+			foreach(IValidator validator in validators)
+			{
+				if (validator.SupportWebValidation)
+				{
+					validator.ApplyWebValidation(validationConfig, inputType, generator, attributes);
+				}
+			}
+		}
+
+		#endregion
+
 		#region protected members
+
+		protected string RewriteTargetIfWithinObjectScope(string target)
+		{
+			if (objectStack.Count == 0)
+			{
+				return target;
+			}
+			else
+			{
+				return objectStack.Peek() + "." + target;
+			}
+		}
 
 		/// <summary>
 		/// Creates the specified input element 
@@ -947,27 +1127,6 @@ namespace Castle.MonoRail.Framework.Helpers
 			string id = CreateHtmlId(attributes, target);
 
 			return CreateInputElement(type, id, target, FormatIfNecessary(value, attributes), attributes);
-		}
-
-		protected string FormatIfNecessary(object value, IDictionary attributes)
-		{
-			string formatString = ObtainEntryAndRemove(attributes, "textformat");
-
-			if (value != null && formatString != null)
-			{
-				IFormattable formattable = value as IFormattable;
-
-				if (formattable != null)
-				{
-					value = formattable.ToString(formatString, null);
-				}
-			}
-			else if (value == null)
-			{
-				value = String.Empty;
-			}
-
-			return value.ToString();
 		}
 
 		/// <summary>
@@ -1006,6 +1165,47 @@ namespace Castle.MonoRail.Framework.Helpers
 			                     type, id, target, value, GetAttributes(attributes));
 		}
 
+		protected String CreateInputElement(String type, String value, IDictionary attributes)
+		{
+			return String.Format("<input type=\"{0}\" value=\"{1}\" {2}/>",
+								 type, value, GetAttributes(attributes));
+		}
+
+		protected string FormatIfNecessary(object value, IDictionary attributes)
+		{
+			string formatString = ObtainEntryAndRemove(attributes, "textformat");
+
+			if (value != null && formatString != null)
+			{
+				IFormattable formattable = value as IFormattable;
+
+				if (formattable != null)
+				{
+					value = formattable.ToString(formatString, null);
+				}
+			}
+			else if (value == null)
+			{
+				value = String.Empty;
+			}
+
+			return value.ToString();
+		}
+
+		protected PropertyInfo ObtainTargetProperty(RequestContext context, String target)
+		{
+			string[] pieces;
+
+			object root = ObtainRootInstance(context, target, out pieces);
+
+			if (root != null && pieces.Length > 1)
+			{
+				return QueryPropertyInfoRecursive(root.GetType(), pieces, 1);
+			}
+
+			return null;
+		}
+
 		/// <summary>
 		/// Queries the context for the target value
 		/// </summary>
@@ -1024,7 +1224,55 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The generated form element</returns>
 		protected object ObtainValue(RequestContext context, String target)
 		{
-			String[] pieces = target.Split(new char[] {'.'});
+			string[] pieces;
+
+			object rootInstance = ObtainRootInstance(context, target, out pieces);
+
+			if (rootInstance != null && pieces.Length > 1)
+			{
+				return QueryPropertyRecursive(rootInstance, pieces, 1);
+			}
+
+			return rootInstance;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="context"></param>
+		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
+		/// <returns>The generated form element</returns>
+		protected object ObtainRootInstance(RequestContext context, String target)
+		{
+			object rootInstance = null;
+
+			if (context == RequestContext.All || context == RequestContext.PropertyBag)
+			{
+				rootInstance = Controller.PropertyBag[target];
+			}
+			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Flash))
+			{
+				rootInstance = Controller.Context.Flash[target];
+			}
+			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Session))
+			{
+				rootInstance = Controller.Context.Session[target];
+			}
+			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Params))
+			{
+				rootInstance = Controller.Params[target];
+			}
+			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Request))
+			{
+				rootInstance = Controller.Context.UnderlyingContext.Items[target];
+			}
+
+			return rootInstance;
+		}
+
+		protected object ObtainRootInstance(RequestContext context, string target, out string[] pieces)
+		{
+			pieces = target.Split(new char[] {'.'});
 
 			String root = pieces[0];
 
@@ -1032,7 +1280,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			bool isIndexed = CheckForExistenceAndExtractIndex(ref root, out index);
 
-			Object rootInstance = ObtainRootInstance(context, root);
+			object rootInstance = ObtainRootInstance(context, root);
 
 			if (rootInstance == null)
 			{
@@ -1053,7 +1301,57 @@ namespace Castle.MonoRail.Framework.Helpers
 				rootInstance = GetArrayElement(rootInstance, index);
 			}
 
-			return QueryPropertyRecursive(rootInstance, pieces, 1);
+			return rootInstance;
+		}
+
+		private PropertyInfo QueryPropertyInfoRecursive(Type type, string[] propertyPath, int piece)
+		{
+			String property = propertyPath[piece]; int index;
+
+			bool isIndexed = CheckForExistenceAndExtractIndex(ref property, out index);
+
+			PropertyInfo propertyInfo = type.GetProperty(property, PropertyFlags);
+
+			if (propertyInfo == null)
+			{
+				if (logger.IsErrorEnabled)
+				{
+					logger.Error("No public property '{0}' found on type '{1}'", property, type.FullName);
+				}
+
+				return null;
+			}
+
+			if (!propertyInfo.CanRead)
+			{
+				throw new BindingException("Property '{0}' for type '{1}' can not be read",
+					propertyInfo.Name, type.FullName);
+			}
+
+			if (propertyInfo.GetIndexParameters().Length != 0)
+			{
+				throw new BindingException("Property '{0}' for type '{1}' has indexes, which are not supported",
+					propertyInfo.Name, type.FullName);
+			}
+
+			type = propertyInfo.PropertyType;
+
+			if (type.IsGenericType)
+			{
+				return false;
+			}
+
+			if (isIndexed)
+			{
+				type = type.GetElementType();
+			}
+
+			if (piece + 1 == propertyPath.Length)
+			{
+				return propertyInfo;
+			}
+
+			return QueryPropertyInfoRecursive(type, propertyPath, piece + 1);
 		}
 
 		/// <summary>
@@ -1097,7 +1395,7 @@ namespace Castle.MonoRail.Framework.Helpers
 				
 				if (propertyInfo.GetIndexParameters().Length != 0)
 				{
-					throw new BindingException("Property '{0}' for type '{1}' has indexes, which is not supported", 
+					throw new BindingException("Property '{0}' for type '{1}' has indexes, which are not supported", 
 						propertyInfo.Name, instanceType.FullName);
 				}
 
@@ -1119,41 +1417,6 @@ namespace Castle.MonoRail.Framework.Helpers
 			return QueryPropertyRecursive(instance, propertyPath, piece + 1);
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
-		/// <returns>The generated form element</returns>
-		protected object ObtainRootInstance(RequestContext context, String target)
-		{
-			object rootInstance = null;
-
-			if (context == RequestContext.All || context == RequestContext.PropertyBag)
-			{
-				rootInstance = Controller.PropertyBag[target];
-			}
-			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Flash))
-			{
-				rootInstance = Controller.Context.Flash[target];
-			}
-			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Session))
-			{
-				rootInstance = Controller.Context.Session[target];
-			}
-			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Params))
-			{
-				rootInstance = Controller.Params[target];
-			}
-			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Request))
-			{
-				rootInstance = Controller.Context.UnderlyingContext.Items[target];
-			}
-
-			return rootInstance;
-		}
-
-		
 		/// <summary>
 		/// Creates the HTML id.
 		/// </summary>
@@ -1207,6 +1470,20 @@ namespace Castle.MonoRail.Framework.Helpers
 			}
 			
 			return null;
+		}
+
+		/// <summary>
+		/// Obtains the entry.
+		/// </summary>
+		/// <param name="attributes">The attributes.</param>
+		/// <param name="key">The key.</param>
+		/// <param name="defaultValue">The default value.</param>
+		/// <returns>the entry value or the default value</returns>
+		protected internal static String ObtainEntry(IDictionary attributes, String key, String defaultValue)
+		{
+			String value = ObtainEntry(attributes, key);
+
+			return value != null ? value : defaultValue;
 		}
 
 		/// <summary>

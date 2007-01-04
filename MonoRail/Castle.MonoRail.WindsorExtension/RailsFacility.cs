@@ -63,6 +63,7 @@ namespace Castle.MonoRail.WindsorExtension
 
 			// Ensure it's transient
 			model.LifestyleType = LifestyleType.Transient;
+			model.InspectionBehavior = PropertiesInspectionBehavior.DeclaredOnly;
 
 			if (isController)
 			{
