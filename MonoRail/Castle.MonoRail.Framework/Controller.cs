@@ -113,7 +113,7 @@ namespace Castle.MonoRail.Framework
 
 		internal IServiceProvider serviceProvider;
 
-		internal Validator validatorEngine;
+		internal ValidatorRunner validator;
 
 		#endregion
 
@@ -357,13 +357,13 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
-		/// Gets the validator engine.
+		/// Gets the validator runner instance.
 		/// </summary>
-		/// <value>The validator engine.</value>
-		public Validator ValidatorEngine
+		/// <value>The validator instance.</value>
+		public ValidatorRunner Validator
 		{
-			get { return validatorEngine; }
-			set { validatorEngine = value; }
+			get { return validator; }
+			set { validator = value; }
 		}
 
 		/// <summary>
@@ -1059,7 +1059,7 @@ namespace Castle.MonoRail.Framework
 		protected virtual void Initialize()
 		{
 			// TODO: PropertyBasedRegistry must come from the service container
-			validatorEngine = new Validator(new PropertyBasedRegistry());
+			validator = new ValidatorRunner(true, new PropertyBasedRegistry());
 		}
 
 		/// <summary>

@@ -23,9 +23,14 @@ namespace ValidationTestSite.Controllers
 			PropertyBag["client"] = new Client();
 		}
 
-		public void Save([DataBind("client")] Client client)
+		public void Save([DataBind("client", Validate=true)] Client client)
 		{
-			PropertyBag["isvalid"] = ValidatorEngine.IsValid(client);
+			PropertyBag["isvalid"] = Validator.IsValid(client);
+		}
+
+		public void Supplier()
+		{
+			PropertyBag["supplier"] = new Supplier();
 		}
 	}
 }

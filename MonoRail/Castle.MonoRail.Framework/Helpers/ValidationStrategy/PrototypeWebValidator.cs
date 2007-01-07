@@ -14,6 +14,7 @@
 
 namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 {
+	using System;
 	using System.Collections;
 	using Castle.Components.Validator;
 
@@ -118,8 +119,19 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 				}
 				else
 				{
-
 				}
+			}
+
+			public void SetDigitsOnly(string violationMessage)
+			{
+				AddClass("validate-digits");
+				AddTitle(violationMessage);
+			}
+
+			public void SetNumberOnly(string violationMessage)
+			{
+				AddClass("validate-number");
+				AddTitle(violationMessage);
 			}
 
 			public void SetEmail(string violationMessage)

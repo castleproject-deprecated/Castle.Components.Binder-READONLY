@@ -40,7 +40,7 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 			return new FValidateGenerator(inputType, attributes);
 		}
 
-		#region Configuration 
+		#region Configuration
 
 		public class FValidateConfiguration : WebValidationConfiguration
 		{
@@ -84,7 +84,7 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 
 		#endregion 
 
-		#region Configuration
+		#region Generator
 
 		public class FValidateGenerator : IWebValidationGenerator
 		{
@@ -117,6 +117,16 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 			{
 				AddValidator("email|1");
 				AddErrorMessage(violationMessage);
+			}
+
+			public void SetDigitsOnly(string violationMessage)
+			{
+				// TODO
+			}
+
+			public void SetNumberOnly(string violationMessage)
+			{
+				// TODO
 			}
 
 			public void SetExactLength(int length)

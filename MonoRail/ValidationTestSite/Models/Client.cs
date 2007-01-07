@@ -13,14 +13,14 @@ namespace ValidationTestSite.Models
 			set { id = value; }
 		}
 
-		[ValidateNotEmpty]
+		[ValidateNonEmpty]
 		public string Name
 		{
 			get { return name; }
 			set { name = value; }
 		}
 
-		[ValidateNotEmpty, ValidateEmail]
+		[ValidateNonEmpty, ValidateEmail]
 		public string Email
 		{
 			get { return email; }

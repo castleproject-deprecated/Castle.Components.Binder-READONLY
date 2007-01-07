@@ -1,16 +1,11 @@
 
 $Form.FormTag("%{action='save.rails', immediate='true', usetitles='true'}")
 
-$Form.Push("client")
+$Form.Push("supplier")
 
 <p>
 	$Form.LabelFor("id", "Id:")
 	$Form.TextField("id")
-</p>
-
-<p>
-	$Form.LabelFor("name", "Name:")
-	$Form.TextField("name")
 </p>
 
 <p>

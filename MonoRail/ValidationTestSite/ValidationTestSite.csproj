@@ -56,9 +56,12 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="GlobalApplication.cs" />
     <Compile Include="Models\Client.cs" />
+    <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\Supplier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Views\Home\supplier.vm" />
     <None Include="Views\Home\index2.vm" />
     <None Include="Views\Home\save.vm" />
     <None Include="Views\Home\index.vm" />

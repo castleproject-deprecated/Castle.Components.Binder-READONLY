@@ -40,6 +40,7 @@ namespace Castle.MonoRail.Framework
 		private String exclude = String.Empty;
 		private String allow = String.Empty;
 		private String prefix;
+		private bool validate;
 
 		/// <summary>
 		/// Creates a <see cref="DataBindAttribute"/>
@@ -75,7 +76,18 @@ namespace Castle.MonoRail.Framework
 			get { return allow; }
 			set { allow = value; }
 		}
-		
+
+		/// <summary>
+		/// Gets or sets a value indicating whether 
+		/// the target should be validate during binding.
+		/// </summary>
+		/// <value><c>true</c> if should be validated; otherwise, <c>false</c>.</value>
+		public bool Validate
+		{
+			get { return validate; }
+			set { validate = value; }
+		}
+
 		/// <summary>
 		/// Gets or sets <see cref="ParamStore"/> used to 
 		/// indicate where to get the values from
@@ -129,6 +141,15 @@ namespace Castle.MonoRail.Framework
 		public virtual object Bind(SmartDispatcherController controller, ParameterInfo parameterInfo)
 		{
 			DataBinder binder = controller.Binder;
+
+			if (validate)
+			{
+				binder.Validator = controller.Validator;
+			}
+			else
+			{
+				binder.Validator = null;
+			}
 
 			CompositeNode node = controller.ObtainParamsNode(From);
 
