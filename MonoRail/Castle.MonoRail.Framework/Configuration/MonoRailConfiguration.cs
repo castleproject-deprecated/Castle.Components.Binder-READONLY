@@ -220,6 +220,5 @@ namespace Castle.MonoRail.Framework.Configuration
 			customFilterFactory = TypeLoadUtil.GetType(
 				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorFilterFactory, " + windsorAssembly));
 		}
-		
 	}
 }

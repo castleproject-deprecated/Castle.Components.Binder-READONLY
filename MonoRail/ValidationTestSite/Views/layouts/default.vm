@@ -9,8 +9,6 @@
 	$Scriptaculous.InstallScripts()
 	$Validation.InstallScripts()
 	
-	<script src="$siteRoot/Content/validation.js"></script>
-	
 </head>
 
 <body>

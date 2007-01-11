@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 	using System;
 	using System.Collections;
 	using Castle.Components.Validator;
+	using Castle.MonoRail.Framework.Internal;
 
 	public class PrototypeWebValidator : IWebValidatorProvider
 	{
@@ -62,13 +63,13 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 
 			public override void Configure(IDictionary parameters)
 			{
-				string onSubmit = FormHelper.ObtainEntryAndRemove(parameters, "onsubmit", "true");
-				string stopOnFirst = FormHelper.ObtainEntryAndRemove(parameters, "stopOnFirst", "false");
-				string immediate = FormHelper.ObtainEntryAndRemove(parameters, "immediate", "false");
-				string focusOnError = FormHelper.ObtainEntryAndRemove(parameters, "focusOnError", "true");
-				string useTitles = FormHelper.ObtainEntryAndRemove(parameters, "useTitles", "false");
-				string onFormValidate = FormHelper.ObtainEntryAndRemove(parameters, "onFormValidate");
-				string onElementValidate = FormHelper.ObtainEntryAndRemove(parameters, "onElementValidate");
+				string onSubmit = CommonUtils.ObtainEntryAndRemove(parameters, "onsubmit", "true");
+				string stopOnFirst = CommonUtils.ObtainEntryAndRemove(parameters, "stopOnFirst", "false");
+				string immediate = CommonUtils.ObtainEntryAndRemove(parameters, "immediate", "false");
+				string focusOnError = CommonUtils.ObtainEntryAndRemove(parameters, "focusOnError", "true");
+				string useTitles = CommonUtils.ObtainEntryAndRemove(parameters, "useTitles", "false");
+				string onFormValidate = CommonUtils.ObtainEntryAndRemove(parameters, "onFormValidate");
+				string onElementValidate = CommonUtils.ObtainEntryAndRemove(parameters, "onElementValidate");
 
 				jsOptions["onSubmit"] = onSubmit;
 				jsOptions["stopOnFirst"] = stopOnFirst;

@@ -68,8 +68,8 @@ namespace Castle.MonoRail.WindsorExtension
 			if (isController)
 			{
 				ControllerDescriptor descriptor = ControllerInspectionUtil.Inspect(model.Implementation);
-			
-				tree.AddController( descriptor.Area, descriptor.Name, model.Name );
+
+				tree.AddController(descriptor.Area, descriptor.Name, model.Implementation);
 			}
 		}
 	}

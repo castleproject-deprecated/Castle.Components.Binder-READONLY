@@ -12,26 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.Tests
+namespace Castle.MonoRail.Framework.Tests.Controllers.Clients
 {
-	using System;
-	using NUnit.Framework;
-
-	[TestFixture]
-	public class ControllerLifecycleExecutorTestCase
+	[ControllerDetails("Home", Area="clients")]
+	public class ClientHomeController : Controller
 	{
-		//private ControllerLifecycleExecutor executor;
-		
-		[SetUp]
-		public void Init()
-		{
-			// executor = new ControllerLifecycleExecutor();
-		}
-		
-		[Test]
-		public void ControllerCreation()
-		{
-			
-		}
 	}
 }

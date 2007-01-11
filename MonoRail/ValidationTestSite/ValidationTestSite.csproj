@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\style.css" />
-    <Content Include="Content\validation.js" />
     <Content Include="Default.aspx" />
     <Content Include="global.asax" />
     <Content Include="Readme.txt" />

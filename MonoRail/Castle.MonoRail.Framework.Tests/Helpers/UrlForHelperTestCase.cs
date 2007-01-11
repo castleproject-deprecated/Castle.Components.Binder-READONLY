@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.Helpers
+namespace Castle.MonoRail.Framework.Tests.Helpers
 {
+	using NUnit.Framework;
 
-	public class UrlForHelper : AbstractHelper
+	[TestFixture]
+	public class UrlForHelperTestCase
 	{
+		// public void 
 	}
 }

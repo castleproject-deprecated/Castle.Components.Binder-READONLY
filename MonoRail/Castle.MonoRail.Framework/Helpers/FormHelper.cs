@@ -24,6 +24,7 @@ namespace Castle.MonoRail.Framework.Helpers
 	using Castle.Core;
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Helpers.ValidationStrategy;
+	using Castle.MonoRail.Framework.Internal;
 	using HtmlTextWriter = System.Web.UI.HtmlTextWriter;
 	using Castle.Components.Binder;
 	using Castle.Components.Validator;
@@ -113,8 +114,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns></returns>
 		public string FormTag(IDictionary parameters)
 		{
-			string action = ObtainEntryAndRemove(parameters, "action");
-			currentFormId = ObtainEntryAndRemove(parameters, "id", "form" + ++formCount);
+			string action = CommonUtils.ObtainEntryAndRemove(parameters, "action");
+			currentFormId = CommonUtils.ObtainEntryAndRemove(parameters, "id", "form" + ++formCount);
 
 			validationConfig = validatorProvider.CreateConfiguration(parameters);
 
@@ -140,7 +141,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		public void Push(string target, IDictionary parameters)
 		{
-			string disableValidation = ObtainEntryAndRemove(parameters, "disablevalidation", "false");
+			string disableValidation = CommonUtils.ObtainEntryAndRemove(parameters, "disablevalidation", "false");
 			object value = ObtainValue(target);
 
 			if (value == null)
@@ -816,8 +817,8 @@ namespace Castle.MonoRail.Framework.Helpers
 			target = RewriteTargetIfWithinObjectScope(target);
 
 			object value = ObtainValue(target);
-			
-			string trueValue = ObtainEntryAndRemove(attributes, "trueValue", "true");
+
+			string trueValue = CommonUtils.ObtainEntryAndRemove(attributes, "trueValue", "true");
 			
 			bool isChecked;
 
@@ -843,7 +844,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			string id = CreateHtmlId(attributes, target);
 			string hiddenElementId = id + "H";
-			string hiddenElementValue = ObtainEntryAndRemove(attributes, "falseValue", "false");
+			string hiddenElementValue = CommonUtils.ObtainEntryAndRemove(attributes, "falseValue", "false");
 
 			string result = CreateInputElement("checkbox", id, target, trueValue, attributes);
 			
@@ -1013,8 +1014,8 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (attributes != null)
 			{
-				firstOption = ObtainEntryAndRemove(attributes, "firstoption");
-				firstOptionValue = ObtainEntryAndRemove(attributes, "firstoptionvalue");
+				firstOption = CommonUtils.ObtainEntryAndRemove(attributes, "firstoption");
+				firstOptionValue = CommonUtils.ObtainEntryAndRemove(attributes, "firstoptionvalue");
 				
 				if (attributes.Contains("name"))
 				{
@@ -1086,7 +1087,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			get
 			{
-				if (objectStack.Count == 0) return true;
+				if (objectStack.Count == 0) return false;
 
 				return ((FormScopeInfo) objectStack.Peek()).IsValidationEnabled;
 			}
@@ -1094,7 +1095,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		private void ApplyValidation(InputElementType inputType, string target, ref IDictionary attributes)
 		{
-			string disableValidation = ObtainEntryAndRemove(attributes, "disablevalidation", "false");
+			string disableValidation = CommonUtils.ObtainEntryAndRemove(attributes, "disablevalidation", "false");
 
 			if (!IsValidationEnabledForScope && disableValidation == "true")
 			{
@@ -1166,7 +1167,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			if (value == null)
 			{
-				value = ObtainEntryAndRemove(attributes, "defaultValue");
+				value = CommonUtils.ObtainEntryAndRemove(attributes, "defaultValue");
 			}
 
 			string id = CreateHtmlId(attributes, target);
@@ -1194,11 +1195,11 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (attributes != null && attributes.Contains("mask"))
 			{
-				string mask = ObtainEntryAndRemove(attributes, "mask");
-				string maskSep = ObtainEntryAndRemove(attributes, "mask_separator", "-");
+				string mask = CommonUtils.ObtainEntryAndRemove(attributes, "mask");
+				string maskSep = CommonUtils.ObtainEntryAndRemove(attributes, "mask_separator", "-");
 
-				string onBlur = ObtainEntryAndRemove(attributes, "onBlur", "void(0)");
-				string onKeyUp = ObtainEntryAndRemove(attributes, "onKeyUp", "void(0)");
+				string onBlur = CommonUtils.ObtainEntryAndRemove(attributes, "onBlur", "void(0)");
+				string onKeyUp = CommonUtils.ObtainEntryAndRemove(attributes, "onKeyUp", "void(0)");
 
 				string js = "return monorail_formhelper_mask(event,this,'" + mask + "','" + maskSep + "');";
 
@@ -1218,7 +1219,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		protected string FormatIfNecessary(object value, IDictionary attributes)
 		{
-			string formatString = ObtainEntryAndRemove(attributes, "textformat");
+			string formatString = CommonUtils.ObtainEntryAndRemove(attributes, "textformat");
 
 			if (value != null && formatString != null)
 			{
@@ -1486,11 +1487,11 @@ namespace Castle.MonoRail.Framework.Helpers
 			
 			if (removeEntry)
 			{
-				id = ObtainEntryAndRemove(attributes, "id");
+				id = CommonUtils.ObtainEntryAndRemove(attributes, "id");
 			}
 			else
 			{
-				id = ObtainEntry(attributes, "id");
+				id = CommonUtils.ObtainEntry(attributes, "id");
 			}
 
 			if (id == null)
@@ -1501,78 +1502,14 @@ namespace Castle.MonoRail.Framework.Helpers
 			return id;
 		}
 
-		/// <summary>
-		/// Obtains the entry.
-		/// </summary>
-		/// <param name="attributes">The attributes.</param>
-		/// <param name="key">The key.</param>
-		/// <returns>The generated form element</returns>
-		protected internal static string ObtainEntry(IDictionary attributes, string key)
-		{
-			if (attributes != null && attributes.Contains(key))
-			{
-				return (String) attributes[key];
-			}
-			
-			return null;
-		}
-
-		/// <summary>
-		/// Obtains the entry.
-		/// </summary>
-		/// <param name="attributes">The attributes.</param>
-		/// <param name="key">The key.</param>
-		/// <param name="defaultValue">The default value.</param>
-		/// <returns>the entry value or the default value</returns>
-		protected internal static string ObtainEntry(IDictionary attributes, string key, string defaultValue)
-		{
-			string value = ObtainEntry(attributes, key);
-
-			return value != null ? value : defaultValue;
-		}
-
-		/// <summary>
-		/// Obtains the entry and remove it if found.
-		/// </summary>
-		/// <param name="attributes">The attributes.</param>
-		/// <param name="key">The key.</param>
-		/// <param name="defaultValue">The default value.</param>
-		/// <returns>the entry value or the default value</returns>
-		protected internal static string ObtainEntryAndRemove(IDictionary attributes, string key, string defaultValue)
-		{
-			string value = ObtainEntryAndRemove(attributes, key);
-			
-			return value != null ? value : defaultValue;
-		}
-		
-		/// <summary>
-		/// Obtains the entry and remove it if found.
-		/// </summary>
-		/// <param name="attributes">The attributes.</param>
-		/// <param name="key">The key.</param>
-		/// <returns>the entry value or null</returns>
-		protected internal static string ObtainEntryAndRemove(IDictionary attributes, string key)
-		{
-			string value = null;
-			
-			if (attributes != null && attributes.Contains(key))
-			{
-				value = (String) attributes[key];
-
-				attributes.Remove(key);
-			}
-			
-			return value;
-		}
-
 		#endregion
 
 		#region private helpers
 
 		private static void ApplyNumberOnlyOptions(IDictionary attributes)
 		{
-			string list = ObtainEntryAndRemove(attributes, "exceptions", String.Empty);
-			string forbid = ObtainEntryAndRemove(attributes, "forbid", String.Empty);
+			string list = CommonUtils.ObtainEntryAndRemove(attributes, "exceptions", String.Empty);
+			string forbid = CommonUtils.ObtainEntryAndRemove(attributes, "forbid", String.Empty);
 
 			attributes["onKeyPress"] = "return monorail_formhelper_numberonly(event, [" + list + "], [" + forbid + "]);";
 		}
