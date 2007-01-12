@@ -50,7 +50,9 @@ namespace Castle.MonoRail.Framework
 		/// </param>
 		/// <param name="context">Context that represents the current request</param>
 		/// <param name="controller">Controller instance</param>
+		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		Message RenderMailMessage(String templateName, IRailsEngineContext context, Controller controller);
+		Message RenderMailMessage(String templateName, IRailsEngineContext context,
+		                          Controller controller, bool doNotApplyLayout);
 	}
 }

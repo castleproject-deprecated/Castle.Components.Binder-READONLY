@@ -38,6 +38,9 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		private ILogger logger = NullLogger.Instance;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EmailTemplateService"/> class.
+		/// </summary>
 		public EmailTemplateService()
 		{
 		}
@@ -88,10 +91,7 @@ namespace Castle.MonoRail.Framework
 
 			IRailsEngineContext context = EngineContextModule.ObtainRailsEngineContext(HttpContext.Current);
 
-			ControllerLifecycleExecutor executor = 
-				(ControllerLifecycleExecutor) context.UnderlyingContext.Items[ControllerLifecycleExecutor.ExecutorEntry];
-			
-			Controller controller = executor.Controller;
+			Controller controller = context.CurrentController;
 
 			if (controller == null)
 			{
@@ -132,8 +132,10 @@ namespace Castle.MonoRail.Framework
 		/// </param>
 		/// <param name="context">Context that represents the current request</param>
 		/// <param name="controller">Controller instance</param>
+		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		public Message RenderMailMessage(String templateName, IRailsEngineContext context, Controller controller)
+		public Message RenderMailMessage(String templateName, IRailsEngineContext context,
+		                                 Controller controller, bool doNotApplyLayout)
 		{
 			// create a message object
 			Message message = new Message();
@@ -141,7 +143,19 @@ namespace Castle.MonoRail.Framework
 			// use the template engine to generate the body of the message
 			StringWriter writer = new StringWriter();
 
+			String oldLayout = controller.LayoutName;
+
+			if (doNotApplyLayout)
+			{
+				controller.LayoutName = null;
+			}
+
 			controller.InPlaceRenderSharedView(writer, Path.Combine(Constants.EmailTemplatePath, templateName));
+
+			if (doNotApplyLayout)
+			{
+				controller.LayoutName = oldLayout;
+			}
 
 			String body = writer.ToString();
 			

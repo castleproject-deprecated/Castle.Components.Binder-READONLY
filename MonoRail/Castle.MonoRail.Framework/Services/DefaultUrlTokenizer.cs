@@ -5,12 +5,18 @@ namespace Castle.MonoRail.Framework.Services
 	using System.Collections.Specialized;
 	using System.IO;
 	using System.Text;
+	using Castle.Core;
+	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
-	/// 
+	/// Breaks the url into smaller pieces to find out
+	/// the requested controller, action and optionally the area.
+	/// <para>
+	/// It alsos checks for default urls.
+	/// </para>
 	/// </summary>
-	public class DefaultUrlTokenizer : IUrlTokenizer
+	public class DefaultUrlTokenizer : IUrlTokenizer, IServiceEnabledComponent
 	{
 		private IDictionary defaultUrl2CustomUrlInfo = new HybridDictionary(true);
 
@@ -23,6 +29,22 @@ namespace Castle.MonoRail.Framework.Services
 
 			defaultUrl2CustomUrlInfo[url] = new UrlInfo(area, controller, action);
 		}
+
+		#region IServiceEnabledComponent
+
+		public void Service(IServiceProvider provider)
+		{
+			MonoRailConfiguration config = (MonoRailConfiguration) provider.GetService(typeof(MonoRailConfiguration));
+
+			foreach(DefaultUrl url in config.DefaultUrls)
+			{
+				AddDefaultRule(url.Url, url.Area, url.Controller, url.Action);
+			}
+		}
+
+		#endregion
+
+		#region IUrlTokenizer
 
 		public UrlInfo TokenizeUrl(string rawUrl, Uri uri, bool isLocal, string appVirtualDir)
 		{
@@ -72,7 +94,7 @@ namespace Castle.MonoRail.Framework.Services
 			}
 			else
 			{
-				ExtractAreaControllerAction(out area, out controller, out action, rawUrl);
+				ExtractAreaControllerAction(rawUrl, out area, out controller, out action);
 			}
 
 			string extension = GetExtension(rawUrl);
@@ -80,7 +102,9 @@ namespace Castle.MonoRail.Framework.Services
 			return new UrlInfo(domain, subdomain, appVirtualDir, uri.Scheme, uri.Port, rawUrl, area, controller, action, extension);
 		}
 
-		private void ExtractAreaControllerAction(out string area, out string controller, out string action, string rawUrl)
+		#endregion
+
+		private void ExtractAreaControllerAction(string rawUrl, out string area, out string controller, out string action)
 		{
 			string[] parts = rawUrl.Split('/');
 

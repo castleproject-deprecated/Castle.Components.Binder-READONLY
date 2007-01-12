@@ -1022,10 +1022,25 @@ namespace Castle.MonoRail.Framework
 		/// <returns>An instance of <see cref="Message"/></returns>
 		public Message RenderMailMessage(string templateName)
 		{
-			IEmailTemplateService templateService = (IEmailTemplateService) 
+			return RenderMailMessage(templateName, false);
+		}
+
+		/// <summary>
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
+		/// </summary>
+		/// <param name="templateName">
+		/// Name of the template to load. 
+		/// Will look in Views/mail for that template file.
+		/// </param>
+		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
+		/// <returns>An instance of <see cref="Message"/></returns>
+		public Message RenderMailMessage(string templateName, bool doNotApplyLayout)
+		{
+			IEmailTemplateService templateService = (IEmailTemplateService)
 				ServiceProvider.GetService(typeof(IEmailTemplateService));
 
-			return templateService.RenderMailMessage(templateName, Context, this);
+			return templateService.RenderMailMessage(templateName, Context, this, doNotApplyLayout);
 		}
 
 		/// <summary>
