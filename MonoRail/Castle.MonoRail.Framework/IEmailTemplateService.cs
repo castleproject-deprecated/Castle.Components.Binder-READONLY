@@ -37,8 +37,9 @@ namespace Castle.MonoRail.Framework
 		/// Dictionary with parameters 
 		/// that you can use on the email template
 		/// </param>
+		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		Message RenderMailMessage(String templateName, IDictionary parameters);
+		Message RenderMailMessage(String templateName, IDictionary parameters, bool doNotApplyLayout);
 
 		/// <summary>
 		/// Creates an instance of <see cref="Message"/>

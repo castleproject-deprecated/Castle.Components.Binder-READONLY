@@ -76,8 +76,9 @@ namespace Castle.MonoRail.Framework
 		/// Dictionary with parameters 
 		/// that you can use on the email template
 		/// </param>
+		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		public Message RenderMailMessage(String templateName, IDictionary parameters)
+		public Message RenderMailMessage(String templateName, IDictionary parameters, bool doNotApplyLayout)
 		{
 			if (HttpContext.Current == null)
 			{
@@ -108,7 +109,7 @@ namespace Castle.MonoRail.Framework
 
 			try
 			{
-				return RenderMailMessage(templateName, context, controller);
+				return RenderMailMessage(templateName, context, controller, doNotApplyLayout);
 			}
 			finally
 			{

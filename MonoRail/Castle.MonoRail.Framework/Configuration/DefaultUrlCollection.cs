@@ -17,7 +17,7 @@ namespace Castle.MonoRail.Framework.Configuration
 
 				entry.Deserialize(node);
 
-				InnerList.Add(node);
+				InnerList.Add(entry);
 			}
 		}
 

@@ -1068,7 +1068,6 @@ namespace Castle.MonoRail.Framework
 
 		/// <summary>
 		/// Renders and delivers the e-mail message.
-		/// <seealso cref="RenderMailMessage"/>
 		/// <seealso cref="DeliverEmail"/>
 		/// </summary>
 		/// <param name="templateName"></param>

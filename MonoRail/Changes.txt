@@ -4,6 +4,10 @@ Change history
 Release Candidate 3
 ===================
 
+- Configuration changed, added defaultUrls section (see monorail_configuration_ref.txt)
+
+- Added Controller.RenderMailMessage(string templateName, bool doNotApplyLayout) overload
+
 - Added IViewComponentContext.RenderView(name, textwriter)
 
 - Fixed MR-201
