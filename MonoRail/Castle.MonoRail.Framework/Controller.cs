@@ -359,7 +359,7 @@ namespace Castle.MonoRail.Framework
 		public ValidatorRunner Validator
 		{
 			get { return validator; }
-			set { validator = value; }
+			set { validator = value; }		
 		}
 
 		/// <summary>
@@ -577,7 +577,16 @@ namespace Castle.MonoRail.Framework
 		}
 
 		#region RedirectToAction
-		
+
+		/// <summary> 
+		/// Redirects to another action in the same controller.
+		/// </summary>
+		protected void RedirectToReferer()
+		{
+			string referer = Request.Params["HTTP_Referer"];
+			Redirect(referer);
+		}
+
 		/// <summary> 
 		/// Redirects to another action in the same controller.
 		/// </summary>
@@ -976,8 +985,10 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected virtual void Initialize()
 		{
-			// TODO: PropertyBasedRegistry must come from the service container
-			validator = new ValidatorRunner(true, new PropertyBasedRegistry());
+			IValidatorRegistry validatorRegistry = 
+				(IValidatorRegistry) serviceProvider.GetService(typeof(IValidatorRegistry));
+
+			validator = new ValidatorRunner(true, validatorRegistry);
 		}
 
 		/// <summary>

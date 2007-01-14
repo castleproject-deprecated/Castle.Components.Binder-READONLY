@@ -114,15 +114,15 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns></returns>
 		public string FormTag(IDictionary parameters)
 		{
-			string action = CommonUtils.ObtainEntryAndRemove(parameters, "action");
+			string url = UrlHelper.For(parameters);
+
 			currentFormId = CommonUtils.ObtainEntryAndRemove(parameters, "id", "form" + ++formCount);
 
 			validationConfig = validatorProvider.CreateConfiguration(parameters);
 
 			string afterFormTag = validationConfig.CreateAfterFormOpened(currentFormId);
 
-			string formContent = "<form action='" + action + 
-				"' method='post' id='" + currentFormId + "' " + GetAttributes(parameters) + ">";
+			string formContent = "<form action='" + url + "' method='post' id='" + currentFormId + "' " + GetAttributes(parameters) + ">";
 
 			return formContent + afterFormTag;
 		}
@@ -144,12 +144,23 @@ namespace Castle.MonoRail.Framework.Helpers
 			string disableValidation = CommonUtils.ObtainEntryAndRemove(parameters, "disablevalidation", "false");
 			object value = ObtainValue(target);
 
-			if (value == null)
+			if (value != null)
 			{
-				throw new ArgumentException("target could not be evaluated during Push operation. Target: " + target);
+				objectStack.Push(new FormScopeInfo(target, disableValidation == "true"));
 			}
+			else
+			{
+				value = ObtainValue(target + "type");
 
-			objectStack.Push(new FormScopeInfo(target, disableValidation == "true"));
+				if (value != null)
+				{
+					objectStack.Push(new FormScopeInfo(target, disableValidation == "true"));
+				}
+				else
+				{
+					throw new ArgumentException("target could not be evaluated during Push operation. Target: " + target);
+				}
+			}
 		}
 
 		public void Pop()
@@ -996,6 +1007,37 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
 		/// <param name="selectedValue"></param>
 		/// <param name="dataSource">The set of available elements</param>
+		/// <returns>The generated form element</returns>
+		public string Select(string target, object selectedValue, IEnumerable dataSource)
+		{
+			return Select(target, selectedValue, dataSource, null);
+		}
+
+		/// <summary>
+		/// Creates a <c>select</c> element and its <c>option</c>s based on the <c>dataSource</c>.
+		/// If the <c>dataSource</c>
+		/// elements are complex objects (ie not string or primitives), 
+		/// supply the parameters <c>value</c> and <c>text</c> to the dictionary to make
+		/// the helper use the specified properties to extract the <c>option</c> value and content respectively.
+		/// <para>
+		/// You can also specify the attribute <c>firstoption</c> to force the first option be
+		/// something like 'please select'. You can set the value of <c>firstoption</c> by specifying the attribute
+		/// <c>firstoptionvalue</c>. The default value is '0'.
+		/// </para>
+		/// <para>
+		/// Usually the <c>target</c> is a single value and the <c>dataSource</c> is obviously 
+		/// a set with multiple items. The element types tend to be the same. If 
+		/// they are not, you might have to specify the <c>suffix</c> parameters on 
+		/// the <c>attributes</c> as it would not be inferred.
+		/// </para>
+		/// <para>
+		/// The target can also be a set. In this case the intersection will be 
+		/// the initially selected elements.
+		/// </para>
+		/// </summary>
+		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
+		/// <param name="selectedValue"></param>
+		/// <param name="dataSource">The set of available elements</param>
 		/// <param name="attributes">Attributes for the FormHelper method and for the html element it generates</param>
 		/// <returns>The generated form element</returns>
 		public string Select(string target, object selectedValue, IEnumerable dataSource, IDictionary attributes)
@@ -1095,9 +1137,9 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		private void ApplyValidation(InputElementType inputType, string target, ref IDictionary attributes)
 		{
-			string disableValidation = CommonUtils.ObtainEntryAndRemove(attributes, "disablevalidation", "false");
+			bool disableValidation = CommonUtils.ObtainEntryAndRemove(attributes, "disablevalidation", "false") == "true";
 
-			if (!IsValidationEnabledForScope && disableValidation == "true")
+			if (!IsValidationEnabledForScope && disableValidation)
 			{
 				return;
 			}
@@ -1130,7 +1172,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			foreach(IValidator validator in validators)
 			{
-				if (validator.SupportWebValidation)
+				if (validator.SupportsWebValidation)
 				{
 					validator.ApplyWebValidation(validationConfig, inputType, generator, attributes);
 				}
@@ -1242,11 +1284,11 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			string[] pieces;
 
-			object root = ObtainRootInstance(context, target, out pieces);
+			Type root = ObtainRootType(context, target, out pieces);
 
 			if (root != null && pieces.Length > 1)
 			{
-				return QueryPropertyInfoRecursive(root.GetType(), pieces, 1);
+				return QueryPropertyInfoRecursive(root, pieces, 1);
 			}
 
 			return null;
@@ -1350,6 +1392,25 @@ namespace Castle.MonoRail.Framework.Helpers
 			return rootInstance;
 		}
 
+		private Type ObtainRootType(RequestContext context, string target, out string[] pieces)
+		{
+			pieces = target.Split(new char[] { '.' });
+
+			Type foundType = (Type) Controller.PropertyBag[pieces[0] + "type"];
+
+			if (foundType == null)
+			{
+				object root = ObtainRootInstance(context, target, out pieces);
+
+				if (root != null)
+				{
+					foundType = root.GetType();
+				}
+			}
+
+			return foundType;
+		}
+
 		private PropertyInfo QueryPropertyInfoRecursive(Type type, string[] propertyPath, int piece)
 		{
 			string property = propertyPath[piece]; int index;
@@ -1417,19 +1478,16 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			PropertyInfo propertyInfo = instanceType.GetProperty(property, PropertyFlags);
 
-			object instance;
+			object instance = null;
 
 			if (propertyInfo == null)
 			{
 				FieldInfo fieldInfo = instanceType.GetField(property, FieldFlags);
 
-				if (fieldInfo == null)
+				if (fieldInfo != null)
 				{
-					throw new BindingException("No public property or field '{0}' found on type '{1}'", 
-						property, instanceType.FullName);
+					instance = fieldInfo.GetValue(rootInstance);
 				}
-
-				instance = fieldInfo.GetValue(rootInstance);
 			}
 			else
 			{

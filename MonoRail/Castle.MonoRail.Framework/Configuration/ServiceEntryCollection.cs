@@ -19,6 +19,7 @@ namespace Castle.MonoRail.Framework.Configuration
 	using System.Xml;
 	
 	using Castle.Components.Common.EmailSender;
+	using Castle.Components.Validator;
 	using Castle.MonoRail.Framework.Internal;
 	
 
@@ -139,6 +140,8 @@ namespace Castle.MonoRail.Framework.Configuration
 					return typeof(IUrlTokenizer);
 				case ServiceIdentification.ServerUtility:
 					return typeof(IServerUtility);
+				case ServiceIdentification.ValidatorRegistry:
+					return typeof(IValidatorRegistry);
 				default:
 					throw new NotSupportedException("Id not supported " + id);
 			}

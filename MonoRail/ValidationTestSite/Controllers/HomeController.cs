@@ -1,31 +1,30 @@
 namespace ValidationTestSite.Controllers
 {
-	using System;
-	using Castle.Components.Validator;
 	using Castle.MonoRail.Framework;
 	using ValidationTestSite.Models;
 
 	[Layout("default"), Rescue("generalerror")]
 	public class HomeController : SmartDispatcherController
 	{
-		public HomeController()
-		{
-			// validatorEngine = new Validator(new PropertyBasedRegistry());
-		}
-
 		public void Index()
 		{
-			PropertyBag["client"] = new Client();
+			// PropertyBag["client"] = new Client();
+			PropertyBag["clienttype"] = typeof(Client);
 		}
 
 		public void Index2()
 		{
-			PropertyBag["client"] = new Client();
+			PropertyBag["clienttype"] = typeof(Client);
 		}
 
 		public void Save([DataBind("client", Validate=true)] Client client)
 		{
-			PropertyBag["isvalid"] = Validator.IsValid(client);
+			if (HasValidationError(client))
+			{
+				Flash["errors"] = GetErrorSummary(client);
+				Flash["client"] = client;
+				RedirectToReferer();
+			}
 		}
 
 		public void Supplier()

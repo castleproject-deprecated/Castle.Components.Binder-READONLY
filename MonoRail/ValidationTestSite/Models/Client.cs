@@ -1,11 +1,18 @@
 namespace ValidationTestSite.Models
 {
+	using System;
 	using Castle.Components.Validator;
 
 	public class Client
 	{
 		private int id;
 		private string name, email;
+		private DateTime dob, created;
+
+		public Client()
+		{
+			dob = new DateTime(1979,7,16);
+		}
 
 		public int Id
 		{
@@ -25,6 +32,18 @@ namespace ValidationTestSite.Models
 		{
 			get { return email; }
 			set { email = value; }
+		}
+
+		public DateTime Dob
+		{
+			get { return dob; }
+			set { dob = value; }
+		}
+
+		public DateTime Created
+		{
+			get { return created; }
+			set { created = value; }
 		}
 	}
 }

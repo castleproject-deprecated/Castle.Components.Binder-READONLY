@@ -18,11 +18,24 @@ namespace Castle.MonoRail.Framework
 	using System.Reflection;
 
 	using Castle.Components.Binder;
+	using Castle.Components.Validator;
 
+	/// <summary>
+	/// Defines where the parameters should be obtained from
+	/// </summary>
 	public enum ParamStore
 	{
+		/// <summary>
+		/// Query string
+		/// </summary>
 		QueryString,
+		/// <summary>
+		/// Only from the Form
+		/// </summary>
 		Form,
+		/// <summary>
+		/// From QueryString, Form and Environment variables.
+		/// </summary>
 		Params
 	}
 
@@ -37,9 +50,9 @@ namespace Castle.MonoRail.Framework
 	public class DataBindAttribute : Attribute, IParameterBinder
 	{
 		private ParamStore from = ParamStore.Params;
-		private String exclude = String.Empty;
-		private String allow = String.Empty;
-		private String prefix;
+		private string exclude = string.Empty;
+		private string allow = string.Empty;
+		private string prefix;
 		private bool validate;
 
 		/// <summary>
@@ -48,7 +61,7 @@ namespace Castle.MonoRail.Framework
 		/// in the form data and is used to avoid name clashes.
 		/// </summary>
 		/// <param name="prefix"></param>
-		public DataBindAttribute(String prefix)
+		public DataBindAttribute(string prefix)
 		{
 			this.prefix = prefix;
 		}
@@ -59,7 +72,7 @@ namespace Castle.MonoRail.Framework
 		/// <remarks>The property name should include the <i>prefix</i>.</remarks>
 		/// <value>A comma separated list 
 		/// of property names to exclude from databinding.</value>
-		public String Exclude
+		public string Exclude
 		{
 			get { return exclude; }
 			set { exclude = value; }
@@ -71,7 +84,7 @@ namespace Castle.MonoRail.Framework
 		/// <remarks>The property name should include the <i>prefix</i>.</remarks>
 		/// <value>A comma separated list 
 		/// of property names to allow from databinding.</value>
-		public String Allow
+		public string Allow
 		{
 			get { return allow; }
 			set { allow = value; }
@@ -109,7 +122,7 @@ namespace Castle.MonoRail.Framework
 		/// on the source http request.
 		/// </remarks>
 		/// <value>The databinding prefix.</value>
-		public String Prefix
+		public string Prefix
 		{
 			get { return prefix; }
 		}
@@ -158,6 +171,13 @@ namespace Castle.MonoRail.Framework
 			if (instance != null)
 			{
 				controller.BoundInstanceErrors[instance] = binder.ErrorList;
+			}
+
+			// Populates the validation error summary
+			if (validate)
+			{
+				ErrorSummary summary = binder.GetValidationSummary(instance);
+				controller.ValidationSummaryPerInstance[instance] = summary;
 			}
 
 			return instance;

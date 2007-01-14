@@ -21,6 +21,7 @@ namespace Castle.MonoRail.Framework
 	using System.Configuration;
 	using System.IO;
 	using System.Xml;
+	using Castle.Components.Validator;
 	using Castle.Core;
 	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Internal;
@@ -380,6 +381,8 @@ namespace Castle.MonoRail.Framework
 			{
 				services.RegisterService(ServiceIdentification.UrlTokenizer, typeof(DefaultUrlTokenizer));
 			}
+
+			services.RegisterService(ServiceIdentification.ValidatorRegistry, typeof(CachedValidationRegistry));
 		}
 
 		private object ActivateService(Type type)

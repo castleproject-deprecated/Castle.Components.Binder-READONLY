@@ -20,6 +20,7 @@ namespace Castle.MonoRail.Framework
 	using System.Collections.Specialized;
 
 	using Castle.Components.Binder;
+	using Castle.Components.Validator;
 
 	/// <summary>
 	/// Specialization of <see cref="Controller"/> that tries
@@ -38,6 +39,7 @@ namespace Castle.MonoRail.Framework
 		private DataBinder binder;
 		private TreeBuilder treeBuilder = new TreeBuilder();
 		private CompositeNode paramsNode, formNode, queryStringNode;
+		private IDictionary validationSummaryPerInstance = new Hashtable();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SmartDispatcherController"/> class.
@@ -66,6 +68,46 @@ namespace Castle.MonoRail.Framework
 			set { boundInstances = value; }
 		}
 
+		/// <summary>
+		/// Gets the validation summary (key is the object instance)
+		/// </summary>
+		/// <value>The validation summary per instance.</value>
+		public IDictionary ValidationSummaryPerInstance
+		{
+			get { return validationSummaryPerInstance; }
+		}
+
+		/// <summary>
+		/// Gets the error summary.
+		/// <para>
+		/// Will only work for instances populated by the <c>DataBinder</c>
+		/// </para>
+		/// </summary>
+		/// <param name="instance">object instance</param>
+		/// <returns>Error summary instance (can be null if the DataBinder wasn't configured to validate)</returns>
+		protected ErrorSummary GetErrorSummary(object instance)
+		{
+			return (ErrorSummary) validationSummaryPerInstance[instance];
+		}
+
+		/// <summary>
+		/// Returns <c>true</c> if the given instance had 
+		/// validation errors during binding.
+		/// <para>
+		/// Will only work for instances populated by the <c>DataBinder</c>
+		/// </para>
+		/// </summary>
+		/// <param name="instance">object instance</param>
+		/// <returns><c>true</c> if the validation had an error</returns>
+		protected bool HasValidationError(object instance)
+		{
+			ErrorSummary summary = GetErrorSummary(instance);
+
+			if (summary == null) return false;
+
+			return summary.ErrorsCount != 0;
+		}
+
 		protected internal override void InvokeMethod(MethodInfo method, IRequest request, IDictionary actionArgs)
 		{
 			ParameterInfo[] parameters = method.GetParameters();
@@ -75,7 +117,8 @@ namespace Castle.MonoRail.Framework
 			method.Invoke(this, methodArgs);
 		}
 
-		protected internal override MethodInfo SelectMethod(String action, IDictionary actions, IRequest request, IDictionary actionArgs)
+		protected internal override MethodInfo SelectMethod(String action, IDictionary actions,
+		                                                    IRequest request, IDictionary actionArgs)
 		{
 			object methods = actions[action];
 
@@ -90,7 +133,9 @@ namespace Castle.MonoRail.Framework
 			                           request.Params, actionArgs);
 		}
 
-		protected virtual MethodInfo SelectBestCandidate(MethodInfo[] candidates, NameValueCollection webParams, IDictionary actionArgs)
+		protected virtual MethodInfo SelectBestCandidate(MethodInfo[] candidates,
+		                                                 NameValueCollection webParams,
+		                                                 IDictionary actionArgs)
 		{
 			if (candidates.Length == 1)
 			{
@@ -134,7 +179,6 @@ namespace Castle.MonoRail.Framework
 		{
 			int points = 0;
 			int matchCount = 0;
-			int actionArgsIndex = 0;
 
 			ParameterInfo[] parameters = candidate.GetParameters();
 
@@ -196,7 +240,6 @@ namespace Castle.MonoRail.Framework
 						if (exactMatch) points += 5;
 						
 						matchCount++;
-						actionArgsIndex++;	
 					}
 				}
 			}
