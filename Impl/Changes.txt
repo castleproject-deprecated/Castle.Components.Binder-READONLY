@@ -1,6 +1,9 @@
 RC 4
 ====
 
+- Applied Jeff Brown's patch fixing IOC-54
+  "Empty component parameter values cause runtime exception during component resolution."
+
 - Applied patch by Bill Pierce that
 
 -- Introduces the WebUserControlComponentActivator

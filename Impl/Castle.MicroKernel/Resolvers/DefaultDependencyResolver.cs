@@ -336,7 +336,7 @@ namespace Castle.MicroKernel.Resolvers
 
 				try
 				{
-					if (parameter.Value != null)
+					if (parameter.Value != null || parameter.ConfigValue == null)
 					{
 						return converter.PerformConversion(parameter.Value, dependency.TargetType);
 					}
