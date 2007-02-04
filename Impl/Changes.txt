@@ -1,6 +1,9 @@
 RC 4
 ====
 
+- Applied Norbert Wagner's patch fixing IOC-55
+  "Generic Type Converters: Set default entry types to generic arguments of property type"
+
 - Applied Jeff Brown's patch fixing IOC-54
   "Empty component parameter values cause runtime exception during component resolution."
 
