@@ -1,6 +1,0 @@
-
-Feb, 2006 
-
-- Added logging support
-
-- Added IsRollbackOnlySet
