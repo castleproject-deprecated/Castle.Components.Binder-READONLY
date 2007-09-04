@@ -1,5 +1,8 @@
 RC 3
 ====
+ - IOC-32, Support generic collections. Supported collections are: ICollection<T>, IList<T>, List<T>, IDictionary<K,V>, Dictionary<K,V>, IEnumerable<T> 
+ 
+- Applied patch by William C. Pierce <wcpierce@gmail.com> adding PerWebRequestAttribute
 
 - Fixed IOC-34 
   "Cannot use types having their own base type as constructor argument"
