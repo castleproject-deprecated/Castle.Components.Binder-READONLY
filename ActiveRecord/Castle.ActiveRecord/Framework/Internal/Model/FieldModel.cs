@@ -19,7 +19,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 
 	[Serializable]
-	public class FieldModel : IModelNode
+	public class FieldModel : IVisitable
 	{
 		private readonly FieldInfo field;
 		private readonly FieldAttribute att;

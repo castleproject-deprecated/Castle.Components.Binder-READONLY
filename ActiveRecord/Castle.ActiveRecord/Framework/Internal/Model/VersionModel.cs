@@ -19,7 +19,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 
 	[Serializable]
-	public class VersionModel : IModelNode
+	public class VersionModel : IVisitable
 	{
 		private readonly PropertyInfo prop;
 		private readonly VersionAttribute att;

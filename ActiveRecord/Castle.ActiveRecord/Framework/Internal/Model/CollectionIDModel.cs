@@ -18,7 +18,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System.Reflection;
 
 	[Serializable]
-	public class CollectionIDModel : IModelNode
+	public class CollectionIDModel : IVisitable
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly CollectionIDAttribute collAtt;

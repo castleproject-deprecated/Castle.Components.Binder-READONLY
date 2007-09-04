@@ -18,7 +18,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System.Collections;
 
 	[Serializable]
-	public class ActiveRecordModel : IModelNode
+	public class ActiveRecordModel : IVisitable
 	{
 		protected internal static IDictionary type2Model = Hashtable.Synchronized(new Hashtable());
 

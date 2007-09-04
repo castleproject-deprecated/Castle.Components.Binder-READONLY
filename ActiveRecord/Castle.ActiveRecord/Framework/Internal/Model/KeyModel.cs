@@ -18,7 +18,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System.Reflection;
 
 	[Serializable]
-	public class KeyModel : IModelNode
+	public class KeyModel : IVisitable
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly JoinedKeyAttribute att;

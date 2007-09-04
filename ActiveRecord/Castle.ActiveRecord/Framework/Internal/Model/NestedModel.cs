@@ -19,7 +19,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 
 	[Serializable]
-	public class NestedModel : IModelNode
+	public class NestedModel : IVisitable
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly NestedAttribute nestedAtt;

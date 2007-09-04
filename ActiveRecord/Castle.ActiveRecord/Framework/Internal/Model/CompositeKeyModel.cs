@@ -18,7 +18,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System.Reflection;
 
 	[Serializable]
-	public class CompositeKeyModel : IModelNode
+	public class CompositeKeyModel : IVisitable
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly CompositeKeyAttribute pkAtt;

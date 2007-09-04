@@ -19,7 +19,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 
 	[Serializable]
-	public class HiloModel : IModelNode
+	public class HiloModel : IVisitable
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly HiloAttribute hiloAtt;

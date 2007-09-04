@@ -21,7 +21,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 
 	[Serializable]
-	public class HasManyToAnyModel : IModelNode
+	public class HasManyToAnyModel : IVisitable
 	{
 		private readonly PropertyInfo prop;
 		private readonly HasManyToAnyAttribute hasManyToAnyAtt;
@@ -59,7 +59,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 		/// <summary>
 		/// I need this class to pass special configuration for the many-to-any
 		/// </summary>
-		public class Config : IModelNode
+		public class Config : IVisitable
 		{
 			HasManyToAnyModel parent;
 

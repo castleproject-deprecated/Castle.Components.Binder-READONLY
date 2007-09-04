@@ -19,7 +19,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 
 	[Serializable]
-	public class BelongsToModel : IModelNode
+	public class BelongsToModel : IVisitable
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly BelongsToAttribute belongsToAtt;

@@ -21,7 +21,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using Castle.ActiveRecord;
 
 	[Serializable]
-	public class AnyModel : IModelNode
+	public class AnyModel : IVisitable
 	{
 		private readonly PropertyInfo prop;
 		private readonly AnyAttribute anyAtt;

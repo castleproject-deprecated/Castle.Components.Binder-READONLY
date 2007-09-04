@@ -573,7 +573,7 @@ namespace Castle.DynamicProxy.Generators
 				}
 				else
 				{
-					throw new NotImplementedException("Int/Ref parameters are not supported yet");
+					throw new NotImplementedException("Out/Ref parameters are not supported yet");
 				}
 			}
 
@@ -753,6 +753,13 @@ namespace Castle.DynamicProxy.Generators
 		/// <returns></returns>
 		protected bool AcceptMethod(MethodInfo method, bool onlyVirtuals)
 		{
+			// we can never intercept a sealed (final) method
+			if (method.IsFinal)
+				return false;
+
+			if (IsInternal(method))
+				return false;
+			
 			if (onlyVirtuals && !method.IsVirtual)
 			{
 				if (method.DeclaringType != typeof(object) && method.DeclaringType != typeof(MarshalByRefObject))
@@ -775,6 +782,12 @@ namespace Castle.DynamicProxy.Generators
 			}
 
 			return generationHook.ShouldInterceptMethod(targetType, method); ;
+		}
+
+		private static bool IsInternal(MethodInfo method)
+		{
+			return (method.Attributes & MethodAttributes.FamANDAssem) != 0 //internal
+			       && (method.Attributes & MethodAttributes.Family) == 0;//b
 		}
 
 		protected MethodInfo[] CollectMethodsAndProperties(ClassEmitter emitter, Type targetType,
@@ -855,6 +868,10 @@ namespace Castle.DynamicProxy.Generators
 		{
 			FieldReference fieldCache = classEmitter.CreateField("tokenCache" + fieldCount++, typeof(MethodInfo));
 
+			if(method2TokenField.ContainsKey(method))
+			{
+				throw new ArgumentException(string.Format("Duplicate method {0} on type {1}", method.ToString(), method.DeclaringType.FullName));
+			}
 			method2TokenField.Add(method, fieldCache);
 
 			cacheMethod.CodeBuilder.AddStatement(

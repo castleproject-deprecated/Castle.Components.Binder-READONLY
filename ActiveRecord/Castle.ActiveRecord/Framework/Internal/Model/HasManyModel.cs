@@ -19,7 +19,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 
 	[Serializable]
-	public class HasManyModel : IModelNode
+	public class HasManyModel : IVisitable
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly HasManyAttribute hasManyAtt;

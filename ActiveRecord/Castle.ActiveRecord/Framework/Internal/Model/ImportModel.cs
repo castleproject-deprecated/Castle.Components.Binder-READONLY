@@ -14,7 +14,7 @@
 
 namespace Castle.ActiveRecord.Framework.Internal
 {
-	public class ImportModel : IModelNode
+	public class ImportModel : IVisitable
 	{
 		private readonly ImportAttribute att;
 
