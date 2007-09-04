@@ -16,6 +16,7 @@ namespace Castle.ActiveRecord.Framework
 {
 	using System;
 	using System.Web;
+	using Castle.ActiveRecord.Framework.Scopes;
 
 	/// <summary>
 	/// HttpModule to set up a session for the request lifetime.
@@ -36,11 +37,18 @@ namespace Castle.ActiveRecord.Framework
 	public class SessionScopeWebModule : IHttpModule
 	{
 		protected static readonly String SessionKey = "SessionScopeWebModule.session";
+		
+		/// <summary>
+		/// Used to check whether the ThreadScopeInfo being used is suitable for a web environment
+		/// </summary>
+		private static bool isWebConfigured;
 
 		public void Init(HttpApplication app)
 		{
 			app.BeginRequest += new EventHandler(OnBeginRequest);
 			app.EndRequest += new EventHandler(OnEndRequest);
+
+			isWebConfigured = (ActiveRecordBase.holder.ThreadScopeInfo is WebThreadScopeInfo);
 		}
 
 		public void Dispose()
@@ -50,7 +58,14 @@ namespace Castle.ActiveRecord.Framework
 
 		private void OnBeginRequest(object sender, EventArgs e)
 		{
-			HttpContext.Current.Items.Add(SessionKey, new SessionScope());
+			if (isWebConfigured) 
+			{
+				HttpContext.Current.Items.Add(SessionKey, new SessionScope());
+			} 
+			else 
+			{
+				throw new ActiveRecordException("Seems that the framework isn't configured properly. (isWeb != true and SessionScopeWebModule is in use) Check the documentation for further information");
+			}
 		}
 
 		private void OnEndRequest(object sender, EventArgs e)

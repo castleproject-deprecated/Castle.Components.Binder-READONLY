@@ -1,11 +1,11 @@
-Release Candidate 1
+Release Candidate 2
 ===================
 
-- Potentially breaking change: all classes / associations are now lazy by default. 
-  This is done to match NHibernate 1.2 behavior.
-  This can be turned of by specifying default-lazy="false" in the <activerecord> element in the configuration. (Global flag)
-  Explictly specifying lazy behavior always override the default setting.
-  Modified tests to retain the old behavior.
+- Applied Josh Robb's patch adding a check for isWeb=true on the Session module.
+
+- Returned to the default lazy false behavior.
+
+- Will automatically initialize entities when loading outside of scope.
 
 - Removed IModelNode since it was no longer of any value.
 
@@ -23,6 +23,10 @@ Release Candidate 1
   ProjectionQuery<Blog, int> proj = new ProjectionQuery<Blog, int>(Projections.RowCount());
   int rowCount = proj.Execute();
   Assert.AreEqual(1, rowCount);
+
+
+Release Candidate 1
+===================
 
 - Changed name of mapping files generated when isDebug=true. They now follow the NHibernate convention of name.hbm.xml
 
