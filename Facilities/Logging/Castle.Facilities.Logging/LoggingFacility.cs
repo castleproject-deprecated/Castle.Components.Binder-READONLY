@@ -38,10 +38,8 @@ namespace Castle.Facilities.Logging
 
 	/// <summary>
 	/// A facility for logging support.
-	/// <para>
-	/// TODO: Document its inner working and configuration scheme
-	/// </para>
 	/// </summary>
+	/// <remarks>TODO: Document its inner working and configuration scheme</remarks>
 	public class LoggingFacility : AbstractFacility
 	{
 		private static readonly String Log4NetLoggerFactoryTypeName =
@@ -151,9 +149,11 @@ namespace Castle.Facilities.Logging
 				default:
 					throw new ConfigurationException("An invalid loggingApi was specified: " + logApi);
 			}
-			
-			if (loggerFactoryType == null) // some sanity checking
+
+			if (loggerFactoryType == null)
+			{
 				throw new FacilityException("LoggingFacility was unable to find an implementation of ILoggerFactory.");
+			}
 
 			object[] args = null;
 
@@ -168,5 +168,4 @@ namespace Castle.Facilities.Logging
 				SubSystemConstants.ConversionManagerKey) as IConversionManager;
 		}
 	}
-
 }

@@ -19,7 +19,6 @@ namespace Castle.ActiveRecord.Tests
 	using System.Text;
 	using System.Reflection;
 	using System.Collections.Generic;
-	using Castle.ActiveRecord.Framework.Queries;
 	using NUnit.Framework;
 
 	using Castle.ActiveRecord.Tests.Model.GenericModel;
@@ -365,18 +364,55 @@ namespace Castle.ActiveRecord.Tests
 		}
 
 		[Test]
-		public void ProjectionQueryTest()
+		public void ScalarProjectionQueryTest()
 		{
 			Blog blog = new Blog();
 			blog.Name = "hammett's blog";
 			blog.Author = "hamilton verissimo";
 			blog.Save();
 
-			ProjectionQuery<Blog, int> proj = new ProjectionQuery<Blog, int>(Projections.RowCount());
+			ScalarProjectionQuery<Blog, int> proj = new ScalarProjectionQuery<Blog, int>(Projections.RowCount());
 			int rowCount = proj.Execute();
 			Assert.AreEqual(1, rowCount);
 		}
 
+
+		[Test]
+		public void UnTypedProjectionQueryTest()
+		{
+			Blog blog = new Blog();
+			blog.Name = "hammett's blog";
+			blog.Author = "hamilton verissimo";
+			blog.Save();
+
+			ProjectionQuery<Blog> proj = new ProjectionQuery<Blog>(
+				Projections.ProjectionList()
+				.Add(Projections.Property("Name"))
+				.Add(Projections.Property("Author")));
+			IList<object[]> results = proj.Execute();
+			Assert.AreEqual(blog.Name, results[0][0]);
+			Assert.AreEqual(blog.Author, results[0][1]);
+		}
+
+
+		[Test]
+		public void TypedProjectionQueryTest()
+		{
+			Blog blog = new Blog();
+			blog.Name = "hammett's blog";
+			blog.Author = "hamilton verissimo";
+			blog.Save();
+
+			ProjectionQuery<Blog, KeyValuePair<string, string>> proj = new ProjectionQuery<Blog, KeyValuePair<string, string>>(
+				Projections.ProjectionList()
+				.Add(Projections.Property("Name"))
+				.Add(Projections.Property("Author")));
+			IList<KeyValuePair<string, string>> results = proj.Execute();
+			Assert.AreEqual(blog.Name, results[0].Key);
+			Assert.AreEqual(blog.Author, results[0].Value);
+		}
+		
+		
 		[Test]
 		public void UseBlogWithGenericPostCollection()
 		{
