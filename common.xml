@@ -69,6 +69,7 @@
 		<if test="${not(target::exists('set-' + project.config + '-project-configuration'))}">
 			<fail message="Unknown configuration: '${project.config}'" />
 		</if>
+		<property name="build.warnmissingdocs" value="false" overwrite="false" />
 		<call target="set-${project.config}-project-configuration" />
 
 		<property name="src.dir" 			value="${path::get-full-path(project::get-base-directory())}" />

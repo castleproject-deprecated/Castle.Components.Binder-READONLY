@@ -29,6 +29,7 @@ namespace Castle.ActiveRecord.Framework.Config
 		private Type sessionFactoryHolderImplementation;
         private Type namingStrategyImplementation;
 		private bool debug = false;
+		private bool isLazyByDefault;
 
 		public InPlaceConfigurationSource()
 		{
@@ -62,6 +63,17 @@ namespace Castle.ActiveRecord.Framework.Config
 		public bool Debug
 		{
 			get { return debug; }
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether the entities should be lazy by default.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if entities should be lazy by default; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsLazyByDefault
+		{
+			get { return this.isLazyByDefault; }
 		}
 
 		#endregion
@@ -145,6 +157,14 @@ namespace Castle.ActiveRecord.Framework.Config
 		protected void SetDebugFlag(bool isDebug)
 		{
 			debug = isDebug;
+		}
+		
+		/// <summary>
+		/// Set whatever entities are lazy by default or not.
+		/// </summary>
+		protected void SetIsLazyByDefault(bool lazyByDefault)
+		{
+			this.isLazyByDefault = lazyByDefault;
 		}
 
 		private IConfiguration ConvertToConfiguration(IDictionary properties)
