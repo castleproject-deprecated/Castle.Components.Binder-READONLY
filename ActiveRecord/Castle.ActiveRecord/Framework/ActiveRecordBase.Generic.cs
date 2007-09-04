@@ -264,6 +264,17 @@ namespace Castle.ActiveRecord
 		#region FindAll
 
 		/// <summary>
+		/// Returns all the instances that match the detached criteria.
+		/// </summary>
+		/// <param name="criteria">Detached criteria</param>
+		/// <param name="orders">Optional ordering</param>
+		/// <returns>All entities that match the criteria</returns>
+		public static T[] FindAll(DetachedCriteria criteria, params Order[] orders)
+		{
+			return (T[])ActiveRecordBase.FindAll(typeof(T), criteria, orders);	
+		}
+		
+		/// <summary>
 		/// Returns all instances found for <typeparamref name="T"/>
 		/// </summary>
 		/// <returns></returns>
@@ -272,6 +283,14 @@ namespace Castle.ActiveRecord
 			return (T[]) ActiveRecordBase.FindAll(typeof(T));
 		}
 
+		/// <summary>
+		/// Returns all instances found for <typeparamref name="T"/>
+		/// using the specified sort order and criterias.
+		/// </summary>
+		public static T[] FindAll(Order order, params ICriterion[] criterias)
+		{
+			return (T[])ActiveRecordBase.FindAll(typeof(T), new Order[] { order }, criterias);
+		}
 		/// <summary>
 		/// Returns all instances found for <typeparamref name="T"/>
 		/// using sort orders and criterias.
@@ -379,6 +398,17 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Searches and returns the first row for <typeparamref name="T"/>
 		/// </summary>
+		/// <param name="order">The sort order - used to determine which record is the first one</param>
+		/// <param name="criterias">The criteria expression</param>
+		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
+		public static T FindFirst(Order order, params ICriterion[] criterias)
+		{
+			return (T)ActiveRecordBase.FindFirst(typeof(T), new Order[] { order }, criterias);
+		}
+		
+		/// <summary>
+		/// Searches and returns the first row for <typeparamref name="T"/>
+		/// </summary>
 		/// <param name="orders">The sort order - used to determine which record is the first one</param>
 		/// <param name="criterias">The criteria expression</param>
 		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
@@ -412,6 +442,18 @@ namespace Castle.ActiveRecord
 			return (T) ActiveRecordBase.FindOne(typeof(T), criterias);
 		}
 
+		/// <summary>
+		/// Searches and returns a row. If more than one is found, 
+		/// throws <see cref="ActiveRecordException"/>
+		/// </summary>
+		/// <param name="criteria">The criteria</param>
+		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
+		public static T FindOne(DetachedCriteria criteria)
+		{
+			return (T)ActiveRecordBase.FindOne(typeof(T), criteria);
+		}
+
+		
 		#endregion
 
 		#region SlicedFindAll
