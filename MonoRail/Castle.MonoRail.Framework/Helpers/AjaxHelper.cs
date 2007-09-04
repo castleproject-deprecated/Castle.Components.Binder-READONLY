@@ -128,11 +128,11 @@ namespace Castle.MonoRail.Framework.Helpers
 				Controller.Context.UrlInfo.Extension);
 		}
 
-        [Obsolete("Please use the preferred InstallScripts function.")]
-        public String GetJavascriptFunctions()
-        {
-            return InstallScripts();
-        }
+		[Obsolete("Please use the preferred InstallScripts function.")]
+		public String GetJavascriptFunctions()
+		{
+			return InstallScripts();
+		}
 	    
 		/// <summary>
 		/// Renders a script tag refering the Behaviour library code.
@@ -597,8 +597,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		#region ObserveForm
 
 		/// <summary>
-		/// Works like the <see cref="ObserveField"/>, but operates on an entire form identified by the
-		/// DOM ID <c>formId</c>. Options are the same as <see cref="ObserveField"/>, except 
+		/// Works like the <see cref="ObserveField(IDictionary)"/>, but operates on an entire form identified by the
+		/// DOM ID <c>formId</c>. Options are the same as <see cref="ObserveField(IDictionary)"/>, except 
 		/// the default value of the <c>with</c> option evaluates to the
 		/// serialized (request String) value of the entire form.
 		/// </summary>
