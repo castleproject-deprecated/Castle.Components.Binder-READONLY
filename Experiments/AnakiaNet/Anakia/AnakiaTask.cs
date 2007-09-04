@@ -354,6 +354,7 @@ namespace Anakia
 			context.Put("vb", vbFormatter);
 
 			context.Put("basefolder", BaseGenFolder);
+			context.Put("basefolder", BaseGenFolder);
 			context.Put("breadcrumbs", node.BreadCrumbs);
 			context.Put("meta", node.Meta);
 			context.Put("doc", node.XmlDoc);
@@ -576,7 +577,7 @@ namespace Anakia
 				XmlElement elem = xmlNode.OwnerElement;
 
 				String relative = elem.GetAttribute("relative");
-
+				
 				if (relative.StartsWith("!"))
 				{
 					relative = relative.Substring(1);
@@ -586,7 +587,7 @@ namespace Anakia
 				{
 					elem.RemoveAttribute("relative");
 				}
-
+				
 				elem.SetAttribute("src", Relativize(level, relative));
 			}
 		}
