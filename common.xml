@@ -28,7 +28,7 @@
 	<!-- 
 		Versioning
 	-->
-	<property name="project.version" 	value="1.0.0.0" overwrite="false" />
+	<property name="project.version" 	value="1.1.0.0" overwrite="false" />
 	<property name="project.major" 		value="${version::get-major(version::parse(project.version))}" 		dynamic="true" />
 	<property name="project.minor" 		value="${version::get-minor(version::parse(project.version))}" 		dynamic="true" />
 	<property name="project.build"		value="${version::get-build(version::parse(project.version))}" 		dynamic="true" />
@@ -187,5 +187,20 @@
 			<echo message="WARNING: nunit-console not found, using less predictable NAnt &lt;nunit2&gt; task" unless="${nunit.found}"/>
 		</if>
 	</target>
+	
+	<script language="C#" prefix="build">
+		<code>
+			<![CDATA[
+				[Function("path-make-relative")]
+				public static string PathMakeRelative(string fromPath, string toPath)
+				{
+					Uri uri1 = new Uri(Path.GetFullPath(fromPath));
+					Uri uri2 = new Uri(Path.GetFullPath(toPath));
+					return uri1.MakeRelative(uri2);
+				}
+				
+			]]>
+		</code>
+	</script>
 	
 </project>
