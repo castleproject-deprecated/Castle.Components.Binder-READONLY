@@ -45,15 +45,23 @@ namespace Castle.ActiveRecord.Framework
 
 		public void Init(HttpApplication app)
 		{
+			if (ActiveRecordBase.holder == null)
+			{
+				// Not properly initialized, most probably due to a container initialization failure
+				// We cannot throw an exception as it will hide the original error, so we just
+				// skip our process completely
+
+				return;
+			}
+
 			app.BeginRequest += new EventHandler(OnBeginRequest);
 			app.EndRequest += new EventHandler(OnEndRequest);
-
+			
 			isWebConfigured = (ActiveRecordBase.holder.ThreadScopeInfo is WebThreadScopeInfo);
 		}
 
 		public void Dispose()
 		{
-			
 		}
 
 		private void OnBeginRequest(object sender, EventArgs e)
