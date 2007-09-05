@@ -1622,7 +1622,7 @@ namespace Commons.Collections
 		{
 			ExtendedProperties c = new ExtendedProperties();
 
-			foreach (String key in p.Keys)
+			foreach(String key in p.Keys)
 			{
 				Object value = p.GetProperty(key);
 				

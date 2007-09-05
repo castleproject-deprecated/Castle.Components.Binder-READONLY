@@ -15,9 +15,7 @@
 namespace Castle.ActiveRecord.Framework.Validators
 {
 	using System;
-	using System.Reflection;
-
-
+	
 	public class ConfirmationValidator : AbstractValidator
 	{
 		private String _confirmationFieldOrProperty;
@@ -29,7 +27,7 @@ namespace Castle.ActiveRecord.Framework.Validators
 
 		public override bool Perform(object instance, object fieldValue)
 		{
-			object confValue = GetFieldOrPropertyValue(instance);
+			object confValue = GetFieldOrPropertyValue(instance, _confirmationFieldOrProperty);
 
 			if (confValue == null && (fieldValue == null || fieldValue.ToString().Length == 0))
 			{
@@ -50,27 +48,6 @@ namespace Castle.ActiveRecord.Framework.Validators
 			}
 
 			return confValue.Equals(fieldValue);
-		}
-
-		private object GetFieldOrPropertyValue(object instance)
-		{
-			PropertyInfo pi = instance.GetType().GetProperty(_confirmationFieldOrProperty, BindingFlags.DeclaredOnly|BindingFlags.Instance|BindingFlags.Public);
-			
-			if (pi == null)
-			{
-				FieldInfo fi = instance.GetType().GetField(_confirmationFieldOrProperty, BindingFlags.DeclaredOnly|BindingFlags.Instance|BindingFlags.Public);
-
-				if (fi != null)
-				{
-					return fi.GetValue( instance );
-				}
-			}
-			else
-			{
-				return pi.GetValue(instance, null);
-			}
-
-			throw new ValidationException("No public instance field or property named " + _confirmationFieldOrProperty + " for type " + instance.GetType().FullName);
 		}
 
 		protected override string BuildErrorMessage()
