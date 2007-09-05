@@ -117,6 +117,10 @@ namespace Castle.Windsor.Configuration.Interpreters
 			{
 				DeserializeComponents(node.ChildNodes, store);
 			}
+			else if (BootstrapNodeName.Equals(node.Name))
+			{
+				DeserializeBootstrapComponents(node.ChildNodes, store);
+			}
 			else
 			{
 				throw new ConfigurationException(String.Format("DeserializeElement cannot process element {0}", node.Name));
@@ -158,6 +162,19 @@ namespace Castle.Windsor.Configuration.Interpreters
 			}
 		}
 
+		private void DeserializeBootstrapComponents(XmlNodeList nodes, IConfigurationStore store)
+		{
+			foreach(XmlNode node in nodes)
+			{
+				if (node.NodeType == XmlNodeType.Element)
+				{
+					AssertNodeName(node, ComponentNodeName);
+
+					DeserializeBootstrapComponent(node, store);
+				}
+			}
+		}
+
 		private void DeserializeComponent(XmlNode node, IConfigurationStore store)
 		{
 			String id = GetRequiredAttributeValue(node, "id");
@@ -167,9 +184,18 @@ namespace Castle.Windsor.Configuration.Interpreters
 			AddComponentConfig(id, config, store);
 		}
 
+		private void DeserializeBootstrapComponent(XmlNode node, IConfigurationStore store)
+		{
+			String id = GetRequiredAttributeValue(node, "id");
+
+			IConfiguration config = GetDeserializedNode(node);
+
+			AddBootstrapComponentConfig(id, config, store);
+		}
+
 		private IConfiguration GetDeserializedNode(XmlNode node)
 		{
-			MutableConfiguration config = null;
+			MutableConfiguration config;
 			ConfigurationCollection configChilds = new ConfigurationCollection();
 
 			StringBuilder configValue = new StringBuilder();
@@ -239,16 +265,6 @@ namespace Castle.Windsor.Configuration.Interpreters
 		private bool IsTextNode(XmlNode node)
 		{
 			return node.NodeType == XmlNodeType.Text || node.NodeType == XmlNodeType.CDATA;
-		}
-
-		private void AssertRequiredAttribute(IConfiguration config, string attrName, string parentName)
-		{
-			String content = config.Attributes[attrName];
-
-			if (content == null || content.Trim() == String.Empty)
-			{
-				throw new ConfigurationException(String.Format("{0} expects {1} attribute", parentName, attrName));
-			}
 		}
 
 		private void AssertNodeName(XmlNode node, string expectedName)
