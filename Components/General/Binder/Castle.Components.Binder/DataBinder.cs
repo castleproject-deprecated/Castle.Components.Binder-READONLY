@@ -207,6 +207,12 @@ namespace Castle.Components.Binder
 			{
 				return InternalBindObjectArray(instanceType, paramPrefix, node, out succeeded);
 			}
+#if DOTNET2
+			else if (IsGenericList(instanceType))
+			{
+				return InternalBindGenericList(instanceType, paramPrefix, node, out succeeded);
+			}
+#endif
 			else
 			{
 				succeeded = true;
@@ -246,9 +252,11 @@ namespace Castle.Components.Binder
 			// TODO: Good candidate to cache:
 			PropertyInfo[] props = instanceType.GetProperties(PropertiesBindingFlags);
 
+			string nodeFullName = node.FullName;
+
 			foreach(PropertyInfo prop in props)
 			{
-				if (ShouldIgnoreProperty(prop)) continue;
+				if (ShouldIgnoreProperty(prop, nodeFullName)) continue;
 
 				Type propType = prop.PropertyType;
 				String paramName = prop.Name;
@@ -265,26 +273,14 @@ namespace Castle.Components.Binder
 
 						if (translatedParamName == null) continue;
 
-//						if (node.CanConvert)
-//						{
-//							object value = node.GetEntryValue(translatedParamName, propType, out conversionSucceeded);
-//
-//							if (conversionSucceeded)
-//							{
-//								prop.SetValue(instance, value, null);
-//							}
-//						}
-//						else
-//						{
-							object value = ConvertToSimpleValue(propType, translatedParamName, node, out conversionSucceeded);
+						object value = ConvertToSimpleValue(propType, translatedParamName, node, out conversionSucceeded);
 
-							if (conversionSucceeded)
-							{
-								prop.SetValue(instance, value, null);
-							}
-//						}
+						if (conversionSucceeded)
+						{
+							prop.SetValue(instance, value, null);
+						}
 					}
-					else // if (node.CanHandleNested)
+					else 
 					{
 						Node nestedNode = node.GetChildNode(paramName);
 
@@ -346,6 +342,42 @@ namespace Castle.Components.Binder
 			
 			return ConvertToArray(instanceType, paramPrefix, node, out succeeded);
 		}
+		
+#if DOTNET2
+		
+		internal static bool IsGenericList(Type instanceType)
+		{
+			if (!instanceType.IsGenericType )
+			{
+				return false;
+			}
+			if (typeof(IList).IsAssignableFrom(instanceType))
+			{
+				return true;
+			}
+
+			Type[] genericArgs = instanceType.GetGenericArguments();
+			
+			if (genericArgs.Length == 0)
+			{
+				return false;
+			}
+			Type listType = typeof(System.Collections.Generic.IList<>).MakeGenericType(genericArgs[0]);
+			return listType.IsAssignableFrom(instanceType);
+		}
+		
+		private object InternalBindGenericList(Type instanceType, string paramPrefix, Node node, out bool succeeded)
+		{
+			succeeded = false;
+
+			if (node == null)
+			{
+				return CreateInstance(instanceType, paramPrefix, node);
+			}
+
+			return ConvertToGenericList(instanceType, paramPrefix, node, out succeeded);
+		}
+#endif
 
 		#endregion
 
@@ -383,7 +415,14 @@ namespace Castle.Components.Binder
 
 		protected virtual bool ShouldIgnoreType(Type instanceType)
 		{
-			return instanceType.IsAbstract || instanceType.IsInterface;
+			bool ignore = instanceType.IsAbstract || instanceType.IsInterface;
+#if DOTNET2
+			if (ignore && instanceType.IsGenericType)
+			{
+				ignore = !IsGenericList(instanceType);
+			}
+#endif
+			return ignore;
 		}
 
 		protected virtual bool PerformCustomBinding(object instance, string prefix, Node node)
@@ -492,9 +531,16 @@ namespace Castle.Components.Binder
 
 		private object ConvertComplexNodesToArray(Type desiredType, IndexedNode parent, out bool conversionSucceeded)
 		{
-			conversionSucceeded = true;
-			
 			Type arrayElemType = desiredType.GetElementType();
+
+			ArrayList validItems = ConvertComplexNodesToList(arrayElemType, parent, out conversionSucceeded);
+
+			return conversionSucceeded ? validItems.ToArray(arrayElemType) : Array.CreateInstance(arrayElemType, 0);
+		}
+
+		private ArrayList ConvertComplexNodesToList(Type elemType, IndexedNode parent, out bool conversionSucceeded)
+		{
+			conversionSucceeded = true;
 			
 			ArrayList validItems = new ArrayList();
 			
@@ -504,7 +550,7 @@ namespace Castle.Components.Binder
 				{
 					CompositeNode lnode = node as CompositeNode;
 					
-					validItems.Add(InternalBindObject(arrayElemType, parent.Name, lnode));
+					validItems.Add(InternalBindObject(elemType, parent.Name, lnode, out conversionSucceeded));
 					
 					if (!conversionSucceeded)
 					{
@@ -513,17 +559,24 @@ namespace Castle.Components.Binder
 				}
 			}
 			
-			return conversionSucceeded ? validItems.ToArray(arrayElemType) : Array.CreateInstance(arrayElemType, 0);
+			return validItems;
 		}
-		
+
 		private object ConvertFlatNodesToArray(Type desiredType, Node[] nodes, out bool conversionSucceeded)
 		{
-			conversionSucceeded = true;
-			
 			Type arrayElemType = desiredType.GetElementType();
-			
+
+			ArrayList validItems = ConvertFlatNodesToList(arrayElemType, nodes, out conversionSucceeded);
+
+			return conversionSucceeded ? validItems.ToArray(arrayElemType) : Array.CreateInstance(arrayElemType, 0);
+		}
+
+		private ArrayList ConvertFlatNodesToList(Type elemType, Node[] nodes, out bool conversionSucceeded)
+		{
+			conversionSucceeded = true;
+
 			ArrayList validItems = new ArrayList();
-			
+
 			foreach(Node node in nodes)
 			{
 				if (node.Name != String.Empty)
@@ -535,7 +588,7 @@ namespace Castle.Components.Binder
 				{
 					LeafNode lnode = node as LeafNode;
 					
-					validItems.Add(ConvertLeafNode(arrayElemType, lnode, out conversionSucceeded));
+					validItems.Add(ConvertLeafNode(elemType, lnode, out conversionSucceeded));
 					
 					if (!conversionSucceeded)
 					{
@@ -544,9 +597,64 @@ namespace Castle.Components.Binder
 				}
 			}
 			
-			return conversionSucceeded ? validItems.ToArray(arrayElemType) : Array.CreateInstance(arrayElemType, 0);
+			return validItems;
 		}
 
+#if DOTNET2
+		private object ConvertToGenericList(Type desiredType, String key, Node node, out bool conversionSucceeded)
+		{
+			Type[] genericArgs = desiredType.GetGenericArguments();
+			
+			if (genericArgs.Length == 0)
+			{
+				throw new BindingException("Can't infer the Generics placeholders (type parameters). Key {0}.", key);
+			}
+
+			Type elemType = genericArgs[0];
+
+			if (node == null)
+			{
+				conversionSucceeded = false;
+				return CreateInstance(desiredType, key, node);
+			}
+			else if (node.NodeType == NodeType.Leaf)
+			{
+				LeafNode leafNode = node as LeafNode;
+
+				return Converter.Convert(desiredType, leafNode.ValueType, leafNode.Value, out conversionSucceeded);
+			}
+			else if (node.NodeType == NodeType.Indexed)
+			{
+				IndexedNode indexedNode = node as IndexedNode;
+
+				IList convertedNodes;
+
+				if (IsSimpleProperty(elemType))
+				{
+					convertedNodes = ConvertFlatNodesToList(elemType, indexedNode.ChildNodes, out conversionSucceeded);
+				}
+				else
+				{
+					convertedNodes = ConvertComplexNodesToList(elemType, indexedNode, out conversionSucceeded);
+				}
+
+				IList target = (IList) CreateInstance(desiredType, key, node);
+				
+				foreach (object elem in convertedNodes)
+				{
+					target.Add(elem);
+				}
+
+				return target;
+			}
+			else
+			{
+				throw new BindingException("Could not convert param to generic list as the node related " +
+					"to the param is not a leaf node nor an indexed node. Key {0}", key);
+			}
+		}
+#endif
+		
 		private object TrySpecialDateTimeBinding(Type desiredType, CompositeNode treeRoot, 
 		                                         String paramName, out bool conversionSucceeded)
 		{
@@ -653,23 +761,25 @@ namespace Castle.Components.Binder
 		{
 			for(int i = 0; i < list.Length; i++)
 			{
-				list[i] = list[i].Trim();
+				list[i] = "root." + list[i].Trim();
 			}
 			Array.Sort(list, CaseInsensitiveComparer.Default);
 		}
 
-		private bool ShouldIgnoreProperty(PropertyInfo prop)
+		private bool ShouldIgnoreProperty(PropertyInfo prop, string nodeFullName)
 		{
 			bool allowed = true;
 			bool disallowed = false;
 
+			string propId = string.Format("{0}.{1}", nodeFullName, prop.Name);
+
 			if (allowedPropertyList != null)
 			{
-				allowed = Array.BinarySearch(allowedPropertyList, prop.Name, CaseInsensitiveComparer.Default) >= 0;
+				allowed = Array.BinarySearch(allowedPropertyList, propId, CaseInsensitiveComparer.Default) >= 0;
 			}
 			if (excludedPropertyList != null)
 			{
-				disallowed = Array.BinarySearch(excludedPropertyList, prop.Name, CaseInsensitiveComparer.Default) >= 0;
+				disallowed = Array.BinarySearch(excludedPropertyList, propId, CaseInsensitiveComparer.Default) >= 0;
 			}
 
 			return (!allowed) || (disallowed);
@@ -677,12 +787,6 @@ namespace Castle.Components.Binder
 
 		private bool IsSimpleProperty(Type propType)
 		{
-			// When dealing with arrays or lists we want to check
-			// the type of the array element type
-//			if (propType.IsArray)
-//			{
-//				propType = propType.GetElementType();
-//			}
 			if (propType.IsArray)
 			{
 				return false;

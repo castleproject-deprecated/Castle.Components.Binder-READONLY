@@ -18,15 +18,14 @@ namespace Castle.ActiveRecord
 	using System.Collections;
 	using System.Data;
 	using System.Reflection;
-
-	using NHibernate.Cfg;
-	using NHibernate.Tool.hbm2ddl;
-	
-	using Castle.Core.Configuration;
 	using Castle.ActiveRecord.Framework;
 	using Castle.ActiveRecord.Framework.Config;
-	using Castle.ActiveRecord.Framework.Scopes;
 	using Castle.ActiveRecord.Framework.Internal;
+	using Castle.ActiveRecord.Framework.Scopes;
+	using Castle.Core.Configuration;
+	using NHibernate.Cfg;
+	using NHibernate.Tool.hbm2ddl;
+	using Environment=NHibernate.Cfg.Environment;
 
 	public delegate void SessionFactoryHolderDelegate(ISessionFactoryHolder holder);
 
@@ -41,9 +40,9 @@ namespace Castle.ActiveRecord
 		private static readonly Object lockConfig = new object();
 
 		private static bool isInitialized = false;
-		
+
 		private static IDictionary registeredTypes;
-		
+
 		/// <summary>
 		/// This is saved so one can invoke <c>RegisterTypes</c> later
 		/// </summary>
@@ -76,9 +75,9 @@ namespace Castle.ActiveRecord
 				{
 					throw new ArgumentNullException("types");
 				}
-				
+
 				registeredTypes = new Hashtable();
-				
+
 				configSource = source;
 
 				// First initialization
@@ -92,6 +91,7 @@ namespace Castle.ActiveRecord
 				ActiveRecordModel.type2Model.Clear();
 				ActiveRecordModel.isDebug = source.Debug;
 				ActiveRecordModel.isLazyByDefault = source.IsLazyByDefault;
+				ActiveRecordModel.pluralizeTableNames = source.PluralizeTableNames;
 
 				// Sets up base configuration
 				SetUpConfiguration(source, typeof(ActiveRecordBase), holder);
@@ -125,7 +125,7 @@ namespace Castle.ActiveRecord
 
 			foreach(Assembly assembly in assemblies)
 			{
-                CollectValidActiveRecordTypesFromAssembly(assembly, list, source);
+				CollectValidActiveRecordTypesFromAssembly(assembly, list, source);
 			}
 
 			Initialize(source, (Type[]) list.ToArray(typeof(Type)));
@@ -167,7 +167,7 @@ namespace Castle.ActiveRecord
 				{
 					export.Create(false, true);
 				}
-				catch (Exception ex)
+				catch(Exception ex)
 				{
 					throw new ActiveRecordException("Could not create the schema", ex);
 				}
@@ -216,7 +216,7 @@ namespace Castle.ActiveRecord
 				{
 					export.Drop(false, true);
 				}
-				catch (Exception ex)
+				catch(Exception ex)
 				{
 					throw new ActiveRecordException("Could not drop the schema", ex);
 				}
@@ -241,7 +241,7 @@ namespace Castle.ActiveRecord
 					export.SetOutputFile(fileName);
 					export.Drop(false, false);
 				}
-				catch (Exception ex)
+				catch(Exception ex)
 				{
 					throw new ActiveRecordException("Could not drop the schema", ex);
 				}
@@ -266,7 +266,7 @@ namespace Castle.ActiveRecord
 					export.SetOutputFile(fileName);
 					export.Create(false, false);
 				}
-				catch (Exception ex)
+				catch(Exception ex)
 				{
 					throw new ActiveRecordException("Could not create the schema", ex);
 				}
@@ -281,7 +281,7 @@ namespace Castle.ActiveRecord
 			isInitialized = false;
 		}
 
-		private static ActiveRecordModelCollection BuildModels(ISessionFactoryHolder holder, 
+		private static ActiveRecordModelCollection BuildModels(ISessionFactoryHolder holder,
 		                                                       IConfigurationSource source,
 		                                                       Type[] types, bool ignoreProblematicTypes)
 		{
@@ -306,7 +306,7 @@ namespace Castle.ActiveRecord
 				else if (TypeDefinesADatabaseBoundary(type))
 				{
 					SetUpConfiguration(source, type, holder);
-					
+
 					continue;
 				}
 				else if (!IsActiveRecordType(type))
@@ -321,18 +321,18 @@ namespace Castle.ActiveRecord
 							String.Format("Type `{0}` is not an ActiveRecord type. Use ActiveRecordAttributes to define one", type.FullName));
 					}
 				}
-				
+
 				ActiveRecordModel model = builder.Create(type);
-				
+
 				if (model == null)
 				{
 					throw new ActiveRecordException(
 						String.Format("ActiveRecordModel for `{0}` could not be created", type.FullName));
 				}
-				
+
 				registeredTypes.Add(type, String.Empty);
 			}
-			
+
 			return models;
 		}
 
@@ -357,16 +357,16 @@ namespace Castle.ActiveRecord
 			{
 				return true;
 			}
-			
+
 			object[] attrs = type.GetCustomAttributes(typeof(ActiveRecordAttribute), false);
 
 			if (attrs != null && attrs.Length > 0)
 			{
-				ActiveRecordAttribute att = (ActiveRecordAttribute)attrs[0];
+				ActiveRecordAttribute att = (ActiveRecordAttribute) attrs[0];
 
 				return att.DiscriminatorColumn != null;
 			}
-			
+
 			return false;
 		}
 
@@ -399,7 +399,7 @@ namespace Castle.ActiveRecord
 			{
 				return assembly.GetExportedTypes();
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				throw new ActiveRecordInitializationException(
 					"Error while loading the exported types from the assembly: " + assembly.FullName, ex);
@@ -430,7 +430,7 @@ namespace Castle.ActiveRecord
 		private static Configuration CreateConfiguration(IConfiguration config)
 		{
 			// hammett comments: I'm gonna test this off for a while
-			NHibernate.Cfg.Environment.UseReflectionOptimizer = false;
+			Environment.UseReflectionOptimizer = false;
 
 			Configuration cfg = new Configuration();
 
@@ -450,18 +450,20 @@ namespace Castle.ActiveRecord
 			{
 				Configuration nconf = CreateConfiguration(config);
 
-				if (source.NamingStrategyImplementation != null) 
+				if (source.NamingStrategyImplementation != null)
 				{
 					Type namingStrategyType = source.NamingStrategyImplementation;
 
 					if (!typeof(INamingStrategy).IsAssignableFrom(namingStrategyType))
 					{
-						String message = String.Format("The specified type {0} does " + "not implement the interface INamingStrategy", namingStrategyType.FullName);
+						String message =
+							String.Format("The specified type {0} does " + "not implement the interface INamingStrategy",
+							              namingStrategyType.FullName);
 
 						throw new ActiveRecordException(message);
 					}
 
-					nconf.SetNamingStrategy((INamingStrategy)Activator.CreateInstance(namingStrategyType));
+					nconf.SetNamingStrategy((INamingStrategy) Activator.CreateInstance(namingStrategyType));
 				}
 
 				holder.Register(type, nconf);
@@ -499,7 +501,8 @@ namespace Castle.ActiveRecord
 			}
 		}
 
-		private static void RegisterTypes(ISessionFactoryHolder holder, IConfigurationSource source, Type[] types, bool ignoreProblematicTypes)
+		private static void RegisterTypes(ISessionFactoryHolder holder, IConfigurationSource source, Type[] types,
+		                                  bool ignoreProblematicTypes)
 		{
 			lock(lockConfig)
 			{
@@ -545,15 +548,16 @@ namespace Castle.ActiveRecord
 		/// <param name="assembly">Assembly to retrive types from</param>
 		/// <param name="list">Array to store retrived types in</param>
 		/// <param name="source">IConfigurationSource to inspect AR base declerations from</param>
-		private static void CollectValidActiveRecordTypesFromAssembly(Assembly assembly, ArrayList list, IConfigurationSource source)
+		private static void CollectValidActiveRecordTypesFromAssembly(Assembly assembly, ArrayList list,
+		                                                              IConfigurationSource source)
 		{
 			Type[] types = GetExportedTypesFromAssembly(assembly);
 
 			Type activeRecordBaseType = typeof(ActiveRecordBase);
 
-			foreach (Type type in types)
+			foreach(Type type in types)
 			{
-				if (IsActiveRecordType(type) || 
+				if (IsActiveRecordType(type) ||
 				    (source.GetConfiguration(type) != null && activeRecordBaseType.IsAssignableFrom(type)))
 				{
 					list.Add(type);

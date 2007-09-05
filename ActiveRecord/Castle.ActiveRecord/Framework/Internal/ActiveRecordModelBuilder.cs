@@ -15,8 +15,8 @@
 namespace Castle.ActiveRecord.Framework.Internal
 {
 	using System;
-	using System.Reflection;
 	using System.Collections;
+	using System.Reflection;
 
 	public class ActiveRecordModelBuilder
 	{
@@ -105,7 +105,9 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 			if (model.ActiveRecordAtt.Table == null)
 			{
-				model.ActiveRecordAtt.Table = model.Type.Name;
+				model.ActiveRecordAtt.Table = ActiveRecordModel.pluralizeTableNames
+				                              	? Inflector.Pluralize(model.Type.Name)
+				                              	: model.Type.Name;
 			}
 		}
 
@@ -161,13 +163,13 @@ namespace Castle.ActiveRecord.Framework.Internal
 					{
 						PrimaryKeyAttribute propAtt = attribute as PrimaryKeyAttribute;
 						isArProperty = true;
-						
+
 						if (prop.PropertyType.IsDefined(typeof(CompositeKeyAttribute), true))
 						{
 							object[] att = prop.PropertyType.GetCustomAttributes(typeof(CompositeKeyAttribute), true);
-							
+
 							CompositeKeyAttribute cAtt = att[0] as CompositeKeyAttribute;
-							
+
 							model.CompositeKey = new CompositeKeyModel(prop, cAtt);
 						}
 						else
@@ -254,7 +256,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 						model.Timestamp = new TimestampModel(prop, propAtt);
 					}
-					// Relations
+						// Relations
 					else if (attribute is OneToOneAttribute)
 					{
 						OneToOneAttribute propAtt = attribute as OneToOneAttribute;
@@ -269,7 +271,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 						model.BelongsTo.Add(new BelongsToModel(prop, propAtt));
 					}
-					// The ordering is important here, HasManyToAny must comes before HasMany!
+						// The ordering is important here, HasManyToAny must comes before HasMany!
 					else if (attribute is HasManyToAnyAttribute)
 					{
 						HasManyToAnyAttribute propAtt = attribute as HasManyToAnyAttribute;
@@ -356,19 +358,19 @@ namespace Castle.ActiveRecord.Framework.Internal
 			return shouldCheck;
 		}
 
-		private static bool IsRootType(Type type) {
-			
+		private static bool IsRootType(Type type)
+		{
 			bool isRootType = type.BaseType != typeof(object) &&
-			                   type.BaseType != typeof(ActiveRecordBase) &&
-			                   type.BaseType != typeof(ActiveRecordValidationBase);
-								// && !type.BaseType.IsDefined(typeof(ActiveRecordAttribute), false);
+			                  type.BaseType != typeof(ActiveRecordBase) &&
+			                  type.BaseType != typeof(ActiveRecordValidationBase);
+			// && !type.BaseType.IsDefined(typeof(ActiveRecordAttribute), false);
 
 #if DOTNET2
 			// generic check
 			if (type.BaseType.IsGenericType)
 			{
 				isRootType = type.BaseType.GetGenericTypeDefinition() != typeof(ActiveRecordBase<>) &&
-				              type.BaseType.GetGenericTypeDefinition() != typeof(ActiveRecordValidationBase<>);
+				             type.BaseType.GetGenericTypeDefinition() != typeof(ActiveRecordValidationBase<>);
 			}
 #endif
 
