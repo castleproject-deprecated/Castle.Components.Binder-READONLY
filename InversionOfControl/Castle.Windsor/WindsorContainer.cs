@@ -109,7 +109,8 @@ namespace Castle.Windsor
 			if (installer == null) throw new ArgumentNullException("installer");
 
 			this.kernel = kernel;
-			this.kernel.ProxyFactory = new Proxy.ProxySmartFactory();
+			// this.kernel.ProxyFactory = new Proxy.ProxySmartFactory();
+			this.kernel.ProxyFactory = new Proxy.DefaultProxyFactory();
 
 			this.installer = installer;
 		}
@@ -261,6 +262,28 @@ namespace Castle.Windsor
 		/// Returns a component instance by the service
 		/// </summary>
 		/// <param name="service"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		public virtual object Resolve(Type service, IDictionary arguments)
+		{
+			return kernel.Resolve(service, arguments);
+		}
+
+		/// <summary>
+		/// Returns a component instance by the key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		public virtual object Resolve(String key, IDictionary arguments)
+		{
+			return kernel.Resolve(key, arguments);
+		}
+
+		/// <summary>
+		/// Returns a component instance by the service
+		/// </summary>
+		/// <param name="service"></param>
 		/// <returns></returns>
 		public virtual object Resolve(Type service)
 		{
@@ -296,13 +319,47 @@ namespace Castle.Windsor
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="service"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		public virtual object Resolve(String key, Type service, IDictionary arguments)
+		{
+			return kernel.Resolve(key, service, arguments);
+		}
+		
+		/// <summary>
+		/// Returns a component instance by the service 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		public T Resolve<T>(IDictionary arguments)
+		{
+			return (T) Resolve(typeof(T), arguments);
+		}
+
+		/// <summary>
+		/// Returns a component instance by the key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		public virtual T Resolve<T>(String key, IDictionary arguments)
+		{
+			return (T) Resolve(key, typeof(T), arguments);
+		}
+
+		/// <summary>
 		/// Returns a component instance by the service 
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
 		public T Resolve<T>()
 		{
-			return (T) Resolve(typeof(T));
+			return (T)Resolve(typeof(T));
 		}
 
 		/// <summary>
@@ -312,9 +369,8 @@ namespace Castle.Windsor
 		/// <returns></returns>
 		public virtual T Resolve<T>(String key)
 		{
-			return (T) Resolve(key, typeof(T));
+			return (T)Resolve(key, typeof(T));
 		}
-
 #endif
 
 		/// <summary>

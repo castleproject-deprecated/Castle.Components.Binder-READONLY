@@ -4,6 +4,20 @@ Change history
 Release Candidate 3
 ===================
 
+- Applied patch by Andrew Peters fixing MR-182
+  "Adds FormTo and LinkToWithPost methods to HtmlHelper"
+
+- Fixed MR-180
+  "Url Tokenizer Bug at Turkish Culture Info"
+
+- Properly quote file/directory arguments in Pre/Post Build Events to accomodate
+  names with spaces.
+  Also added some missing files to TestSiteWindsor-vs2005 Project
+
+- Removed DetermineIfPostBack due to side effects when using a custom upload approach
+  Also removed PreRequestHandler setting the session as it wasn't really necessary using
+  this event for that. Moved to the handler.
+
 - Included abstract Filter class, just as a helper to implement filters 
   with a better interface (instead of IFilter.Process)
 

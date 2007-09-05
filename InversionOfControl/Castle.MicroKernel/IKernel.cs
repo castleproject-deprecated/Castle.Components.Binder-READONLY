@@ -246,6 +246,22 @@ namespace Castle.MicroKernel
 		/// <returns></returns>
 		object Resolve(String key, Type service);
 
+		/// <summary>
+		/// Returns component instances that implement TService
+		/// </summary>
+		/// <typeparam name="TService"></typeparam>
+		/// <returns></returns>
+		TService[] ResolveServices<TService>();
+
+		/// <summary>
+		/// Returns a component instance by the key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="service"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		object Resolve(String key, Type service, IDictionary arguments);
+		
 		#endif
 		
 		/// <summary>

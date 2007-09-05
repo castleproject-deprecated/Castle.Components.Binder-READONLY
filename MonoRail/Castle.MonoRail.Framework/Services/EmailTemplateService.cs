@@ -83,7 +83,7 @@ namespace Castle.MonoRail.Framework
 			
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Rendering email message. Template name {0}", templateName);
+				logger.DebugFormat("Rendering email message. Template name {0}", templateName);
 			}
 
 			IRailsEngineContext context = EngineContextModule.ObtainRailsEngineContext(HttpContext.Current);
@@ -169,7 +169,7 @@ namespace Castle.MonoRail.Framework
 			
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Rendering email message to {0} cc {1} bcc {2}", message.To, message.Cc, message.Bcc);
+				logger.DebugFormat("Rendering email message to {0} cc {1} bcc {2}", message.To, message.Cc, message.Bcc);
 			}
 
 			body = Constants.readdress.Replace(body, String.Empty);
@@ -191,7 +191,7 @@ namespace Castle.MonoRail.Framework
 				String header	= matches2[i].Groups[Constants.HeaderKey].ToString();
 				String strval	= matches2[i].Groups[Constants.ValueKey].ToString();
 
-				if (header.ToLower() == Constants.Subject)
+				if (header.ToLower(System.Globalization.CultureInfo.InvariantCulture) == Constants.Subject)
 				{
 					message.Subject = strval;
 				}
@@ -202,7 +202,7 @@ namespace Castle.MonoRail.Framework
 				
 				if (logger.IsDebugEnabled)
 				{
-					logger.Debug("Adding header {0} value {1}", header, strval);
+					logger.DebugFormat("Adding header {0} value {1}", header, strval);
 				}
 			}
 			
@@ -212,11 +212,11 @@ namespace Castle.MonoRail.Framework
 			
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Email message body {0}", body);
+				logger.DebugFormat("Email message body {0}", body);
 			}
 
 			// a little magic to see if the body is html
-			if (message.Body.ToLower().IndexOf(Constants.HtmlTag) != -1)
+			if (message.Body.ToLower(System.Globalization.CultureInfo.InvariantCulture).IndexOf(Constants.HtmlTag) != -1)
 			{
 				message.Format = Format.Html;
 				

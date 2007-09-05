@@ -93,6 +93,10 @@
       <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
       <Name>Castle.Core-vs2005</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Tools\Castle.DynamicProxy2\Castle.DynamicProxy\Castle.DynamicProxy-net-2-0.csproj">
+      <Project>{2DE7CC8C-6F06-43BC-A7B6-9466BEDEAC28}</Project>
+      <Name>Castle.DynamicProxy-net-2-0</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Castle.MicroKernel.Tests\Castle.MicroKernel.Tests-vs2005.csproj">
       <Project>{EF9313A4-C6E0-40F7-9E3F-530D547D3AEF}</Project>
       <Name>Castle.MicroKernel.Tests-2-0</Name>
@@ -132,6 +136,7 @@
     <Compile Include="Components\CalculatorServiceWithLifecycle.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Components\Camera.cs" />
     <Compile Include="Components\CircularDependencyComponents.cs" />
     <Compile Include="Components\ComponentWithProperties.cs" />
     <Compile Include="Components\DotNet2Components.cs" />
@@ -150,6 +155,7 @@
     <Compile Include="Components\IReviewer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Components\MailServer.cs" />
     <Compile Include="Components\MarshalCalculatorService.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -181,9 +187,11 @@
     <Compile Include="ContainerProblem.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ContainerProblem2.cs" />
     <Compile Include="DependencyProblem.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Content Include="ignoreprop.xml" />
     <Content Include="DotNet2Config\ComplexGenericConfig.xml" />
     <Content Include="DotNet2Config\GenericDecoratorConfig.xml" />
     <Content Include="DotNet2Config\MissingDecoratorConfig.xml" />
@@ -195,6 +203,7 @@
     <Compile Include="Facilities\SlowlyInitFacility.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IgnoreWireTestCase.cs" />
     <Compile Include="Installer\InstallerTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -202,9 +211,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PropertiesInspectionBehaviorTestCase.cs" />
-    <Compile Include="RealProxyTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ReportedProblemTestCase.cs">
       <SubType>Code</SubType>
     </Compile>

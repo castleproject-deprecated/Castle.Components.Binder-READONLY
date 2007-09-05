@@ -15,12 +15,13 @@
 namespace Castle.DynamicProxy.Tests
 {
 	using System;
-
+	using Castle.Core.Interceptor;
 	using Castle.DynamicProxy.Generators;
 	using Castle.DynamicProxy.Tests.Classes;
 	using Castle.DynamicProxy.Tests.Interceptors;
-	
+	using Castle.DynamicProxy.Tests.InterClasses;
 	using NUnit.Framework;
+	using ClassWithIndexer=Castle.DynamicProxy.Tests.Classes.ClassWithIndexer;
 
 	[TestFixture]
 	public class BasicClassProxyTestCase : BasePEVerifyTestCase
@@ -156,6 +157,55 @@ namespace Castle.DynamicProxy.Tests
 				Assert.AreEqual("This is a DynamicProxy2 error: the interceptor attempted " + 
 					"to 'Proceed' for a method without a target, for example, an interface method", ex.Message);
 			}
+		}
+
+		[Test]
+		public void ProxyForCharReturnType()
+		{
+			LogInvocationInterceptor logger = new LogInvocationInterceptor();
+			object proxy = generator.CreateClassProxy(typeof(ClassWithCharRetType), logger);
+			Assert.IsNotNull(proxy);
+			ClassWithCharRetType classProxy = (ClassWithCharRetType) proxy;
+			Assert.AreEqual('c', classProxy.DoSomething());
+		}
+		
+		[Test]
+		public void ProxyForClassWithConstructors()
+		{
+			object proxy = generator.CreateClassProxy(
+				typeof(ClassWithConstructors), new IInterceptor[] { new StandardInterceptor() }, 
+				new object[] { "name" } );
+			
+			Assert.IsNotNull(proxy);
+			ClassWithConstructors classProxy = (ClassWithConstructors) proxy;
+			Assert.AreEqual("name", classProxy.Name);
+
+			proxy = generator.CreateClassProxy(
+				typeof(ClassWithConstructors), new IInterceptor[] { new StandardInterceptor() },
+				new object[] { "name", 10 });
+
+			Assert.IsNotNull(proxy);
+			classProxy = (ClassWithConstructors) proxy;
+			Assert.AreEqual("name", classProxy.Name);
+			Assert.AreEqual(10, classProxy.X);
+		}
+
+		[Test]
+		[Ignore("Multi dimensional arrays seems to not work at all")]
+		public void ProxyTypeWithMultiDimentionalArrayAsParameters()
+		{
+			LogInvocationInterceptor log = new LogInvocationInterceptor();
+			
+			ClassWithMultiDimentionalArray proxy = 
+				generator.CreateClassProxy<ClassWithMultiDimentionalArray>(log);
+
+			int[,] x = new int[1, 2];
+
+			proxy.Do(new int[] { 1 });
+			proxy.Do2(x);
+			proxy.Do3(new string[] {"1", "2"});
+			
+			Assert.AreEqual("Do Do2 Do3 ", log.LogContents);
 		}
 	}
 }

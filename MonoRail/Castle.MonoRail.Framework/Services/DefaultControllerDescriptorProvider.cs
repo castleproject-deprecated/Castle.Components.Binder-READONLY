@@ -137,7 +137,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Building controller descriptor for {0}", controllerType);
+				logger.DebugFormat("Building controller descriptor for {0}", controllerType);
 			}
 
 			ControllerMetaDescriptor descriptor = new ControllerMetaDescriptor();
@@ -156,7 +156,7 @@ namespace Castle.MonoRail.Framework.Services
 		private void CollectActions(Type controllerType, ControllerMetaDescriptor desc)
 		{
 			// HACK: GetRealControllerType is a workaround for DYNPROXY-14 bug
-			// see: http://support.castleproject.org/jira/browse/DYNPROXY-14
+			// see: http://support.castleproject.org/browse/DYNPROXY-14
 			controllerType = GetRealControllerType(controllerType);
 
 			MethodInfo[] methods = controllerType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
@@ -215,7 +215,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Collection attributes for action {0}", method.Name);
+				logger.DebugFormat("Collection attributes for action {0}", method.Name);
 			}
 
 			ActionMetaDescriptor actionDescriptor = descriptor.GetAction(method);
@@ -269,13 +269,18 @@ namespace Castle.MonoRail.Framework.Services
 			desc.Resources = resourceDescriptorProvider.CollectResources(memberInfo);
 		}
 		
+		/// <summary>
+		/// Gets the real controller type, instead of the proxy type.
+		/// </summary>
+		/// <remarks>
+		/// Workaround for DYNPROXY-14 bug. See: http://support.castleproject.org/browse/DYNPROXY-14
+		/// </remarks>
 		private Type GetRealControllerType(Type controllerType)
 		{
 			Type prev = controllerType;
 
-			// try to get the first type which is not a proxy
-			// TODO: skip it in case of mixins
-			while(controllerType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen"))
+			// try to get the first non-proxy type
+			while(controllerType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2") || controllerType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen"))
 			{
 				controllerType = controllerType.BaseType;
 

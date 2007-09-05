@@ -18,6 +18,7 @@ namespace Castle.MonoRail.Framework
 	using System.Web;
 	using System.Web.SessionState;
 	using Castle.Core.Logging;
+	using Castle.MonoRail.Framework.Adapters;
 	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
@@ -73,7 +74,10 @@ namespace Castle.MonoRail.Framework
 		{
 			ControllerLifecycleExecutor executor = 
 				(ControllerLifecycleExecutor) context.UnderlyingContext.Items[ControllerLifecycleExecutor.ExecutorEntry];
-			
+
+			DefaultRailsEngineContext contextImpl = (DefaultRailsEngineContext) context;
+			contextImpl.ResolveRequestSession();
+
 			HttpContext httpCtx = context.UnderlyingContext;
 			
 			httpCtx.Items["mr.controller"] = executor.Controller;
@@ -123,7 +127,7 @@ namespace Castle.MonoRail.Framework
 				{
 					Controller controller = executor.Controller;
 					
-					logger.Debug("Ending request process for '{0}'/'{1}.{2}' Extension '{3}' with url '{4}'", 
+					logger.DebugFormat("Ending request process for '{0}'/'{1}.{2}' Extension '{3}' with url '{4}'", 
 						controller.AreaName, controller.Name, controller.Action, context.UrlInfo.Extension, context.UrlInfo.UrlRaw);
 				}
 

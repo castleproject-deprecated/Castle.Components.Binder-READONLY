@@ -20,18 +20,18 @@ namespace Castle.DynamicProxy.Generators
 	using System.Reflection;
 	using System.Threading;
 	using System.Xml.Serialization;
-	
+	using Castle.Core.Interceptor;
 	using Castle.DynamicProxy.Generators.Emitters;
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
 	/// <summary>
 	/// 
 	/// </summary>
+	[CLSCompliant(false)]
 	public class InterfaceProxyWithTargetGenerator : BaseProxyGenerator
 	{
 		private FieldReference targetField;
 		protected Dictionary<MethodInfo, NestedClassEmitter> method2Invocation = new Dictionary<MethodInfo, NestedClassEmitter>();
-
 		protected Dictionary<MethodInfo, MethodInfo> method2methodOnTarget = new Dictionary<MethodInfo, MethodInfo>();
 
 		public InterfaceProxyWithTargetGenerator(ModuleScope scope, Type theInterface) : base(scope, theInterface)
@@ -57,10 +57,17 @@ namespace Castle.DynamicProxy.Generators
 				return cacheType;
 			}
 
-			LockCookie lc = rwlock.UpgradeToWriterLock(-1);
+			rwlock.UpgradeToWriterLock(-1);
 
 			try
 			{
+				cacheType = GetFromCache(cacheKey);
+
+				if (cacheType != null)
+				{
+					return cacheType;
+				}
+				
 				generationHook = options.Hook;
 
 				String newName = targetType.Name + "Proxy" + Guid.NewGuid().ToString("N");
@@ -77,8 +84,10 @@ namespace Castle.DynamicProxy.Generators
 				}
 
 				AddDefaultInterfaces(interfaceList);
+				
+				Type baseType = options.BaseTypeForInterfaceProxy;
 
-				ClassEmitter emitter = BuildClassEmitter(newName, options.BaseTypeForInterfaceProxy, interfaceList);
+				ClassEmitter emitter = BuildClassEmitter(newName, baseType, interfaceList);
 				emitter.DefineCustomAttribute(new XmlIncludeAttribute(targetType));
 
 				// Custom attributes
@@ -105,10 +114,15 @@ namespace Castle.DynamicProxy.Generators
 
 				// Constructor
 
-				initCacheMethod = CreateInitializeCacheMethod(targetType, methods, emitter);
-
-				GenerateConstructor(initCacheMethod, emitter, interceptorsField, targetField);
-				// GenerateParameterlessConstructor(initCacheMethod, emitter, interceptorsField);
+				ConstructorEmitter typeInitializer = GenerateStaticConstructor(emitter);
+				
+				CacheMethodTokens(emitter, 
+				                  proxyTargetType.GetMethods(BindingFlags.Public | BindingFlags.Instance), 
+				                  typeInitializer);
+				
+				CreateInitializeCacheMethodBody(proxyTargetType, methods, emitter, typeInitializer);
+				GenerateConstructors(emitter, baseType, interceptorsField, targetField);
+				// GenerateParameterlessConstructor(emitter, interceptorsField, baseType);
 
 				// Implement interfaces
 
@@ -116,7 +130,7 @@ namespace Castle.DynamicProxy.Generators
 				{
 					foreach(Type inter in interfaces)
 					{
-						ImplementBlankInterface(targetType, inter, emitter, interceptorsField);
+						ImplementBlankInterface(targetType, inter, emitter, interceptorsField, typeInitializer);
 					}
 				}
 
@@ -133,7 +147,8 @@ namespace Castle.DynamicProxy.Generators
 
 				foreach(MethodInfo method in methods)
 				{
-					if (method.IsSpecialName && (method.Name.StartsWith("get_") || method.Name.StartsWith("set_")))
+					if (method.IsSpecialName && 
+					    (method.Name.StartsWith("get_") || method.Name.StartsWith("set_")))
 					{
 						continue;
 					}
@@ -149,6 +164,25 @@ namespace Castle.DynamicProxy.Generators
 					ReplicateNonInheritableAttributes(method, newProxiedMethod);
 
 					method2Emitter[method] = newProxiedMethod;
+
+					ParameterInfo[] parameters = method.GetParameters();
+					// ParameterInfo[] parametersProxy = newProxiedMethod.MethodBuilder.GetParameters();
+					
+					bool useDefineOverride = true;
+
+					for(int i = 0; i < parameters.Length; i++)
+					{
+						ParameterInfo paramInfo = parameters[i];
+						// ParameterInfo paramInfo2 = parametersProxy[i];
+						
+						Console.WriteLine("{0} {1} {2} {3}", paramInfo.Name, paramInfo.ParameterType, paramInfo.Attributes, paramInfo.Position);
+						// Console.WriteLine("{0} {1} {2} {3}", paramInfo2.Name, paramInfo2.ParameterType, paramInfo2.Attributes, paramInfo2.Position);
+					}
+
+					if (useDefineOverride)
+					{
+						// emitter.TypeBuilder.DefineMethodOverride(newProxiedMethod.MethodBuilder, method);
+					}
 				}
 
 				foreach(PropertyToGenerate propToGen in propsToGenerate)
@@ -167,6 +201,8 @@ namespace Castle.DynamicProxy.Generators
 											   ConstructorVersion.WithTargetMethod, method2methodOnTarget[propToGen.GetMethod]);
 
 						ReplicateNonInheritableAttributes(propToGen.GetMethod, getEmitter);
+
+						// emitter.TypeBuilder.DefineMethodOverride(getEmitter.MethodBuilder, propToGen.GetMethod);
 					}
 
 					if (propToGen.CanWrite)
@@ -183,22 +219,40 @@ namespace Castle.DynamicProxy.Generators
 						                       ConstructorVersion.WithTargetMethod, method2methodOnTarget[propToGen.SetMethod]);
 
 						ReplicateNonInheritableAttributes(propToGen.SetMethod, setEmitter);
+						
+						// emitter.TypeBuilder.DefineMethodOverride(setEmitter.MethodBuilder, propToGen.SetMethod);
 					}
 				}
 
 				// Complete Initialize 
 
-				CompleteInitCacheMethod(initCacheMethod);
+				CompleteInitCacheMethod(typeInitializer.CodeBuilder);
 
 				// Crosses fingers and build type
 
 				generatedType = emitter.BuildType();
 
+				foreach(MethodInfo m in generatedType.GetMethods())
+				{
+					ParameterInfo[] parameters = m.GetParameters();
+
+					Console.WriteLine(m.Name);
+
+					for (int i = 0; i < parameters.Length; i++)
+					{
+						ParameterInfo paramInfo = parameters[i];
+
+						Console.WriteLine("{0} {1} {2} {3}", paramInfo.Name, paramInfo.ParameterType, paramInfo.Attributes, paramInfo.Position);
+						// Console.WriteLine("{0} {1} {2} {3}", paramInfo2.Name, paramInfo2.ParameterType, paramInfo2.Attributes, paramInfo2.Position);
+					}
+				}
+				
+
 				AddToCache(cacheKey, generatedType);
 			}
 			finally
 			{
-				rwlock.DowngradeFromWriterLock(ref lc);
+				rwlock.ReleaseWriterLock();
 			}
 
 			Scope.SaveAssembly();

@@ -1,7 +1,20 @@
-
-
 Beta 1 Version 1.0.0.0
 ======================
+
+- Fixed DYNPROXY-39
+  "Deadlock in DynamicProxy2"
+
+- Fixed DYNPROXY-28
+  "Virtual methods calls from constructors are not working"
+
+- Fixed DYNPROXY-27
+  "Support for non-parameterless constructors"
+
+- Fixed DYNPROXY-25
+  "Chars returns are not properly configured"
+
+- Fixed DYNPROXY-24
+  "DynamicProxy2: missing locks"
 
 - Fixed DYNPROXY-34
   "Cant proxy generic interfaces"

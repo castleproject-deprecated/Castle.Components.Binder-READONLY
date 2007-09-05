@@ -19,10 +19,11 @@ namespace Castle.DynamicProxy.Generators
 	using System.Collections.Generic;
 	using System.Reflection;
 	using System.Reflection.Emit;
-	using Castle.Core.Logging;
+	using Castle.Core.Interceptor;
 	using Castle.DynamicProxy.Generators.Emitters;
+	using Castle.DynamicProxy.Generators.Emitters.CodeBuilders;
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	
+
 	public enum ConstructorVersion
 	{
 		WithTargetMethod,
@@ -44,6 +45,7 @@ namespace Castle.DynamicProxy.Generators
 	/// - Add tests and fixes for 'leaking this' problem
 	/// - Mixin support
 	/// </remarks>
+	[CLSCompliant(false)]
 	public abstract class BaseProxyGenerator
 	{
 		private readonly ModuleScope scope;
@@ -54,7 +56,7 @@ namespace Castle.DynamicProxy.Generators
 
 		protected readonly Type targetType;
 		protected IProxyGenerationHook generationHook;
-		protected MethodEmitter initCacheMethod;
+		// protected MethodEmitter initCacheMethod;
 
 		protected BaseProxyGenerator(ModuleScope scope, Type targetType)
 		{
@@ -87,10 +89,12 @@ namespace Castle.DynamicProxy.Generators
 		}
 
 		/// <summary>
-		/// Used by dinamically implement <see cref="IProxyTargetAccessor"/>
+		/// Used by dinamically implement <see cref="Core.Interceptor.IProxyTargetAccessor"/>
 		/// </summary>
 		/// <returns></returns>
 		protected abstract Reference GetProxyTargetReference();
+
+		protected abstract bool CanOnlyProxyVirtual();
 
 		#region Cache related
 
@@ -120,7 +124,8 @@ namespace Castle.DynamicProxy.Generators
 		}
 
 		protected void ImplementBlankInterface(Type targetType, Type _interface, 
-		                                       ClassEmitter emitter, FieldReference interceptorsField)
+		                                       ClassEmitter emitter, FieldReference interceptorsField, 
+		                                       ConstructorEmitter typeInitializerConstructor)
 		{
 			PropertyToGenerate[] propsToGenerate;
 			MethodInfo[] methods = CollectMethodsAndProperties(emitter, _interface, false, out propsToGenerate);
@@ -129,8 +134,7 @@ namespace Castle.DynamicProxy.Generators
 
 			foreach(MethodInfo method in methods)
 			{
-				AddFieldToCacheMethodTokenAndStatementsToInitialize(method, _interface, 
-				                                                    initCacheMethod, emitter);
+				AddFieldToCacheMethodTokenAndStatementsToInitialize(method, typeInitializerConstructor, emitter);
 				
 				method2Invocation[method] = BuildInvocationNestedType(emitter, targetType,
 																	  emitter.TypeBuilder,
@@ -248,7 +252,7 @@ namespace Castle.DynamicProxy.Generators
 
 			Expression typeTokenFieldExp = typeTokenField.ToExpression();
 			Expression methodInfoTokenExp;
-			
+
 			if (method2TokenField.ContainsKey(method)) // Token is in the cache
 			{
 				methodInfoTokenExp = method2TokenField[method].ToExpression();
@@ -257,7 +261,7 @@ namespace Castle.DynamicProxy.Generators
 			{
 				// Not in the cache: generic method
 				
-				methodInfoTokenExp = new MethodTokenExpression(method, targetType);
+				methodInfoTokenExp = new MethodTokenExpression(method);
 			}
 
 			ConstructorInfo constructor = invocationImpl.Constructors[0].Builder;
@@ -271,16 +275,26 @@ namespace Castle.DynamicProxy.Generators
 
 			if (version == ConstructorVersion.WithTargetMethod)
 			{
-				MethodTokenExpression methodOnTargetTokenExp = 
-					new MethodTokenExpression(methodOnTarget, methodOnTarget.DeclaringType);
+				Expression methodOnTargetTokenExp;
+
+				if (method2TokenField.ContainsKey(methodOnTarget)) // Token is in the cache
+				{
+					methodOnTargetTokenExp = method2TokenField[methodOnTarget].ToExpression();
+				}
+				else
+				{
+					// Not in the cache: generic method
+
+					methodOnTargetTokenExp = new MethodTokenExpression(methodOnTarget);
+				}
 				
 				newInvocImpl = new NewInstanceExpression(
 					constructor,
 					targetRef.ToExpression(),
 					interceptors,
 					typeTokenFieldExp,
-					methodInfoTokenExp,
 					methodOnTargetTokenExp,
+					methodInfoTokenExp,
 					new ReferencesToObjectArrayExpression(dereferencedArguments), 
 					SelfReference.Self.ToExpression());
 			}
@@ -321,41 +335,71 @@ namespace Castle.DynamicProxy.Generators
 			return methodEmitter;
 		}
 
-		protected void GenerateConstructor(MethodEmitter initCacheMethod, 
-		                                   ClassEmitter emitter, params FieldReference[] fields)
+		protected void GenerateConstructor(ClassEmitter emitter,
+										   params FieldReference[] fields)
 		{
-			ArgumentReference[] args = new ArgumentReference[fields.Length];
+			GenerateConstructor(emitter, null, fields);
+		}
 
-			for(int i = 0; i < args.Length; i++)
+		protected void GenerateConstructor(ClassEmitter emitter, 
+		                                   ConstructorInfo baseConstructor,
+		                                   params FieldReference[] fields)
+		{
+			ArgumentReference[] args;
+			ParameterInfo[] baseConstructorParams = null;
+
+			if (baseConstructor != null)
+			{
+				baseConstructorParams = baseConstructor.GetParameters();
+			}
+
+			if (baseConstructorParams != null && baseConstructorParams.Length != 0)
+			{
+				args = new ArgumentReference[fields.Length + baseConstructorParams.Length];
+
+				int offset = fields.Length;
+
+				for(int i = offset; i < offset + baseConstructorParams.Length; i++)
+				{
+					ParameterInfo paramInfo = baseConstructorParams[i - offset];
+					args[i] = new ArgumentReference(paramInfo.ParameterType);
+				}
+			}
+			else
+			{
+				args = new ArgumentReference[fields.Length];
+			}
+
+			for(int i = 0; i < fields.Length; i++)
 			{
 				args[i] = new ArgumentReference(fields[i].Reference.FieldType);
 			}
 
 			ConstructorEmitter constructor = emitter.CreateConstructor(args);
 
-			for(int i = 0; i < args.Length; i++)
+			for(int i = 0; i < fields.Length; i++)
 			{
 				constructor.CodeBuilder.AddStatement(new AssignStatement(fields[i], args[i].ToExpression()));
 			}
 			
-			// TODO: What we should do here is to invoke the initialization method before
-			// Otherwise if the base constructor makes a virtual call, an exception will be bound to happen
-			// However peverify complains with:
-			/**
-				[IL]: Error: [E:\dev\castleall\trunk\Tools\Castle.DynamicProxy2\Castle.DynamicProxy.Tests\bin\Debug
-				\CastleDynProxy2.dll : Proxy::.ctor][offset 0x00000008][found <uninitialized> ref ('this' ptr) 'Pro
-				xy'][expected ref 'Proxy'] Unexpected type on the stack.
-				1 Error Verifying CastleDynProxy2.dll
-			 */
-
 			// Invoke base constructor
 
-			constructor.CodeBuilder.InvokeBaseConstructor();
+			if (baseConstructor != null)
+			{
+				ArgumentReference[] slice = new ArgumentReference[baseConstructorParams.Length];
+				Array.Copy(args, fields.Length, slice, 0, baseConstructorParams.Length);
+
+				constructor.CodeBuilder.InvokeBaseConstructor(baseConstructor, slice);
+			}
+			else
+			{
+				constructor.CodeBuilder.InvokeBaseConstructor();
+			}
 
 			// Invoke initialize method
 
-			constructor.CodeBuilder.AddStatement(
-				new ExpressionStatement(new MethodInvocationExpression(SelfReference.Self, initCacheMethod)));
+			// constructor.CodeBuilder.AddStatement(
+			// 	new ExpressionStatement(new MethodInvocationExpression(SelfReference.Self, initCacheMethod)));
 
 			constructor.CodeBuilder.AddStatement(new ReturnStatement());
 		}
@@ -367,24 +411,33 @@ namespace Castle.DynamicProxy.Generators
 		/// This constructor is important to allow proxies to be XML serializable
 		/// </para>
 		/// </summary>
-		protected void GenerateParameterlessConstructor(MethodEmitter initCacheMethod, 
-		                                                ClassEmitter emitter, FieldReference interceptorField)
+		protected void GenerateParameterlessConstructor(ClassEmitter emitter, Type baseClass, FieldReference interceptorField)
 		{
+			// Check if the type actually has a default constructor
+
+			ConstructorInfo defaultConstructor = baseClass.GetConstructor(BindingFlags.Public, null, Type.EmptyTypes, null);
+			
+			if (defaultConstructor == null)
+			{
+				defaultConstructor = baseClass.GetConstructor(BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+
+				if (defaultConstructor == null || defaultConstructor.IsPrivate)
+				{
+					return;
+				}
+			}
+			
 			ConstructorEmitter constructor = emitter.CreateConstructor();
 			
 			// initialize fields with an empty interceptor
 
-			constructor.CodeBuilder.AddStatement(new AssignStatement(interceptorField, new NewArrayExpression(1, typeof(IInterceptor))));
+			constructor.CodeBuilder.AddStatement(
+				new AssignStatement(interceptorField, new NewArrayExpression(1, typeof(IInterceptor))));
 			constructor.CodeBuilder.AddStatement(new AssignArrayStatement(interceptorField, 0, new NewInstanceExpression(typeof(StandardInterceptor), new Type[0])));
 
 			// Invoke base constructor
 
-			constructor.CodeBuilder.InvokeBaseConstructor();
-
-			// Invoke initialize method
-
-			constructor.CodeBuilder.AddStatement(
-				new ExpressionStatement(new MethodInvocationExpression(SelfReference.Self, initCacheMethod)));
+			constructor.CodeBuilder.InvokeBaseConstructor(defaultConstructor);
 
 			constructor.CodeBuilder.AddStatement(new ReturnStatement());
 		}
@@ -487,6 +540,7 @@ namespace Castle.DynamicProxy.Generators
 		/// <param name="targetForInvocation"></param>
 		/// <param name="methodInfo"></param>
 		/// <param name="callbackMethod"></param>
+		/// <param name="version"></param>
 		/// <returns></returns>
 		protected NestedClassEmitter BuildInvocationNestedType(
 			ClassEmitter emitter, Type targetType, Type targetForInvocation,
@@ -704,110 +758,6 @@ namespace Castle.DynamicProxy.Generators
 
 		#endregion
 
-		protected void CollectMethodsToProxy(ArrayList methodList, Type type, bool onlyVirtuals)
-		{
-			CollectMethods(methodList, type, onlyVirtuals);
-			
-			if (type.IsInterface)
-			{
-				Type[] typeChain = type.FindInterfaces(new TypeFilter(NoFilter), null);
-
-				foreach(Type interType in typeChain)
-				{
-					CollectMethods(methodList, interType, onlyVirtuals);
-				}
-			}
-		}
-
-		protected void CollectPropertyMethodsToProxy(ArrayList methodList, Type type, bool onlyVirtuals,
-													 ClassEmitter emitter, out PropertyToGenerate[] propsToGenerate)
-		{
-			if (type.IsInterface)
-			{
-				ArrayList toGenerateList = new ArrayList();
-
-				toGenerateList.AddRange(CollectProperties(methodList, type, onlyVirtuals, emitter));
-				
-				Type[] typeChain = type.FindInterfaces(new TypeFilter(NoFilter), null);
-
-				foreach(Type interType in typeChain)
-				{
-					toGenerateList.AddRange(CollectProperties(methodList, interType, onlyVirtuals, emitter));
-				}
-				
-				propsToGenerate = (PropertyToGenerate[]) toGenerateList.ToArray(typeof(PropertyToGenerate));
-			}
-			else
-			{
-				propsToGenerate = CollectProperties(methodList, type, onlyVirtuals, emitter);
-			}
-		}
-
-		/// <summary>
-		/// Performs some basic screening and invokes the <see cref="IProxyGenerationHook"/>
-		/// to select methods.
-		/// </summary>
-		/// <param name="method"></param>
-		/// <param name="onlyVirtuals"></param>
-		/// <returns></returns>
-		protected bool AcceptMethod(MethodInfo method, bool onlyVirtuals)
-		{
-			// we can never intercept a sealed (final) method
-			if (method.IsFinal)
-				return false;
-
-			if (IsInternal(method))
-				return false;
-			
-			if (onlyVirtuals && !method.IsVirtual)
-			{
-				if (method.DeclaringType != typeof(object) && method.DeclaringType != typeof(MarshalByRefObject))
-				{
-					generationHook.NonVirtualMemberNotification(targetType, method);
-				}
-				
-				return false;
-			}
-
-			// TODO: Only protected and public should accepted
-
-			if (method.DeclaringType == typeof(object))
-			{
-				return false;
-			}
-			if (method.DeclaringType == typeof(MarshalByRefObject))
-			{
-				return false;
-			}
-
-			return generationHook.ShouldInterceptMethod(targetType, method); ;
-		}
-
-		private static bool IsInternal(MethodInfo method)
-		{
-			return (method.Attributes & MethodAttributes.FamANDAssem) != 0 //internal
-			       && (method.Attributes & MethodAttributes.Family) == 0;//b
-		}
-
-		protected MethodInfo[] CollectMethodsAndProperties(ClassEmitter emitter, Type targetType,
-														   out PropertyToGenerate[] propsToGenerate)
-		{
-			bool onlyVirtuals = CanOnlyProxyVirtual();
-
-			return CollectMethodsAndProperties(emitter, targetType, onlyVirtuals, out propsToGenerate);
-		}
-
-		protected MethodInfo[] CollectMethodsAndProperties(ClassEmitter emitter, Type targetType, bool onlyVirtuals, 
-		                                                   out PropertyToGenerate[] propsToGenerate)
-		{
-			ArrayList methodsList = new ArrayList();
-
-			CollectMethodsToProxy(methodsList, targetType, onlyVirtuals);
-			CollectPropertyMethodsToProxy(methodsList, targetType, onlyVirtuals, emitter, out propsToGenerate);
-
-			return (MethodInfo[]) methodsList.ToArray(typeof(MethodInfo));
-		}
-
 		#region Custom Attribute handling
 
 		protected void ReplicateNonInheritableAttributes(Type targetType, ClassEmitter emitter)
@@ -816,6 +766,8 @@ namespace Castle.DynamicProxy.Generators
 
 			foreach(Attribute attribute in attrs)
 			{
+				if (IsInheritable(attribute)) continue;
+				
 				emitter.DefineCustomAttribute(attribute);
 			}
 		}
@@ -826,6 +778,8 @@ namespace Castle.DynamicProxy.Generators
 
 			foreach(Attribute attribute in attrs)
 			{
+				if (IsInheritable(attribute)) continue;
+				
 				emitter.DefineCustomAttribute(attribute);
 			}
 		}
@@ -834,53 +788,72 @@ namespace Castle.DynamicProxy.Generators
 
 		#region Type tokens related operations
 
+		protected void GenerateConstructors(ClassEmitter emitter, Type baseType, params FieldReference[] fields)
+		{
+			ConstructorInfo[] constructors = baseType.GetConstructors(
+				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+			foreach(ConstructorInfo constructor in constructors)
+			{
+				if (constructor.IsPrivate) continue;
+				
+				GenerateConstructor(emitter, constructor, fields);
+			}
+		}
+
+		protected ConstructorEmitter GenerateStaticConstructor(ClassEmitter emitter)
+		{
+			return emitter.CreateTypeConstructor();
+		}
+		
 		/// <summary>
 		/// Improvement: this cache should be static. We should generate a
 		/// type constructor instead
 		/// </summary>
-		protected MethodEmitter CreateInitializeCacheMethod(Type targetType, 
-		                                                    MethodInfo[] methods, 
-		                                                    ClassEmitter classEmitter)
+		protected void CreateInitializeCacheMethodBody(Type targetType, MethodInfo[] methods,
+													   ClassEmitter classEmitter, 
+		                                               ConstructorEmitter typeInitializerConstructor)
 		{
-			MethodEmitter cacheMethod = classEmitter.CreateMethod(
-				"InitializeTokenCache", MethodAttributes.Private, new ReturnReferenceExpression(typeof(void)));
+			typeTokenField = classEmitter.CreateStaticField("typeTokenCache", typeof(Type));
 
-			typeTokenField = classEmitter.CreateField("typeTokenCache", typeof(Type));
-
-			cacheMethod.CodeBuilder.AddStatement(
+			typeInitializerConstructor.CodeBuilder.AddStatement(
 				new AssignStatement(typeTokenField, new TypeTokenExpression(targetType)));
 
+			CacheMethodTokens(classEmitter, methods, typeInitializerConstructor);
+		}
+
+		protected void CacheMethodTokens(ClassEmitter classEmitter, MethodInfo[] methods, ConstructorEmitter typeInitializerConstructor)
+		{
 			foreach(MethodInfo method in methods)
 			{
 				// Aparently we cannot cache generic methods
 				if (method.IsGenericMethod) continue;
 				
-				// AddFieldToCacheMethodTokenAndStatementsToInitialize(method, targetType, cacheMethod, classEmitter);
-				AddFieldToCacheMethodTokenAndStatementsToInitialize(method, method.DeclaringType, cacheMethod, classEmitter);
+				AddFieldToCacheMethodTokenAndStatementsToInitialize(method, typeInitializerConstructor, classEmitter);
 			}
-
-			return cacheMethod;
 		}
 
-		protected void AddFieldToCacheMethodTokenAndStatementsToInitialize(MethodInfo method, Type targetType,
-																		   MethodEmitter cacheMethod, 
+		protected void AddFieldToCacheMethodTokenAndStatementsToInitialize(MethodInfo method, 
+																		   ConstructorEmitter typeInitializerConstructor, 
 		                                                                   ClassEmitter classEmitter)
 		{
-			FieldReference fieldCache = classEmitter.CreateField("tokenCache" + fieldCount++, typeof(MethodInfo));
+			FieldReference fieldCache = classEmitter.CreateStaticField("tokenCache" + fieldCount++, typeof(MethodInfo));
 
-			if(method2TokenField.ContainsKey(method))
+			if (method2TokenField.ContainsKey(method))
 			{
-				throw new ArgumentException(string.Format("Duplicate method {0} on type {1}", method.ToString(), method.DeclaringType.FullName));
+				throw new ArgumentException(String.Format("Duplicate method {0} on type {1}", 
+				                                          method.ToString(), method.DeclaringType.FullName));
 			}
+			
 			method2TokenField.Add(method, fieldCache);
 
-			cacheMethod.CodeBuilder.AddStatement(
-				new AssignStatement(fieldCache, new MethodTokenExpression(method, targetType)));
+			typeInitializerConstructor.CodeBuilder.AddStatement(
+				new AssignStatement(fieldCache, new MethodTokenExpression(method)));
 		}
 
-		protected void CompleteInitCacheMethod(MethodEmitter methodEmitter)
+		protected void CompleteInitCacheMethod(ConstructorCodeBuilder constCodeBuilder)
 		{
-			methodEmitter.CodeBuilder.AddStatement(new ReturnStatement());
+			constCodeBuilder.AddStatement(new ReturnStatement());
 		}
 
 		protected void AddDefaultInterfaces(IList interfaceList)
@@ -906,8 +879,112 @@ namespace Castle.DynamicProxy.Generators
 
 		#endregion
 
-		protected abstract bool CanOnlyProxyVirtual();
+		#region Utility methods
 
+		protected void CollectMethodsToProxy(ArrayList methodList, Type type, bool onlyVirtuals)
+		{
+			CollectMethods(methodList, type, onlyVirtuals);
+
+			if (type.IsInterface)
+			{
+				Type[] typeChain = type.FindInterfaces(new TypeFilter(NoFilter), null);
+
+				foreach (Type interType in typeChain)
+				{
+					CollectMethods(methodList, interType, onlyVirtuals);
+				}
+			}
+		}
+
+		protected void CollectPropertyMethodsToProxy(ArrayList methodList, Type type, bool onlyVirtuals,
+													 ClassEmitter emitter, out PropertyToGenerate[] propsToGenerate)
+		{
+			if (type.IsInterface)
+			{
+				ArrayList toGenerateList = new ArrayList();
+
+				toGenerateList.AddRange(CollectProperties(methodList, type, onlyVirtuals, emitter));
+
+				Type[] typeChain = type.FindInterfaces(new TypeFilter(NoFilter), null);
+
+				foreach (Type interType in typeChain)
+				{
+					toGenerateList.AddRange(CollectProperties(methodList, interType, onlyVirtuals, emitter));
+				}
+
+				propsToGenerate = (PropertyToGenerate[])toGenerateList.ToArray(typeof(PropertyToGenerate));
+			}
+			else
+			{
+				propsToGenerate = CollectProperties(methodList, type, onlyVirtuals, emitter);
+			}
+		}
+
+		/// <summary>
+		/// Performs some basic screening and invokes the <see cref="IProxyGenerationHook"/>
+		/// to select methods.
+		/// </summary>
+		/// <param name="method"></param>
+		/// <param name="onlyVirtuals"></param>
+		/// <returns></returns>
+		protected bool AcceptMethod(MethodInfo method, bool onlyVirtuals)
+		{
+			// we can never intercept a sealed (final) method
+			if (method.IsFinal)
+				return false;
+
+			if (IsInternal(method))
+				return false;
+
+			if (onlyVirtuals && !method.IsVirtual)
+			{
+				if (method.DeclaringType != typeof(object) && method.DeclaringType != typeof(MarshalByRefObject))
+				{
+					generationHook.NonVirtualMemberNotification(targetType, method);
+				}
+
+				return false;
+			}
+
+			// TODO: Only protected and public should accepted
+
+			if (method.DeclaringType == typeof(object))
+			{
+				return false;
+			}
+			if (method.DeclaringType == typeof(MarshalByRefObject))
+			{
+				return false;
+			}
+
+			return generationHook.ShouldInterceptMethod(targetType, method); ;
+		}
+
+		private static bool IsInternal(MethodInfo method)
+		{
+			return (method.Attributes & MethodAttributes.FamANDAssem) != 0 //internal
+				   && (method.Attributes & MethodAttributes.Family) == 0;//b
+		}
+
+		protected MethodInfo[] CollectMethodsAndProperties(ClassEmitter emitter, Type targetType,
+														   out PropertyToGenerate[] propsToGenerate)
+		{
+			bool onlyVirtuals = CanOnlyProxyVirtual();
+
+			return CollectMethodsAndProperties(emitter, targetType, onlyVirtuals, out propsToGenerate);
+		}
+
+		protected MethodInfo[] CollectMethodsAndProperties(ClassEmitter emitter, Type targetType, bool onlyVirtuals,
+														   out PropertyToGenerate[] propsToGenerate)
+		{
+			ArrayList methodsList = new ArrayList();
+
+			CollectMethodsToProxy(methodsList, targetType, onlyVirtuals);
+			CollectPropertyMethodsToProxy(methodsList, targetType, onlyVirtuals, emitter, out propsToGenerate);
+
+			return (MethodInfo[])methodsList.ToArray(typeof(MethodInfo));
+		}
+		
 		/// <summary>
 		/// Checks if the method is public or protected.
 		/// </summary>
@@ -1018,5 +1095,21 @@ namespace Castle.DynamicProxy.Generators
 
 			return (PropertyToGenerate[])toGenerateList.ToArray(typeof(PropertyToGenerate));
 		}
+
+		private bool IsInheritable(Attribute attribute)
+		{
+			object[] attrs = attribute.GetType().GetCustomAttributes(typeof(AttributeUsageAttribute), true);
+
+			if (attrs.Length != 0)
+			{
+				AttributeUsageAttribute usage = (AttributeUsageAttribute)attrs[0];
+
+				return usage.Inherited;
+			}
+
+			return true;
+		}
+
+		#endregion
 	}
 }
