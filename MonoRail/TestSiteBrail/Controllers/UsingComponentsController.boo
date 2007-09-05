@@ -40,6 +40,9 @@ class UsingComponentsController(SmartDispatcherController):
 	def Index9():
 		pass
 		
+	def Index10():
+		pass
+		
 	def Template():
 		pass
 

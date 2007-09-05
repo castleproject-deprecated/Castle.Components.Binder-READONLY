@@ -15,7 +15,7 @@
 namespace TestSiteNVelocity.Controllers
 {
 	using System;
-
+	using System.Web;
 	using Castle.MonoRail.Framework;
 
 	public class HomeController : Controller
@@ -26,7 +26,6 @@ namespace TestSiteNVelocity.Controllers
 
 		public void Index()
 		{
-			
 		}
 
 		public void Flash1()
