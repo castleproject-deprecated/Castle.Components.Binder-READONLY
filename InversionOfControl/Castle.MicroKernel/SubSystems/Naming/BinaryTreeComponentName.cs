@@ -38,7 +38,7 @@ namespace Castle.MicroKernel.SubSystems.Naming
 			{
 				ArrayList list = new ArrayList();
 				Visit(root, list);
-				return (IHandler[]) list.ToArray( typeof(IHandler) );
+				return (IHandler[])list.ToArray(typeof(IHandler));
 			}
 		}
 
@@ -49,7 +49,7 @@ namespace Castle.MicroKernel.SubSystems.Naming
 
 		public void Remove(ComponentName name)
 		{
-			// Not implemented yet
+			Remove(FindNode(name));
 		}
 
 		public void Add(ComponentName name, IHandler handler)
@@ -63,14 +63,14 @@ namespace Castle.MicroKernel.SubSystems.Naming
 
 			TreeNode current = root;
 
-			while(true)
+			while (true)
 			{
 				int cmp = String.Compare(current.CompName.Service, name.Service);
 
-				if ( cmp < 0 )
+				if (cmp < 0)
 				{
-					if (current.Left != null) 
-					{	
+					if (current.Left != null)
+					{
 						current = current.Left;
 					}
 					else
@@ -80,10 +80,10 @@ namespace Castle.MicroKernel.SubSystems.Naming
 						break;
 					}
 				}
-				else if ( cmp > 0 )
+				else if (cmp > 0)
 				{
-					if (current.Right != null) 
-					{	
+					if (current.Right != null)
+					{
 						current = current.Right;
 					}
 					else
@@ -105,28 +105,28 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		public IHandler GetHandler(ComponentName name)
 		{
 			TreeNode node = FindNode(name);
-			
+
 			return node != null ? node.Handler : null;
 		}
 
 		public IHandler[] GetHandlers(ComponentName name)
 		{
 			TreeNode node = FindNode(name);
-			
+
 			if (node != null)
 			{
 				ArrayList list = new ArrayList();
-				
+
 				list.Add(node.Handler);
 
-				while(node.NextSibling != null)
+				while (node.NextSibling != null)
 				{
 					node = node.NextSibling.FindBestMatch(name);
-					
+
 					list.Add(node.Handler);
 				}
 
-				return (IHandler[]) list.ToArray( typeof(IHandler) );
+				return (IHandler[])list.ToArray(typeof(IHandler));
 			}
 
 			return null;
@@ -135,7 +135,7 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		internal void Visit(TreeNode node, ArrayList list)
 		{
 			list.Add(node.Handler);
-			
+
 			if (node.Left != null)
 			{
 				Visit(node.Left, list);
@@ -145,25 +145,27 @@ namespace Castle.MicroKernel.SubSystems.Naming
 				Visit(node.Right, list);
 			}
 
-			while(node.NextSibling != null)
+			while (node.NextSibling != null)
 			{
-				list.Add( node.NextSibling.Handler );
+				list.Add(node.NextSibling.Handler);
 				node = node.NextSibling;
 			}
 		}
 
 		internal TreeNode FindNode(ComponentName name)
 		{
+			if (root == null) return null;
+
 			TreeNode current = root;
 
-			while(true)
+			while (true)
 			{
 				int cmp = String.Compare(current.CompName.Service, name.Service);
 
-				if ( cmp < 0 )
+				if (cmp < 0)
 				{
-					if (current.Left != null) 
-					{	
+					if (current.Left != null)
+					{
 						current = current.Left;
 					}
 					else
@@ -171,10 +173,10 @@ namespace Castle.MicroKernel.SubSystems.Naming
 						return null;
 					}
 				}
-				else if ( cmp > 0 )
+				else if (cmp > 0)
 				{
-					if (current.Right != null) 
-					{	
+					if (current.Right != null)
+					{
 						current = current.Right;
 					}
 					else
@@ -186,6 +188,106 @@ namespace Castle.MicroKernel.SubSystems.Naming
 				{
 					return current.FindBestMatch(name);
 				}
+			}
+		}
+
+
+		private void Remove(TreeNode node)
+		{
+			if (node == null) return;
+
+			//A real tree node (this should be better indicated, there is really two types of nodes here)
+			if (node.PreviousSibling == null)
+			{
+				if (node.NextSibling != null)
+				{
+					TreeNode replacement = node.NextSibling;
+					replacement.PreviousSibling = null;
+					PromoteNode(node, replacement);
+				}
+				else
+				{
+					RemoveBinaryTreeNode(node);
+				}
+			}
+			else
+				node.PreviousSibling.NextSibling = node.NextSibling;
+
+			count--;
+		}
+
+		/// <summary>
+		/// Method finds the next biggest node
+		/// It assumes Add puts lesser nodes on the right
+		/// </summary>
+		private TreeNode FindSuccessor(TreeNode node)
+		{
+			TreeNode current = node.Left;
+			if (current != null)
+			{
+				while (current.Right != null)
+				{
+					current = current.Right;
+				}
+			}
+
+			return current;
+		}
+
+		private void PromoteNode(TreeNode oldNode, TreeNode promoted)
+		{
+			if (promoted.Right != null || promoted.Left != null)
+				throw new InvalidOperationException("promoted node can not have child nodes, remove node from tree before promoting");
+
+			promoted.Right = oldNode.Right;
+			promoted.Left = oldNode.Left;
+
+			if (root == oldNode)
+				root = promoted;
+			else
+				ReplaceNode(oldNode, promoted);
+		}
+
+		private void ReplaceNode(TreeNode oldNode, TreeNode newNode)
+		{
+			TreeNode parent = oldNode.Parent;
+			if (parent == null)
+			{
+				root = newNode;
+			}
+			else if (parent.Right == oldNode)
+			{
+				parent.Right = newNode;
+			}
+			else if (parent.Left == oldNode)
+			{
+				parent.Left = newNode;
+			}
+
+			//throw if wanted
+		}
+
+		private void RemoveBinaryTreeNode(TreeNode node)
+		{
+			if (node.Left != null && node.Right != null)
+			{
+				TreeNode inorderSuccessor = FindSuccessor(node);
+				RemoveBinaryTreeNode(inorderSuccessor); //it has maximum one node to reorder
+				PromoteNode(node, inorderSuccessor);
+			}
+			else if (node.Left == null && node.Right == null)
+			{
+				ReplaceNode(node, null);
+			}
+			else if (node.Left != null)
+			{
+				ReplaceNode(node, node.Left);
+				node.Left = null;
+			}
+			else if (node.Right != null)
+			{
+				ReplaceNode(node, node.Right);
+				node.Right = null;
 			}
 		}
 	}
@@ -202,9 +304,13 @@ namespace Castle.MicroKernel.SubSystems.Naming
 
 		/// <summary>Node's right</summary>
 		private TreeNode right;
-		
+
+		/// <summary>Node's parent</summary>
+		private TreeNode parent;
+
 		/// <summary>DA Linked List</summary>
 		private TreeNode nextSibling;
+		private TreeNode previousSibling;
 
 		public TreeNode(ComponentName compName, IHandler handler)
 		{
@@ -225,23 +331,54 @@ namespace Castle.MicroKernel.SubSystems.Naming
 			get { return handler; }
 		}
 
+		public TreeNode Parent
+		{
+			get { return parent; }
+			set { parent = value; }
+		}
+
 		public TreeNode Left
 		{
 			get { return left; }
-			set { left = value; }
+			set
+			{
+				left = value;
+				if (left != null)
+				{
+					left.Parent = this;
+				}
+			}
 		}
 
 		public TreeNode Right
 		{
 			get { return right; }
-			set { right = value; }
+			set
+			{
+				right = value;
+				if (right != null)
+				{
+					right.Parent = this;
+				}
+			}
 		}
 
 		public TreeNode NextSibling
 		{
 			get { return nextSibling; }
-			set { nextSibling = value; }
+			set
+			{
+				nextSibling = value;
+				if (nextSibling != null) nextSibling.PreviousSibling = this;
+			}
 		}
+
+		public TreeNode PreviousSibling
+		{
+			get { return previousSibling; }
+			set { previousSibling = value; }
+		}
+
 
 		public void AddSibling(TreeNode node)
 		{
@@ -251,8 +388,8 @@ namespace Castle.MicroKernel.SubSystems.Naming
 			}
 
 			TreeNode current = NextSibling;
-			
-			while(current.NextSibling != null)
+
+			while (current.NextSibling != null)
 			{
 				current = current.NextSibling;
 			}
@@ -262,20 +399,48 @@ namespace Castle.MicroKernel.SubSystems.Naming
 
 		public TreeNode FindBestMatch(ComponentName name)
 		{
+			if ("*".Equals(name.LiteralProperties))
+			{
+				return this;
+			}
+			else if (name.LiteralProperties == null || name.LiteralProperties == string.Empty)
+			{
+				return FindWithEmptyProperties();
+			}
+			else
+			{
+				return FindBestMatchByProperties(name);
+			}
+		}
+
+		private TreeNode FindWithEmptyProperties()
+		{
 			TreeNode current = this;
 
-			while(current != null)
+			while (current != null)
 			{
-				if ("*".Equals(name.LiteralProperties))
+				if (current.CompName.LiteralProperties == null || current.CompName.LiteralProperties == string.Empty)
 				{
-					break;
+					return current;
 				}
 
+				current = current.NextSibling;
+			}
+
+			return this;
+		}
+
+		private TreeNode FindBestMatchByProperties(ComponentName name)
+		{
+			TreeNode current = this;
+
+			while (current != null)
+			{
 				bool selected = true;
 
-				foreach(DictionaryEntry entry in name.Properties)
+				foreach (DictionaryEntry entry in name.Properties)
 				{
-					String value = current.CompName.Properties[ entry.Key ] as String;
+					String value = current.CompName.Properties[entry.Key] as String;
 
 					if (value == null || !value.Equals(entry.Value))
 					{
