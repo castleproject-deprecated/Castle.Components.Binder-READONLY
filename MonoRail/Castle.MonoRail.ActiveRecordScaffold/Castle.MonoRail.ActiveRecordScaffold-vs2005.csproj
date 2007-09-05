@@ -25,6 +25,7 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\scaffold\</OutputPath>
@@ -111,6 +112,7 @@
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
@@ -133,6 +135,7 @@
     <Compile Include="AbstractScaffoldAction.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ConfirmRemoveAction.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -177,6 +180,7 @@
     <None Include="..\..\CastleKey.snk">
       <Link>CastleKey.snk</Link>
     </None>
+    <EmbeddedResource Include="Templates\layout.vm" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

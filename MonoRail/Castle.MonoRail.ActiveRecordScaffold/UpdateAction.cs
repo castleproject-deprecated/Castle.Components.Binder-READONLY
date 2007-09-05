@@ -15,7 +15,8 @@
 namespace Castle.MonoRail.ActiveRecordScaffold
 {
 	using System;
-
+	using System.Collections;
+	using System.Reflection;
 	using Castle.ActiveRecord;
 	using Castle.Components.Common.TemplateEngine;
 	using Castle.MonoRail.Framework;
@@ -40,13 +41,15 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 
 		protected override void PerformActionProcess(Controller controller)
 		{
+			object instance = null;
+			
 			try
 			{
 				AssertIsPost(controller);
 				
-				object instance = binder.BindObject(Model.Type, Model.Type.Name, builder.BuildSourceNode(controller.Request.Form));
+				instance = binder.BindObject(Model.Type, Model.Type.Name, builder.BuildSourceNode(controller.Request.Form));
 
-				CommonOperationUtils.SaveInstance(instance, controller, errors, prop2Validation, false);
+				CommonOperationUtils.SaveInstance(instance, controller, errors, ref prop2Validation, false);
 
 				SessionScope.Current.Flush();
 				
@@ -66,15 +69,24 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 
 			if (errors.Count != 0)
 			{
+				controller.Context.Flash[Model.Type.Name] = instance;
 				controller.Context.Flash["errors"] = errors;
 
+				PropertyInfo keyProp = ObtainPKProperty();
+				IDictionary props = new Hashtable();
+
+				if (instance != null)
+				{
+					props[keyProp.Name] = keyProp.GetValue(instance, null);
+				}
+				
 				if (UseModelName)
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "edit" + Model.Type.Name, controller.Request.Form);
+					controller.Redirect(controller.AreaName, controller.Name, "edit" + Model.Type.Name, props);
 				}
 				else
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "edit", controller.Request.Form);
+					controller.Redirect(controller.AreaName, controller.Name, "edit", props);
 				}
 			}
 		}
