@@ -632,8 +632,18 @@ namespace Castle.ActiveRecord
 		/// <returns><c>true</c> if the ID exists; otherwise <c>false</c>.</returns>
 		protected internal static bool Exists(Type targetType, object id)
 		{
-			return Exists(targetType, "id=?", id);
+			return FindByPrimaryKey(targetType, id, false) != null;
 		}
+
+		/// <summary>
+		/// Check if any instance matches the criteria.
+		/// </summary>
+		/// <returns><c>true</c> if an instance is found; otherwise <c>false</c>.</returns>
+		protected internal static bool Exists(Type targetType, params ICriterion[] criterias) {
+			Array ar = FindAll(targetType, criterias);
+			return ar != null && ar.Length > 0;
+		}
+
 
 		#endregion
 
@@ -643,7 +653,7 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Returns all instances found for the specified type according to the criteria
 		/// </summary>
-		protected static Array FindAll(Type targetType, DetachedCriteria detachedCriteria, params Order[] orders)
+		protected internal static Array FindAll(Type targetType, DetachedCriteria detachedCriteria, params Order[] orders)
 		{
 			EnsureInitialized(targetType);
 

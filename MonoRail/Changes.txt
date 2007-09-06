@@ -4,6 +4,23 @@ Change history
 Release Candidate 3
 ===================
 
+- Introduced IPaginatedPage.HasPage(), useful for Google-like pagination.
+
+- PaginationHelper.CreatePagination<T>() now accepts ICollection<T> as a parameter.
+
+- New method PaginationHelper.CreatePageLinkWithCurrentQueryString().
+  Creates a page link, copying the current QueryString parameters as well.
+
+- Enhanced AbstractHelper.BuildQueryString to support multi-value query strings:
+  IDictionary dict = new Hashtable();
+  dict.Add("id", 5);
+  dict.Add("selectedItem", new int[] { 2, 4, 99 });
+  string queryString = BuildQueryString(dict);
+  // should result in: "id=5&amp;selectedItem=2&amp;selectedItem=4&amp;selectedItem=99&amp;"
+
+- FormHelper.Select() - applied patch from James Sapara allowing firstoptionvalue to be set to 
+  something other than null. 
+
 - Restored property IsPostback checking (For use with WebFormViewEngine).
 
 - Restored support for passing additional arguments to a controller
