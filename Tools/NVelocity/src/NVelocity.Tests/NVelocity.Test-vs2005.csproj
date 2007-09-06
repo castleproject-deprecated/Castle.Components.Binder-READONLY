@@ -130,6 +130,7 @@
     <Compile Include="Test\IntrospectorTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Test\MethodCallTestCase.cs" />
     <Compile Include="Test\ObjectComparisonTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
