@@ -16,7 +16,10 @@ using System;
 namespace Castle.MonoRail.Views.Brail
 {
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.IO;
+	using System.Text;
+	using System.Text.RegularExpressions;
 	using Boo.Lang.Compiler;
 	using Boo.Lang.Compiler.IO;
 	using Boo.Lang.Compiler.Steps;
@@ -24,7 +27,6 @@ namespace Castle.MonoRail.Views.Brail
 
 	public class BrailPreProcessor : AbstractCompilerStep
 	{
-	    
 		private static IDictionary Seperators = CreateSeperators();
         private BooViewEngine booViewEngine;
 		IDictionary inputToCode = new Hashtable();
@@ -117,10 +119,81 @@ namespace Castle.MonoRail.Views.Brail
 		{
 			if (code.Length == 0)
 				return;
+			code = RemoveDoubleQuotesFromExpressions(code);
 			buffer.WriteLine();
 			buffer.Write("output \"\"\"");
 			buffer.Write(code);
 			buffer.WriteLine("\"\"\"");
+		}
+
+		/// <summary>
+		/// This will replace any " inside a ${ } expressions with a ', because it breaks the parser
+		/// otherwise.
+		/// This is a very stupid scanner, but it is replacing a regex that had performance issues.
+		/// </summary>
+		/// <param name="code"></param>
+		private static string RemoveDoubleQuotesFromExpressions(string code)
+		{
+			Stack<BrachMatchingInfo> bracesPositions = new Stack<BrachMatchingInfo>();
+			bool prevCharWasDollary = false;
+			for (int index = 0; index < code.Length;index++ )
+			{
+				if (code[index] == '{')
+				{
+					bracesPositions.Push(new BrachMatchingInfo(index, -1, prevCharWasDollary));
+				}
+				// Note that here there is an implicit check for ${   }   }
+				// it will match the last }
+				if (code[index] == '}' && bracesPositions.Count > 0)
+				{
+					bracesPositions.Peek().End = index;
+				}
+				prevCharWasDollary = code[index] == '$';
+			}
+			if(bracesPositions.Count==0)
+				return code;
+			StringBuilder sb = new StringBuilder(code);
+			foreach(BrachMatchingInfo matchingInfo in bracesPositions)
+			{
+				//probably a malf-formed expression, or not part of an ${ }, we will ignore that and let
+				// the parser shout at the user
+				if (matchingInfo.End== -1 || matchingInfo.PrevCharWasDollar==false)
+					continue;
+				sb.Replace('"', '\'', matchingInfo.Start, matchingInfo.End - matchingInfo.Start);
+			}
+			return sb.ToString();
+		}
+
+		private class BrachMatchingInfo
+		{
+			private int start, end;
+
+			public int Start
+			{
+				get { return start; }
+				set { start = value; }
+			}
+
+			public int End
+			{
+				get { return end; }
+				set { end = value; }
+			}
+
+			public bool PrevCharWasDollar
+			{
+				get { return prevCharWasDollar; }
+				set { prevCharWasDollar = value; }
+			}
+
+			public BrachMatchingInfo(int start, int end, bool prevCharWasDollar)
+			{
+				this.start = start;
+				this.end = end;
+				this.prevCharWasDollar = prevCharWasDollar;
+			}
+
+			private bool prevCharWasDollar;
 		}
 
 		private static DictionaryEntry GetSeperators(string code)
