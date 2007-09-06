@@ -5,7 +5,7 @@
 	smtpUsername="" 
 	smtpPassword="">
 	
-	<!-- custom Factories/Should be configured on services. Here for backward compatible purposes -->
+	<!-- custom Factories/Should be configured on services. Here for backward compatibility purposes -->
 	
 	<customControllerFactory type="type name that implements IControllerFactory" />
 	<customComponentFactory type="type name that implements IComponentFactory" />
@@ -21,10 +21,11 @@
 		<assembly>AssemblyName2</assembly>
 	</viewcomponents>
 	
+	<!-- customEngine support for backward compatibility purposes -->
 	<viewEngine 
 		viewPathRoot="views" 
 		customEngine="ViewEngine.Type.Name, Assembly">
-		
+
 		<additionalSources>
 			<assembly name="" namespace="" />
 			<assembly name="" namespace="" />
@@ -32,11 +33,18 @@
 		
 	</viewEngine>
 
+	<viewEngines viewPathRoot="views">
+
+		<add type="ViewEngine.Type.Name1, Assembly" xhtml="false" />
+		<add type="ViewEngine.Type.Name2, Assembly" xhtml="false" />
+
+	</viewEngines>
+
 	<!-- List of services ids:
 
 			Custom
 			ControllerFactory
-			ViewEngine
+			ViewEngineManager
 			ViewSourceLoader
 			ViewComponentFactory
 			FilterFactory

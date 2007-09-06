@@ -23,18 +23,23 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	using System.IO;
 	using System.Collections;
 	using Castle.Core;
+	using Castle.MonoRail.Framework.Helpers;
+	using Castle.MonoRail.Framework.Views.NVelocity.JSGeneration;
 	using Commons.Collections;
 
 	/// <summary>
-	/// Pendent
+	/// Implements a view engine using the popular Velocity syntax.
+	/// <para>
+	/// For details on the syntax, check the VTL Reference Guide
+	/// http://jakarta.apache.org/velocity/docs/vtl-reference-guide.html
+	/// </para>
 	/// </summary>
 	public class NVelocityViewEngine : ViewEngineBase, IInitializable
 	{
 		internal const String TemplateExtension = ".vm";
+		internal const String JsTemplateExtension = ".njs";
 
 		internal const String ServiceProvider = "service.provider";
-
-		// private const String TemplatePathPattern = "{0}{1}{2}";
 
 		private IServiceProvider provider;
 
@@ -87,39 +92,78 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 		#region IViewEngine implementation
 
+		/// <summary>
+		/// Gets a value indicating whether the view engine
+		/// support the generation of JS.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if JS generation is supported; otherwise, <c>false</c>.
+		/// </value>
+		public override bool SupportsJSGeneration
+		{
+			get { return true; }
+		}
+
+		/// <summary>
+		/// Gets the view file extension.
+		/// </summary>
+		/// <value>The view file extension.</value>
+		public override string ViewFileExtension
+		{
+			get { return ".vm"; }
+		}
+
+		/// <summary>
+		/// Gets the JS generator file extension.
+		/// </summary>
+		/// <value>The JS generator file extension.</value>
+		public override string JSGeneratorFileExtension
+		{
+			get { return ".njs"; }
+		}
+
+		/// <summary>
+		/// Evaluates whether the specified template exists.
+		/// </summary>
+		/// <param name="templateName"></param>
+		/// <returns><c>true</c> if it exists</returns>
 		public override bool HasTemplate(String templateName)
 		{
 			return ViewSourceLoader.HasTemplate(ResolveTemplateName(templateName));
 		}
 
+		/// <summary>
+		/// Processes the specified context.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="viewName">Name of the view.</param>
 		public override void Process(IRailsEngineContext context, Controller controller, String viewName)
 		{
 			IContext ctx = CreateContext(context, controller);
 
-			AdjustContentType(context);
-
-			Template template;
-
-			bool hasLayout = controller.LayoutName != null;
-
-			TextWriter writer;
-
-			if (hasLayout)
-			{
-				// Because we are rendering within a layout we need to catch it first
-				writer = new StringWriter();
-			}
-			else
-			{
-				// No layout so render direct to the output
-				writer = context.Response.Output;
-			}
-
-			String view = ResolveTemplateName(viewName);
-
 			try
 			{
-				template = velocity.GetTemplate(view);
+				AdjustContentType(context);
+
+				bool hasLayout = controller.LayoutName != null;
+
+				TextWriter writer;
+
+				if (hasLayout)
+				{
+					// Because we are rendering within a layout we need to catch it first
+					writer = new StringWriter();
+				}
+				else
+				{
+					// No layout so render direct to the output
+					writer = context.Response.Output;
+				}
+
+				String view = ResolveTemplateName(viewName);
+
+				Template template = velocity.GetTemplate(view);
 
 				PreSendView(controller, template);
 
@@ -127,22 +171,21 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 				template.Merge(ctx, writer);
 
 				PostSendView(controller, template);
-			}
-			catch(Exception)
-			{
+
 				if (hasLayout)
 				{
-					// Restore original writer
-					writer = context.Response.Output;
+					String contents = (writer as StringWriter).GetStringBuilder().ToString();
+					ProcessLayout(contents, controller, ctx, context);
+				}
+			}
+			catch(Exception ex)
+			{
+				if (Logger.IsErrorEnabled)
+				{
+					Logger.Error("Could not render view", ex);
 				}
 
 				throw;
-			}
-
-			if (hasLayout)
-			{
-				String contents = (writer as StringWriter).GetStringBuilder().ToString();
-				ProcessLayout(contents, controller, ctx, context);
 			}
 		}
 
@@ -167,7 +210,78 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 			catch(Exception ex)
 			{
-				throw new RailsException("Could not obtain view: " + view, ex);
+				if (Logger.IsErrorEnabled)
+				{
+					Logger.Error("Could not render view", ex);
+				}
+
+				throw new RailsException("Could not render view: " + view, ex);
+			}
+		}
+
+		public override void ProcessPartial(TextWriter output, IRailsEngineContext context, 
+		                                    Controller controller, string partialName)
+		{
+			IContext ctx = CreateContext(context, controller);
+			String view = ResolveTemplateName(partialName);
+
+			try
+			{
+				Template template = velocity.GetTemplate(view);
+				template.Merge(ctx, output);
+			}
+			catch(Exception ex)
+			{
+				if (Logger.IsErrorEnabled)
+				{
+					Logger.Error("Could not render partial", ex);
+				}
+
+				throw new RailsException("Could not render partial " + view, ex);
+			}
+		}
+
+		public override object CreateJSGenerator(IRailsEngineContext context)
+		{
+			return new JSGeneratorDuck(new PrototypeHelper.JSGenerator(context));
+		}
+
+		public override void GenerateJS(IRailsEngineContext context, Controller controller, string templateName)
+		{
+			GenerateJS(context.Response.Output, context, controller, templateName);
+		}
+
+		public override void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller,
+		                                string templateName)
+		{
+			IContext ctx = CreateContext(context, controller);
+
+			object generator = CreateJSGenerator(context);
+
+			ctx.Put("page", generator);
+
+			AdjustJavascriptContentType(context);
+
+			String view = ResolveJSTemplateName(templateName);
+
+			try
+			{
+				Template template = velocity.GetTemplate(view);
+
+				StringWriter writer = new StringWriter();
+
+				template.Merge(ctx, writer); 
+
+				output.WriteLine(generator);
+			}
+			catch(Exception ex)
+			{
+				if (Logger.IsErrorEnabled)
+				{
+					Logger.Error("Could not generate JS", ex);
+				}
+
+				throw new RailsException("Error generating JS. Template " + templateName, ex);
 			}
 		}
 
@@ -206,20 +320,44 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		/// <summary>
 		/// Resolves the template name into a velocity template file name.
 		/// </summary>
-		protected virtual string ResolveTemplateName(string templateName)
+		protected string ResolveTemplateName(string templateName)
 		{
-			return templateName + TemplateExtension;
+			if (Path.HasExtension(templateName))
+			{
+				return templateName;
+			}
+			else
+			{
+				return templateName + TemplateExtension;
+			}
+		}
+
+		/// <summary>
+		/// Resolves the template name into a velocity JS template file name.
+		/// </summary>
+		protected string ResolveJSTemplateName(string templateName)
+		{
+			if (Path.HasExtension(templateName))
+			{
+				return templateName;
+			}
+			else
+			{
+				return templateName + JsTemplateExtension;
+			}
 		}
 
 		/// <summary>
 		/// Resolves the template name into a velocity template file name.
 		/// </summary>
-		protected virtual string ResolveTemplateName(string area, string templateName)
+		protected string ResolveTemplateName(string area, string templateName)
 		{
-			return String.Format("{0}{1}{2}", area, Path.DirectorySeparatorChar, ResolveTemplateName(templateName));
+			return String.Format("{0}{1}{2}",
+			                     area, Path.DirectorySeparatorChar,
+			                     ResolveTemplateName(templateName));
 		}
 
-		protected virtual void BeforeMerge(VelocityEngine velocity, Template template, IContext context)
+		protected virtual void BeforeMerge(VelocityEngine velocityEngine, Template template, IContext context)
 		{
 		}
 

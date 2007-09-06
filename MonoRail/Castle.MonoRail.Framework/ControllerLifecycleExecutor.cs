@@ -40,9 +40,9 @@ namespace Castle.MonoRail.Framework
 		private ILogger logger = NullLogger.Instance;
 
 		/// <summary>
-		/// The reference to the <see cref="IViewEngine"/> instance
+		/// The reference to the <see cref="IViewEngineManager"/> instance
 		/// </summary>
-		private IViewEngine viewEngine;
+		private IViewEngineManager viewEngineManager;
 
 		private IResourceFactory resourceFactory;
 		private IScaffoldingSupport scaffoldSupport;
@@ -88,7 +88,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="provider">The service proviver</param>
 		public void Service(IServiceProvider provider)
 		{
-			viewEngine = (IViewEngine) provider.GetService(typeof(IViewEngine));
+			viewEngineManager = (IViewEngineManager) provider.GetService(typeof(IViewEngineManager));
 			filterFactory = (IFilterFactory) provider.GetService(typeof(IFilterFactory));
 			resourceFactory = (IResourceFactory) provider.GetService(typeof(IResourceFactory));
 			scaffoldSupport = (IScaffoldingSupport) provider.GetService(typeof(IScaffoldingSupport));
@@ -116,6 +116,14 @@ namespace Castle.MonoRail.Framework
 
 		#region IControllerLifecycleExecutor
 
+		/// <summary>
+		/// Should bring the controller to an usable
+		/// state by populating its fields with values that
+		/// represent the current request
+		/// </summary>
+		/// <param name="areaName">The area name</param>
+		/// <param name="controllerName">The controller name</param>
+		/// <param name="actionName">The action name</param>
 		public void InitializeController(string areaName, string controllerName, string actionName)
 		{
 			InitializeControllerFieldsFromServiceProvider();
@@ -142,13 +150,28 @@ namespace Castle.MonoRail.Framework
 					controller.HttpContext.Items[Constants.OriginalViewKey] = controller._selectedViewName;
 				}
 			}
+
+			context.CurrentController = controller;
 		}
 
+		/// <summary>
+		/// Selects the action to execute based on the url information
+		/// </summary>
+		/// <param name="controllerName">The controller name</param>
+		/// <param name="actionName">The action name</param>
+		/// <returns></returns>
 		public bool SelectAction(string actionName, string controllerName)
 		{
 			return SelectAction(actionName, controllerName, null);
 		}
-		
+
+		/// <summary>
+		/// Selects the action to execute based on the url information
+		/// </summary>
+		/// <param name="controllerName">The controller name</param>
+		/// <param name="actionName">The action name</param>
+		/// <param name="actionArgs">The action arguments.</param>
+		/// <returns></returns>
 		public bool SelectAction(string actionName, string controllerName, IDictionary actionArgs)
 		{
 			try
@@ -237,10 +260,14 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="actionArgs">The action args.</param>
 		public void ProcessSelectedAction(IDictionary actionArgs)
-		{			
+		{
+			bool actionSucceeded = false;
+
 			try
 			{
-				if (RunBeforeActionFilters())
+				bool canProceed = RunBeforeActionFilters();
+
+				if (canProceed)
 				{
 					PrepareResources();
 					
@@ -252,6 +279,8 @@ namespace Castle.MonoRail.Framework
 					{
 						dynAction.Execute(controller);
 					}
+
+					actionSucceeded = true;
 					
 					if (!hasConfiguredCache && 
 					    !context.Response.WasRedirected &&
@@ -277,32 +306,39 @@ namespace Castle.MonoRail.Framework
 				}
 
 				hasError = true;
+
+				return;
 			}
 			catch(Exception ex)
 			{
 				exceptionToThrow = ex;
 
 				hasError = true;
-
-				if (logger.IsErrorEnabled)
-				{
-					logger.Error("Exception during action process", ex);
-				}
-
-				if (context.Response.WasRedirected) return;
-				
-				PerformErrorHandling();
 			}
 
 			RunAfterActionFilters();
 
-			if (context.Response.WasRedirected) return;
-			
-			// If we haven't failed anywhere and no redirect was issued
-			if (!hasError && !context.Response.WasRedirected)
+			if (hasError && exceptionToThrow != null)
 			{
-				// Render the actual view then cleanup
-				ProcessView();
+				if (logger.IsErrorEnabled)
+				{
+					logger.Error("Error processing action", exceptionToThrow);
+				}
+
+				if (context.Response.WasRedirected) return;
+
+				PerformErrorHandling();
+			}
+			else if (actionSucceeded)
+			{
+				if (context.Response.WasRedirected) return;
+
+				// If we haven't failed anywhere and no redirect was issued
+				if (!hasError && !context.Response.WasRedirected)
+				{
+					// Render the actual view then cleanup
+					ProcessView();
+				}
 			}
 			
 			RunAfterRenderFilters();
@@ -351,7 +387,7 @@ namespace Castle.MonoRail.Framework
 					if (!ProcessFilters(ExecuteEnum.StartRequest))
 					{
 						// Record that they failed.
-						hasError = true;
+						return false;
 					}
 				}
 			}
@@ -409,7 +445,7 @@ namespace Castle.MonoRail.Framework
 
 			metaDescriptor = controller.metaDescriptor;
 
-			controller.viewEngine = viewEngine;
+			controller.viewEngineManager = viewEngineManager;
 
 			ILoggerFactory loggerFactory = (ILoggerFactory) context.GetService(typeof(ILoggerFactory));
 
@@ -467,8 +503,7 @@ namespace Castle.MonoRail.Framework
 					// ...run them. If they fail...
 					if (!ProcessFilters(ExecuteEnum.BeforeAction))
 					{
-						// Record that they failed.
-						hasError = true;
+						return false;
 					}
 				}
 			}
@@ -503,7 +538,17 @@ namespace Castle.MonoRail.Framework
 		{
 			if (skipFilters) return;
 
-			ProcessFilters(ExecuteEnum.AfterAction);
+			try
+			{
+				ProcessFilters(ExecuteEnum.AfterAction);
+			}
+			catch(Exception ex)
+			{
+				if (logger.IsErrorEnabled)
+				{
+					logger.Error("Error executing AfterAction filter(s)", ex);
+				}
+			}
 		}
 
 		/// <summary>
@@ -513,7 +558,17 @@ namespace Castle.MonoRail.Framework
 		{
 			if (skipFilters) return;
 
-			ProcessFilters(ExecuteEnum.AfterRendering);
+			try
+			{
+				ProcessFilters(ExecuteEnum.AfterRendering);
+			}
+			catch(Exception ex)
+			{
+				if (logger.IsErrorEnabled)
+				{
+					logger.Error("Error executing AfterRendering filter(s)", ex);
+				}
+			}
 		}
 
 		private void CreateFiltersDescriptors()
@@ -529,8 +584,9 @@ namespace Castle.MonoRail.Framework
 			AbstractHelper[] builtInHelpers =
 				new AbstractHelper[]
 					{
-						new AjaxHelper(),
-						new EffectsFatHelper(), new Effects2Helper(),
+						new AjaxHelper(), new BehaviourHelper(),
+						new UrlForHelper(), new TextHelper(), 
+						new EffectsFatHelper(), new ScriptaculousHelper(), 
 						new DateFormatHelper(), new HtmlHelper(),
 						new ValidationHelper(), new DictHelper(),
 						new PaginationHelper(), new FormHelper()
@@ -545,6 +601,13 @@ namespace Castle.MonoRail.Framework
 				if (!helpers.Contains(helperName))
 				{
 					helpers[helperName] = helper;
+				}
+
+				// Also makes the helper available with a less verbose name
+				// FormHelper and Form, AjaxHelper and Ajax
+				if (helperName.EndsWith("Helper"))
+				{
+					helpers[helperName.Substring(0, helperName.Length - 6)] = helper;
 				}
 
 				PerformAdditionalHelperInitialization(helper);
@@ -585,11 +648,6 @@ namespace Castle.MonoRail.Framework
 
 				scaffoldSupport.Process(controller);
 			}
-		}
-
-		private bool IsClientConnected
-		{
-			get { return context.Response.IsClientConnected; }
 		}
 
 		#region Resources
@@ -780,7 +838,7 @@ namespace Castle.MonoRail.Framework
 		{
 			if (controller._selectedViewName != null)
 			{
-				viewEngine.Process(context, controller, controller._selectedViewName);
+				viewEngineManager.Process(context, controller, controller._selectedViewName);
 			}
 		}
 
@@ -791,7 +849,7 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Performs the rescue.
 		/// </summary>
-		/// <param name="method">The action (can be null).</param>
+		/// <param name="method">The action (can be null in the case of dynamic actions).</param>
 		/// <param name="ex">The exception.</param>
 		/// <returns></returns>
 		protected bool PerformRescue(MethodInfo method, Exception ex)

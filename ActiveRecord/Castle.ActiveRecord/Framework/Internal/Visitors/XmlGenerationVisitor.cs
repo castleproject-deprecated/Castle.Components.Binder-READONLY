@@ -212,6 +212,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 				case PrimaryKeyType.Native:
 				case PrimaryKeyType.Assigned:
 				case PrimaryKeyType.Foreign:
+				case PrimaryKeyType.Increment:
 					className = model.PrimaryKeyAtt.Generator.ToString().ToLower(CultureInfo.InvariantCulture);
 					break;
 
@@ -225,6 +226,14 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 				case PrimaryKeyType.UuidString:
 					className = "uuid.string";
+					break;
+
+				case PrimaryKeyType.Counter:
+					className = "vm";
+					break;
+
+				case PrimaryKeyType.Custom:
+					className = MakeTypeName(model.PrimaryKeyAtt.CustomGenerator);
 					break;
 			}
 

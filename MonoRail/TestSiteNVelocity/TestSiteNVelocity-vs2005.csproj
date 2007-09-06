@@ -82,10 +82,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Nullables.dll</HintPath>
     </Reference>
-    <Reference Include="NVelocity">
-      <Name>NVelocity</Name>
-      <HintPath>..\..\build\net-2.0\debug\NVelocity.dll</HintPath>
-    </Reference>
+    <Reference Include="NVelocity, Version=0.5.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -176,6 +173,7 @@
     <Compile Include="Controllers\HomeController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\JSGenerationController.cs" />
     <Compile Include="Controllers\LayoutController.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -229,11 +227,30 @@
     <None Include="views\flash\flashIt.vm" />
     <None Include="views\flash\validateRequest.vm" />
     <None Include="views\formhelper\index.vm" />
+    <None Include="views\formhelper\numbersonly.vm" />
     <None Include="views\formhelper\useparamstofillinputs.vm" />
     <None Include="views\helper\DictHelperUsage.vm" />
     <None Include="views\home\display.vm" />
+    <Content Include="views\jsgeneration\_partial1.vm" />
+    <None Include="views\jsgeneration\CheckCNPJ.njs" />
+    <None Include="views\jsgeneration\collectionaccess.njs" />
+    <None Include="views\jsgeneration\collectionfirstlast.njs" />
+    <None Include="views\jsgeneration\index.vm" />
+    <None Include="views\jsgeneration\multipleactions.njs" />
+    <None Include="views\jsgeneration\replace.njs" />
+    <None Include="views\jsgeneration\InsertHtml.njs" />
+    <None Include="views\jsgeneration\replacehtml.njs" />
+    <None Include="views\jsgeneration\elementmethoddepth.njs" />
+    <None Include="views\jsgeneration\elementattributedepth.njs" />
+    <None Include="views\jsgeneration\elementattribute.njs" />
+    <None Include="views\jsgeneration\elementmethod.njs" />
+    <None Include="views\jsgeneration\elementreplace.njs" />
+    <None Include="views\jsgeneration\elementreplacehtml.njs" />
+    <None Include="views\jsgeneration\replacehtmlwithpartial.njs" />
+    <None Include="views\jsgeneration\elementaccess.njs" />
     <None Include="views\home\heyhello.vm" />
     <None Include="views\home\index.vm" />
+    <None Include="views\jsgeneration\visualeffect.njs" />
     <None Include="views\layoutable\changelayout.vm" />
     <None Include="views\layoutable\index.vm" />
     <None Include="views\layouts\master.vm" />
@@ -281,7 +298,9 @@
     <None Include="views\wizard\testwizardwitharea\page3.vm" />
     <None Include="views\wizard\testwizardwitharea\page4.vm" />
     <None Include="web.config" />
-    <EmbeddedResource Include="Controllers\ResourceFile.resx" />
+    <EmbeddedResource Include="Controllers\ResourceFile.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Content Include="views\ajax\autocom.vm" />
     <Content Include="views\ajax\index.vm" />
     <Content Include="views\filter\index.vm" />
