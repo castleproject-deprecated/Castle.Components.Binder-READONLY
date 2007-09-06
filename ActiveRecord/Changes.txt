@@ -1,6 +1,9 @@
 Release Candidate 2
 ===================
 
+- Fixed AR-115 Exists always returns True for lazily-proxied classes
+  Chacged FindByPK to use Get/Load according to its parameters.
+
 - Included PrimaryKeyType.Custom and property CustomGenerator:Type
   allowing one to supply its own generator
 

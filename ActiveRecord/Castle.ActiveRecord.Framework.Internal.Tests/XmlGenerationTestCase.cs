@@ -233,7 +233,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests
 				"      <generator class=\"native\">\r\n" +
 				"      </generator>\r\n" +
 				"    </id>\r\n" +
-				"    <any name=\"PaymentMethod\" access=\"property\" id-type=\"Int64\" meta-type=\"System.String\" cascade=\"save-update\">\r\n"+
+				"    <any name=\"PaymentMethod\" access=\"property\" id-type=\"Int64\" meta-type=\"System.String\" cascade=\"save-update\" not-null=\"true\">\r\n"+
 				"      <meta-value value=\"BANK_ACCOUNT\" class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.BankAccount, Castle.ActiveRecord.Framework.Internal.Tests\" />\r\n" +
 				"      <column name=\"BILLING_DETAILS_TYPE\" />\r\n"+
 				"      <column name=\"BILLING_DETAILS_ID\" />\r\n"+
@@ -299,7 +299,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests
 				"    </id>\r\n" +
 				"    <set name=\"PaymentMethod\" access=\"property\" table=\"payments_table\" lazy=\"false\">\r\n" +
 				"      <key column=\"pay_id\" />\r\n" +
-				"      <many-to-any id-type=\"Int32\">\r\n" +
+				"      <many-to-any id-type=\"Int32\" meta-type=\"Int32\">\r\n" +
 				"        <column name=\"payment_type\" />\r\n" +
 				"        <column name=\"payment_method_id\" />\r\n" +
 				"      </many-to-any>\r\n" +
@@ -874,6 +874,59 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests
 				"</hibernate-mapping>\r\n";
 
 			Assert.AreEqual(expected, xml);
+		}
+
+		[Test]
+		public void NotFoundBehaviourClass()
+		{
+			ActiveRecordModelBuilder builder = new ActiveRecordModelBuilder();
+			ActiveRecordModel NotFoundBehaviourClassModel = builder.Create(typeof(NotFoundBehaviourClass));
+			ActiveRecordModel RelationalFoobarModel = builder.Create(typeof(RelationalFoobar));
+			Assert.IsNotNull(NotFoundBehaviourClassModel);
+			Assert.IsNotNull(RelationalFoobarModel);
+
+			String xml = Process(builder, NotFoundBehaviourClassModel);
+
+			String expected =
+				"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n" +
+				"<hibernate-mapping  auto-import=\"true\" default-lazy=\"false\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:nhibernate-mapping-2.2\">\r\n" +
+				"  <class name=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.NotFoundBehaviourClass, Castle.ActiveRecord.Framework.Internal.Tests\" table=\"NotFoundBehaviourClass\">\r\n" +
+				"    <id name=\"Id\" access=\"property\" column=\"Id\" type=\"Int32\" unsaved-value=\"0\">\r\n" +
+				"      <generator class=\"native\">\r\n" +
+				"      </generator>\r\n" +
+				"    </id>\r\n" +
+				"    <bag name=\"SubClasses\" access=\"property\" table=\"RelationalFoobarTable\" lazy=\"false\">\r\n" +
+				"      <key column=\"keycol\" />\r\n" +
+				"      <one-to-many class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.RelationalFoobar, Castle.ActiveRecord.Framework.Internal.Tests\" not-found=\"ignore\" />\r\n" +
+				"    </bag>\r\n" +
+				"    <bag name=\"ManySubClasses\" access=\"property\" table=\"ManySubClasses\" lazy=\"false\">\r\n" +
+				"      <key column=\"id\" />\r\n" +
+				"      <many-to-many class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.RelationalFoobar, Castle.ActiveRecord.Framework.Internal.Tests\" column=\"ref_id\" not-found=\"ignore\"/>\r\n" +
+				"    </bag>\r\n" +
+				"  </class>\r\n" +
+				"</hibernate-mapping>\r\n";
+
+			Assert.AreEqual(expected, xml);
+
+			xml = Process(builder, RelationalFoobarModel);
+
+			expected =
+				"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n" +
+				"<hibernate-mapping  auto-import=\"true\" default-lazy=\"false\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:nhibernate-mapping-2.2\">\r\n" +
+				"  <class name=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.RelationalFoobar, Castle.ActiveRecord.Framework.Internal.Tests\" table=\"RelationalFoobar\">\r\n" +
+				"    <id name=\"Id\" access=\"property\" column=\"Id\" type=\"Int32\" unsaved-value=\"0\">\r\n" +
+				"      <generator class=\"native\">\r\n" +
+				"      </generator>\r\n" +
+				"    </id>\r\n" +
+				"    <many-to-one name=\"NotFoundBehaviourClass\" access=\"property\" class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.NotFoundBehaviourClass, Castle.ActiveRecord.Framework.Internal.Tests\" column=\"NotFoundBehaviourClass\" not-found=\"ignore\" />\r\n" +
+				"    <bag name=\"NotFoundBehaviourClassList\" access=\"property\" table=\"ManySubClasses\" lazy=\"false\">\r\n" +
+				"      <key column=\"id\" />\r\n" +
+				"      <many-to-many class=\"Castle.ActiveRecord.Framework.Internal.Tests.Model.NotFoundBehaviourClass, Castle.ActiveRecord.Framework.Internal.Tests\" column=\"ref_id\" not-found=\"ignore\"/>\r\n" +
+				"    </bag>\r\n" +
+				"  </class>\r\n" +
+				"</hibernate-mapping>\r\n";
+
+			Assert.AreEqual(expected, xml);			
 		}
 		
 #if DOTNET2

@@ -14,107 +14,137 @@
 
 namespace Castle.MonoRail.Views.Brail
 {
-    using System;
-    using System.Collections;
-    using System.IO;
-    using Boo.Lang;
-    using Castle.MonoRail.Framework;
+	using System;
+	using System.Collections;
+	using System.Collections.Specialized;
+	using System.IO;
+	using Boo.Lang;
+	using Castle.MonoRail.Framework;
 
-    public class BrailViewComponentContext : IViewComponentContext
-    {
-        string componentName;
-        IDictionary contextVars = new Hashtable(
-#if DOTNET2
-StringComparer.InvariantCultureIgnoreCase
-#else
-				CaseInsensitiveHashCodeProvider.Default,
-				CaseInsensitiveComparer.Default
-#endif
-);
+	public class BrailViewComponentContext : IViewComponentContext
+	{
+		string componentName;
+		private IDictionary contextVars = new HybridDictionary(true);
 
-        IDictionary componentParameters;
-        IDictionary sections;
-        string viewToRender;
+		IDictionary componentParameters;
+		IDictionary sections;
+		string viewToRender;
 
-        ICallable body;
-        private readonly TextWriter default_writer;
+		ICallable body;
+		private readonly TextWriter default_writer;
+		private BrailBase parent;
 
-        public string ComponentName
-        {
-            get { return componentName; }
-        }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="BrailViewComponentContext"/> class.
+		/// </summary>
+		/// <param name="parent">The parent.</param>
+		/// <param name="body">The body.</param>
+		/// <param name="name">The name.</param>
+		/// <param name="text">The text.</param>
+		/// <param name="parameters">The parameters.</param>
+		public BrailViewComponentContext(BrailBase parent, ICallable body,
+										 string name, TextWriter text, IDictionary parameters)
+		{
+			this.parent = parent;
+			parent.ExtendDictionaryWithProperties(contextVars);
+			this.body = body;
+			componentName = name;
+			default_writer = text;
+			componentParameters = parameters;
+		}
 
-        public IDictionary ContextVars
-        {
-            get { return contextVars; }
-        }
+		public string ComponentName
+		{
+			get { return componentName; }
+		}
 
-        public IDictionary ComponentParameters
-        {
-            get { return componentParameters; }
-        }
+		public IDictionary ContextVars
+		{
+			get { return contextVars; }
+		}
 
-        public string ViewToRender
-        {
-            get { return viewToRender; }
-            set { viewToRender = value; }
-        }
+		public IDictionary ComponentParameters
+		{
+			get { return componentParameters; }
+		}
 
-        public ICallable Body
-        {
-            get { return body; }
-            set { body = value; }
-        }
+		public string ViewToRender
+		{
+			get { return viewToRender; }
+			set { viewToRender = value; }
+		}
 
-        public TextWriter Writer
-        {
-            get { return default_writer; }
-        }
+		public ICallable Body
+		{
+			get { return body; }
+			set { body = value; }
+		}
 
-        public BrailViewComponentContext(BrailBase parent, ICallable body, string name, TextWriter text, IDictionary parameters)
-        {
-            parent.ExtendDictionaryWithProperties(contextVars);
-            this.body = body;
-            this.componentName = name;
-            this.default_writer = text;
-            this.componentParameters = parameters;
-        }
+		public TextWriter Writer
+		{
+			get { return default_writer; }
+		}
 
-        public void RenderBody()
-        {
-            RenderBody(default_writer);
-        }
+		public void RenderBody()
+		{
+			RenderBody(default_writer);
+		}
 
-        public void RenderBody(TextWriter writer)
-        {
-            if (body == null)
-                throw new RailsException("This component does not have a body content to be rendered");
-            body.Call(new object[] { writer });
-        }
+		public void RenderBody(TextWriter writer)
+		{
+			if (body == null)
+			{
+				throw new RailsException("This component does not have a body content to be rendered");
+			}
+			using (parent.SetOutputStream(writer))
+			{
+				body.Call(new object[] { writer });
+			}
+		}
 
-        public bool HasSection(string sectionName)
-        {
-            return sections != null && sections.Contains(sectionName);
-        }
+		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="writer"></param>
+		public void RenderView(string name, TextWriter writer)
+		{
+			throw new NotImplementedException();
+		}
 
-        public void RenderSection(string sectionName)
-        {
-            if (HasSection(sectionName) == false)
-                return;//matching the NVelocity behavior, but maybe should throw?
-            ICallable callable = (ICallable)sections[sectionName];
-            callable.Call(new object[] { default_writer });
-        }
+		public bool HasSection(string sectionName)
+		{
+			return sections != null && sections.Contains(sectionName);
+		}
+
+		public void RenderSection(string sectionName)
+		{
+			RenderSection(sectionName, default_writer);
+		}
+
+		/// <summary>
+		/// Renders the the specified section
+		/// </summary>
+		/// <param name="sectionName">Name of the section.</param>
+		/// <param name="writer">The writer.</param>
+		public void RenderSection(string sectionName, TextWriter writer)
+		{
+			if (HasSection(sectionName) == false)
+				return;//matching the NVelocity behavior, but maybe should throw?
+			ICallable callable = (ICallable)sections[sectionName];
+			callable.Call(new object[] { writer });
+		}
 
 		public IViewEngine ViewEngine
 		{
-			get { throw new NotImplementedException(); }
+			get { return parent.ViewEngine; }
 		}
 
-        public void RegisterSection(string name, ICallable section)
-        {
-            if (sections == null)
-                sections = new Hashtable();
-            sections[name] = section;
-        }
-    }
+		public void RegisterSection(string name, ICallable section)
+		{
+			if (sections == null)
+				sections = new Hashtable();
+			sections[name] = section;
+		}
+	}
 }

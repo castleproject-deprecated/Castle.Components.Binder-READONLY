@@ -140,6 +140,8 @@ namespace Castle.MonoRail.Framework.Services
 			RegisterComponent("UpdatePage", typeof(UpdatePage));
 			RegisterComponent("UpdatePageTag", typeof(UpdatePageTag));
 			RegisterComponent("AuthenticatedContent", typeof(AuthenticatedContent));
+			RegisterComponent("DiggStylePagination", typeof(DiggStylePagination));
+			RegisterComponent("ColumnRenderer", typeof(ColumnRenderer));
 		}
 
 		/// <summary>

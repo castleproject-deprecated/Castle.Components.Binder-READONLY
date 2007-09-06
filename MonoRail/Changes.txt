@@ -4,6 +4,42 @@ Change history
 Release Candidate 3
 ===================
 
+- Added IViewComponentContext.RenderView(name, textwriter)
+
+- Fixed MR-201
+  "DiggStylePagination.Initialize() doesn't check useInlineStyle parameter"
+
+- Added FormHelper.HiddenField("key", value) overload
+
+- Added 'valueformat' to SetOperations (affects FormHelper.Select, Checkboxlist)
+
+- Fixed MR-197
+  "Exception thrown by AccessibleThrough are not caught by rescues"
+
+- Added 'textformat' support to the all FormHelper operations (that create input elements).
+
+- Added BrailJS Support, allowing to generate javascript via brail scripts.
+ Note; BrailJS scripts do not need <?brail ?> and any output statements there will be ignored.
+  They are used strictly to create the generator.
+
+- Changed Brail extention from Boo to Brail / BrailJS
+
+- Added mask support to FormHelper field elements
+
+- Added FormHelper.PasswordNumberField
+
+- Refactored FormHelper to support other approaches to extract values from instance.
+  Now it supports DataRows, DataRowViews and reflection
+
+- Added ColumnRenderer view component
+
+- Added DiggStylePagination ViewComponent, based on Alex Henderson work. 
+  See http://blog.bittercoder.com/PermaLink,guid,579711a8-0b16-481b-b52b-ebdfa1a7e225.aspx
+
+- Added PaginationHelper.CreateCustomPage
+  
+  This is only useful if the application code takes care of slicing (select top and etc)
+
 - Added formatting support to SetOperations (affects FormHelper.Select, Checkboxlist)
   
   Example:

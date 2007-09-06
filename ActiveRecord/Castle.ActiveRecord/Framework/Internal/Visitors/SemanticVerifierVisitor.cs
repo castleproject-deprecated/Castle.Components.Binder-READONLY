@@ -426,7 +426,20 @@ namespace Castle.ActiveRecord.Framework.Internal
 			if (model.HasManyToAnyAtt.MapType == null)
 				model.HasManyToAnyAtt.MapType = GuessType(null, model.Property.PropertyType);
 
+			model.HasManyToAnyAtt.RelationType = GuessRelation(model.Property, model.HasManyToAnyAtt.RelationType);
+
 			base.VisitHasManyToAny(model);
+		}
+
+		/// <summary>
+		/// Visits any.
+		/// </summary>
+		/// <param name="model">The model.</param>
+		public override void VisitAny(AnyModel model)
+		{
+			if (model.AnyAtt.MetaType == null)
+				throw new ActiveRecordException("MetaType is a required attribute of AnyAttribute on " + model.Property.DeclaringType.FullName + "." +
+				                                model.Property.Name + ".");
 		}
 
 		/// <summary>

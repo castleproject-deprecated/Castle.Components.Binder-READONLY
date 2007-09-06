@@ -15,6 +15,7 @@
 namespace Castle.ActiveRecord.Framework.Internal
 {
 	using System;
+	using System.Collections;
 	using System.Reflection;
 
 	using Castle.ActiveRecord;
@@ -25,11 +26,12 @@ namespace Castle.ActiveRecord.Framework.Internal
 	{
 		private readonly PropertyInfo prop;
 		private readonly HasManyToAnyAttribute hasManyToAnyAtt;
-
+		private IList metaValues;
 		public HasManyToAnyModel(PropertyInfo prop, HasManyToAnyAttribute hasManyToAnyAtt)
 		{
 			this.prop = prop;
 			this.hasManyToAnyAtt = hasManyToAnyAtt;
+			metaValues = new ArrayList();
 		}
 
 		public PropertyInfo Property
@@ -45,6 +47,16 @@ namespace Castle.ActiveRecord.Framework.Internal
 		public Config Configuration
 		{
 			get { return  new Config(this); }
+		}
+
+		/// <summary>
+		/// Gets or sets the meta values.
+		/// </summary>
+		/// <value>The meta values.</value>
+		public IList MetaValues
+		{
+			get { return metaValues; }
+			set { metaValues = value; }
 		}
 
 		#region IVisitable Members

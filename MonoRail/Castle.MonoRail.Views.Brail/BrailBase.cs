@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
+using System.Text;
+
 namespace Castle.MonoRail.Views.Brail
 {
 	using System;
@@ -23,7 +26,7 @@ namespace Castle.MonoRail.Views.Brail
 	// resources usage, etc.
 	public abstract class BrailBase
 	{
-		protected TextWriter outputStream;
+		private TextWriter outputStream;
 
 		// This is used by layout scripts only, for outputing the child's content
 		protected TextWriter childOutput;
@@ -56,6 +59,11 @@ namespace Castle.MonoRail.Views.Brail
 			get { return viewEngine.ViewRootDir; }
 		}
 
+		public BooViewEngine ViewEngine
+		{
+			get { return viewEngine; }
+		}
+
 		// Output the subview to the client, this is either a relative path "SubView" which
 		// is relative to the current /script/ or an "absolute" path "/home/menu" which is
 		// actually relative to ViewDirRoot
@@ -83,9 +91,9 @@ namespace Castle.MonoRail.Views.Brail
 		public string GetSubViewFilename(string subviewName)
 		{
 			//absolute path from Views directory
-			if (subviewName[0] == '/')
-				return viewEngine.GetTemplateName(subviewName.Substring(1));
-			return Path.Combine(ScriptDirectory, subviewName) + viewEngine.Options.Extention;
+            if (subviewName[0] == '/')
+                return subviewName.Substring(1) + viewEngine.ViewFileExtension;
+			return Path.Combine(ScriptDirectory, subviewName) + viewEngine.ViewFileExtension;
 		}
 
 		// this is called by ReplaceUnknownWithParameters step to create a more dynamic experiance
@@ -151,6 +159,17 @@ namespace Castle.MonoRail.Views.Brail
 			get { return outputStream; }
 		}
 
+		/// <summary>
+		/// This is required because we may want to replace the output stream and get the correct
+		/// behavior from components call RenderText() or RenderSection()
+		/// </summary>
+		public IDisposable SetOutputStream(TextWriter newOutputStream)
+		{
+			ReturnOutputStreamToInitialWriter disposable = new ReturnOutputStreamToInitialWriter(OutputStream, this);
+			this.outputStream = newOutputStream;
+			return disposable;
+		}
+
 		public TextWriter ChildOutput
 		{
 			get { return childOutput;  }
@@ -164,6 +183,14 @@ namespace Castle.MonoRail.Views.Brail
                 dictionary[entry.Key] = entry.Value;
 	        }
 	    }
+
+        /// <summary>
+        /// Note that this will overwrite any existing property.
+        /// </summary>
+        public void AddProperty(string name, object item)
+        {
+            properties[name] = item;
+        }
 
 		// Initialize all the properties that a script may need
 		// One thing to note here is that resources are wrapped in ResourceToDuck wrapper
@@ -235,6 +262,23 @@ namespace Castle.MonoRail.Views.Brail
 			{
 				this.found = found;
 				this.value = value;
+			}
+		}
+
+		private class ReturnOutputStreamToInitialWriter : IDisposable
+		{
+			private TextWriter initialWriter;
+			private BrailBase parent;
+
+			public ReturnOutputStreamToInitialWriter(TextWriter initialWriter, BrailBase parent)
+			{
+				this.initialWriter = initialWriter;
+				this.parent = parent;
+			}
+
+			public void Dispose()
+			{
+				parent.outputStream = initialWriter;
 			}
 		}
 	}

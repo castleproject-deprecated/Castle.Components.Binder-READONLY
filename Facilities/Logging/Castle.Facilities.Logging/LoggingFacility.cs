@@ -16,7 +16,6 @@ namespace Castle.Facilities.Logging
 {
 	using System;
 	using System.Configuration;
-
 	using Castle.Core.Logging;
 	using Castle.MicroKernel;
 	using Castle.MicroKernel.Facilities;
@@ -27,13 +26,15 @@ namespace Castle.Facilities.Logging
 	/// </summary>
 	public enum LoggerImplementation
 	{
+		Custom,
 		Null,
 		Console,
 		Diagnostics,
 		Web,
 		NLog,
 		Log4net,
-		Custom
+		ExtendedNLog,
+		ExtendedLog4net
 	}
 
 	/// <summary>
@@ -44,16 +45,27 @@ namespace Castle.Facilities.Logging
 	{
 		private static readonly String Log4NetLoggerFactoryTypeName =
 			"Castle.Services.Logging.Log4netIntegration.Log4netFactory," +
-				"Castle.Services.Logging.Log4netIntegration,Version=1.0.0.0, Culture=neutral," +
-				"PublicKeyToken=407dd0808d44fbdc";
+			"Castle.Services.Logging.Log4netIntegration,Version=1.0.0.0, Culture=neutral," +
+			"PublicKeyToken=407dd0808d44fbdc";
 
 		private static readonly String NLogLoggerFactoryTypeName =
 			"Castle.Services.Logging.NLogIntegration.NLogFactory," +
-				"Castle.Services.Logging.NLogIntegration,Version=1.0.0.0, Culture=neutral," +
-				"PublicKeyToken=407dd0808d44fbdc";
+			"Castle.Services.Logging.NLogIntegration,Version=1.0.0.0, Culture=neutral," +
+			"PublicKeyToken=407dd0808d44fbdc";
+
+		private static readonly String ExtendedLog4NetLoggerFactoryTypeName =
+			"Castle.Services.Logging.Log4netIntegration.ExtendedLog4netFactory," +
+			"Castle.Services.Logging.Log4netIntegration,Version=1.0.0.0, Culture=neutral," +
+			"PublicKeyToken=407dd0808d44fbdc";
+
+		private static readonly String ExtendedNLogLoggerFactoryTypeName =
+			"Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory," +
+			"Castle.Services.Logging.NLogIntegration,Version=1.0.0.0, Culture=neutral," +
+			"PublicKeyToken=407dd0808d44fbdc";
 
 		private ITypeConverter converter;
 		private ILoggerFactory factory;
+		private LoggerImplementation logApi;
 
 		public LoggingFacility()
 		{
@@ -72,12 +84,26 @@ namespace Castle.Facilities.Logging
 
 		private void RegisterDefaultILogger()
 		{
-			Kernel.AddComponentInstance("ilogger.default", typeof(ILogger), factory.Create("Default"));
+			if (logApi == LoggerImplementation.ExtendedNLog || logApi == LoggerImplementation.ExtendedLog4net)
+			{
+				Kernel.AddComponentInstance("ilogger.default", typeof(IExtendedLogger), factory.Create("Default"));
+			}
+			else
+			{
+				Kernel.AddComponentInstance("ilogger.default", typeof(ILogger), factory.Create("Default"));
+			}
 		}
 
 		private void RegisterLoggerFactory()
 		{
-			Kernel.AddComponentInstance("iloggerfactory", typeof(ILoggerFactory), factory);
+			if (logApi == LoggerImplementation.ExtendedNLog || logApi == LoggerImplementation.ExtendedLog4net)
+			{
+				Kernel.AddComponentInstance("iloggerfactory", typeof(IExtendedLoggerFactory), factory);
+			}
+			else
+			{
+				Kernel.AddComponentInstance("iloggerfactory", typeof(ILoggerFactory), factory);
+			}
 		}
 
 		private void RegisterSubResolver()
@@ -87,7 +113,7 @@ namespace Castle.Facilities.Logging
 
 		private void ReadConfigurationAndCreateLoggerFactory()
 		{
-			LoggerImplementation logApi = LoggerImplementation.Console;
+			logApi = LoggerImplementation.Console;
 
 			String typeAtt = FacilityConfig.Attributes["loggingApi"];
 			String customAtt = FacilityConfig.Attributes["customLoggerFactory"];
@@ -96,20 +122,42 @@ namespace Castle.Facilities.Logging
 			if (typeAtt != null)
 			{
 				logApi = (LoggerImplementation)
-					converter.PerformConversion(typeAtt, typeof(LoggerImplementation));
+				         converter.PerformConversion(typeAtt, typeof(LoggerImplementation));
 			}
 
-			CreateProperLoggerFactory(logApi, customAtt, configFileAtt);
+			CreateProperLoggerFactory(customAtt, configFileAtt);
 
 			RegisterLoggerFactory();
 		}
 
-		private void CreateProperLoggerFactory(LoggerImplementation logApi, String customType, String configFile)
+		private void CreateProperLoggerFactory(string customType, string configFile)
 		{
-			Type loggerFactoryType = null;
-			
-			switch (logApi)
+			Type loggerFactoryType;
+
+			switch(logApi)
 			{
+				case LoggerImplementation.Custom:
+					if (customType == null)
+					{
+						String message = "If you specify loggingApi='custom' " +
+														 "then you must use the attribute customLoggerFactory to inform the " +
+														 "type name of the custom logger factory";
+#if DOTNET2
+						throw new ConfigurationErrorsException(message);
+#else
+						throw new ConfigurationException(message);
+#endif
+					}
+
+					loggerFactoryType = (Type)
+															converter.PerformConversion(customType, typeof(Type));
+
+					if (!typeof(ILoggerFactory).IsAssignableFrom(loggerFactoryType) && !typeof(IExtendedLoggerFactory).IsAssignableFrom(loggerFactoryType))
+					{
+						throw new FacilityException("The specified type '" + customType +
+																				"' does not implement either ILoggerFactory or IExtendedLoggerFactory.");
+					}
+					break;
 				case LoggerImplementation.Null:
 					loggerFactoryType = typeof(NullLogFactory);
 					break;
@@ -123,49 +171,51 @@ namespace Castle.Facilities.Logging
 					loggerFactoryType = typeof(WebLoggerFactory);
 					break;
 				case LoggerImplementation.Log4net:
-					loggerFactoryType = (Type) converter.PerformConversion(Log4NetLoggerFactoryTypeName, typeof(Type));
+					loggerFactoryType = (Type)converter.PerformConversion(Log4NetLoggerFactoryTypeName, typeof(Type));
 					break;
 				case LoggerImplementation.NLog:
-					loggerFactoryType = (Type) converter.PerformConversion(NLogLoggerFactoryTypeName, typeof(Type));
+					loggerFactoryType = (Type)converter.PerformConversion(NLogLoggerFactoryTypeName, typeof(Type));
 					break;
-				case LoggerImplementation.Custom:
-					if (customType == null)
-					{
-						throw new ConfigurationException("If you specify loggingApi='custom' " +
-							"then you must use the attribute customLoggerFactory to inform the " +
-							"type name of the custom logger factory");
-					}
-
-					loggerFactoryType = (Type)
-						converter.PerformConversion(customType, typeof(Type));
-
-					if (!typeof(ILoggerFactory).IsAssignableFrom(loggerFactoryType))
-					{
-						throw new FacilityException("The specified type '" + customType +
-							"' does not implement ILoggerFactory");
-					}
+				case LoggerImplementation.ExtendedLog4net:
+					loggerFactoryType = (Type)converter.PerformConversion(ExtendedLog4NetLoggerFactoryTypeName, typeof(Type));
 					break;
-				
+				case LoggerImplementation.ExtendedNLog:
+					loggerFactoryType = (Type)converter.PerformConversion(ExtendedNLogLoggerFactoryTypeName, typeof(Type));
+					break;
 				default:
-					throw new ConfigurationException("An invalid loggingApi was specified: " + logApi);
+					{
+						String message = "An invalid loggingApi was specified: " + logApi;
+#if DOTNET2
+						throw new ConfigurationErrorsException(message);
+#else
+						throw new ConfigurationException(message);
+#endif
+					}
 			}
 
 			if (loggerFactoryType == null)
 			{
-				throw new FacilityException("LoggingFacility was unable to find an implementation of ILoggerFactory.");
+				throw new FacilityException("LoggingFacility was unable to find an implementation of ILoggerFactory or IExtendedLoggerFactory.");
 			}
 
 			object[] args = null;
 
 			if (configFile != null) args = new object[] {configFile};
 
-			factory = (ILoggerFactory) Activator.CreateInstance(loggerFactoryType, args);
+			if (logApi == LoggerImplementation.ExtendedNLog || logApi == LoggerImplementation.ExtendedLog4net)
+			{
+				factory = (IExtendedLoggerFactory) Activator.CreateInstance(loggerFactoryType, args);
+			}
+			else
+			{
+				factory = (ILoggerFactory) Activator.CreateInstance(loggerFactoryType, args);
+			}
 		}
 
 		private void SetUpTypeConverter()
 		{
 			converter = Kernel.GetSubSystem(
-				SubSystemConstants.ConversionManagerKey) as IConversionManager;
+			            	SubSystemConstants.ConversionManagerKey) as IConversionManager;
 		}
 	}
 }

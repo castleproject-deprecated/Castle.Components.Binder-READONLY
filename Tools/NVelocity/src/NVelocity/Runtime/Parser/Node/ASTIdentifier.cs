@@ -78,6 +78,17 @@ namespace NVelocity.Runtime.Parser.Node
 		/// </summary>
 		public override Object Execute(Object o, IInternalContextAdapter context)
 		{
+			if (identifier == "to_quote" && (o.GetType() == typeof(string) || 
+				o.GetType().IsPrimitive || o.GetType() == typeof(decimal)))
+			{
+				return "\"" + o + "\"";
+			}
+			else if (identifier == "to_squote" && (o.GetType() == typeof(string) || 
+				o.GetType().IsPrimitive || o.GetType() == typeof(decimal)))
+			{
+				return "'" + o + "'";
+			}
+
 			IDuck duck = o as IDuck;
 
 			if (duck != null)

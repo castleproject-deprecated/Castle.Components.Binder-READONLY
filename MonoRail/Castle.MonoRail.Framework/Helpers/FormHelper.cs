@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework.Helpers
 	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
+	using System.Data;
 	using System.IO;
 	using System.Reflection;
 	using System.Text;
@@ -41,6 +42,15 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// It also query the objects available on the context to show property 
 	/// values correctly, saving you the burden of filling text inputs, selects, 
 	/// checkboxes and radios.
+	/// </para>
+	/// <para>
+	/// <b>Mask support</b>. 
+	/// For most elements, you can use 
+	/// the entries <c>mask</c> and optionally <c>mask_separator</c> to define a 
+	/// mask for your inputs. Credits to mordechai Sandhaus - 52action.com
+	/// </para>
+	/// <para>
+	/// For example: mask='2,5',mask_separator='/' will mask the content to '12/34/1234'
 	/// </para>
 	/// </summary>
 	public class FormHelper : AbstractHelper
@@ -130,6 +140,9 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </summary>
 		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
 		/// <returns>The generated form element</returns>
+		/// <remarks>
+		/// You must invoke <see cref="FormHelper.InstallScripts"/> before using it
+		/// </remarks>
 		public String NumberField(String target)
 		{
 			return NumberField(target, null);
@@ -150,19 +163,29 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// FormHelper.NumberField("product.price", {exceptions='13,10,11'})
 		/// </code>
 		/// In this case the key codes 13, 10 and 11 will be accepted on the field.
+		/// <para>
+		/// You can aslo optionally pass an <c>forbid</c> value through the dictionary.
+		/// It must be a comma separated list of chars that cannot be accepted on the field. 
+		/// For example:
+		/// </para>
+		/// <code>
+		/// FormHelper.NumberField("product.price", {forbid='46'})
+		/// </code>
+		/// In this case the key code 46 (period) will not be accepted on the field.
 		/// </summary>
 		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
 		/// <param name="attributes">Attributes for the FormHelper method and for the html element it generates</param>
 		/// <returns>The generated form element</returns>
+		/// <remarks>
+		/// You must invoke <see cref="FormHelper.InstallScripts"/> before using it
+		/// </remarks>
 		public String NumberField(String target, IDictionary attributes)
 		{
 			object value = ObtainValue(target);
 
 			attributes = attributes != null ? attributes : new Hashtable();
 
-			String list = ObtainEntryAndRemove(attributes, "exceptions", String.Empty);
-
-			attributes["onKeyPress"] = "return monorail_formhelper_numberonly(event, [" + list + "]);";
+			ApplyNumberOnlyOptions(attributes);
 
 			return CreateInputElement("text", target, value, attributes);
 		}
@@ -234,6 +257,69 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		#endregion
 
+		#region PasswordNumberField
+
+		/// <summary>
+		/// Generates an input password element with a javascript that prevents
+		/// chars other than numbers from being entered.
+		/// <para>
+		/// The value is extracted from the target (if available)
+		/// </para>
+		/// </summary>
+		/// <remarks>
+		/// You must invoke <see cref="FormHelper.InstallScripts"/> before using it
+		/// </remarks>
+		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
+		/// <returns>The generated form element</returns>
+		public String PasswordNumberField(String target)
+		{
+			return PasswordNumberField(target, null);
+		}
+
+		/// <summary>
+		/// Generates an input password element with a javascript that prevents
+		/// chars other than numbers from being entered.
+		/// <para>
+		/// The value is extracted from the target (if available)
+		/// </para>
+		/// <para>
+		/// You can optionally pass an <c>exceptions</c> value through the dictionary.
+		/// It must be a comma separated list of chars that can be accepted on the field. 
+		/// For example:
+		/// </para>
+		/// <code>
+		/// FormHelper.NumberField("product.price", {exceptions='13,10,11'})
+		/// </code>
+		/// In this case the key codes 13, 10 and 11 will be accepted on the field.
+		/// <para>
+		/// You can aslo optionally pass an <c>forbid</c> value through the dictionary.
+		/// It must be a comma separated list of chars that cannot be accepted on the field. 
+		/// For example:
+		/// </para>
+		/// <code>
+		/// FormHelper.NumberField("product.price", {forbid='46'})
+		/// </code>
+		/// In this case the key code 46 (period) will not be accepted on the field.
+		/// </summary>
+		/// <remarks>
+		/// You must invoke <see cref="FormHelper.InstallScripts"/> before using it
+		/// </remarks>
+		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
+		/// <param name="attributes">Attributes for the FormHelper method and for the html element it generates</param>
+		/// <returns>The generated form element</returns>
+		public String PasswordNumberField(String target, IDictionary attributes)
+		{
+			object value = ObtainValue(target);
+
+			attributes = attributes != null ? attributes : new Hashtable();
+
+			ApplyNumberOnlyOptions(attributes);
+
+			return CreateInputElement("password", target, value, attributes);
+		}
+
+		#endregion
+
 		#region TextFieldFormat
 
 		/// <summary>
@@ -246,6 +332,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
 		/// <param name="formatString">The format string</param>
 		/// <returns>The generated form element</returns>
+		[Obsolete("Use the attribute 'textformat' instead")]
 		public String TextFieldFormat(String target, String formatString)
 		{
 			return TextFieldFormat(target, formatString, null);
@@ -262,6 +349,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="formatString">The format string</param>
 		/// <param name="attributes">Attributes for the FormHelper method and for the html element it generates</param>
 		/// <returns>The generated form element</returns>
+		[Obsolete("Use the attribute 'textformat' instead")]
 		public String TextFieldFormat(String target, String formatString, IDictionary attributes)
 		{
 			object value = ObtainValue(target);
@@ -335,6 +423,20 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			object value = ObtainValue(target);
 
+			return CreateInputElement("hidden", target, value, null);
+		}
+
+		/// <summary>
+		/// Generates a hidden form element.
+		/// <para>
+		/// The value is extracted from the target (if available)
+		/// </para>
+		/// </summary>
+		/// <param name="target">The object to get the value from and to be based on to create the element name.</param>
+		/// <param name="value">The value for the hidden field</param>
+		/// <returns>The generated form element</returns>
+		public String HiddenField(String target, object value)
+		{
 			return CreateInputElement("hidden", target, value, null);
 		}
 		
@@ -842,11 +944,30 @@ namespace Castle.MonoRail.Framework.Helpers
 				value = ObtainEntryAndRemove(attributes, "defaultValue");
 			}
 
-			value = value == null ? "" : value;
-
 			string id = CreateHtmlId(attributes, target);
 
-			return CreateInputElement(type, id, target, value.ToString(), attributes);
+			return CreateInputElement(type, id, target, FormatIfNecessary(value, attributes), attributes);
+		}
+
+		protected string FormatIfNecessary(object value, IDictionary attributes)
+		{
+			string formatString = ObtainEntryAndRemove(attributes, "textformat");
+
+			if (value != null && formatString != null)
+			{
+				IFormattable formattable = value as IFormattable;
+
+				if (formattable != null)
+				{
+					value = formattable.ToString(formatString, null);
+				}
+			}
+			else if (value == null)
+			{
+				value = String.Empty;
+			}
+
+			return value.ToString();
 		}
 
 		/// <summary>
@@ -865,6 +986,20 @@ namespace Castle.MonoRail.Framework.Helpers
 			if (Controller.Context != null) // We have a context
 			{
 				value = HtmlEncode(value);
+			}
+
+			if (attributes != null && attributes.Contains("mask"))
+			{
+				String mask = ObtainEntryAndRemove(attributes, "mask");
+				String maskSep = ObtainEntryAndRemove(attributes, "mask_separator", "-");
+
+				String onBlur = ObtainEntryAndRemove(attributes, "onBlur", "void(0)");
+				String onKeyUp = ObtainEntryAndRemove(attributes, "onKeyUp", "void(0)");
+
+				String js = "return monorail_formhelper_mask(event,this,'" + mask + "','" + maskSep + "');";
+
+				attributes["onBlur"] = "javascript:" + onBlur + ";" + js;
+				attributes["onKeyUp"] = "javascript:" + onKeyUp + ";" + js;
 			}
 			
 			return String.Format("<input type=\"{0}\" id=\"{1}\" name=\"{2}\" value=\"{3}\" {4}/>", 
@@ -1112,6 +1247,14 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		#region private helpers
 
+		private static void ApplyNumberOnlyOptions(IDictionary attributes)
+		{
+			String list = ObtainEntryAndRemove(attributes, "exceptions", String.Empty);
+			String forbid = ObtainEntryAndRemove(attributes, "forbid", String.Empty);
+
+			attributes["onKeyPress"] = "return monorail_formhelper_numberonly(event, [" + list + "], [" + forbid + "]);";
+		}
+
 		private void AssertIsValidArray(object instance, string property, int index)
 		{
 			Type instanceType = instance.GetType();
@@ -1256,7 +1399,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="isMultiple"><c>true</c> if the initial selection is a set</param>
 		/// <returns><c>true</c> if it's selected</returns>
 		protected internal static bool IsPresent(object value, object initialSetValue, 
-		                                         PropertyInfo propertyOnInitialSet, bool isMultiple)
+		                                         ValueGetter propertyOnInitialSet, bool isMultiple)
 		{
 			if (!isMultiple)
 			{
@@ -1264,7 +1407,8 @@ namespace Castle.MonoRail.Framework.Helpers
 				
 				if (propertyOnInitialSet != null)
 				{
-					valueToCompare = propertyOnInitialSet.GetValue(initialSetValue, null);
+					// propertyOnInitialSet.GetValue(initialSetValue, null);
+					valueToCompare = propertyOnInitialSet.GetValue(initialSetValue); 
 				}
 				
 				return AreEqual(value, valueToCompare);
@@ -1277,7 +1421,8 @@ namespace Castle.MonoRail.Framework.Helpers
 
 					if (propertyOnInitialSet != null)
 					{
-						valueToCompare = propertyOnInitialSet.GetValue(item, null);
+						// valueToCompare = propertyOnInitialSet.GetValue(item, null);
+						valueToCompare = propertyOnInitialSet.GetValue(item); 
 					}
 
 					if (AreEqual(value, valueToCompare))
@@ -1290,28 +1435,28 @@ namespace Castle.MonoRail.Framework.Helpers
 			return false;
 		}
 		
-		/// <summary>
-		/// Gets the property get method.
-		/// </summary>
-		/// <param name="elem">Object specifying the type for which to get the method.</param>
-		/// <param name="property">Property name.</param>
-		/// <returns><see cref="MethodInfo"/> to be used to retrieve the property value.
-		/// If <paramref name="property"/> is <c>null</c> <c>null</c> is returned.</returns>
-		/// <remarks>This method is used to get the <see cref="MethodInfo"/> to retrieve
-		/// specified property from the specified type.</remarks>
-		/// <exception cref="ArgumentNullException">Thrown is <paramref name="elem"/> is <c>null</c>.</exception>
-		protected internal static PropertyInfo GetMethod(object elem, String property)
-		{
-			if (elem == null) throw new ArgumentNullException("elem");
-			if (property == null) return null;
-
-			return GetMethod(elem.GetType(), property);
-		}
-
-		protected internal static PropertyInfo GetMethod(Type type, String property)
-		{
-			return type.GetProperty(property, PropertyFlags);
-		}
+		// <summary>
+		// Gets the property get method.
+		// </summary>
+		// <param name="elem">Object specifying the type for which to get the method.</param>
+		// <param name="property">Property name.</param>
+		// <returns><see cref="MethodInfo"/> to be used to retrieve the property value.
+		// If <paramref name="property"/> is <c>null</c> <c>null</c> is returned.</returns>
+		// <remarks>This method is used to get the <see cref="MethodInfo"/> to retrieve
+		// specified property from the specified type.</remarks>
+		// <exception cref="ArgumentNullException">Thrown is <paramref name="elem"/> is <c>null</c>.</exception>
+//		protected internal static PropertyInfo GetMethoda(object elem, String property)
+//		{
+//			if (elem == null) throw new ArgumentNullException("elem");
+//			if (property == null) return null;
+//
+//			return GetMethod(elem.GetType(), property);
+//		}
+//
+//		protected internal static PropertyInfo GetMethoda(Type type, String property)
+//		{
+//			return type.GetProperty(property, PropertyFlags);
+//		}
 
 		private static void AddChecked(IDictionary attributes)
 		{
@@ -1353,7 +1498,120 @@ namespace Castle.MonoRail.Framework.Helpers
 			return sb.ToString();
 		}
 
-		#endregion
+		public abstract class ValueGetter
+		{
+			public abstract string Name { get; }
 
+			public abstract object GetValue(object instance);
+		}
+
+		public class ReflectionValueGetter : ValueGetter
+		{
+			private PropertyInfo propInfo;
+
+			public ReflectionValueGetter(PropertyInfo propInfo)
+			{
+				this.propInfo = propInfo;
+			}
+
+			public override string Name
+			{
+				get { return propInfo.Name; }
+			}
+
+			public override object GetValue(object instance)
+			{
+				return propInfo.GetValue(instance, null);
+			}
+		}
+
+		public class DataRowValueGetter : ValueGetter
+		{
+			private readonly string columnName;
+
+			public DataRowValueGetter(string columnName)
+			{
+				this.columnName = columnName;
+			}
+
+			public override string Name
+			{
+				get { return columnName; }
+			}
+
+			public override object GetValue(object instance)
+			{
+				DataRow row = (DataRow) instance;
+
+				return row[columnName];
+			}
+		}
+
+		public class DataRowViewValueGetter : ValueGetter
+		{
+			private readonly string columnName;
+
+			public DataRowViewValueGetter(string columnName)
+			{
+				this.columnName = columnName;
+			}
+
+			public override string Name
+			{
+				get { return columnName; }
+			}
+
+			public override object GetValue(object instance)
+			{
+				DataRowView row = (DataRowView)instance;
+
+				return row[columnName];
+			}
+		}
+
+		public class NoActionGetter : ValueGetter
+		{
+			public override string Name
+			{
+				get { return string.Empty; }
+			}
+
+			public override object GetValue(object instance)
+			{
+				return null;
+			}
+		}
+
+		public class ValueGetterAbstractFactory
+		{
+			public static ValueGetter Create(Type targetType, String keyName)
+			{
+				if (targetType == null)
+				{
+					return new NoActionGetter();
+				}
+				else if (targetType == typeof(DataRow))
+				{
+					return new DataRowValueGetter(keyName);
+				}
+				else if (targetType == typeof(DataRowView))
+				{
+					return new DataRowViewValueGetter(keyName);
+				}
+				else
+				{
+					PropertyInfo info = targetType.GetProperty(keyName, PropertyFlags);
+					
+					if (info != null)
+					{
+						return new ReflectionValueGetter(info);
+					}
+
+					return null;
+				}
+			}
+		}
+
+		#endregion
 	}
 }

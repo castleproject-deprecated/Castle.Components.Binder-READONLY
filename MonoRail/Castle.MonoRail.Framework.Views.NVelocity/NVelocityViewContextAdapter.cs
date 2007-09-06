@@ -35,6 +35,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		private readonly String componentName;
 		private readonly INode parentNode;
 		private readonly IViewEngine viewEngine;
+		private readonly IViewRenderer renderer;
 
 		private String viewToRender;
 		private TextWriter writer;
@@ -49,11 +50,13 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		/// <param name="componentName">Name of the component.</param>
 		/// <param name="parentNode">The parent node.</param>
 		/// <param name="viewEngine">The view engine.</param>
-		public NVelocityViewContextAdapter(String componentName, INode parentNode, IViewEngine viewEngine)
+		/// <param name="renderer">The view renderer.</param>
+		public NVelocityViewContextAdapter(String componentName, INode parentNode, IViewEngine viewEngine, IViewRenderer renderer)
 		{
 			this.componentName = componentName;
 			this.parentNode = parentNode;
 			this.viewEngine = viewEngine;
+			this.renderer = renderer;
 		}
 
 		#region IViewComponentContext
@@ -74,7 +77,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		/// <value>The context vars.</value>
 		public IDictionary ContextVars
 		{
-			get { return context as IDictionary; }
+			get { return context; }
 		}
 
 		/// <summary>
@@ -128,6 +131,16 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		}
 
 		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="writer"></param>
+		public void RenderView(string name, TextWriter writer)
+		{
+			renderer.RenderComponentView(context, name, writer, this);
+		}
+
+		/// <summary>
 		/// Renders the the specified section
 		/// </summary>
 		/// <param name="sectionName">Name of the section.</param>
@@ -136,6 +149,21 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			if (HasSection(sectionName))
 			{
 				Directive directive = (Directive) sections[sectionName];
+
+				directive.Render(context, writer, parentNode);
+			}
+		}
+
+		/// <summary>
+		/// Renders the the specified section
+		/// </summary>
+		/// <param name="sectionName">Name of the section.</param>
+		/// <param name="writer">The writer.</param>
+		public void RenderSection(string sectionName, TextWriter writer)
+		{
+			if (HasSection(sectionName))
+			{
+				Directive directive = (Directive)sections[sectionName];
 
 				directive.Render(context, writer, parentNode);
 			}

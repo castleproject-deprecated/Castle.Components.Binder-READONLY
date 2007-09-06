@@ -114,12 +114,20 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		[Test]
 		public void NumberField()
 		{
-			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, []);\" />",
+			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [], []);\" />",
 				helper.NumberField("product.quantity"));
-			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [1]);\" />",
+			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [1], []);\" />",
 				helper.NumberField("product.quantity", DictHelper.Create("exceptions=1")));
-			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [1,2]);\" />",
+			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [1,2], []);\" />",
 				helper.NumberField("product.quantity", DictHelper.Create("exceptions=1,2")));
+		}
+
+		[Test]
+		public void MaskedNumberField()
+		{
+			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [], []);\" " +
+				"onBlur=\"javascript:void(0);return monorail_formhelper_mask(event,this,'2,5','-');\" onKeyUp=\"javascript:void(0);return monorail_formhelper_mask(event,this,'2,5','-');\" />",
+				helper.NumberField("product.quantity", DictHelper.Create("mask=2,5")));
 		}
 
 		[Test]
@@ -144,7 +152,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		public void TextFieldFormat()
 		{
 			Assert.AreEqual("<input type=\"text\" id=\"product_price\" name=\"product.price\" value=\"$12.30\" />", 
-				helper.TextFieldFormat("product.price", "C"));
+				helper.TextField("product.price", DictHelper.Create("textformat=C")));
 		}
 
 		[Test]

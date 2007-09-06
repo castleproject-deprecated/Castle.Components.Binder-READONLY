@@ -15,14 +15,11 @@
 namespace Castle.Facilities.Logging.Tests
 {
 	using System;
-	
-	using Castle.Windsor;
-	
 	using Castle.Core.Configuration;
-	
 	using Castle.MicroKernel.SubSystems.Configuration;
+	using Castle.Windsor;
 
-    /// <summary>
+	/// <summary>
 	/// Summary description for BaseTest.
 	/// </summary>
 	public abstract class BaseTest
@@ -32,20 +29,47 @@ namespace Castle.Facilities.Logging.Tests
 			return CreateConfiguredContainer(loggerApi, String.Empty);
 		}
 
-        protected virtual IWindsorContainer CreateConfiguredContainer(LoggerImplementation loggerApi, String custom)
-        {
-            IWindsorContainer container = new WindsorContainer(new DefaultConfigurationStore());
+		protected virtual IWindsorContainer CreateConfiguredContainer(LoggerImplementation loggerApi, String custom)
+		{
+			IWindsorContainer container = new WindsorContainer(new DefaultConfigurationStore());
 
-            MutableConfiguration confignode = new MutableConfiguration("facility");
+			MutableConfiguration confignode = new MutableConfiguration("facility");
 
-            confignode.Attributes.Add("loggingApi", loggerApi.ToString());
-            confignode.Attributes.Add("customLoggerFactory", custom);
+			confignode.Attributes.Add("loggingApi", loggerApi.ToString());
+			switch (loggerApi)
+			{
+				case LoggerImplementation.Custom:
+					{
+						confignode.Attributes.Add("customLoggerFactory", custom);
+						break;
+					}
+				case LoggerImplementation.Log4net:
+					{
+						confignode.Attributes.Add("configFile", "log4net.facilities.test.config");
+						break;
+					}
+				case LoggerImplementation.NLog:
+					{
+						confignode.Attributes.Add("configFile", "NLog.facilities.test.config");
+						break;
+					}
+				case LoggerImplementation.ExtendedLog4net:
+					{
+						confignode.Attributes.Add("configFile", "log4net.facilities.test.config");
+						break;
+					}
+				case LoggerImplementation.ExtendedNLog:
+					{
+						confignode.Attributes.Add("configFile", "NLog.facilities.test.config");
+						break;
+					}
+			}
 
-            container.Kernel.ConfigurationStore.AddFacilityConfiguration("logging", confignode);
+			container.Kernel.ConfigurationStore.AddFacilityConfiguration("logging", confignode);
 
-            container.AddFacility("logging", new LoggingFacility());
+			container.AddFacility("logging", new LoggingFacility());
 
-            return container;
-        }
+			return container;
+		}
 	}
 }

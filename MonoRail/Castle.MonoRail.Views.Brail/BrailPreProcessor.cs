@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
+
 namespace Castle.MonoRail.Views.Brail
 {
 	using System.Collections;
@@ -22,11 +24,17 @@ namespace Castle.MonoRail.Views.Brail
 
 	public class BrailPreProcessor : AbstractCompilerStep
 	{
+	    
 		private static IDictionary Seperators = CreateSeperators();
-
+        private BooViewEngine booViewEngine;
 		IDictionary inputToCode = new Hashtable();
-		
-		private static IDictionary CreateSeperators()
+
+	    public BrailPreProcessor(BooViewEngine booViewEngine)
+	    {
+	        this.booViewEngine = booViewEngine;
+	    }
+
+	    private static IDictionary CreateSeperators()
 		{
 			Hashtable seperators = new Hashtable();
 			seperators.Add("<?brail", "?>");
@@ -48,7 +56,10 @@ namespace Castle.MonoRail.Views.Brail
 				//	System.Diagnostics.Debugger.Break()
 				using(TextReader reader = input.Open())
 				{
-					string code = Booify(reader.ReadToEnd());
+				    string code = reader.ReadToEnd();
+                    if(this.booViewEngine.ConditionalPreProcessingOnly(input.Name) == false || 
+						ShouldPreProcess(code))
+                        code = Booify(code);
 					StringInput newInput = new StringInput(input.Name, code);
 					inputToCode.Add(input, code);
 					processed.Add(newInput);
@@ -61,7 +72,17 @@ namespace Castle.MonoRail.Views.Brail
 			}
 		}
 
-		private string Booify(string code)
+		private bool ShouldPreProcess(string code)
+		{
+			foreach (DictionaryEntry entry in Seperators)
+			{
+				if(code.Contains(entry.Key.ToString()))
+					return true;
+			}
+			return false;
+		}
+
+		public static string Booify(string code)
 		{
 			if (code.Length == 0)
 			{
@@ -92,7 +113,7 @@ namespace Castle.MonoRail.Views.Brail
 			return buffer.ToString();
 		}
 
-		private void Output(StringWriter buffer, string code)
+		private static void Output(StringWriter buffer, string code)
 		{
 			if (code.Length == 0)
 				return;
@@ -102,7 +123,7 @@ namespace Castle.MonoRail.Views.Brail
 			buffer.WriteLine("\"\"\"");
 		}
 
-		private DictionaryEntry GetSeperators(string code)
+		private static DictionaryEntry GetSeperators(string code)
 		{
 			string start = null, end = null;
 			foreach(DictionaryEntry entry in Seperators)

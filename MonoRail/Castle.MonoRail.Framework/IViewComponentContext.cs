@@ -40,6 +40,13 @@ namespace Castle.MonoRail.Framework
 		bool HasSection(String sectionName);
 
 		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="writer"></param>
+		void RenderView(String name, TextWriter writer);
+
+		/// <summary>
 		/// Renders the component body.
 		/// </summary>
 		void RenderBody();
@@ -55,6 +62,13 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="sectionName">Name of the section.</param>
 		void RenderSection(String sectionName);
+
+		/// <summary>
+		/// Renders the the specified section
+		/// </summary>
+		/// <param name="sectionName">Name of the section.</param>
+		/// <param name="writer">The writer.</param>
+		void RenderSection(String sectionName, TextWriter writer);
 
 		/// <summary>
 		/// Gets the writer used to render the component

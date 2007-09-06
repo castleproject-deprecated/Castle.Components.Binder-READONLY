@@ -146,7 +146,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			{
 				bool isArProperty = false;
 				AnyModel anyModel = null;
-				ArrayList anyMetaValues = new ArrayList();
+				HasManyToAnyModel hasManyToAnyModel = null;
 
 				object[] valAtts = prop.GetCustomAttributes(typeof(AbstractValidationAttribute), true);
 
@@ -190,12 +190,8 @@ namespace Castle.ActiveRecord.Framework.Internal
 						isArProperty = true;
 						anyModel = new AnyModel(prop, anyAtt);
 						model.Anys.Add(anyModel);
-					}
-					else if (attribute is Any.MetaValueAttribute)
-					{
-						Any.MetaValueAttribute meta = attribute as Any.MetaValueAttribute;
-						isArProperty = true;
-						anyMetaValues.Add(meta);
+
+						CollectMetaValues(anyModel.MetaValues, prop);
 					}
 					else if (attribute is PropertyAttribute)
 					{
@@ -277,7 +273,10 @@ namespace Castle.ActiveRecord.Framework.Internal
 						HasManyToAnyAttribute propAtt = attribute as HasManyToAnyAttribute;
 						isArProperty = true;
 
-						model.HasManyToAny.Add(new HasManyToAnyModel(prop, propAtt));
+						hasManyToAnyModel = new HasManyToAnyModel(prop, propAtt);
+						model.HasManyToAny.Add(hasManyToAnyModel);
+
+						CollectMetaValues(hasManyToAnyModel.MetaValues, prop);
 					}
 					else if (attribute is HasManyAttribute)
 					{
@@ -292,6 +291,15 @@ namespace Castle.ActiveRecord.Framework.Internal
 						isArProperty = true;
 
 						model.HasAndBelongsToMany.Add(new HasAndBelongsToManyModel(prop, propAtt));
+					}
+					else if (attribute is Any.MetaValueAttribute)
+					{
+						if (prop.GetCustomAttributes(typeof(HasManyToAnyAttribute), false).Length == 0 &&
+						    prop.GetCustomAttributes(typeof(AnyAttribute), false).Length == 0
+							)
+							throw new ActiveRecordException(
+								"You can't specify an Any.MetaValue without specifying the Any or HasManyToAny attribute. " +
+								"Check type " + prop.DeclaringType.FullName);
 					}
 
 					if (attribute is CollectionIDAttribute)
@@ -308,20 +316,26 @@ namespace Castle.ActiveRecord.Framework.Internal
 					}
 				}
 
-				if (anyMetaValues.Count > 0)
-				{
-					if (anyModel == null)
-					{
-						throw new ActiveRecordException("You can't specify an Any.MetaValue without specifying the Any attribute. " +
-						                                "Check type " + prop.DeclaringType.FullName);
-					}
-					anyModel.MetaValues = anyMetaValues;
-				}
-
 				if (!isArProperty)
 				{
 					model.NotMappedProperties.Add(prop);
 				}
+			}
+		}
+
+		private void CollectMetaValues(IList metaStore,PropertyInfo prop)
+		{
+			if (metaStore == null)
+				throw new ArgumentNullException("metaStore");
+			
+			Any.MetaValueAttribute[] metaValues = prop.GetCustomAttributes(typeof(Any.MetaValueAttribute), false) as Any.MetaValueAttribute[];
+			
+			if (metaValues == null || metaValues.Length == 0)
+				return;
+			
+			foreach(Any.MetaValueAttribute attribute in metaValues)
+			{
+				metaStore.Add(attribute);
 			}
 		}
 

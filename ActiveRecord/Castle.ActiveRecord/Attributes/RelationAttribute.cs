@@ -15,6 +15,7 @@
 namespace Castle.ActiveRecord
 {
 	using System;
+	using Castle.ActiveRecord.Framework.Internal;
 
 	/// <summary>
 	/// Define the relation type for a relation.
@@ -47,7 +48,7 @@ namespace Castle.ActiveRecord
 		/// </summary>
 		List
 	}
-
+	
 	/// <summary>
 	/// Base class to define common relation information
 	/// </summary>
@@ -64,9 +65,11 @@ namespace Castle.ActiveRecord
 		internal String indexType;
 		internal String element;
 		internal bool lazy;
+		internal bool lazySpecified = false;
 		internal bool inverse;
 		internal ManyRelationCascadeEnum cascade = ManyRelationCascadeEnum.None;
 		internal RelationType relType = RelationType.Guess;
+		internal NotFoundBehaviour notFoundBehaviour = NotFoundBehaviour.Default;
 
 		/// <summary>
 		/// Gets or sets the type of the relation.
@@ -114,8 +117,17 @@ namespace Castle.ActiveRecord
 		/// <value><c>true</c> if lazy; otherwise, <c>false</c>.</value>
 		public bool Lazy
 		{
-			get { return lazy; }
-			set { lazy = value; }
+			get
+			{
+				if(lazySpecified)
+					return lazy;
+				return ActiveRecordModel.isLazyByDefault;
+			}
+			set
+			{
+				lazy = value;
+				lazySpecified = true;
+			}
 		}
 
 		/// <summary>
@@ -190,6 +202,16 @@ namespace Castle.ActiveRecord
 		{
 			get { return element; }
 			set { element = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the way broken relations are handled.
+		/// </summary>
+		/// <value>The behaviour.</value>
+		public NotFoundBehaviour NotFoundBehaviour
+		{
+			get { return notFoundBehaviour; }
+			set { notFoundBehaviour = value; }
 		}
 	}
 }

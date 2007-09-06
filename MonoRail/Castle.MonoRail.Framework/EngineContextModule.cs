@@ -100,10 +100,6 @@ namespace Castle.MonoRail.Framework
 			{
 				// Could not even select the action, stop here
 				
-				executor.PerformErrorHandling();
-				
-				executor.Dispose();
-				
 				return;
 			}
 
@@ -298,9 +294,13 @@ namespace Castle.MonoRail.Framework
 
 			if (mrContext == null)
 			{
-				mrContext = new DefaultRailsEngineContext(container, context);
+				DefaultRailsEngineContext newContext = new DefaultRailsEngineContext(container, context);
 
-				context.Items[RailsContextKey] = mrContext;
+				context.Items[RailsContextKey] = newContext;
+
+				newContext.AddService(typeof(IRailsEngineContext), newContext);
+
+				mrContext = newContext;
 			}
 
 			return mrContext;
