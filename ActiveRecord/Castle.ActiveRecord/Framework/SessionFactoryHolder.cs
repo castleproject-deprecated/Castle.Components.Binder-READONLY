@@ -141,8 +141,6 @@ namespace Castle.ActiveRecord.Framework
 
 			ISession session = OpenSession(sessionFactory);
 
-			System.Diagnostics.Debug.Assert( session != null );
-
 			return session;
 		}
 
@@ -175,7 +173,7 @@ namespace Castle.ActiveRecord.Framework
 		{
 			lock(sessionFactory)
 			{
-				return sessionFactory.OpenSession( HookDispatcher.Instance );
+				return sessionFactory.OpenSession(HookDispatcher.Instance);
 			}
 		}
 
@@ -195,7 +193,8 @@ namespace Castle.ActiveRecord.Framework
 			}
 			else
 			{
-				session.Close();
+				session.Flush();
+				session.Dispose();
 			}
 		}
 
@@ -223,7 +222,7 @@ namespace Castle.ActiveRecord.Framework
 			}
 			else
 			{
-				ISession session = null;
+				ISession session;
 
 				if (scope.WantsToCreateTheSession)
 				{
