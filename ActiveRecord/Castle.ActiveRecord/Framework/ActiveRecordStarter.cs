@@ -377,7 +377,13 @@ namespace Castle.ActiveRecord
 			foreach(ActiveRecordModel model in models)
 			{
 				Configuration cfg = holder.GetConfiguration(holder.GetRootType(model.Type));
-
+				if(cfg==null)
+				{
+					throw new ActiveRecordException(
+						string.Format(
+							"Could not find configuration for {0} or its root type {1} this is usually an indication that the configuration has not been setup correctly.",
+							model.Type, holder.GetRootType(model.Type)));
+				}
 				if (!model.IsNestedType && !model.IsDiscriminatorSubClass && !model.IsJoinedSubClass)
 				{
 					xmlVisitor.Reset();
@@ -430,7 +436,7 @@ namespace Castle.ActiveRecord
 		private static Configuration CreateConfiguration(IConfiguration config)
 		{
 			// hammett comments: I'm gonna test this off for a while
-			// ayende comment:	removing this means that tests that using generic entities as base class will break
+			// ayende comments:	removing this means that tests that using generic entities as base class will break
 			//					NH do not support generic entities at the moemnt
 			Environment.UseReflectionOptimizer = false;
 

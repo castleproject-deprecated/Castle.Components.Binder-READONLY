@@ -75,15 +75,15 @@
   <ItemGroup>
     <Reference Include="Castle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Castle.Core.dll</HintPath>
+      <HintPath>..\..\..\build\net-2.0\debug\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MicroKernel, Version=1.0.0.2, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Castle.MicroKernel.dll</HintPath>
+      <HintPath>..\..\..\build\net-2.0\debug\Castle.MicroKernel.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Windsor, Version=1.0.0.2, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="Castle.Windsor, Version=1.0.0.5, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Castle.Windsor.dll</HintPath>
+      <HintPath>..\..\..\build\net-2.0\debug\Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -112,22 +112,29 @@
     <Compile Include="Attributes\OutjectAttribute.cs" />
     <Compile Include="Attributes\ScopeAttribute.cs" />
     <Compile Include="BijectionInspector.cs" />
-    <Compile Include="Contexts\Web\IApplicationScope.cs" />
-    <Compile Include="Contexts\Web\IPageScope.cs" />
-    <Compile Include="Contexts\Web\IRequestScope.cs" />
-    <Compile Include="Contexts\IScopeRegistry.cs" />
-    <Compile Include="Contexts\Web\ISessionScope.cs" />
-    <Compile Include="Contexts\ScopeRegistry.cs" />
-    <Compile Include="Contexts\Web\WebApplicationScope.cs" />
-    <Compile Include="Contexts\Web\WebConversationScope.cs" />
-    <Compile Include="Contexts\Web\WebPageScope.cs" />
-    <Compile Include="Contexts\Web\WebRequestScope.cs" />
-    <Compile Include="Contexts\Web\WebSessionScope.cs" />
-    <Compile Include="Contexts\Windows\SingletonScope.cs" />
+    <Compile Include="LifestyleManager\ScopeLifestyleManager.cs" />
+    <Compile Include="Mock\MockApplicationScope.cs" />
+    <Compile Include="Mock\MockPageScope.cs" />
+    <Compile Include="Mock\MockRequestScope.cs" />
+    <Compile Include="Mock\MockScope.cs" />
+    <Compile Include="Mock\MockSessionScope.cs" />
+    <Compile Include="Scopes\Web\IApplicationScope.cs" />
+    <Compile Include="Scopes\Web\IPageScope.cs" />
+    <Compile Include="Scopes\Web\IRequestScope.cs" />
+    <Compile Include="Scopes\IScopeRegistry.cs" />
+    <Compile Include="Scopes\Web\ISessionScope.cs" />
+    <Compile Include="Scopes\ScopeRegistry.cs" />
+    <Compile Include="Scopes\Web\WebApplicationScope.cs" />
+    <Compile Include="Scopes\Web\WebConversationScope.cs" />
+    <Compile Include="Scopes\Web\WebPageScope.cs" />
+    <Compile Include="Scopes\Web\WebRequestScope.cs" />
+    <Compile Include="Scopes\Web\WebSessionScope.cs" />
+    <Compile Include="Scopes\Windows\SingletonScope.cs" />
     <Compile Include="IglooFacility.cs" />
     <Compile Include="Interceptors\BijectionInterceptor.cs" />
     <Compile Include="LifestyleManager\Candidate.cs" />
-    <Compile Include="LifestyleManager\ScopeWebApplicationLifestyleManager.cs" />
+    <Compile Include="Scopes\Windows\ThreadScope.cs" />
+    <Compile Include="Scopes\Windows\TransientScope.cs" />
     <Compile Include="UIComponents\UIComponentRepository.cs" />
     <Compile Include="Configuration\CommandsSetting.cs">
       <SubType>Code</SubType>
@@ -144,9 +151,9 @@
     <Compile Include="ContainerWebAccessorUtil.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Contexts\Web\WebConversationManager.cs" />
-    <Compile Include="Contexts\IConversationManager.cs" />
-    <Compile Include="Contexts\IScope.cs" />
+    <Compile Include="Scopes\Web\WebConversationManager.cs" />
+    <Compile Include="Scopes\IConversationManager.cs" />
+    <Compile Include="Scopes\IScope.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ControllerInspector.cs" />
     <Compile Include="Controllers\IController.cs">
@@ -155,8 +162,6 @@
     <Compile Include="Interceptors\LogIMethodInterceptor.cs" />
     <Compile Include="Interceptors\NavigationInterceptor.cs" />
     <Compile Include="LifestyleManager\ScopeLifestyleModule.cs" />
-    <Compile Include="LifestyleManager\ScopeWebRequestLifestyleManager.cs" />
-    <Compile Include="LifestyleManager\ScopeWebSessionLifestyleManager.cs" />
     <Compile Include="FlashMessages.cs" />
     <Compile Include="Navigation\NavigationState.cs">
       <SubType>Code</SubType>
@@ -208,7 +213,6 @@
       <DependentUpon>Castle.Igloo.xsd</DependentUpon>
     </None>
     <None Include="Configuration\Example.config" />
-    <None Include="Contexts\Contexts.cd" />
     <Content Include="licence.txt" />
     <Content Include="readme.txt" />
     <Content Include="ToDo.txt" />

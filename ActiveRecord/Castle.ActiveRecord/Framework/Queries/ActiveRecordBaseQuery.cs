@@ -29,20 +29,31 @@ namespace Castle.ActiveRecord
 	/// </summary>
 	public abstract class ActiveRecordBaseQuery : IActiveRecordQuery, ICloneable
 	{
-		private readonly Type targetType;
+		private readonly Type rootType;
 		
 		private ILogger log = NullLogger.Instance;
 		
+		/// <summary>
+		/// list of modifiers for the query
+		/// </summary>
 		protected IList queryModifiers;
 
-		protected ActiveRecordBaseQuery(Type type)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ActiveRecordBaseQuery"/> class.
+		/// </summary>
+		/// <param name="rootType">The type.</param>
+		protected ActiveRecordBaseQuery(Type rootType)
 		{
-			this.targetType = type;
+			this.rootType = rootType;
 		}
 
-		public Type Target
+		/// <summary>
+		/// Gets the target type of this query
+		/// </summary>
+		/// <value></value>
+		public Type RootType
 		{
-			get { return targetType; }
+			get { return rootType; }
 		}
 		
 		/// <summary>
@@ -62,15 +73,28 @@ namespace Castle.ActiveRecord
 		}
 
 		#region IActiveRecordQuery implementation
+
+		/// <summary>
+		/// Executes the specified query and return the results
+		/// </summary>
+		/// <param name="session">The session to execute the query in.</param>
+		/// <returns></returns>
 		object IActiveRecordQuery.Execute(ISession session)
 		{
 			return InternalExecute(session);
 		}
 
+		/// <summary>
+		/// Enumerates over the result of the query.
+		/// Note: Only use if you expect most of your values to already exist in the second level cache!
+		/// </summary>
+		/// <param name="session"></param>
+		/// <returns></returns>
 		IEnumerable IActiveRecordQuery.Enumerate(ISession session)
 		{
 			return InternalEnumerate(session);
 		}
+
 		#endregion
 
 		/// <summary>
@@ -84,6 +108,7 @@ namespace Castle.ActiveRecord
 
 		/// <summary>
 		/// Simply creates the query and then call its <see cref="IQuery.Enumerable()"/> method.
+		/// Note: Only use when you expect most of the results to be in the second level cache
 		/// </summary>
 		/// <param name="session">The <c>NHibernate</c>'s <see cref="ISession"/></param>
 		protected virtual IEnumerable InternalEnumerate(ISession session)
@@ -101,9 +126,11 @@ namespace Castle.ActiveRecord
 		/// </summary>
 		public virtual object Clone()
 		{
-			ActiveRecordBaseQuery clone = (ActiveRecordBaseQuery) this.MemberwiseClone();
-			if (this.queryModifiers != null)
-				clone.queryModifiers = new ArrayList(this.queryModifiers);
+			ActiveRecordBaseQuery clone = (ActiveRecordBaseQuery) MemberwiseClone();
+			if (queryModifiers != null)
+			{
+				clone.queryModifiers = new ArrayList(queryModifiers);
+			}
 			return clone;
 		}
 
@@ -134,7 +161,7 @@ namespace Castle.ActiveRecord
 		{
 			if (queryModifiers != null)
 			{
-				foreach (IQueryModifier modifier in queryModifiers)
+				foreach(IQueryModifier modifier in queryModifiers)
 				{
 					modifier.Apply(query);
 				}

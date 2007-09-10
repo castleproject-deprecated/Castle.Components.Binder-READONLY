@@ -24,7 +24,7 @@ namespace Castle.ActiveRecord
 	/// </summary>
 	public interface IActiveRecordQuery
 	{
-		Type Target { get; }
+		Type RootType { get; }
 
 		object Execute(ISession session);
 		
