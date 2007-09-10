@@ -12,39 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.GenClasses
+namespace Castle.MonoRail.Framework
 {
 	using System;
 
-	public class GenClassWithGenMethods<T> where T : new()
+	public interface IViewComponentTree
 	{
-		private object savedParam;
-		private bool invoked;
-
-		public object SavedParam
-		{
-			get { return savedParam; }
-		}
-
-		public bool Invoked
-		{
-			get { return invoked; }
-		}
-
-		public virtual T DoSomething<Z>(Z z)
-		{
-			invoked = true;
-			
-			savedParam = z;
-			
-			return new T();
-		}
-
-		public virtual void DoSomethingElse<T2>(Converter<int, T2> converter, int value)
-		{
-			invoked = true;
-			
-			savedParam = converter(value);
-		}
+		void AddViewComponent(string name, Type type);
+		
+		Type GetViewComponent(string name);
 	}
 }

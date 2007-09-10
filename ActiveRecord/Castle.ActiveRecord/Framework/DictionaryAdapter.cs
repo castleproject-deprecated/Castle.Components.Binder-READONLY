@@ -26,12 +26,14 @@ namespace Castle.ActiveRecord.Framework
 		private int _tablesize;
 		private Entry[] _table;
 		private object[] _values;
+		private string[] _keys;
 
 		public DictionaryAdapter(String[] names, object[] values)
 		{
 			_tablesize = names.Length;
 			_table = new Entry[_tablesize];
 			_values = values;
+			_keys = names;
 
 			for(int i=0; i<_tablesize; i++)
 			{
@@ -124,7 +126,10 @@ namespace Castle.ActiveRecord.Framework
 
 		public ICollection Keys
 		{
-			get { throw new NotSupportedException(); }
+			get			
+			{
+				return _keys;
+			}
 		}
 
 		public ICollection Values
@@ -146,6 +151,9 @@ namespace Castle.ActiveRecord.Framework
 		{
 			get 
 			{
+				if (_values == null || _values.Length.Equals(0))
+					return null;
+
 				int index = GetValuesIndexByKey(key);
 
 				if (index >= 0)

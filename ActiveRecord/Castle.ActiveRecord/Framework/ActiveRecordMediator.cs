@@ -320,6 +320,17 @@ namespace Castle.ActiveRecord
 		}
 
 		/// <summary>
+		/// Returns the number of records of the specified 
+		/// type in the database
+		/// </summary>
+		/// <param name="targetType">The target type.</param>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>The count result</returns>
+		public static int Count(Type targetType, ICriterion[] criteria) {
+			return ActiveRecordBase.Count(targetType, criteria);
+		}
+
+		/// <summary>
 		/// Check if there is any records in the db for the target type
 		/// </summary>
 		/// <param name="targetType">Type of the target.</param>
@@ -365,38 +376,80 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Saves the instance to the database
 		/// </summary>
-		/// <param name="instance"></param>
+		/// <param name="instance">The ActiveRecord instance to be deleted</param>
 		public static void Save(object instance)
 		{
 			ActiveRecordBase.Save(instance);
 		}
 
 		/// <summary>
+		/// Saves the instance to the database and flushes the session. If the primary key is unitialized
+		/// it creates the instance on the database. Otherwise it updates it.
+		/// <para>
+		/// If the primary key is assigned, then you must invoke <see cref="Create(object)"/>
+		/// or <see cref="Update(object)"/> instead.
+		/// </para>
+		/// </summary>
+		/// <param name="instance">The ActiveRecord instance to be saved</param>
+		public static void SaveAndFlush(object instance)
+		{
+			ActiveRecordBase.SaveAndFlush(instance);
+		}
+
+		/// <summary>
 		/// Creates (Saves) a new instance to the database.
 		/// </summary>
-		/// <param name="instance"></param>
+		/// <param name="instance">The ActiveRecord instance to be deleted</param>
 		public static void Create(object instance)
 		{
 			ActiveRecordBase.Create(instance);
 		}
 
 		/// <summary>
+		/// Creates (Saves) a new instance to the database and flushes the session.
+		/// </summary>
+		/// <param name="instance">The ActiveRecord instance to be created on the database</param>
+		public static void CreateAndFlush(object instance)
+		{
+			ActiveRecordBase.CreateAndFlush(instance);
+		}
+
+		/// <summary>
 		/// Persists the modification on the instance
 		/// state to the database.
 		/// </summary>
-		/// <param name="instance"></param>
+		/// <param name="instance">The ActiveRecord instance to be deleted</param>
 		public static void Update(object instance)
 		{
 			ActiveRecordBase.Update(instance);
 		}
 
 		/// <summary>
+		/// Persists the modification on the instance
+		/// state to the database and flushes the session.
+		/// </summary>
+		/// <param name="instance">The ActiveRecord instance to be updated on the database</param>
+		public static void UpdateAndFlush(object instance)
+		{
+			ActiveRecordBase.UpdateAndFlush(instance);
+		}
+
+		/// <summary>
 		/// Deletes the instance from the database.
 		/// </summary>
-		/// <param name="instance"></param>
+		/// <param name="instance">The ActiveRecord instance to be deleted</param>
 		public static void Delete(object instance)
 		{
 			ActiveRecordBase.Delete(instance);
+		}
+
+		/// <summary>
+		/// Deletes the instance from the database and flushes the session.
+		/// </summary>
+		/// <param name="instance">The ActiveRecord instance to be deleted</param>
+		public static void DeleteAndFlush(object instance)
+		{
+			ActiveRecordBase.DeleteAndFlush(instance);
 		}
 
 		/// <summary>

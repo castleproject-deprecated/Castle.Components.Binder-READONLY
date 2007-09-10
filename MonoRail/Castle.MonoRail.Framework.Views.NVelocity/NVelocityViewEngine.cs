@@ -397,13 +397,16 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			{
 				foreach(String key in controller.Resources.Keys)
 				{
-					innerContext.Add(key, controller.Resources[key]);
+					innerContext[key] = controller.Resources[key];
 				}
 			}
 
-			foreach(object key in controller.Helpers.Keys)
+			foreach(String key in context.Params.AllKeys)
 			{
-				innerContext.Add(key, controller.Helpers[key]);
+				if (key == null) continue; // Nasty bug?
+				object value = context.Params[key];
+				if (value == null) continue;
+				innerContext[key] = value;
 			}
 
 #if DOTNET2
@@ -424,26 +427,20 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 						new StaticAccessorHelper<Boolean>(),
 						new StaticAccessorHelper<Char>(),
 						new StaticAccessorHelper<Decimal>(),
-//						new StaticAccessorHelper<IntPtr>(),
-//						new StaticAccessorHelper<UIntPtr>(),
-//						new StaticAccessorHelper<Object>(),
 						new StaticAccessorHelper<String>(),
 						new StaticAccessorHelper<Guid>(),
 						new StaticAccessorHelper<DateTime>()
 					};
 
-			foreach (object helper in builtInHelpers)
+			foreach(object helper in builtInHelpers)
 			{
-				innerContext.Add(helper.GetType().GetGenericArguments()[0].Name, helper);
+				innerContext[helper.GetType().GetGenericArguments()[0].Name] = helper;
 			}
 #endif
 
-			foreach(String key in context.Params.AllKeys)
+			foreach(object key in controller.Helpers.Keys)
 			{
-				if (key == null) continue; // Nasty bug?
-				object value = context.Params[key];
-				if (value == null) continue;
-				innerContext[key] = value;
+				innerContext[key] = controller.Helpers[key];
 			}
 
 			// Adding flash as a collection and each individual item
@@ -461,7 +458,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 			if (controller.PropertyBag != null)
 			{
-				foreach (DictionaryEntry entry in controller.PropertyBag)
+				foreach(DictionaryEntry entry in controller.PropertyBag)
 				{
 					if (entry.Value == null) continue;
 					innerContext[entry.Key] = entry.Value;
@@ -476,7 +473,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		private void SendErrorDetails(Exception ex, TextWriter writer)
 		{
 			writer.WriteLine("<pre>");
-			writer.WriteLine(ex.ToString());
+			writer.WriteLine(ex);
 			writer.WriteLine("</pre>");
 		}
 
