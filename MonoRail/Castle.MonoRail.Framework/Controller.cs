@@ -109,7 +109,7 @@ namespace Castle.MonoRail.Framework
 
 		internal IServiceProvider serviceProvider;
 
-		internal ValidatorRunner validator;
+		protected ValidatorRunner validator;
 
 		#endregion
 
@@ -784,7 +784,7 @@ namespace Castle.MonoRail.Framework
 
 		#region Core members
 
-		internal void InitializeFieldsFromServiceProvider(IRailsEngineContext context)
+		public void InitializeFieldsFromServiceProvider(IRailsEngineContext context)
 		{
 			serviceProvider = context;
 
@@ -805,7 +805,13 @@ namespace Castle.MonoRail.Framework
 			this.context = context;
 		}
 
-		internal void InitializeControllerState(string areaName, string controllerName, string actionName)
+		/// <summary>
+		/// Initializes the state of the controller.
+		/// </summary>
+		/// <param name="areaName">Name of the area.</param>
+		/// <param name="controllerName">Name of the controller.</param>
+		/// <param name="actionName">Name of the action.</param>
+		public void InitializeControllerState(string areaName, string controllerName, string actionName)
 		{
 			SetEvaluatedAction(actionName);
 			_areaName = areaName;
@@ -988,7 +994,21 @@ namespace Castle.MonoRail.Framework
 			IValidatorRegistry validatorRegistry = 
 				(IValidatorRegistry) serviceProvider.GetService(typeof(IValidatorRegistry));
 
-			validator = new ValidatorRunner(true, validatorRegistry);
+			validator = CreateValidatorRunner(validatorRegistry);
+		}
+
+		/// <summary>
+		/// Creates the default validator runner. 
+		/// </summary>
+		/// <param name="validatorRegistry">The validator registry.</param>
+		/// <returns></returns>
+		/// <remarks>
+		/// You can override this method to create a runner
+		/// with some different configuration
+		/// </remarks>
+		protected virtual ValidatorRunner CreateValidatorRunner(IValidatorRegistry validatorRegistry)
+		{
+			return new ValidatorRunner(true, validatorRegistry);
 		}
 
 		/// <summary>

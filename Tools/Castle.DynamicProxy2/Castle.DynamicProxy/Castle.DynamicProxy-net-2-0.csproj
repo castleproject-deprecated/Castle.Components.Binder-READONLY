@@ -251,6 +251,7 @@
     <Compile Include="IInterceptorSelector.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="InternalsHelper.cs" />
     <Compile Include="IProxyBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -264,15 +265,18 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ProxyGenerator.cs" />
+    <Compile Include="RemotableInvocation.cs" />
+    <Compile Include="Serialization\ProxyObjectReference.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CastleKey.snk">
       <Link>CastleKey.snk</Link>
     </None>
+    <EmbeddedResource Include="DynProxy.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Castle.Core\Castle.Core-vs2005.csproj">
-      <Project>{C3D02148-5E0F-4C35-A38E-D59308AA4DAC}</Project>
+      <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
       <Name>Castle.Core-vs2005</Name>
     </ProjectReference>
   </ItemGroup>

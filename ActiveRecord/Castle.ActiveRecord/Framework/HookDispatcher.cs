@@ -24,7 +24,7 @@ namespace Castle.ActiveRecord.Framework
 	/// Translates the <c>IInterceptor</c>
 	/// messages to instance possible hooks
 	/// </summary>
-	public class HookDispatcher : IInterceptor
+	public class HookDispatcher : EmptyInterceptor
 	{
 		private static readonly HookDispatcher instance = new HookDispatcher();
 
@@ -50,7 +50,7 @@ namespace Castle.ActiveRecord.Framework
 		/// object. Note that when this method is called, <c>entity</c> will be an empty
 		/// uninitialized instance of the class.</remarks>
 		/// <returns><c>true</c> if the user modified the <c>state</c> in any way</returns>
-		public bool OnLoad(object entity, object id, object[] state, string[] propertyNames, IType[] types)
+		public override bool OnLoad(object entity, object id, object[] state, string[] propertyNames, IType[] types)
 		{
 			ActiveRecordHooksBase hookTarget = entity as ActiveRecordHooksBase;
 
@@ -79,7 +79,7 @@ namespace Castle.ActiveRecord.Framework
 		/// that the interceptor <b>not</b> modify the <c>previousState</c>.
 		/// </remarks>
 		/// <returns><c>true</c> if the user modified the <c>currentState</c> in any way</returns>
-		public bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, IType[] types)
+		public override bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, IType[] types)
 		{
 			ActiveRecordHooksBase hookTarget = entity as ActiveRecordHooksBase;
 
@@ -105,7 +105,7 @@ namespace Castle.ActiveRecord.Framework
 		/// and propagated to the persistent object
 		/// </remarks>
 		/// <returns><c>true</c> if the user modified the <c>state</c> in any way</returns>
-		public bool OnSave(object entity, object id, object[] state, string[] propertyNames, IType[] types)
+		public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, IType[] types)
 		{
 			ActiveRecordHooksBase hookTarget = entity as ActiveRecordHooksBase;
 
@@ -128,7 +128,7 @@ namespace Castle.ActiveRecord.Framework
 		/// <remarks>
 		/// It is not recommended that the interceptor modify the <c>state</c>.
 		/// </remarks>
-		public void OnDelete(object entity, object id, object[] state, string[] propertyNames, IType[] types)
+		public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, IType[] types)
 		{
 			ActiveRecordHooksBase hookTarget = entity as ActiveRecordHooksBase;
 
@@ -142,7 +142,7 @@ namespace Castle.ActiveRecord.Framework
 		/// Called before a flush
 		/// </summary>
 		/// <param name="entities">The entities</param>
-		public void PreFlush(ICollection entities)
+		public override void PreFlush(ICollection entities)
 		{
 			foreach(object entity in entities)
 			{
@@ -160,7 +160,7 @@ namespace Castle.ActiveRecord.Framework
 		/// synchronize in-memory state with the database.
 		/// </summary>
 		/// <param name="entities">The entitites</param>
-		public void PostFlush(ICollection entities)
+		public override void PostFlush(ICollection entities)
 		{
 			foreach(object entity in entities)
 			{
@@ -186,7 +186,7 @@ namespace Castle.ActiveRecord.Framework
 		/// </remarks>
 		/// <param name="entity">A transient entity</param>
 		/// <returns></returns>
-		public object IsUnsaved(object entity)
+		public override object IsUnsaved(object entity)
 		{
 			ActiveRecordHooksBase hookTarget = entity as ActiveRecordHooksBase;
 
@@ -215,7 +215,7 @@ namespace Castle.ActiveRecord.Framework
 		/// <param name="propertyNames"></param>
 		/// <param name="types"></param>
 		/// <returns>An array of dirty property indicies or <c>null</c> to choose default behavior</returns>
-		public int[] FindDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, IType[] types)
+		public override int[] FindDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, IType[] types)
 		{
 			ActiveRecordHooksBase hookTarget = entity as ActiveRecordHooksBase;
 
@@ -234,7 +234,7 @@ namespace Castle.ActiveRecord.Framework
 		/// <param name="type">A mapped type</param>
 		/// <param name="id">The identifier of the new instance</param>
 		/// <returns>An instance of the class, or <c>null</c> to choose default behaviour</returns>
-		public object Instantiate(Type type, object id)
+		public override object Instantiate(Type type, object id)
 		{
 			return null;
 		}

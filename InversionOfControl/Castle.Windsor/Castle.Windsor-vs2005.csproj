@@ -159,6 +159,7 @@
     <Compile Include="Configuration\Interpreters\XmlProcessor\ElementProcessors\DefineElementProcessor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Configuration\Interpreters\XmlProcessor\ElementProcessors\EvalProcessingInstructionProcessor.cs" />
     <Compile Include="Configuration\Interpreters\XmlProcessor\ElementProcessors\IfElementProcessor.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -195,6 +196,7 @@
     <Compile Include="IContainerAccessor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IEnvironmentInfo.cs" />
     <Compile Include="InitializationException.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -210,9 +212,12 @@
     <Compile Include="Proxy\AbstractProxyFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Proxy\ProxyComponentInspector.cs" />
     <Compile Include="Proxy\DefaultProxyFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Proxy\ProxyConstants.cs" />
+    <Compile Include="Proxy\ProxyUtil.cs" />
     <Compile Include="WindsorContainer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -227,6 +232,9 @@
     <None Include="..\..\CastleKey.snk">
       <Link>CastleKey.snk</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

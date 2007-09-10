@@ -19,11 +19,11 @@ namespace Castle.Windsor.Configuration.Interpreters.XmlProcessor
 
 	public interface IXmlNodeProcessor
 	{
-		void Process(IXmlProcessorNodeList nodeList, IXmlProcessorEngine engine);
-
 		String Name { get; }
 
 		XmlNodeType[] AcceptNodeTypes { get; }
+
+		void Process(IXmlProcessorNodeList nodeList, IXmlProcessorEngine engine);
 
 		bool Accept( XmlNode node );
 	}

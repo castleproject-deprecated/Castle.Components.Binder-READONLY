@@ -21,7 +21,7 @@ namespace Castle.Core.Logging
 	/// to provide a logger to a utility class, but do not want any output from it.
 	/// It also helps when you have a utility that does not have a logger to supply.
 	/// </summary>
-	public class NullLogger : ILogger
+	public class NullLogger : IExtendedLogger
 	{
 		public static readonly NullLogger Instance = new NullLogger();
 
@@ -479,5 +479,90 @@ namespace Castle.Core.Logging
 		{
 			return this;
 		}
+
+		/// <summary>
+		/// Returns empty context properties.
+		/// </summary>
+		public IContextProperties GlobalProperties
+		{
+			get { return NullContextProperties.Instance; }
+		}
+
+		/// <summary>
+		/// Returns empty context properties.
+		/// </summary>
+		public IContextProperties ThreadProperties
+		{
+			get { return NullContextProperties.Instance; }
+		}
+
+		/// <summary>
+		/// Returns empty context stacks.
+		/// </summary>
+		public IContextStacks ThreadStacks
+		{
+			get { return NullContextStacks.Instance; }
+		}
+
+		#region NullContextProperties
+
+		private class NullContextProperties : IContextProperties
+		{
+			public static readonly NullContextProperties Instance = new NullContextProperties();
+
+			public object this[string key]
+			{
+				get { return null; }
+				set { }
+			}
+		}
+
+		#endregion
+
+		#region NullContextStack
+
+		private class NullContextStack : IContextStack, IDisposable
+		{
+			public static readonly NullContextStack Instance = new NullContextStack();
+
+			public int Count
+			{
+				get { return 0; }
+			}
+
+			public void Clear()
+			{
+			}
+
+			public string Pop()
+			{
+				return null;
+			}
+
+			public IDisposable Push(string message)
+			{
+				return this;
+			}
+
+			public void Dispose()
+			{
+			}
+		}
+
+		#endregion
+
+		#region NullContextStacks
+
+		private class NullContextStacks : IContextStacks
+		{
+			public static readonly NullContextStacks Instance = new NullContextStacks();
+
+			public IContextStack this[string key]
+			{
+				get { return NullContextStack.Instance; }
+			}
+		}
+
+		#endregion
 	}
 }

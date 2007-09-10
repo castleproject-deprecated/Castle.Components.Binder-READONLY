@@ -12,9 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.Classes
+namespace Castle.Facilities.Db4oIntegration
 {
-	class NonPublicClass
+	using System;
+
+	using Castle.Core;
+	using Castle.MicroKernel;
+	using Castle.MicroKernel.ModelBuilder;
+
+	
+	public class AutoDb4oTransactionInspector : IContributeComponentModelConstruction
 	{
+		public void ProcessModel(IKernel kernel, ComponentModel model)
+		{
+			if (model.Implementation.IsDefined( 
+				typeof(AutoDb4oTransactionAttribute), true ))
+			{
+				model.Dependencies.Add( 
+					new DependencyModel( DependencyType.Service, null, typeof(AutoCommitInterceptor), false ) );
+
+				model.Interceptors.Add( 
+					new InterceptorReference( typeof(AutoCommitInterceptor) ) );
+			}
+		}
 	}
 }
