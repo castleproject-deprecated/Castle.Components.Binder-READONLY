@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if DOTNET2
+#if (DOTNET2 && NET)
 
 namespace Castle.MonoRail.Framework.Views.Aspx
 {
@@ -31,7 +31,18 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 		public void HandleEvent(object sender, EventArgType e)
 		{
-			DispatchAction(sender, e, ObtainAction(e));
+			string actionName = ObtainCommandActionName(e);
+
+			if (!string.IsNullOrEmpty(actionName) ||
+				!string.IsNullOrEmpty(Context.Action.ActionName))
+			{
+				if (string.IsNullOrEmpty(actionName))
+				{
+					actionName = Context.Action.ActionName;
+				}
+
+				DispatchAction(sender, e, actionName);
+			}
 		}
 
 		protected override void AddActionArguments(BindingContext context,
@@ -43,9 +54,9 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			}
 		}
 
-		private string ObtainAction(CommandEventArgs e)
+		private string ObtainCommandActionName(CommandEventArgs e)
 		{
-			string actionName = Context.Action.ActionName;
+			string actionName = null;
 
 			foreach(CommandBinding command in Context.Action.CommandBindings)
 			{

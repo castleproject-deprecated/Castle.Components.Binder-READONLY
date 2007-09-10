@@ -19,9 +19,9 @@ namespace Igloo.Clinic.Web.Views
 
         protected void ButtonLogin_Click(object sender, EventArgs e)
         {
-            if (!_loginController.Validate(login.Text, password.Text))
+            if (!_loginController.Validate(TextBoxLogin.Text, TextBoxPassword.Text))
             {
-                LiteralMessage.Text = Messages["unknown"];
+                LiteralMessage.Text = FlashMessages["unknown"];
             }
         }
     }

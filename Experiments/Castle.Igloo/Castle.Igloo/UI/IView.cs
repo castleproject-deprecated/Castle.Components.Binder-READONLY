@@ -30,12 +30,12 @@ namespace Castle.Igloo.UI
         /// <summary>
         /// Gets the Navigation Context.
         /// </summary>
-        NavigationContext NavigationContext { get; set;  }
+        NavigationState NavigationState { get; set;  }
 
         /// <summary>
-        /// Holds context request messages.
+        /// Holds context request flashMessages.
         /// </summary>
-        Messages Messages { get; set;  }
+        FlashMessages FlashMessages { get; set;  }
 
 	}
 

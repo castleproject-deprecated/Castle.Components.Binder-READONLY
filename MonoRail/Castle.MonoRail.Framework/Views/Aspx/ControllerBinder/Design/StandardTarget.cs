@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if (DOTNET2 && NET)
+
 namespace Castle.MonoRail.Framework.Views.Aspx.Design
 {
 	using System;
@@ -62,6 +64,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx.Design
 				if (propertyNames == null)
 				{
 					propertyNames = CollectPropertyNames(type);
+					Array.Sort(propertyNames);
 				}
 				return propertyNames;
 			}
@@ -89,3 +92,5 @@ namespace Castle.MonoRail.Framework.Views.Aspx.Design
 		}
 	}
 }
+
+#endif

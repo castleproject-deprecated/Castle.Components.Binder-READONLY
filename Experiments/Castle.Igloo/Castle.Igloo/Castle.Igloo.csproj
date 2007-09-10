@@ -108,11 +108,26 @@
     <Compile Include="Attributes\BeginAttribute.cs" />
     <Compile Include="Attributes\EndAttribute.cs" />
     <Compile Include="Attributes\InjectAttribute.cs" />
-    <Compile Include="Attributes\NoNavigationAttribute.cs" />
+    <Compile Include="Attributes\SkipNavigationAttribute.cs" />
     <Compile Include="Attributes\OutjectAttribute.cs" />
     <Compile Include="Attributes\ScopeAttribute.cs" />
     <Compile Include="BijectionInspector.cs" />
+    <Compile Include="Contexts\Web\IApplicationScope.cs" />
+    <Compile Include="Contexts\Web\IPageScope.cs" />
+    <Compile Include="Contexts\Web\IRequestScope.cs" />
+    <Compile Include="Contexts\IScopeRegistry.cs" />
+    <Compile Include="Contexts\Web\ISessionScope.cs" />
+    <Compile Include="Contexts\ScopeRegistry.cs" />
+    <Compile Include="Contexts\Web\WebApplicationScope.cs" />
+    <Compile Include="Contexts\Web\WebConversationScope.cs" />
+    <Compile Include="Contexts\Web\WebPageScope.cs" />
+    <Compile Include="Contexts\Web\WebRequestScope.cs" />
+    <Compile Include="Contexts\Web\WebSessionScope.cs" />
+    <Compile Include="Contexts\Windows\SingletonScope.cs" />
     <Compile Include="IglooFacility.cs" />
+    <Compile Include="Interceptors\BijectionInterceptor.cs" />
+    <Compile Include="LifestyleManager\Candidate.cs" />
+    <Compile Include="LifestyleManager\ScopeWebApplicationLifestyleManager.cs" />
     <Compile Include="UIComponents\UIComponentRepository.cs" />
     <Compile Include="Configuration\CommandsSetting.cs">
       <SubType>Code</SubType>
@@ -129,33 +144,9 @@
     <Compile Include="ContainerWebAccessorUtil.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Contexts\ContextResolver.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Contexts\ContextsResolver.cs" />
-    <Compile Include="Contexts\IApplicationState.cs" />
-    <Compile Include="Contexts\IProcessContext.cs" />
-    <Compile Include="Contexts\ISessionState.cs" />
-    <Compile Include="Contexts\Web\IHttpContextAccessor.cs" />
-    <Compile Include="Contexts\Web\WebApplicationState.cs" />
-    <Compile Include="Contexts\Web\WebContexts.cs" />
     <Compile Include="Contexts\Web\WebConversationManager.cs" />
     <Compile Include="Contexts\IConversationManager.cs" />
-    <Compile Include="Contexts\Web\WebProcessContext.cs" />
-    <Compile Include="Contexts\Web\WebSessionState.cs" />
-    <Compile Include="Contexts\BaseContexts.cs" />
-    <Compile Include="Contexts\ConversationContext.cs" />
-    <Compile Include="Contexts\IContext.cs" />
-    <Compile Include="Contexts\IContexts.cs" />
-    <Compile Include="Contexts\PageContext.cs" />
-    <Compile Include="Contexts\RequestContext.cs" />
-    <Compile Include="Contexts\SessionContext.cs" />
-    <Compile Include="Contexts\ApplicationContext.cs" />
-    <Compile Include="Contexts\Windows\WindowsApplicationState.cs" />
-    <Compile Include="Contexts\Windows\WindowsContexts.cs" />
-    <Compile Include="Contexts\Windows\WindowsConversationManager.cs" />
-    <Compile Include="Contexts\Windows\WindowsProcess.cs" />
-    <Compile Include="Contexts\Windows\WindowsSessionState.cs" />
+    <Compile Include="Contexts\IScope.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ControllerInspector.cs" />
     <Compile Include="Controllers\IController.cs">
@@ -166,8 +157,8 @@
     <Compile Include="LifestyleManager\ScopeLifestyleModule.cs" />
     <Compile Include="LifestyleManager\ScopeWebRequestLifestyleManager.cs" />
     <Compile Include="LifestyleManager\ScopeWebSessionLifestyleManager.cs" />
-    <Compile Include="Messages.cs" />
-    <Compile Include="Navigation\NavigationContext.cs">
+    <Compile Include="FlashMessages.cs" />
+    <Compile Include="Navigation\NavigationState.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Navigation\DefaultNavigator.cs">
