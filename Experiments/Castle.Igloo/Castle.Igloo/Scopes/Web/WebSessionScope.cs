@@ -22,7 +22,6 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Configuration;
-using System.Diagnostics;
 using Castle.Core;
 using Castle.Igloo.LifestyleManager;
 using Castle.Igloo.Util;
@@ -54,24 +53,25 @@ namespace Castle.Igloo.Scopes.Web
         }
         
         /// <summary>
-        /// Gets the <see cref="Object"/> with the specified name.
+        /// Gets or sets the <see cref="Object"/> with the specified name.
         /// </summary>
         /// <value></value>
         public object this[string name]
         {
-            get { return WebUtil.GetCurrentHttpContext().Session[ SESSION_SCOPE_SUFFIX + name]; }
-        }
-
-        /// <summary>
-        /// Adds an element with the provided key and value to the IScope object.
-        /// </summary>
-        /// <param name="name">The name of the element to add.</param>
-        /// <param name="value">The Object to use as the value of the element to add.</param>
-        public void Add(string name, object value)
-        {
-            Trace.WriteLine("Add to session scope : " + name);
-            ComponentNames.Add(name);
-            WebUtil.GetCurrentHttpContext().Session.Add( SESSION_SCOPE_SUFFIX + name, value);
+            get
+            {
+                TraceUtil.Log("Gets to session scope : " + name);
+                return WebUtil.GetCurrentHttpContext().Session[ SESSION_SCOPE_SUFFIX + name];
+            }
+            set
+            {
+                TraceUtil.Log("Sets to session scope : " + name);
+                if (!ComponentNames.Contains(name))
+                {
+                    ComponentNames.Add(name);
+                }
+                WebUtil.GetCurrentHttpContext().Session[SESSION_SCOPE_SUFFIX + name] = value;
+            }
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Castle.Igloo.Scopes.Web
         /// <param name="name">The name of the element to remove.</param>
         public void Remove(string name)
         {
-            Trace.WriteLine("Remove from session scope : " + name);
+            TraceUtil.Log("Remove from session scope : " + name);
             ComponentNames.Remove(name);
             WebUtil.GetCurrentHttpContext().Session.Remove(SESSION_SCOPE_SUFFIX + name);
         }
@@ -109,7 +109,7 @@ namespace Castle.Igloo.Scopes.Web
         /// </summary>
         public void Flush()
         {
-            Trace.WriteLine("Flush session scope.");
+            TraceUtil.Log("Flush session scope.");
 
             StringCollection toRemove = new StringCollection();
             StringCollection names = (StringCollection)WebUtil.GetCurrentHttpContext().Items[COMPONENT_NAMES];

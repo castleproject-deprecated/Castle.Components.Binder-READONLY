@@ -315,7 +315,7 @@ namespace Castle.Windsor
 		/// <returns></returns>
 		public virtual object Resolve(String key, Type service)
 		{
-			return kernel[key];
+            return kernel.Resolve(key, service);
 		}
 
 		/// <summary>

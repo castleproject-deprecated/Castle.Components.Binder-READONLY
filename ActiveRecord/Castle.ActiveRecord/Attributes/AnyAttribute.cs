@@ -63,11 +63,21 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AnyAttribute"/> class.
 		/// </summary>
+		/// <remarks>Using this constructor defaults the idType to Int32</remarks>
+		public AnyAttribute()
+			: this(typeof(Int32))
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AnyAttribute"/> class.
+		/// </summary>
 		/// <param name="idType">Type of the id.</param>
 		public AnyAttribute(Type idType)
 		{
 			this.idType = idType;
 		}
+
 
 		/// <summary>
 		/// Gets or sets the type of the id.

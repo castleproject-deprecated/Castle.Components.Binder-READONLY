@@ -115,8 +115,11 @@
     <Compile Include="Attributes\SkipNavigationAttribute.cs" />
     <Compile Include="Attributes\OutjectAttribute.cs" />
     <Compile Include="Attributes\ScopeAttribute.cs" />
-    <Compile Include="BijectionInspector.cs" />
     <Compile Include="ComponentActivator\ScopeComponentActivator .cs" />
+    <Compile Include="Inspectors\BijectionInspector.cs" />
+    <Compile Include="Inspectors\ControllerInspector.cs" />
+    <Compile Include="Inspectors\IglooInspector.cs" />
+    <Compile Include="Inspectors\ScopeInspector.cs" />
     <Compile Include="Interceptors\ProxyScopeInterceptor.cs" />
     <Compile Include="LifestyleManager\ScopeLifestyleManager.cs" />
     <Compile Include="Mock\MockApplicationScope.cs" />
@@ -124,6 +127,7 @@
     <Compile Include="Mock\MockRequestScope.cs" />
     <Compile Include="Mock\MockScope.cs" />
     <Compile Include="Mock\MockSessionScope.cs" />
+    <Compile Include="Scopes\DefaultScopedObject.cs" />
     <Compile Include="Scopes\IScopedObject.cs" />
     <Compile Include="Scopes\Web\IApplicationScope.cs" />
     <Compile Include="Scopes\Web\IPageScope.cs" />
@@ -162,7 +166,6 @@
     <Compile Include="Scopes\IConversationManager.cs" />
     <Compile Include="Scopes\IScope.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\ControllerInspector.cs" />
     <Compile Include="Controllers\IController.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -180,7 +183,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UIComponents\UIComponent.cs" />
-    <Compile Include="ScopeInspector.cs" />
     <Compile Include="Resource.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -209,6 +211,7 @@
     </Compile>
     <Compile Include="Util\AssertUtils.cs" />
     <Compile Include="Util\AttributeUtil.cs" />
+    <Compile Include="Util\TraceUtil.cs" />
     <Compile Include="Util\WebUtil.cs.cs" />
     <EmbeddedResource Include="castle.Igloo.resx">
       <SubType>Designer</SubType>

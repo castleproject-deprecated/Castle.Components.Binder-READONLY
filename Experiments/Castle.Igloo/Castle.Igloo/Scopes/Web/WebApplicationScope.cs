@@ -21,7 +21,6 @@
 using System;
 using System.Collections;
 using System.Configuration;
-using System.Diagnostics;
 using Castle.Core;
 using Castle.Igloo.LifestyleManager;
 using Castle.Igloo.Util;
@@ -29,7 +28,9 @@ using Castle.MicroKernel;
 
 namespace Castle.Igloo.Scopes.Web
 {
-    //[Scope(Scope = ScopeType.Application)]
+    /// <summary>
+    /// <see cref="IScope"/> implementation that scopes a single component definition to the lifecycle of an ASP.NET application.
+    /// </summary>
     public sealed class WebApplicationScope : IApplicationScope
     {
         #region IApplicationScope Members
@@ -44,25 +45,20 @@ namespace Castle.Igloo.Scopes.Web
         }
  
         /// <summary>
-        /// Gets the <see cref="Object"/> with the specified name.
+        /// Gets or ets the <see cref="Object"/> with the specified name.
         /// </summary>
         /// <value></value>
         public object this[string name]
         {
             get { return WebUtil.GetCurrentHttpContext().ApplicationInstance.Application[name]; }
+            set
+            {
+                TraceUtil.Log("Set to application scope : " + name);
+
+                WebUtil.GetCurrentHttpContext().ApplicationInstance.Application[name] = value;
+            }
         }
 
-        /// <summary>
-        /// Add the specified object under the name.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="value">The value.</param>
-        public void Add(string name, object value)
-        {
-            Trace.WriteLine("Add to application scope : " + name);
-
-            WebUtil.GetCurrentHttpContext().ApplicationInstance.Application.Add(name, value);
-        }
 
         /// <summary>
         /// Removes the specified name.
@@ -70,7 +66,7 @@ namespace Castle.Igloo.Scopes.Web
         /// <param name="name">The name.</param>
         public void Remove(string name)
         {
-            Trace.WriteLine("Remove from application scope : " + name);
+            TraceUtil.Log("Remove from application scope : " + name);
 
             WebUtil.GetCurrentHttpContext().ApplicationInstance.Application.Remove(name);
         }
@@ -102,7 +98,7 @@ namespace Castle.Igloo.Scopes.Web
         /// </summary>
         public void Flush()
         {
-            Trace.WriteLine("Flush application scope.");
+            TraceUtil.Log("Flush application scope.");
 
             WebUtil.GetCurrentHttpContext().ApplicationInstance.Application.RemoveAll();
         }

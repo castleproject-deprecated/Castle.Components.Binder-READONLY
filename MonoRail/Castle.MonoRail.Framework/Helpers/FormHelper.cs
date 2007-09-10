@@ -116,15 +116,30 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns></returns>
 		public string FormTag(IDictionary parameters)
 		{
-			string url = UrlHelper.For(parameters);
+			string url = null;
+			string method = CommonUtils.ObtainEntryAndRemove(parameters, "method", "post");
+
+			if (CommonUtils.ObtainEntryAndRemove(parameters, "noaction", "false") == "false")
+			{
+				url = UrlHelper.For(parameters);
+			}
 
 			currentFormId = CommonUtils.ObtainEntryAndRemove(parameters, "id", "form" + ++formCount);
 
 			validationConfig = validatorProvider.CreateConfiguration(parameters);
 
 			string afterFormTag = validationConfig.CreateAfterFormOpened(currentFormId);
+			string formContent;
 
-			string formContent = "<form action='" + url + "' method='post' id='" + currentFormId + "' " + GetAttributes(parameters) + ">";
+			if (url != null)
+			{
+				formContent = "<form action='" + url + "' method='" + method + "' " + 
+					"id='" + currentFormId + "' " + GetAttributes(parameters) + ">";
+			}
+			else
+			{
+				formContent = "<form method='" + method +  "' id='" + currentFormId + "' " + GetAttributes(parameters) + ">";
+			}
 
 			return formContent + afterFormTag;
 		}
@@ -1892,6 +1907,26 @@ namespace Castle.MonoRail.Framework.Helpers
 			}
 		}
 
+		public class EnumValueGetter : ValueGetter
+		{
+			private Type enumType;
+
+			public EnumValueGetter(Type enumType)
+			{
+				this.enumType = enumType;
+			}
+
+			public override string Name
+			{
+				get { return string.Empty; }
+			}
+
+			public override object GetValue(object instance)
+			{
+				return Enum.Format(enumType, Enum.Parse(enumType, Convert.ToString(instance)), "d");
+			}
+		}
+
 		public class ValueGetterAbstractFactory
 		{
 			public static ValueGetter Create(Type targetType, string keyName)
@@ -1907,6 +1942,10 @@ namespace Castle.MonoRail.Framework.Helpers
 				else if (targetType == typeof(DataRowView))
 				{
 					return new DataRowViewValueGetter(keyName);
+				}
+				else if(typeof(Enum).IsAssignableFrom(targetType))
+				{
+					return new EnumValueGetter(targetType);
 				}
 				else
 				{

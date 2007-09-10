@@ -18,26 +18,23 @@
  ********************************************************************************/
 #endregion
 
-using Castle.Igloo.ComponentActivator;
+using System.Diagnostics;
 
-namespace Castle.Igloo.Scopes
+namespace Castle.Igloo.Util
 {
     /// <summary>
-    /// Objects created from the <see cref="ScopeComponentActivator"/> can be cast to this interface, 
-    /// enabling access to the raw target object
-    /// and programmatic removal of the target object.
+    /// Utils for diganostic
     /// </summary>
-    public interface IScopedObject
+    public class TraceUtil
     {
         /// <summary>
-        /// Return the current target object behind this scoped object proxy, in its raw form (as stored in the target scope).
+        /// Logs the specified message to trace log in debug mode or if trave is enabled
         /// </summary>
-        object TargetObject { get; }
-
-        /// <summary>
-        /// Remove this object from its target scope0
-        /// </summary>
-        void RemoveFromScope();
-
+        /// <param name="message">The message.</param>
+        [Conditional("DEBUG"), Conditional("TRACE")]
+        public static void Log(string message)
+        {
+            Trace.WriteLine(message);
+        }
     }
 }

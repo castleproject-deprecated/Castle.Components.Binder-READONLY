@@ -19,12 +19,12 @@
 #endregion
 
 using System;
-using System.Diagnostics;
 using Castle.Core;
 using Castle.Core.Interceptor;
 using Castle.DynamicProxy;
 using Castle.Igloo.Interceptors;
 using Castle.Igloo.Scopes;
+using Castle.Igloo.Util;
 using Castle.MicroKernel;
 using Castle.MicroKernel.ComponentActivator;
 
@@ -64,22 +64,34 @@ namespace Castle.Igloo.ComponentActivator
         /// <returns></returns>
         protected override object CreateInstance(CreationContext context, object[] arguments, Type[] signature)
         {
-            if (Model.Service == null)
-            {
-                throw new ArgumentNullException();
-            }
+            //ProxyGenerationOptions options = new ProxyGenerationOptions();
+            //DefaultScopedObject scopedObject = new DefaultScopedObject(Kernel, ProxyScopeInterceptor.TARGET_NAME_PREFIX+Model.Name);
+            //options.AddMixinInstance(scopedObject);
 
-            // TO DO Add proxy for concrete class and virtual method
+            IInterceptor interceptor = new ProxyScopeInterceptor(Model, Kernel);
 
             Type[] interfaces = new Type[1];
             interfaces[0] = typeof(IScopedObject);
 
-            IInterceptor interceptor = new ProxyScopeInterceptor(Model, Kernel, context);
-            object instance = _generator.CreateInterfaceProxyWithoutTarget(Model.Service, interfaces, interceptor);
+            if (Model.Service.IsInterface)
+            {
+                object instance = _generator.CreateInterfaceProxyWithoutTarget(Model.Service, interfaces, interceptor);
 
-            Trace.WriteLine("Return a proxy scope for component : " + Model.Name );
+                //object instance = _generator.CreateInterfaceProxyWithoutTarget(Model.Service, interfaces, options, interceptor);
 
-            return instance;
+                TraceUtil.Log("Return a proxy scope for component : " + Model.Name );
+
+                return instance;  
+            }
+            else
+            {
+                //object instance = _generator.CreateClassProxy(Model.Service, interfaces, options, interceptor);
+
+                TraceUtil.Log("Return a proxy scope for component : " + Model.Name);
+
+                return new NotImplementedException();  
+            }
         }
+
     }
 }
