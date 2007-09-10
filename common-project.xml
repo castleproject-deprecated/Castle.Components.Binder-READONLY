@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<project name="Castle" xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd">
+<project name="Castle" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
 
 	<description>
 		This file contains common tasks tailored specifically for the Castle
@@ -58,17 +58,8 @@
 	<target name="common.compile-tests"
 		description="Compile NUnit tests and copy App.config file to the output directory, if it exists.">
 
-		<csc 
-			target="library"
-			define="${current.build.defines}"
-			debug="${build.debug}"
-			output="${build.dir}/${project::get-name()}.dll"
-			rebuild="${build.rebuild}"
-		>
-			<sources refid="project.sources" />
-			<references refid="project.references" />
-			<resources refid="project.resources" />
-		</csc>
+		<property name="istestsproject" value="true" />
+		<call target="common.compile-dll" />
 
 		<!-- Check if there is a framework specific config file and use that -->
 		<property name="app.config.src" value="${src.dir}/App-${framework::get-target-framework()}.config" />
@@ -113,22 +104,51 @@
  	<target name="common.compile-dll"
 		description="Compile sources into a DLL">
 
-		<csc
-			target="library" 
-			define="${current.build.defines}" 
-			debug="${build.debug}" 
-			optimize="${build.optimize}"
-			output="${build.dir}/${project::get-name()}.dll" 
-			doc="${build.dir}/${project::get-name()}.xml"
-			rebuild="${build.rebuild}"
-		>
-			<nowarn>
-				<warning number="1591" unless="${build.warnmissingdocs}" /> <!-- No XML comment for publicly visible member -->
-			</nowarn>
-			<sources refid="project.sources" />
-			<references refid="project.references" />
-			<resources refid="project.resources" />
-		</csc>
+		<property name="istestsproject" value="false" overwrite="false" />
+
+		<if test="${build.msbuild}">
+			<property name="msbuildlogger" value="" overwrite="false" unless="${property::exists('CCNetLabel')}" />
+			<property name="msbuildlogger" value="/logger:ThoughtWorks.CruiseControl.MsBuild.XmlLogger" overwrite="false" if="${property::exists('CCNetLabel')}" />
+			<property name="msbuild.defines" value="${string::replace(current.build.defines, ',', ';')}" />
+
+			<exec program="${framework::get-framework-directory(framework::get-target-framework())}/MSBuild.exe" workingdir="${build.dir}">
+				<arg file="${src.dir}/${project.vsproj}" />
+				<arg value="/p:Configuration=${project.config}" />
+				<arg value="/p:OutputPath=${build.dir}" />
+				<arg value="/p:TreatWarningsAsErrors=${build.warnaserrors}" unless="${istestsproject}" />
+				<arg value='/p:DefineConstants="${msbuild.defines}"' />
+				<arg value='/t:Rebuild' if="${build.rebuild}" />
+				<arg value="/p:DocumentationFile=${build.dir}/${project::get-name()}.xml" unless="${istestsproject}" />
+				<arg value="/p:NoWarn=1591" unless="${build.warnmissingdocs}" />
+				<arg line="/p:SignAssembly=${assembly.sign} /p:AssemblyOriginatorKeyFile=${key.file}" />
+				<arg value="${msbuildlogger}" />
+			</exec>
+		</if>
+		
+		<if test="${not build.msbuild}">
+			<property name="warnaserror" value="false" if="${istestsproject}" />
+			<property name="warnaserror" value="${build.warnaserrors}" if="${not istestsproject}" />
+			<csc
+				target="library" 
+				define="${current.build.defines}" 
+				debug="${build.debug}" 
+				optimize="${build.optimize}"
+				warnaserror="${warnaserror}"
+				output="${build.dir}/${project::get-name()}.dll" 
+				doc="${build.dir}/${project::get-name()}.xml"
+				rebuild="${build.rebuild}"
+				unless="${build.msbuild}"
+			>
+				<nowarn>
+					<warning number="1591" unless="${build.warnmissingdocs}" /> <!-- No XML comment for publicly visible member -->
+				</nowarn>
+				<sources refid="project.sources" />
+				<references refid="project.references" />
+				<resources refid="project.resources" />
+				<arg line="${csc.keyfile}" if="${assembly.sign}" />
+				<arg line="${csc.args}" />
+			</csc>
+		</if>
 	</target>
 
  	<target name="common.compile-website">
@@ -160,6 +180,7 @@
 			define="${current.build.defines}" 
 			debug="${build.debug}"
 			optimize="${build.optimize}"
+			warnaserror="${build.warnaserrors}"
 			output="${build.dir}/${project::get-name()}.exe" 
 		>
 			<nowarn>
@@ -168,6 +189,8 @@
 			<sources refid="project.sources" />
 			<references refid="project.references" />
 			<resources refid="project.resources" />
+			<arg line="${csc.keyfile}" if="${assembly.sign}" />
+			<arg line="${csc.args}" />
 		</csc>
 	</target>
 
@@ -213,7 +236,6 @@
 				<attribute type="AssemblyVersionAttribute" value="${assembly.version}" />
 				<attribute type="AssemblyInformationalVersionAttribute" value="${assembly.version.informational}" />
 				<attribute type="AssemblyFileVersionAttribute" value="${assembly.version}" />
-				<attribute type="AssemblyKeyFileAttribute" value="${assembly.keyfile}" if="${assembly.sign}"/>
 				<attribute type="AssemblyDelaySignAttribute" value="false" />
 				
 				<!-- For some reason, NAnt doesn't detect that APTCA has a public no-argument constructor -->

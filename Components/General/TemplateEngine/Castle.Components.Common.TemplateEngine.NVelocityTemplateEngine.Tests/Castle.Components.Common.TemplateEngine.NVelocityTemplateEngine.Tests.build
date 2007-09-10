@@ -17,6 +17,7 @@
 			<include name="Castle.Core.dll" />
 			<include name="Castle.Components.Common.TemplateEngine.dll" />
 			<include name="Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.dll" />
+ 			<include name="Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR.dll" />
 			<include name="System.Configuration.dll" />
 		</assemblyfileset>
 

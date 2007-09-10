@@ -129,6 +129,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			validationConfig = validatorProvider.CreateConfiguration(parameters);
 
+			
 			string afterFormTag = validationConfig.CreateAfterFormOpened(currentFormId);
 			string formContent;
 
@@ -142,6 +143,51 @@ namespace Castle.MonoRail.Framework.Helpers
 				formContent = "<form method='" + method +  "' id='" + currentFormId + "' " + GetAttributes(parameters) + ">";
 			}
 
+			return formContent + afterFormTag;
+		}
+		/// <summary>
+		/// Generate Ajax form tag for ajax based form submission
+		/// Note noaction is not supported here as ajax requires the url
+		/// </summary>
+		/// <param name="parameters"></param>
+		/// <returns></returns>
+		public string AjaxFormTag(IDictionary parameters)
+		{
+			currentFormId = CommonUtils.ObtainEntryAndRemove(parameters, "id", "form" + ++formCount);
+			
+			//additional form parameters. fValidate creates onsubmit here.
+			validationConfig = validatorProvider.CreateConfiguration(parameters);
+
+			string afterFormTag = validationConfig.CreateAfterFormOpened(currentFormId);
+
+			string url = UrlHelper.For(parameters);
+
+			parameters["form"] = true;
+
+			if (parameters.Contains("onsubmit"))
+			{
+				string onSubmitFunc = CommonUtils.ObtainEntryAndRemove(parameters, "onsubmit");
+				//remove return to make it compatible for ajax condition
+				if (onSubmitFunc.StartsWith("return ", StringComparison.InvariantCultureIgnoreCase))
+					onSubmitFunc = onSubmitFunc.Substring(7);
+				if (onSubmitFunc.EndsWith(";", StringComparison.InvariantCultureIgnoreCase))
+					onSubmitFunc = onSubmitFunc.Remove(onSubmitFunc.Length - 1);
+				string conditionFunc = CommonUtils.ObtainEntryAndRemove(parameters, "condition", string.Empty);
+				if (!string.IsNullOrEmpty(conditionFunc))
+					conditionFunc += " && ";
+				conditionFunc += onSubmitFunc;
+				
+				parameters["condition"] = conditionFunc;
+			}
+			bool isMethodAssigned = parameters.Contains("method");
+			string method = CommonUtils.ObtainEntryAndRemove(parameters, "method", "post");
+			parameters["url"] = url;
+			//reassign method so in case if there is no value the default is assigned.
+			if (isMethodAssigned) parameters["method"] = method;
+			String remoteFunc = RemoteFunction(parameters);
+
+			string formContent = String.Format("<form id='{1}' method='{2}' {3} onsubmit=\"{0}; return false;\" enctype=\"multipart/form-data\">", remoteFunc, currentFormId, method,GetAttributes(parameters));
+		   
 			return formContent + afterFormTag;
 		}
 
@@ -868,7 +914,7 @@ namespace Castle.MonoRail.Framework.Helpers
 			else
 			{
 				isChecked = ((value != null && value is bool && ((bool)value)) || 
-				             (!(value is bool) && (value != null)));
+							 (!(value is bool) && (value != null)));
 			}
 
 			if (isChecked)
@@ -1259,7 +1305,7 @@ namespace Castle.MonoRail.Framework.Helpers
 			}
 			
 			return String.Format("<input type=\"{0}\" id=\"{1}\" name=\"{2}\" value=\"{3}\" {4}/>", 
-			                     type, id, target, value, GetAttributes(attributes));
+								 type, id, target, value, GetAttributes(attributes));
 		}
 
 		protected virtual string CreateInputElement(string type, string value, IDictionary attributes)
@@ -1573,6 +1619,172 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		#region private helpers
 
+		/// <summary>
+		/// Ajax: Returns a function that makes a remote invocation,
+		/// using the supplied parameters
+		/// </summary>
+		/// <param name="options">the options for the Ajax invocation</param>
+		/// <returns>javascript code</returns>
+		private static String RemoteFunction(IDictionary options)
+		{
+			IDictionary jsOptions = new HybridDictionary();
+
+			String javascriptOptionsString = BuildAjaxOptions(jsOptions, options);
+
+			StringBuilder contents = new StringBuilder();
+
+			bool isRequestOnly = !options.Contains("update") &&
+				!options.Contains("success") && !options.Contains("failure");
+
+			if (isRequestOnly)
+			{
+				contents.Append("new Ajax.Request(");
+			}
+			else
+			{
+				contents.Append("new Ajax.Updater(");
+
+				if (options.Contains("update"))
+				{
+					contents.AppendFormat("'{0}', ", options["update"]);
+				}
+				else
+				{
+					contents.Append("{");
+
+					bool commaFirst = false;
+
+					if (options.Contains("success"))
+					{
+						contents.AppendFormat("success:'{0}'", options["success"]);
+						CommonUtils.ObtainEntryAndRemove(options, "success");
+						commaFirst = true;
+					}
+					if (options.Contains("failure"))
+					{
+						if (commaFirst) contents.Append(",");
+						contents.AppendFormat("failure:'{0}'", options["failure"]);
+						CommonUtils.ObtainEntryAndRemove(options, "failure");
+					}
+
+					contents.Append("}, ");
+				}
+			}
+
+			if (!options.Contains("url")) throw new ArgumentException("url is required");
+
+			contents.Append(GetUrlOption(options));
+			contents.Append(", " + javascriptOptionsString + ")");
+
+			if (options.Contains("before"))
+			{
+				contents = new StringBuilder(String.Format("{0}; {1}",
+					options["before"].ToString(), contents.ToString()));
+				CommonUtils.ObtainEntryAndRemove(options, "before");
+			}
+
+			if (options.Contains("after"))
+			{
+				contents = new StringBuilder(String.Format("{1}; {0}",
+					options["after"].ToString(), contents.ToString()));
+				CommonUtils.ObtainEntryAndRemove(options, "after");
+			}
+
+			if (options.Contains("condition"))
+			{
+				String old = contents.ToString();
+				contents = new StringBuilder(
+					String.Format("if ( {0} ) {{ {1}; }}", options["condition"], old));
+				CommonUtils.ObtainEntryAndRemove(options, "condition");
+			}
+
+			return contents.ToString();
+		}
+		private static String GetUrlOption(IDictionary options)
+		{
+			String url = CommonUtils.ObtainEntryAndRemove(options,"url");
+
+			if (url.StartsWith("<") && url.EndsWith(">"))
+			{
+				return url.Substring(1, url.Length - 2);
+			}
+
+			return string.Format("'{0}'", url);
+		}
+		private static String BuildAjaxOptions(IDictionary jsOptions, IDictionary options)
+		{
+			BuildCallbacks(jsOptions, options);
+
+			jsOptions["asynchronous"] = (!options.Contains("type")).ToString().ToLower(System.Globalization.CultureInfo.InvariantCulture);
+			CommonUtils.ObtainEntryAndRemove(options, "type");
+
+			string method=CommonUtils.ObtainEntryAndRemove(options, "method", string.Empty);
+			if (!string.IsNullOrEmpty(method))
+				jsOptions["method"] = method;
+
+			jsOptions["evalScripts"] =CommonUtils.ObtainEntryAndRemove(options, "evalScripts", "true");
+			string position = CommonUtils.ObtainEntryAndRemove(options, "position");
+			if (!string.IsNullOrEmpty(position))
+			{
+				jsOptions["insertion"] = String.Format("Insertion.{0}", position);
+			}
+
+			if (!options.Contains("with") && options.Contains("form"))
+			{
+				jsOptions["parameters"] = "Form.serialize(this)";
+			}
+			else if (options.Contains("with"))
+			{
+				jsOptions["parameters"] = options["with"];
+			}
+
+			CommonUtils.ObtainObjectEntryAndRemove(options, "form");
+			CommonUtils.ObtainEntryAndRemove(options, "with");
+
+			return JavascriptOptions(jsOptions);
+		}
+		private static void BuildCallbacks(IDictionary jsOptions, IDictionary options)
+		{
+			String[] names = CallbackEnum.GetNames(typeof(CallbackEnum));
+
+			foreach (String name in names)
+			{
+				if (!options.Contains(name.ToLower(System.Globalization.CultureInfo.InvariantCulture))) continue;
+
+				String callbackFunctionName;
+
+				String function = BuildCallbackFunction(
+					(CallbackEnum)Enum.Parse(typeof(CallbackEnum), name, true),
+					options[name.ToLower(System.Globalization.CultureInfo.InvariantCulture)] as String, out callbackFunctionName);
+
+				if (function == String.Empty) return;
+
+				jsOptions[callbackFunctionName] = function;
+			}
+		}
+
+		private static String BuildCallbackFunction(CallbackEnum callback, String code, out String name)
+		{
+			name = String.Empty;
+
+			if (callback == CallbackEnum.Uninitialized) return String.Empty;
+
+			if (callback != CallbackEnum.OnFailure && callback != CallbackEnum.OnSuccess)
+			{
+				name = "on" + callback.ToString();
+			}
+			else if (callback == CallbackEnum.OnFailure)
+			{
+				name = "onFailure";
+			}
+			else if (callback == CallbackEnum.OnSuccess)
+			{
+				name = "onSuccess";
+			}
+
+			return String.Format("function(request) {{ {0} }} ", code);
+		}
+
 		private static void ApplyNumberOnlyOptions(IDictionary attributes)
 		{
 			string list = CommonUtils.ObtainEntryAndRemove(attributes, "exceptions", String.Empty);
@@ -1725,7 +1937,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="isMultiple"><c>true</c> if the initial selection is a set</param>
 		/// <returns><c>true</c> if it's selected</returns>
 		protected internal static bool IsPresent(object value, object initialSetValue, 
-		                                         ValueGetter propertyOnInitialSet, bool isMultiple)
+												 ValueGetter propertyOnInitialSet, bool isMultiple)
 		{
 			if (!isMultiple)
 			{
@@ -1991,4 +2203,4 @@ namespace Castle.MonoRail.Framework.Helpers
 			return PropertyFlags;
 		}
 	}
-}
+} 

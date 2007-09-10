@@ -109,7 +109,11 @@ namespace Castle.Windsor.Configuration.Interpreters
 
 		private void DeserializeElement(XmlNode node, IConfigurationStore store)
 		{
-			if (FacilitiesNodeName.Equals(node.Name))
+			if (ContainersNodeName.Equals(node.Name))
+			{
+				DeserializeContainers(node.ChildNodes, store);
+			}
+			else if (FacilitiesNodeName.Equals(node.Name))
 			{
 				DeserializeFacilities(node.ChildNodes, store);
 			}
@@ -125,6 +129,40 @@ namespace Castle.Windsor.Configuration.Interpreters
 			{
 				throw new ConfigurationException(String.Format("DeserializeElement cannot process element {0}", node.Name));
 			}
+		}
+
+		private void DeserializeContainers(XmlNodeList nodes, IConfigurationStore store)
+		{
+			foreach(XmlNode node in nodes)
+			{
+				if (node.NodeType == XmlNodeType.Element)
+				{
+					AssertNodeName(node, ContainerNodeName);
+
+					DeserializeContainer(node, store);
+				}
+			}
+		}
+
+		private void DeserializeContainer(XmlNode node, IConfigurationStore store)
+		{
+			String name = GetRequiredAttributeValue(node, "name");
+
+			IConfiguration config = GetDeserializedNode(node);
+			IConfiguration newConfig = new MutableConfiguration(config.Name, node.InnerXml);
+
+			// Copy all attributes
+			string[] allKeys = config.Attributes.AllKeys;
+			
+			foreach (string key in allKeys)
+			{
+				newConfig.Attributes.Add(key, config.Attributes[key]);
+			}
+
+			// Copy all children
+			newConfig.Children.AddRange(config.Children);
+
+			AddChildContainerConfig(name, newConfig, store);
 		}
 
 		private void DeserializeFacilities(XmlNodeList nodes, IConfigurationStore store)

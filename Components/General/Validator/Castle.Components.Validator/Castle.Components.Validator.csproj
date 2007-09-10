@@ -39,6 +39,22 @@
     <Compile Include="Attributes\ValidateLengthAttribute.cs" />
     <Compile Include="Attributes\ValidateRegExpAttribute.cs" />
     <Compile Include="Attributes\ValidateSameAsAttribute.cs" />
+    <Compile Include="Messages.fr.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Messages.fr.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Messages.it.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Messages.it.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Messages.lt.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Messages.lt.resx</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Messages.nl.Designer.cs">
       <DependentUpon>Messages.nl.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -81,6 +97,22 @@
     <Compile Include="WebValidationConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Messages.fr.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.fr.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Messages.it.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.it.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Messages.lt.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.lt.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Messages.nl.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Messages.nl.Designer.cs</LastGenOutput>
@@ -102,6 +134,7 @@
       <Link>CastleKey.snk</Link>
     </None>
     <None Include="Castle.Components.Validator.build" />
+    <None Include="Validator.cd" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

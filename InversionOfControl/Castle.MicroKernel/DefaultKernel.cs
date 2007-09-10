@@ -344,7 +344,17 @@ namespace Castle.MicroKernel
 
 			RaiseComponentModelCreated(model);
 			IHandler handler = HandlerFactory.Create(model);
-			RegisterHandler(model.Name, handler);
+
+			object skipRegistration = model.ExtendedProperties[ComponentModel.SkipRegistration];
+
+			if (skipRegistration != null)
+			{
+				RegisterHandler(model.Name, handler, (bool)skipRegistration);
+			}
+			else
+			{
+				RegisterHandler(model.Name, handler);
+			}
 		}
 
 		/// <summary>
@@ -693,7 +703,7 @@ namespace Castle.MicroKernel
 
 			if (handler == null && Parent != null)
 			{
-				handler = Parent.GetHandler(key);
+				handler = WrapParentHandler(Parent.GetHandler(key));
 			}
 
 			return handler;
@@ -713,7 +723,7 @@ namespace Castle.MicroKernel
 #endif
 			if (handler == null && Parent != null)
 			{
-				handler = Parent.GetHandler(service);
+				handler = WrapParentHandler(Parent.GetHandler(service));
 			}
 
 			return handler;
@@ -1002,6 +1012,16 @@ namespace Castle.MicroKernel
 
 		#region Protected members
 
+		protected virtual IHandler WrapParentHandler(IHandler parentHandler)
+		{
+			if (parentHandler == null) return null;
+
+			// This has a very destructive side-effect. While the goal is to resolve on same-level containers,
+			// the resolver will invoke GetHandler recursively, leading to stack overflows
+			// return new ParentHandlerWithChildResolver(parentHandler, Resolver);
+			return parentHandler;
+		}
+
 		protected INamingSubSystem NamingSubSystem
 		{
 			get { return GetSubSystem(SubSystemConstants.NamingKey) as INamingSubSystem; }
@@ -1009,7 +1029,15 @@ namespace Castle.MicroKernel
 
 		protected void RegisterHandler(String key, IHandler handler)
 		{
-			NamingSubSystem.Register(key, handler);
+			RegisterHandler(key, handler, false);
+		}
+
+		protected void RegisterHandler(String key, IHandler handler, bool skipRegistration)
+		{
+			if (!skipRegistration)
+			{
+				NamingSubSystem.Register(key, handler);
+			}
 
 			base.RaiseHandlerRegistered(handler);
 			base.RaiseComponentRegistered(key, handler);
