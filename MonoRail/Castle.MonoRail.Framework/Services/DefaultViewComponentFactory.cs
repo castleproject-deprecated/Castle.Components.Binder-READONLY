@@ -16,7 +16,6 @@ namespace Castle.MonoRail.Framework.Services
 {
 	using System;
 	using System.Reflection;
-	
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Configuration;
 
@@ -45,14 +44,14 @@ namespace Castle.MonoRail.Framework.Services
 		/// <summary>
 		/// A dictionary of name to ViewComponent
 		/// </summary>
-		private IViewComponentTree tree;
+		private IViewComponentRegistry registry;
 
 		/// <summary>
 		/// Constructs a <c>DefaultViewComponentFactory</c>
 		/// </summary>
 		public DefaultViewComponentFactory()
 		{
-			tree = new DefaultViewComponentTree();
+			registry = new DefaultViewComponentRegistry();
 		}
 		
 		#region IInitializable implementation
@@ -77,9 +76,9 @@ namespace Castle.MonoRail.Framework.Services
 		
 		#endregion
 
-		protected override IViewComponentTree GetViewComponentTree()
+		protected override IViewComponentRegistry GetViewComponentRegistry()
 		{
-			return tree;
+			return registry;
 		}
 
 		public override void Service(IServiceProvider provider)

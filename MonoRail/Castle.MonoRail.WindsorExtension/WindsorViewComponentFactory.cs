@@ -15,11 +15,9 @@
 namespace Castle.MonoRail.WindsorExtension
 {
 	using System;
-
 	using Castle.MonoRail.Framework;
 	using Castle.MonoRail.Framework.Services;
 	using Castle.Windsor;
-
 
 	public class WindsorViewComponentFactory : AbstractViewComponentFactory
 	{
@@ -35,13 +33,17 @@ namespace Castle.MonoRail.WindsorExtension
 		{
 			IWindsorContainer container = ContainerAccessorUtil.ObtainContainer();
 			Type type = ResolveType(name);
-			return (ViewComponent)container[type];
+			if (container.Kernel.HasComponent(type))
+			{
+				return (ViewComponent) container[type];
+			}
+			return (ViewComponent) Activator.CreateInstance(type);
 		}
 
-		protected override IViewComponentTree GetViewComponentTree()
+		protected override IViewComponentRegistry GetViewComponentRegistry()
 		{
 			IWindsorContainer container = ContainerAccessorUtil.ObtainContainer();
-			return (IViewComponentTree)container["rails.viewcomponenttree"];
+			return (IViewComponentRegistry) container["rails.viewcomponentregistry"];
 		}
 	}
 }

@@ -15,9 +15,6 @@
 namespace Castle.MonoRail.Framework.Services
 {
 	using System;
-	using System.Collections;
-	using System.Collections.Specialized;
-
 	using Castle.Core;
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.ViewComponents;
@@ -32,7 +29,10 @@ namespace Castle.MonoRail.Framework.Services
 		/// </summary>
 		private ILogger logger = NullLogger.Instance;
 
-		public AbstractViewComponentFactory()
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AbstractViewComponentFactory"/> class.
+		/// </summary>
+		protected AbstractViewComponentFactory()
 		{
 		}
 
@@ -77,7 +77,7 @@ namespace Castle.MonoRail.Framework.Services
 			Type viewCompType = ResolveType(name);
 			try
 			{
-				return (ViewComponent)Activator.CreateInstance(viewCompType);
+				return (ViewComponent) Activator.CreateInstance(viewCompType);
 			}
 			catch (Exception ex)
 			{
@@ -94,7 +94,7 @@ namespace Castle.MonoRail.Framework.Services
 				logger.DebugFormat("Creating view component '{0}'", name);
 			}
 
-			Type viewCompType = GetViewComponentTree().GetViewComponent(name);
+			Type viewCompType = GetViewComponentRegistry().GetViewComponent(name);
 
 			return viewCompType;
 		}
@@ -148,10 +148,10 @@ namespace Castle.MonoRail.Framework.Services
 			{
 				logger.DebugFormat("Registering ViewComponent {0} Type {1} ", name, type);
 			}
-			GetViewComponentTree().AddViewComponent(name, type);
+			GetViewComponentRegistry().AddViewComponent(name, type);
 		}
 
-		protected virtual IViewComponentTree GetViewComponentTree()
+		protected virtual IViewComponentRegistry GetViewComponentRegistry()
 		{
 			throw new NotImplementedException();
 		}

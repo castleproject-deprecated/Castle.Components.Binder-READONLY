@@ -4,6 +4,24 @@ Change history
 Release Candidate 3
 ===================
 
+- Applied Jacob Lewallen's patch adding a new attribute (ViewComponentAttribute) used
+  to name view components. The behavior is changed to strip the 'Component' suffix from the class name as well.
+
+- Applied Ernst Naezer's patch fixing MR-191
+  "Add TransformFilter support to MR"
+
+- Applied Lee Henson's patch fixing MR-222
+  "Use of IRailsEngineContext.Items"
+
+- Fixed MR-224
+  "ARDataBindAttribute does not set the Controllers validator on it's DataBinder"
+
+- Fixed MR-219
+  "FormHelper.Select with an interface datasource throws an Object mismatch exception."
+
+- Applied chris ortman's patch fixing MR-188
+  "Allow the #component directive to support variables for the component name"
+
 - Fixed MR-208
   "Using a lazy loaded nested object, "Ambiguous match found" exception occures when 
    trying to use FormHelper to render control for the nested objects property."

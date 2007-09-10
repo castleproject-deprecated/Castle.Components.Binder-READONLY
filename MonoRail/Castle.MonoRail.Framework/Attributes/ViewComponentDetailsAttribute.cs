@@ -16,13 +16,19 @@ namespace Castle.MonoRail.Framework
 {
 	using System;
 
+	/// <summary>
+	/// Decorates a ViewComponent to associate a custom name with it.
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Class), Serializable]
-	public class ViewComponentDetailsAttribute : Attribute
+	public class ViewComponentAttribute : Attribute
 	{
-		private String name;
+		private readonly string name;
 
-		/// <param name="name">The specified ViewComponent Name</param>
-		public ViewComponentDetailsAttribute(String name)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ViewComponentAttribute"/> class.
+		/// </summary>
+		/// <param name="name">The specified ViewComponent's Name</param>
+		public ViewComponentAttribute(String name)
 		{
 			this.name = name;
 		}
@@ -30,7 +36,7 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// The component's name
 		/// </summary>
-		public String Name
+		public string Name
 		{
 			get { return name; }
 		}

@@ -156,6 +156,7 @@
     <Compile Include="Attributes\SkipFilterAttribute.cs" />
     <Compile Include="Attributes\SkipRescueAttribute.cs" />
     <Compile Include="Attributes\ViewComponentDetailsAttribute.cs" />
+    <Compile Include="Attributes\TransformFilterAttribute.cs" />
     <Compile Include="Configuration\DefaultUrl.cs" />
     <Compile Include="Configuration\DefaultUrlCollection.cs" />
     <Compile Include="Filter.cs" />
@@ -321,9 +322,11 @@
     <Compile Include="Internal\Descriptors\ILayoutDescriptorBuilder.cs" />
     <Compile Include="Internal\Descriptors\IRescueDescriptorBuilder.cs" />
     <Compile Include="Internal\Descriptors\IResourceDescriptorBuilder.cs" />
+    <Compile Include="Internal\Descriptors\ITransformFilterDescriptorBuilder.cs" />
     <Compile Include="Internal\Descriptors\LayoutDescriptor.cs" />
     <Compile Include="Internal\Descriptors\RescueDescriptor.cs" />
     <Compile Include="Internal\Descriptors\ResourceDescriptor.cs" />
+    <Compile Include="Internal\Descriptors\TransformFilterDescriptor.cs" />
     <Compile Include="Internal\JSCollectionGeneratorBase.cs" />
     <Compile Include="Internal\JSElementGeneratorBase.cs" />
     <Compile Include="Internal\JSGeneratorBase.cs" />
@@ -332,12 +335,14 @@
     <Compile Include="Internal\Providers\DefaultLayoutDescriptorProvider.cs" />
     <Compile Include="Internal\Providers\DefaultRescueDescriptorProvider.cs" />
     <Compile Include="Internal\Providers\DefaultResourceDescriptorProvider.cs" />
+    <Compile Include="Internal\Providers\DefaultTransformFilterDescriptorProvider.cs" />
     <Compile Include="Internal\Providers\IFilterDescriptorProvider.cs" />
     <Compile Include="Internal\Providers\IHelperDescriptorProvider.cs" />
     <Compile Include="Internal\Providers\ILayoutDescriptorProvider.cs" />
     <Compile Include="Internal\Providers\IProvider.cs" />
     <Compile Include="Internal\Providers\IRescueDescriptorProvider.cs" />
     <Compile Include="Internal\Providers\IResourceDescriptorProvider.cs" />
+    <Compile Include="Internal\Providers\ITransformDescriptorFilterProvider.cs" />
     <Compile Include="Internal\ResourceDictionary.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -381,13 +386,15 @@
     <Compile Include="ITrace.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ITransformFilter.cs" />
+    <Compile Include="ITransformFilterFactory.cs" />
     <Compile Include="IUrlBuilder.cs" />
     <Compile Include="IUrlTokenizer.cs" />
     <Compile Include="IViewComponentContext.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IViewComponentFactory.cs" />
-    <Compile Include="IViewComponentTree.cs" />
+    <Compile Include="IViewComponentRegistry.cs" />
     <Compile Include="IViewEngine.cs" />
     <Compile Include="IViewEngineManager.cs" />
     <Compile Include="IViewSource.cs" />
@@ -421,10 +428,11 @@
     <Compile Include="Services\DefaultControllerTree.cs" />
     <Compile Include="Services\DefaultFilterFactory.cs" />
     <Compile Include="Services\DefaultResourceFactory.cs" />
+    <Compile Include="Services\DefaultTransformFilterFactory.cs" />
     <Compile Include="Services\DefaultUrlBuilder.cs" />
     <Compile Include="Services\DefaultUrlTokenizer.cs" />
     <Compile Include="Services\DefaultViewComponentFactory.cs" />
-    <Compile Include="Services\DefaultViewComponentTree.cs" />
+    <Compile Include="Services\DefaultViewComponentRegistry.cs" />
     <Compile Include="Services\DefaultViewEngineManager.cs" />
     <Compile Include="Services\EmailTemplateService.cs" />
     <Compile Include="Services\MonoRailSmtpSender.cs" />
@@ -433,6 +441,11 @@
     <Compile Include="SmartDispatcherController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TransformFilter.cs" />
+    <Compile Include="TransformFilters\Formatters\WikiFormatter.cs" />
+    <Compile Include="TransformFilters\LowerCaseTransformFilter.cs" />
+    <Compile Include="TransformFilters\UpperCaseTransformFilter.cs" />
+    <Compile Include="TransformFilters\WikiTransformFilter.cs" />
     <Compile Include="ViewComponent.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -539,6 +552,7 @@
     <None Include="..\..\CastleKey.snk">
       <Link>CastleKey.snk</Link>
     </None>
+    <None Include="Castle.MonoRail.Framework.build" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\Aspx\ControllerBinder\Design\Castle.gif" />

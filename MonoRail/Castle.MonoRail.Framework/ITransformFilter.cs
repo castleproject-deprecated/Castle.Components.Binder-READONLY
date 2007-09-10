@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,17 @@
 
 namespace Castle.MonoRail.Framework
 {
-	using System;
-
-	public interface IViewComponentTree
+	/// <summary>
+	/// Dictates the contract for transformfilters. 
+	/// </summary>
+	public interface ITransformFilter
 	{
-		void AddViewComponent(string name, Type type);
-		
-		Type GetViewComponent(string name);
+		/// <summary>
+		/// Writes the specified buffer to the output
+		/// </summary>
+		/// <param name="buffer">The buffer.</param>
+		/// <param name="offset">The offset.</param>
+		/// <param name="count">The count.</param>
+		void Write(byte[] buffer, int offset, int count);
 	}
 }

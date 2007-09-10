@@ -16,74 +16,81 @@ namespace Castle.MonoRail.Framework.Tests
 {
 	using System;
 	using Castle.MonoRail.Framework.Services;
-	using Castle.MonoRail.Framework.Tests.Controllers;
-	using Castle.MonoRail.Framework.Tests.Controllers.Clients;
-	using Castle.MonoRail.Framework.Tests.Controllers.Products;
 	using NUnit.Framework;
 
 	[TestFixture]
-	public class DefaultViewComponentTreeTests
+	public class DefaultViewComponentRegistryTests
 	{
-		#region Member Data
-		private DefaultViewComponentTree _tree;
-		#endregion
+		private DefaultViewComponentRegistry registry;
 
-		#region Test Setup and Teardown Methods
 		[SetUp]
 		public void Setup()
 		{
-			_tree = new DefaultViewComponentTree();
+			registry = new DefaultViewComponentRegistry();
 		}
-		#endregion
 
-		#region Test Methods
 		[Test]
 		public void AddViewComponent_NewComponent_Works()
 		{
-			_tree.AddViewComponent("MyViewComponent", typeof(ViewComponent));
+			registry.AddViewComponent("MyViewComponent", typeof(ViewComponent));
 		}
 
 		[Test]
-		[ExpectedException(typeof(ArgumentException))]
+		[ExpectedException(typeof(RailsException))]
 		public void AddViewComponent_DuplicateComponent_ThrowsException()
 		{
-			_tree.AddViewComponent("MyViewComponent", typeof(ViewComponent));
-			_tree.AddViewComponent("MyViewComponent", typeof(ViewComponent));
+			registry.AddViewComponent("MyViewComponent", typeof(ViewComponent));
+			registry.AddViewComponent("MyViewComponent", typeof(ViewComponent));
 		}
 
 		[Test]
-		[ExpectedException(typeof(ArgumentException))]
+		[ExpectedException(typeof(RailsException))]
 		public void AddViewComponent_NonViewComponent_ThrowsException()
 		{
-			_tree.AddViewComponent("MyViewComponent", typeof(DefaultViewComponentTree));
+			registry.AddViewComponent("MyViewComponent", typeof(DefaultViewComponentRegistry));
 		}
 
 		[Test]
-		[ExpectedException(typeof(ArgumentException))]
+		[ExpectedException(typeof(RailsException))]
 		public void GetViewComponent_MissingComponent_ThrowsException()
 		{
-			_tree.GetViewComponent("MissingComponent");
+			registry.GetViewComponent("MissingComponent");
 		}
 
 		[Test]
 		public void GetViewComponent_ExistingComponent_Works()
 		{
 			Type type = typeof(ViewComponent);
-			_tree.AddViewComponent("MyViewComponent", type);
-			Assert.AreEqual(type, _tree.GetViewComponent("MyViewComponent"));
+			registry.AddViewComponent("MyViewComponent", type);
+			Assert.AreEqual(type, registry.GetViewComponent("MyViewComponent"));
+		}
+
+		[Test]
+		public void GetViewComponent_ExistingWithoutComponentWithoutSuffixLookup_Works()
+		{
+			Type type = typeof(ViewComponent);
+			registry.AddViewComponent("MyView", type);
+			Assert.AreEqual(type, registry.GetViewComponent("MyView"));
+		}
+
+		[Test]
+		public void GetViewComponent_ExistingComponentWithoutSuffix_Works()
+		{
+			Type type = typeof(ViewComponent);
+			registry.AddViewComponent("MyViewComponent", type);
+			Assert.AreEqual(type, registry.GetViewComponent("MyView"));
 		}
 
 		[Test]
 		public void GetViewComponent_NamedViaAttribute_Works()
 		{
 			Type type = typeof(ATestViewComponent);
-			_tree.AddViewComponent("MyViewComponent", type);
-			Assert.AreEqual(type, _tree.GetViewComponent("DifferentName"));
+			registry.AddViewComponent("MyViewComponent", type);
+			Assert.AreEqual(type, registry.GetViewComponent("DifferentName"));
 		}
-		#endregion
 	}
 
-	[ViewComponentDetails("DifferentName")]
+	[ViewComponent("DifferentName")]
 	public class ATestViewComponent : ViewComponent
 	{
 	}

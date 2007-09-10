@@ -31,7 +31,7 @@ namespace Castle.MonoRail.WindsorExtension
 	public class RailsFacility : AbstractFacility
 	{
 		private IControllerTree controllerTree;
-		private IViewComponentTree componentTree;
+		private IViewComponentRegistry componentRegistry;
 
 		public RailsFacility()
 		{
@@ -41,10 +41,10 @@ namespace Castle.MonoRail.WindsorExtension
 		{
 			Kernel.AddComponent("rails.controllertree", typeof(IControllerTree), typeof(DefaultControllerTree));
 			Kernel.AddComponent("rails.wizardpagefactory", typeof(IWizardPageFactory), typeof(DefaultWizardPageFactory));
-			Kernel.AddComponent("rails.viewcomponenttree", typeof(IViewComponentTree), typeof(DefaultViewComponentTree));
+			Kernel.AddComponent("rails.viewcomponentregistry", typeof(IViewComponentRegistry), typeof(DefaultViewComponentRegistry));
 
 			controllerTree = (IControllerTree)Kernel["rails.controllertree"];
-			componentTree = (IViewComponentTree)Kernel["rails.viewcomponenttree"];
+			componentRegistry = (IViewComponentRegistry)Kernel["rails.viewcomponentregistry"];
 
 			Kernel.ComponentModelCreated += new ComponentModelDelegate(OnComponentModelCreated);
 
@@ -82,7 +82,7 @@ namespace Castle.MonoRail.WindsorExtension
 
 			if (isViewComponent)
 			{
-				componentTree.AddViewComponent(model.Name, model.Implementation);
+				componentRegistry.AddViewComponent(model.Name, model.Implementation);
 			}
 		}
 	}

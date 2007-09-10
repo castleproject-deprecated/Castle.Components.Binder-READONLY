@@ -14,7 +14,6 @@
 
 namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 {
-	using System;
 	using System.Collections;
 
 	[ActiveRecord(Lazy=false, Cache=CacheEnum.ReadWrite)]

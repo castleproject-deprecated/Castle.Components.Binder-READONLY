@@ -23,8 +23,9 @@ namespace Castle.ActiveRecord.Framework.Internal
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly HasManyAttribute hasManyAtt;
+		private DependentObjectModel dependentObjectModel;
 
-		public HasManyModel( PropertyInfo propInfo, HasManyAttribute hasManyAtt )
+		public HasManyModel(PropertyInfo propInfo, HasManyAttribute hasManyAtt)
 		{
 			this.hasManyAtt = hasManyAtt;
 			this.propInfo = propInfo;
@@ -38,6 +39,16 @@ namespace Castle.ActiveRecord.Framework.Internal
 		public HasManyAttribute HasManyAtt
 		{
 			get { return hasManyAtt; }
+		}
+
+		/// <summary>
+		/// Gets/Sets the the dependent object model
+		/// </summary>
+		/// <value>The dependent object model.</value>
+		public DependentObjectModel DependentObjectModel
+		{
+			get { return dependentObjectModel; }
+			set { dependentObjectModel = value; }
 		}
 
 		#region IVisitable Members
