@@ -42,13 +42,19 @@ namespace Castle.Facilities.AutomaticTransactionManagement.Tests
 		
 		public event TransactionDelegate TransactionDisposed;
 
-		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode)
+		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode,
+		                                      bool distributedTransaction)
 		{
 			_current = new MockTransaction();
 
 			_transactions++;
 
 			return _current;
+		}
+
+		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode)
+		{
+			return CreateTransaction(transactionMode, isolationMode, false);
 		}
 
 		public void Dispose(ITransaction tran)

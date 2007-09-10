@@ -18,6 +18,7 @@ namespace Castle.MonoRail.WindsorExtension
 	using Castle.MicroKernel;
 	using Castle.MicroKernel.Facilities;
 	using Castle.MonoRail.Framework;
+	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Internal;
 	using Castle.MonoRail.Framework.Controllers;
 	using Castle.MonoRail.Framework.Services;
@@ -44,6 +45,9 @@ namespace Castle.MonoRail.WindsorExtension
 
 			Kernel.ComponentModelCreated += new ComponentModelDelegate(OnComponentModelCreated);
 
+			MonoRailConfiguration.GetConfig().ServiceEntries.RegisterService(
+				ServiceIdentification.ControllerTree, typeof(ControllerTreeAccessor));
+
 			AddBuiltInControllers();
 		}
 
@@ -63,12 +67,13 @@ namespace Castle.MonoRail.WindsorExtension
 
 			// Ensure it's transient
 			model.LifestyleType = LifestyleType.Transient;
+			model.InspectionBehavior = PropertiesInspectionBehavior.DeclaredOnly;
 
 			if (isController)
 			{
 				ControllerDescriptor descriptor = ControllerInspectionUtil.Inspect(model.Implementation);
-			
-				tree.AddController( descriptor.Area, descriptor.Name, model.Name );
+
+				tree.AddController(descriptor.Area, descriptor.Name, model.Implementation);
 			}
 		}
 	}

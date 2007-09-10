@@ -48,7 +48,7 @@ namespace Castle.MonoRail.Framework
 				throw new ConfigurationException("Could not obtain IViewSourceLoader");
 			}
 
-			ILoggerFactory loggerFactory = (ILoggerFactory)provider.GetService(typeof(ILoggerFactory));
+			ILoggerFactory loggerFactory = (ILoggerFactory) provider.GetService(typeof(ILoggerFactory));
 
 			if (loggerFactory != null)
 			{

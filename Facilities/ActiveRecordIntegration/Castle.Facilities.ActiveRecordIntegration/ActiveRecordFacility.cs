@@ -124,13 +124,16 @@ namespace Castle.Facilities.ActiveRecordIntegration
 				log.Info("No Transaction Manager registered on Kernel, registering AR Transaction Manager");
 
 				Kernel.AddComponent("ar.transaction.manager",
-				                    typeof(ITransactionManager), typeof(ActiveRecordTransactionManager));
+				                    typeof(ITransactionManager), typeof(DefaultTransactionManager));
 			}
 		}
 
-		private void OnNewTransaction(ITransaction transaction, TransactionMode transactionMode, IsolationMode isolationMode)
+		private void OnNewTransaction(ITransaction transaction, TransactionMode transactionMode, IsolationMode isolationMode, bool distributedTransaction)
 		{
-			transaction.Enlist(new TransactionScopeResourceAdapter(transactionMode));
+			if (!transaction.DistributedTransaction)
+			{
+				transaction.Enlist(new TransactionScopeResourceAdapter(transactionMode));
+			}
 		}
 
 		private Assembly ObtainAssembly(String assemblyName)

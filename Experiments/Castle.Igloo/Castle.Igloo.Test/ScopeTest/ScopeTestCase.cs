@@ -23,7 +23,7 @@ namespace Castle.Igloo.Test.ScopeTest
     [TestFixture]
     public class ScopeTestCase
     {
-        private static IWindsorContainer _container = null;
+        private IWindsorContainer _container = null;
 
         private IComponent instance3;
 
@@ -70,13 +70,8 @@ namespace Castle.Igloo.Test.ScopeTest
         [Test]
         public void ScopeSetThroughAttribute()
         {
-            _container.AddComponent("a", typeof(IComponent), typeof(SingletonScopeComponent));
-            IHandler handler = _container.Kernel.GetHandler("a");
-            Assert.AreEqual(LifestyleType.Custom, handler.ComponentModel.LifestyleType);
-            Assert.AreEqual(typeof(ScopeLifestyleManager), handler.ComponentModel.CustomLifestyle);
-
             _container.AddComponent("b", typeof(TransientScopeComponent));
-            handler = _container.Kernel.GetHandler("b");
+            IHandler handler = _container.Kernel.GetHandler("b");
             Assert.AreEqual(LifestyleType.Custom, handler.ComponentModel.LifestyleType);
             Assert.AreEqual(typeof(ScopeLifestyleManager), handler.ComponentModel.CustomLifestyle);
 
@@ -84,19 +79,21 @@ namespace Castle.Igloo.Test.ScopeTest
             handler = _container.Kernel.GetHandler("c");
             Assert.AreEqual(LifestyleType.Custom, handler.ComponentModel.LifestyleType);
             Assert.AreEqual(typeof(ScopeLifestyleManager), handler.ComponentModel.CustomLifestyle);
+        }
 
-            //_container.AddComponent("d", typeof(PerScopeWebRequestComponent));
-            //handler = _container.Kernel.GetHandler("d");
-            //Assert.AreEqual(LifestyleType.Custom, handler.ComponentModel.LifestyleType);
-            //Assert.AreEqual(typeof(ScopeLifestyleManager), handler.ComponentModel.CustomLifestyle);
+        [Test]
+        public void ScopeSetThroughConfig()
+        {
+            IHandler handler = _container.Kernel.GetHandler("Singleton.Scope.Component");
+            Assert.AreEqual(LifestyleType.Custom, handler.ComponentModel.LifestyleType);
+            Assert.AreEqual(typeof(ScopeLifestyleManager), handler.ComponentModel.CustomLifestyle);
+
         }
 
         [Test]
         public void TestSingletonScope()
         {
-            _container.AddComponent("a", typeof(IComponent), typeof(SingletonScopeComponent));
-
-            IHandler handler = _container.Kernel.GetHandler("a");
+            IHandler handler = _container.Kernel.GetHandler("Singleton.Scope.Component");
 
             IComponent instance1 = handler.Resolve(CreationContext.Empty) as IComponent;
             IComponent instance2 = handler.Resolve(CreationContext.Empty) as IComponent;
@@ -165,5 +162,6 @@ namespace Castle.Igloo.Test.ScopeTest
             IHandler handler = _container.Kernel.GetHandler("a");
             this.instance3 = handler.Resolve(CreationContext.Empty) as IComponent;
         }
+
     }
 }

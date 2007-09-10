@@ -15,7 +15,6 @@
 namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 {
 	using System;
-
 	using Castle.Services.Transaction;
 
 	[Transactional]
@@ -76,6 +75,11 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 			Blog blog = firstDao.Create();
 			secondDao.Create(blog);
 			orderDao.Create(1.122f);
+
+			if (throwException)
+			{
+				throw new Exception("Nah, giving up");
+			}
 		}
 	}
 }

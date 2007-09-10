@@ -18,7 +18,6 @@ namespace Castle.MonoRail.Framework.Adapters
 	using System.IO;
 	using System.Web;
 	using Castle.MonoRail.Framework;
-	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
 	/// Adapts the <see cref="IResponse"/> to
@@ -165,8 +164,9 @@ namespace Castle.MonoRail.Framework.Adapters
 		{
 			redirected = true;
 
-			response.Redirect(UrlInfo.CreateAbsoluteRailsUrl(
-								appPath, controller, action, context.UrlInfo.Extension), false);
+			IUrlBuilder builder = (IUrlBuilder) context.GetService(typeof(IUrlBuilder));
+
+			response.Redirect(builder.BuildUrl(context.UrlInfo, controller, action), false);
 		}
 
 		public void Redirect(String area, String controller, String action)
@@ -179,8 +179,9 @@ namespace Castle.MonoRail.Framework.Adapters
 			{
 				redirected = true;
 
-				response.Redirect(UrlInfo.CreateAbsoluteRailsUrl(
-				                  	appPath, area, controller, action, context.UrlInfo.Extension), false);
+				IUrlBuilder builder = (IUrlBuilder) context.GetService(typeof(IUrlBuilder));
+
+				response.Redirect(builder.BuildUrl(context.UrlInfo, area, controller, action), false);
 			}
 		}
 
@@ -215,7 +216,7 @@ namespace Castle.MonoRail.Framework.Adapters
 			HttpCookie cookie = new HttpCookie(name, cookieValue);
 
 			cookie.Expires = expiration;
-			cookie.Path = "/";
+			cookie.Path = context.ApplicationPath;
 
 			CreateCookie(cookie);
 		}
@@ -235,7 +236,12 @@ namespace Castle.MonoRail.Framework.Adapters
 		/// <param name="name">The name.</param>
 		public void RemoveCookie(string name)
 		{
-			response.Cookies.Remove(name);
+			HttpCookie cookie = new HttpCookie(name, "");
+			
+			cookie.Expires = DateTime.Now.AddYears(-10);
+			cookie.Path = context.ApplicationPath;
+			
+			CreateCookie(cookie);
 		}
 	}
 }

@@ -55,17 +55,17 @@ namespace Castle.Igloo
         /// </summary>
 		protected override void Init()
 		{
-			if (FacilityConfig == null)
+			if (FacilityConfig != null)
 			{
-				throw new ConfigurationErrorsException(
-					"The IglooFacility requires an 'assembyView' child tag.");
-			}
-
-			IConfiguration factoriesConfig = FacilityConfig.Children["assembyView"];
-			if (factoriesConfig!=null && 
-				factoriesConfig.Value!= null && factoriesConfig.Value!= string.Empty )
-			{
-				_assembly =  Assembly.Load(factoriesConfig.Value) ;	
+                IConfiguration factoriesConfig = FacilityConfig.Children["assembyView"];
+                if (factoriesConfig != null &&
+                    factoriesConfig.Value != null && factoriesConfig.Value != string.Empty)
+                {
+                    _assembly = Assembly.Load(factoriesConfig.Value);
+                }
+			    
+                //throw new ConfigurationErrorsException(
+                //    "The IglooFacility requires an 'assembyView' child tag.");
 			}
 
             RegisterContributor();
@@ -154,12 +154,12 @@ namespace Castle.Igloo
                 Kernel.AddComponent(ScopeType.Page, typeof(IPageScope), typeof(MockPageScope));
                 Kernel.AddComponent(ScopeType.Request, typeof(IRequestScope), typeof(MockRequestScope));
                 Kernel.AddComponent(ScopeType.Session, typeof(ISessionScope), typeof(MockSessionScope));
-
-                // Windows scope
-                Kernel.AddComponent(ScopeType.Thread, typeof(IScope), typeof(ThreadScope));
-                Kernel.AddComponent(ScopeType.Singleton, typeof(IScope), typeof(SingletonScope));
-                Kernel.AddComponent(ScopeType.Transient, typeof(IScope), typeof(TransientScope));
             }
+
+            // Windows scope
+            Kernel.AddComponent(ScopeType.Thread, typeof(IScope), typeof(ThreadScope));
+            Kernel.AddComponent(ScopeType.Singleton, typeof(IScope), typeof(SingletonScope));
+            Kernel.AddComponent(ScopeType.Transient, typeof(IScope), typeof(TransientScope));
         }
 
         private void RegisterContributor()

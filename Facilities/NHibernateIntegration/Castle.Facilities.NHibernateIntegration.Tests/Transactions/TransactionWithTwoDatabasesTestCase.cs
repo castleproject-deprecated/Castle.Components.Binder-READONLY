@@ -50,5 +50,32 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 			Assert.AreEqual(1, blogitems.Length);
 			Assert.AreEqual(1, orders.Length);
 		}
+
+		[Test]
+		public void ExceptionOnEndWithTwoDatabases()
+		{
+			RootService service = (RootService) container["root"];
+			OrderDao orderDao = (OrderDao) container["myorderdao"];
+
+			try
+			{
+				service.DoTwoDBOperation_Create(true);
+			}
+			catch(Exception)
+			{
+				// Expected
+			}
+
+			Array blogs = service.FindAll(typeof(Blog));
+			Array blogitems = service.FindAll(typeof(BlogItem));
+			Array orders = orderDao.FindAll(typeof(Order));
+
+			Assert.IsNotNull(blogs);
+			Assert.IsNotNull(blogitems);
+			Assert.IsNotNull(orders);
+			Assert.AreEqual(0, blogs.Length);
+			Assert.AreEqual(0, blogitems.Length);
+			Assert.AreEqual(0, orders.Length);
+		}
 	}
 }

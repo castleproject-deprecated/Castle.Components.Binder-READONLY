@@ -47,12 +47,13 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 			{
 				service.DoBlogRefOperation(blog);
 				
+				// Expects a constraint exception on Commit
+
 				Assert.Fail("Must fail");
 			}
 			catch(Exception)
 			{
-				// transaction exception
-				// Console.Write(e);
+				// transaction exception expected
 			}
 		}
 
@@ -154,7 +155,7 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 				Array blogs = rootService.FindAll(typeof(Blog));
 				Assert.AreEqual(1, blogs.Length);
 				Array blogitems = rootService.FindAll(typeof(BlogItem));
-				Assert.IsNull(blogitems);
+				Assert.IsEmpty(blogitems);
 			}
 		}
 
@@ -192,8 +193,8 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 			Array blogs = service.FindAll(typeof(Blog));
 			Array blogitems = service.FindAll(typeof(BlogItem));
 
-			Assert.IsNull(blogs);
-			Assert.IsNull(blogitems);
+			Assert.IsEmpty(blogs);
+			Assert.IsEmpty(blogitems);
 		}
 
 		[Test]
@@ -214,8 +215,8 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 			Array blogs = service.FindAll(typeof(Blog));
 			Array blogitems = service.FindAll(typeof(BlogItem));
 
-			Assert.IsNull(blogs);
-			Assert.IsNull(blogitems);
+			Assert.IsEmpty(blogs);
+			Assert.IsEmpty(blogitems);
 		}
 	}
 }

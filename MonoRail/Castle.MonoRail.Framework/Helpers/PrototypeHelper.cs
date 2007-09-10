@@ -30,9 +30,9 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		public class JSGenerator : DynamicDispatchSupport
+		public class JSGenerator : DynamicDispatchSupport, IJSGenerator
 		{
-			enum Position
+			private enum Position
 			{
 				Top,
 				Bottom,
@@ -40,7 +40,7 @@ namespace Castle.MonoRail.Framework.Helpers
 				After
 			}
 
-			private readonly static IDictionary DispMethods;
+			private static readonly IDictionary DispMethods;
 
 			private readonly IRailsEngineContext context;
 			private readonly StringBuilder lines = new StringBuilder();
@@ -56,7 +56,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 				BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
-				MethodInfo[] methods = typeof(JSGenerator).GetMethods(flags);
+				MethodInfo[] methods = typeof(IJSGenerator).GetMethods(flags);
 
 				PopulateAvailableMethods(DispMethods, methods);
 			}
@@ -249,25 +249,25 @@ namespace Castle.MonoRail.Framework.Helpers
 				if (renderOptions == null)
 				{
 					throw new ArgumentNullException("renderOptions",
-						"renderOptions cannot be null. Must be a string or a dictionary");
+					                                "renderOptions cannot be null. Must be a string or a dictionary");
 				}
 				else if (renderOptions is IDictionary)
 				{
-					IDictionary options = (IDictionary)renderOptions;
+					IDictionary options = (IDictionary) renderOptions;
 
-					String partialName = (String)options["partial"];
+					String partialName = (String) options["partial"];
 
 					if (partialName == null)
 					{
 						throw new ArgumentNullException("renderOptions",
-							"renderOptions, as a dictionary, must have a 'partial' " +
-							"entry with the template name to render");
+						                                "renderOptions, as a dictionary, must have a 'partial' " +
+						                                "entry with the template name to render");
 					}
 
 					try
 					{
 						IViewEngineManager viewEngineManager = (IViewEngineManager)
-							context.GetService(typeof(IViewEngineManager));
+						                                       context.GetService(typeof(IViewEngineManager));
 
 						StringWriter writer = new StringWriter();
 
@@ -313,21 +313,36 @@ namespace Castle.MonoRail.Framework.Helpers
 			public override string ToString()
 			{
 				return @"try " +
-					"\n{\n" + lines +
-					"}\n" +
-					"catch(e)\n" +
-					"{\n" +
-					"alert('JS error ' + e.toString());\n" +
-					"alert('Generated content: \\n" + JsEscapeWithSQuotes(lines.ToString()) + "');\n}";
+				       "\n{\n" + lines +
+				       "}\n" +
+				       "catch(e)\n" +
+				       "{\n" +
+				       "alert('JS error ' + e.toString());\n" +
+				       "alert('Generated content: \\n" + JsEscapeWithSQuotes(lines.ToString()) + "');\n}";
 			}
 
 			#endregion
 
+			public StringBuilder Lines
+			{
+				get { return lines; }
+			}
+
+			public IJSCollectionGenerator CreateCollectionGenerator(string root)
+			{
+				return new PrototypeHelper.JSCollectionGenerator(this, root);
+			}
+
+			public IJSElementGenerator CreateElementGenerator(string root)
+			{
+				return new PrototypeHelper.JSElementGenerator(this, root);
+			}
+
 			#region Static members
 
-			public static void Record(JSGenerator gen, string line)
+			public static void Record(IJSGenerator gen, string line)
 			{
-				gen.lines.AppendFormat("{0};\r\n", line);
+				gen.Lines.AppendFormat("{0};\r\n", line);
 			}
 
 			public static string BuildJSArguments(object[] args)
@@ -350,26 +365,27 @@ namespace Castle.MonoRail.Framework.Helpers
 				return tempBuffer.ToString();
 			}
 
-			public static void ReplaceTailByPeriod(JSGenerator generator)
+			//TODO: Should just the stringbuilder be passed here?
+			public static void ReplaceTailByPeriod(IJSGenerator generator)
 			{
-				int len = generator.lines.Length;
+				int len = generator.Lines.Length;
 
 				if (len > 3)
 				{
 					RemoveTail(generator);
-					generator.lines.Append('.');
+					generator.Lines.Append('.');
 				}
 			}
 
-			public static void RemoveTail(JSGenerator generator)
+			public static void RemoveTail(IJSGenerator generator)
 			{
-				int len = generator.lines.Length;
+				int len = generator.Lines.Length;
 
 				if (len > 3)
 				{
-					if (generator.lines[len - 3] == ';')
+					if (generator.Lines[len - 3] == ';')
 					{
-						generator.lines.Length = len - 3;
+						generator.Lines.Length = len - 3;
 					}
 				}
 			}
@@ -393,9 +409,9 @@ namespace Castle.MonoRail.Framework.Helpers
 			#endregion
 		}
 
-		public class JSCollectionGenerator : DynamicDispatchSupport
+		public class JSCollectionGenerator : DynamicDispatchSupport, IJSCollectionGenerator
 		{
-			private readonly static IDictionary DispMethods;
+			private static readonly IDictionary DispMethods;
 
 			private readonly JSGenerator generator;
 
@@ -410,7 +426,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 				BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
-				MethodInfo[] methods = typeof(JSCollectionGenerator).GetMethods(flags);
+				MethodInfo[] methods = typeof(IJSCollectionGenerator).GetMethods(flags);
 
 				PopulateAvailableMethods(DispMethods, methods);
 			}
@@ -437,7 +453,7 @@ namespace Castle.MonoRail.Framework.Helpers
 			/// Gets the parent generator.
 			/// </summary>
 			/// <value>The parent generator.</value>
-			public JSGenerator ParentGenerator
+			public IJSGenerator ParentGenerator
 			{
 				get { return generator; }
 			}
@@ -456,9 +472,9 @@ namespace Castle.MonoRail.Framework.Helpers
 			#endregion
 		}
 
-		public class JSElementGenerator : DynamicDispatchSupport
+		public class JSElementGenerator : DynamicDispatchSupport, IJSElementGenerator
 		{
-			private readonly static IDictionary DispMethods;
+			private static readonly IDictionary DispMethods;
 
 			private readonly JSGenerator generator;
 
@@ -473,7 +489,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 				BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
-				MethodInfo[] methods = typeof(JSElementGenerator).GetMethods(flags);
+				MethodInfo[] methods = typeof(IJSElementGenerator).GetMethods(flags);
 
 				PopulateAvailableMethods(DispMethods, methods);
 			}
@@ -500,7 +516,7 @@ namespace Castle.MonoRail.Framework.Helpers
 			/// Gets the parent generator.
 			/// </summary>
 			/// <value>The parent generator.</value>
-			public JSGenerator ParentGenerator
+			public IJSGenerator ParentGenerator
 			{
 				get { return generator; }
 			}
@@ -567,7 +583,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			int paramArrayIndex = -1;
 
-			for(int i=0; i < parameters.Length; i++)
+			for(int i = 0; i < parameters.Length; i++)
 			{
 				ParameterInfo paramInfo = parameters[i];
 
@@ -583,8 +599,8 @@ namespace Castle.MonoRail.Framework.Helpers
 			}
 			catch(Exception ex)
 			{
-				throw new RailsException("Error invoking method on generator. " + 
-					"Method invoked [" + method + "] with " + args.Length + " argument(s)", ex);
+				throw new RailsException("Error invoking method on generator. " +
+				                         "Method invoked [" + method + "] with " + args.Length + " argument(s)", ex);
 			}
 		}
 
@@ -635,6 +651,4 @@ namespace Castle.MonoRail.Framework.Helpers
 			return methodArguments;
 		}
 	}
-
-	
 }

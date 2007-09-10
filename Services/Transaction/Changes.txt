@@ -1,0 +1,12 @@
+
+Jan, 2007
+
+- Added System.Transactions integration
+
+- Added ActivityManager/Activity concept
+
+Feb, 2006 
+
+- Added logging support
+
+- Added IsRollbackOnlySet

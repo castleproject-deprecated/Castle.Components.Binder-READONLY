@@ -125,6 +125,13 @@ namespace Castle.Components.Binder
 				{
 					return ConvertPrimitive(desiredType, input, ref conversionSucceeded);
 				}
+#if DOTNET2
+				else if (desiredType.IsGenericType &&
+				         desiredType.GetGenericTypeDefinition() == typeof(Nullable<>))
+				{
+					return ConvertNullable(desiredType, input, ref conversionSucceeded);
+				}
+#endif
 				else if (desiredType == typeof(Guid))
 				{
 					return ConvertGuid(input, ref conversionSucceeded);
@@ -162,6 +169,22 @@ namespace Castle.Components.Binder
 		}
 
 #if DOTNET2		
+		private object ConvertNullable(Type desiredType, object input, ref bool conversionSucceeded)
+		{
+			Type underlyingType = Nullable.GetUnderlyingType(desiredType);
+
+			object value = Convert(underlyingType, input, out conversionSucceeded);
+
+			if (conversionSucceeded)
+			{
+				Type typeToConstruct = typeof(Nullable<>).MakeGenericType(underlyingType);
+
+				return Activator.CreateInstance(typeToConstruct, value);
+			}
+
+			return null;
+		}
+
 		private object ConvertGenericList(Type desiredType, object input, ref bool conversionSucceeded)
 		{
 			Type elemType = desiredType.GetGenericArguments()[0];
@@ -259,44 +282,9 @@ namespace Castle.Components.Binder
 
 			String value = NormalizeInput(input);
 			
-			if (desiredType == typeof(Boolean))
+			if (IsBool(desiredType))
 			{
-				if (input == null)
-				{
-					conversionSucceeded = false;
-					return null;
-				}
-				else if (value == String.Empty)
-				{
-					return false;
-				}
-				else
-				{
-					if (value.IndexOf(',') != -1)
-					{
-						value = value.Substring(0, value.IndexOf(','));
-					}
-					
-					bool performNumericConversion = false;
-					
-					foreach(char c in value.ToCharArray())
-					{
-						if (Char.IsNumber(c))
-						{
-							performNumericConversion = true;
-							break;
-						}
-					}
-					
-					if (performNumericConversion)
-					{
-						return System.Convert.ToBoolean(System.Convert.ToInt32(value));
-					}
-					else
-					{
-						return !(String.Compare("false", value, true) == 0);
-					}
-				}
+				return SpecialBoolConversion(value, input, ref conversionSucceeded);
 			}
 			else if (input == null || value == String.Empty)
 			{
@@ -308,6 +296,58 @@ namespace Castle.Components.Binder
 			{
 				return System.Convert.ChangeType(input, desiredType);
 			}
+		}
+
+		private object SpecialBoolConversion(string value, object input, ref bool conversionSucceeded)
+		{
+			if (input == null)
+			{
+				conversionSucceeded = false;
+				return null;
+			}
+			else if (value == String.Empty)
+			{
+				return false;
+			}
+			else
+			{
+				if (value.IndexOf(',') != -1)
+				{
+					value = value.Substring(0, value.IndexOf(','));
+				}
+
+				bool performNumericConversion = false;
+
+				foreach (char c in value.ToCharArray())
+				{
+					if (Char.IsNumber(c))
+					{
+						performNumericConversion = true;
+						break;
+					}
+				}
+
+				if (performNumericConversion)
+				{
+					return System.Convert.ToBoolean(System.Convert.ToInt32(value));
+				}
+				else
+				{
+					return !(String.Compare("false", value, true) == 0);
+				}
+			}
+		}
+
+		private bool IsBool(Type desiredType)
+		{
+			bool isBool = desiredType == typeof(Boolean);
+#if DOTNET2
+			if (!isBool)
+			{
+				isBool = desiredType == typeof(bool?);
+			}
+#endif
+			return isBool;
 		}
 
 		private object ConvertEnum(Type desiredType, object input, ref bool conversionSucceeded)
@@ -353,10 +393,11 @@ namespace Castle.Components.Binder
 
 			Array values = input as Array;
 			Array result = Array.CreateInstance(elemType, values.Length);
-			bool elementConversionSucceeded;
 
 			for(int i = 0; i < values.Length; i++)
 			{
+				bool elementConversionSucceeded;
+
 				result.SetValue(Convert(elemType, values.GetValue(i), out elementConversionSucceeded), i);
 				
 				// if at least one array element get converted 

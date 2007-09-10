@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Castle.MonoRail.Framework.Tests.build" />
     <None Include="contentinfs.vm" />
     <EmbeddedResource Include="Content\contentinassembly.vm" />
     <None Include="Content\notinassembly.vm" />
@@ -119,12 +120,15 @@
     <Compile Include="BasicFunctionalityTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Controllers\Clients\HomeController.cs">
+    <Compile Include="Controllers\Clients\ClientCartController.cs" />
+    <Compile Include="Controllers\Clients\ClientContactController.cs" />
+    <Compile Include="Controllers\Clients\ClientHomeController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\Clients\OtherController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\HomeController.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -137,9 +141,12 @@
     <Compile Include="ControllerTreeTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DefaultUrlBuilderTestCase.cs" />
     <Compile Include="Helpers\AbstractHelperTestCase.cs" />
     <Compile Include="Helpers\ScriptaculousHelperTestCase.cs" />
     <Compile Include="Helpers\TextHelperTestCase.cs" />
+    <Compile Include="Helpers\UrlForHelperTestCase.cs" />
+    <Compile Include="Mocks\MockServerUtility.cs" />
     <Compile Include="PostBackTestCase.cs" />
     <Compile Include="DefaultControllerFactoryTestCase.cs">
       <SubType>Code</SubType>
@@ -182,15 +189,13 @@
     <Compile Include="LocalizationTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="RailsUrlTokenizerTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="RescueTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ServerUtilityTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DefaultUrlTokenizerTestCase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

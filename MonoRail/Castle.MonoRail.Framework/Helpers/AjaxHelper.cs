@@ -19,9 +19,10 @@ namespace Castle.MonoRail.Framework.Helpers
 	using System.Collections;
 	using System.Collections.Specialized;
 	using System.Reflection;
-
+	using System.Threading;
 	using Castle.Core;
 	using Castle.Core.Logging;
+	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Internal;
 
 	public enum CallbackEnum
@@ -168,9 +169,11 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (result == null)
 			{
-				Controller controllerInstance = controllerFactory.CreateController(new UrlInfo("/", area, controller, "", ""));
-				
-				if (controllerInstance == null)
+				IControllerTree tree = (IControllerTree) CurrentContext.GetService(typeof(IControllerTree));
+
+				Type controllerType = tree.GetController(area, controller);
+
+				if (controllerType == null)
 				{
 					throw new RailsException("Controller not found with Area: '{0}', Name: '{1}'", area, controller);
 				}
@@ -192,8 +195,7 @@ namespace Castle.MonoRail.Framework.Helpers
 				
 				functions.Append("{ " + Environment.NewLine);
 				
-				ControllerMetaDescriptor metaDescriptor = 
-					controllerDescriptorBuilder.BuildDescriptor(controllerInstance);
+				ControllerMetaDescriptor metaDescriptor = controllerDescriptorBuilder.BuildDescriptor(controllerType);
 				
 				bool commaNeeded = false;
 				
@@ -219,6 +221,29 @@ namespace Castle.MonoRail.Framework.Helpers
 					foreach(ParameterInfo pi in ajaxActionMethod.GetParameters())
 					{
 						String paramName = pi.Name;
+
+						object[] parameterAttributes = pi.GetCustomAttributes(typeof(DataBindAttribute), true);
+						if(parameterAttributes.Length > 0)
+						{
+							paramName = ((DataBindAttribute)parameterAttributes[0]).Prefix;
+						}
+
+						Type ARFetcherType =
+							TypeLoadUtil.GetType(
+								TypeLoadUtil.GetEffectiveTypeName(
+									"Castle.MonoRail.ActiveRecordSupport.ARFetchAttribute, Castle.MonoRail.ActiveRecordSupport"), true);
+
+
+						if(ARFetcherType != null)
+						{
+							parameterAttributes = pi.GetCustomAttributes(ARFetcherType, true);
+							if (parameterAttributes.Length > 0)
+							{
+								paramName = Convert.ToString(ARFetcherType.GetProperty("RequestParameterName").GetValue(parameterAttributes[0], null));
+							}
+						}
+
+						
 						paramName = Char.ToLower(paramName[0], System.Globalization.CultureInfo.InvariantCulture) + 
 						            (paramName.Length > 0 ? paramName.Substring(1) : null);
 						functions.AppendFormat("{0}, ", paramName);
@@ -269,13 +294,45 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <summary>
 		/// Returns a link that will trigger a javascript function using the 
 		/// onclick handler and return false after the fact.
+		/// <code>
+		/// &lt;a href="javascript:void(0);" onclick="confirm('question') { functionCodeOrName}; return false"&gt;innerContent&lt;/a&gt;
+		/// </code>
+		/// </summary>
+		/// <param name="innerContent">Link content</param>
+		/// <param name="functionCodeOrName">Function definition</param>
+		/// <param name="confirm">Confirm question</param>
+		/// <param name="attributes">Attributes to be applied to the html element</param>
+		/// <returns></returns>
+		public String LinkToFunction(String innerContent, String functionCodeOrName, string confirm, IDictionary attributes)
+		{
+			String htmlAtt = GetAttributes(attributes);
+
+			return String.Format("<a href=\"javascript:void(0);\" {2} onclick=\"if(confirm('" + confirm + "')){{{0}}};return false;\" >{1}</a>", functionCodeOrName, innerContent, htmlAtt);
+		}
+
+		/// <summary>
+		/// Returns a link that will trigger a javascript function using the 
+		/// onclick handler and return false after the fact.
 		/// </summary>
 		/// <param name="innerContent">Link content</param>
 		/// <param name="functionCodeOrName">Function definition</param>
 		/// <returns></returns>
 		public String LinkToFunction(String innerContent, String functionCodeOrName)
 		{
-			return LinkToFunction(innerContent, functionCodeOrName, null);
+			return LinkToFunction(innerContent, functionCodeOrName, new Hashtable());
+		}
+
+		/// <summary>
+		/// Returns a link that will trigger a javascript function using the 
+		/// onclick handler and return false after the fact.
+		/// </summary>
+		/// <param name="innerContent">Link content</param>
+		/// <param name="functionCodeOrName">Function definition</param>
+		/// <param name="confirm">Confirm question</param>
+		/// <returns></returns>
+		public String LinkToFunction(String innerContent, String functionCodeOrName, String confirm)
+		{
+			return LinkToFunction(innerContent, functionCodeOrName, confirm, null);
 		}
 		
 		#endregion
@@ -357,6 +414,23 @@ namespace Castle.MonoRail.Framework.Helpers
 		public String LinkToRemote(String innerContent, String url, IDictionary options)
 		{
 			return LinkToFunction(innerContent, BuildRemoteFunction(url, options));
+		}
+
+		/// <summary>
+		/// Returns a link to a remote action defined by <c>options["url"]</c> 
+		/// that is called in the background using 
+		/// XMLHttpRequest. The result of that request can then be inserted into a
+		/// DOM object whose id can be specified with <c>options["update"]</c>. 
+		/// Usually, the result would be a partial prepared by the controller
+		/// </summary>
+		/// <param name="innerContent">Link content</param>
+		/// <param name="confirm">the confirm question</param>
+		/// <param name="url">Target url</param>
+		/// <param name="options">the options for the Ajax invocation</param>
+		/// <returns>The handcrafted element</returns>
+		public String LinkToRemote(String innerContent, String confirm, String url, IDictionary options)
+		{
+			return LinkToFunction(innerContent, BuildRemoteFunction(url, options), confirm, null);
 		}
 
 		/// <summary>

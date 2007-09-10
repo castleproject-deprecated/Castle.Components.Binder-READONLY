@@ -72,6 +72,40 @@ namespace Castle.ActiveRecord.Framework.Validators
 			this.maxLength = maxLength;
 		}
 
+
+		/// <summary>
+		/// Gets the exact length of the field.
+		/// </summary>
+		/// <value>The exact length of the field.</value>
+		public int ExactLength
+		{
+			get { return exactLength; }
+		}
+
+		/// <summary>
+		/// Gets the minimum length.
+		/// </summary>
+		/// <value>The minimum length.</value>
+		public int MinLength
+		{
+			get { return minLength; }
+		}
+
+		/// <summary>
+		/// Gets the maximun length.
+		/// </summary>
+		/// <value>The maximun length.</value>
+		public int MaxLength
+		{
+			get { return maxLength; }
+		}
+
+		/// <summary>
+		/// Validate that the property value matches the length requirements.
+		/// </summary>
+		/// <param name="instance"></param>
+		/// <param name="fieldValue"></param>
+		/// <returns><c>true</c> if the field is OK</returns>
 		public override bool Perform(object instance, object fieldValue)
 		{
 			//Do we have a value to work with?
@@ -100,6 +134,10 @@ namespace Castle.ActiveRecord.Framework.Validators
 			}
 		}
 
+		/// <summary>
+		/// Builds the error message.
+		/// </summary>
+		/// <returns></returns>
 		protected override string BuildErrorMessage()
 		{
 			//Are we in exact mode?

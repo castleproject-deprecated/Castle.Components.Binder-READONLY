@@ -20,6 +20,7 @@
 
 using System;
 using Castle.Core;
+using Castle.Igloo.Attributes;
 using Castle.Igloo.LifestyleManager;
 using Castle.Igloo.Scopes;
 using Castle.MicroKernel;
@@ -29,12 +30,8 @@ using Castle.MicroKernel.Lifestyle;
 namespace Castle.Igloo.LifestyleManager
 {
     /// <summary>
-    /// Implements a Lifestyle Manager for Web Apps that
-    /// create at most one object per web session.
-    /// 
-    /// ScopeWebSessionLifestyleManager tries to lookup component by name 
-    /// in http session. 
-    /// If not found, it tries to instantiate new bean and attaches it to said session.
+    /// ScopeLifestyleManager tries to lookup component by name in the scope. 
+    /// If not found, it tries to instantiate new component and register it in its scope.
     /// </summary>
     [Serializable]
     public class ScopeLifestyleManager : AbstractLifestyleManager
@@ -51,10 +48,10 @@ namespace Castle.Igloo.LifestyleManager
         /// <returns>The component</returns>
         public override object Resolve(CreationContext context)
         {
-            ComponentModel component = (ComponentActivator as AbstractComponentActivator).Model;
-            string scopeName = (string)component.ExtendedProperties[ScopeInspector.SCOPE_TOKEN];
+            ComponentModel component = ((AbstractComponentActivator)ComponentActivator).Model;
+            ScopeAttribute scopeAttribute = (ScopeAttribute)component.ExtendedProperties[ScopeInspector.SCOPE_ATTRIBUTE];
 
-            IScope scope = (IScope)Kernel[scopeName];
+            IScope scope = (IScope)Kernel[scopeAttribute.Scope];
 
             object instance = scope[component.Name];
 
@@ -63,14 +60,18 @@ namespace Castle.Igloo.LifestyleManager
                 scope.CheckInitialisation();
 
                 instance = base.Resolve(context);
-                
+
                 scope.Add(component.Name, instance);
                 scope.RegisterForEviction(this, component, instance);
             }
-            
-            return instance;
+
+            return instance; 
         }
 
+        /// <summary>
+        /// Releases the specified instance.
+        /// </summary>
+        /// <param name="instance">The instance.</param>
         public override void Release(object instance)
         {
             // Since this method is called by the kernel when an external
@@ -81,17 +82,24 @@ namespace Castle.Igloo.LifestyleManager
             // the web session.
         }
 
+        /// <summary>
+        /// Evicts the specified candidate.
+        /// </summary>
+        /// <param name="candidate">The candidate.</param>
         public void Evict(Candidate candidate)
         {
             base.Release(candidate.Intance);
 
-            string scopeName = (string)candidate.ComponentModel.ExtendedProperties[ScopeInspector.SCOPE_TOKEN];
+            ScopeAttribute scopeAttribute = (ScopeAttribute)candidate.ComponentModel.ExtendedProperties[ScopeInspector.SCOPE_ATTRIBUTE];
 
-            IScope scope = (IScope)Kernel[scopeName];
+            IScope scope = (IScope)Kernel[scopeAttribute.Scope];
 
             scope.Remove(candidate.ComponentModel.Name);
         }
 
+        /// <summary>
+        /// Disposes this instance.
+        /// </summary>
         public override void Dispose()
         {
         }

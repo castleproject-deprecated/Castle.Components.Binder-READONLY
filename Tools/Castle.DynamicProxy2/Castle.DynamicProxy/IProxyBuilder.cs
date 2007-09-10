@@ -40,19 +40,12 @@ namespace Castle.DynamicProxy
 		Type CreateClassProxy(Type theClass, Type[] interfaces, ProxyGenerationOptions options);
 
 		/// <summary>
-		/// Implementors should return a proxy for the specified interface
-		/// </summary>
-		/// <param name="theInterface"></param>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		// Type CreateInterfaceProxyTypeWithoutTarget(Type theInterface, ProxyGenerationOptions options);
-
-		/// <summary>
 		/// Implementors should return a proxy for the specified
 		/// interface that 'proceeds' executions to the 
 		/// specified target
 		/// </summary>
 		/// <param name="theInterface"></param>
+		/// <param name="interfaces"></param>
 		/// <param name="targetType"></param>
 		/// <param name="options"></param>
 		/// <returns></returns>
@@ -68,6 +61,17 @@ namespace Castle.DynamicProxy
 		/// <param name="options"></param>
 		/// <returns></returns>
 		Type CreateInterfaceProxyTypeWithoutTarget(Type theInterface, Type[] interfaces,  ProxyGenerationOptions options);
-	
+
+		/// <summary>
+		/// Implementors should return a proxy for the specified
+		/// interface that delegate all executions to the
+		/// specified interceptor(s) and uses an instance of the interface
+		/// as their targets, rather than a class. All IInvocation's
+		/// should then implement IChangeProxyTarget.
+		/// </summary>
+		/// <param name="theInterface"></param>
+		/// <param name="options"></param>
+		/// <returns></returns>
+		Type CreateInterfaceProxyTypeWithTargetInterface(Type theInterface, ProxyGenerationOptions options);
 	}
 }

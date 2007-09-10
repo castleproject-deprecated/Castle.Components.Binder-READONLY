@@ -19,7 +19,7 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 
 	using Castle.Core;
 	using Castle.Core.Interceptor;
-
+	using Castle.Core.Logging;
 	using Castle.MicroKernel;
 
 	using Castle.Services.Transaction;
@@ -35,6 +35,7 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 		private readonly IKernel kernel;
 		private readonly TransactionMetaInfoStore infoStore;
 		private TransactionMetaInfo metaInfo;
+		private ILogger logger = NullLogger.Instance;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TransactionInterceptor"/> class.
@@ -45,6 +46,16 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 		{
             this.kernel = kernel;
 			this.infoStore = infoStore;
+		}
+
+		/// <summary>
+		/// Gets or sets the logger.
+		/// </summary>
+		/// <value>The logger.</value>
+		public ILogger Logger
+		{
+			get { return logger; }
+			set { logger = value; }
 		}
 
 		#region IOnBehalfAware
@@ -81,9 +92,8 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 
 				ITransactionManager manager = (ITransactionManager) kernel[ typeof(ITransactionManager) ];
 
-				ITransaction transaction = 
-					manager.CreateTransaction( 
-						transactionAtt.TransactionMode, transactionAtt.IsolationMode );
+				ITransaction transaction = manager.CreateTransaction(
+					transactionAtt.TransactionMode, transactionAtt.IsolationMode, transactionAtt.Distributed);
 
 				if (transaction == null)
 				{
@@ -101,18 +111,27 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 
 					if (transaction.IsRollbackOnlySet)
 					{
+						logger.DebugFormat("Rolling back transaction {0}", transaction.GetHashCode());
+
 						rolledback = true;
 						transaction.Rollback();
 					}
 					else
 					{
+						logger.DebugFormat("Committing back transaction {0}", transaction.GetHashCode());
+
 						transaction.Commit();
 					}
 				}
-				catch(TransactionException)
+				catch(TransactionException ex)
 				{
 					// Whoops. Special case, let's throw without 
 					// attempt to rollback anything
+
+					if (logger.IsFatalEnabled)
+					{
+						logger.Fatal("Fatal error during transaction processing", ex);
+					}
 
 					throw;
 				}
@@ -120,6 +139,8 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 				{
 					if (!rolledback)
 					{
+						logger.DebugFormat("Rolling back transaction {0} due to exception on method {2}.{1}", transaction.GetHashCode(), methodInfo.Name, methodInfo.DeclaringType.Name);
+
 						transaction.Rollback();
 					}
 
