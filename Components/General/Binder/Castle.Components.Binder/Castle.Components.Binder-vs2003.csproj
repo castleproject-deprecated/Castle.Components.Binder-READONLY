@@ -94,10 +94,6 @@
         <Files>
             <Include>
                 <File
-                    RelPath = "AssemblyInfo.cs"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "BindingException.cs"
                     SubType = "Code"
                     BuildAction = "Compile"

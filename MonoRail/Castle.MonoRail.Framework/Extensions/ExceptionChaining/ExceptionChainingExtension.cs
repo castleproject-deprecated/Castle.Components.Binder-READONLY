@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -124,14 +124,14 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		{
 			const String mrExceptionKey = "MonoRail.ExceptionHandled";
 			
-			if (context.Items.Contains(mrExceptionKey))
+			if (context.UnderlyingContext.Items.Contains(mrExceptionKey))
 			{
 				return;
 			}
 			
 			if (firstHandler != null)
 			{
-				context.Items.Add(mrExceptionKey, true);
+				context.UnderlyingContext.Items.Add(mrExceptionKey, true);
 				
 				firstHandler.Process(context);
 			}

@@ -41,9 +41,9 @@ namespace NVelocity.Test
 			StringWriter writer = new StringWriter();
 			Velocity.Evaluate(context, writer, "vm_chain1", template1);
 
-			String output = writer.ToString();
+			String out_Renamed = writer.ToString();
 
-			Assert.AreEqual(result1, output);
+			Assert.AreEqual(result1, out_Renamed);
 		}
 	}
 }

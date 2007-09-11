@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,46 +30,36 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 	using System.Collections;
 
 	using Castle.MonoRail.Framework;
+	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
 	/// Pendent
 	/// </summary>
-	public abstract class AbstractComponentDirective : Directive, IViewRenderer
+	public abstract class AbstractComponentDirective : Directive
 	{
 		private readonly IViewComponentFactory viewComponentFactory;
 
 		private String componentName;
 		private ViewComponent component;
 		private NVelocityViewContextAdapter contextAdapter;
-		private IViewEngine viewEngine;
-		private INode compNameNode;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="AbstractComponentDirective"/> class.
-		/// </summary>
-		/// <param name="viewComponentFactory">The view component factory.</param>
-		/// <param name="viewEngine">The view engine instance</param>
-		public AbstractComponentDirective(IViewComponentFactory viewComponentFactory, IViewEngine viewEngine)
+		public AbstractComponentDirective(IViewComponentFactory viewComponentFactory)
 		{
 			this.viewComponentFactory = viewComponentFactory;
-			this.viewEngine = viewEngine;
 		}
 
 		public override void Init(IRuntimeServices rs, IInternalContextAdapter context, INode node)
 		{
 			base.Init(rs, context, node);
 
-			compNameNode = node.GetChild(0);
+			INode compNameNode = node.GetChild(0);
 
 			if (compNameNode == null)
 			{
 				String message = String.Format("You must specify the component name on the #{0} directive", Name);
 				throw new ViewComponentException(message);
 			}
-		}
 
-		public override bool Render(IInternalContextAdapter context, TextWriter writer, INode node)
-		{
 			componentName = compNameNode.FirstToken.Image;
 
 			if (componentName == null)
@@ -77,25 +67,14 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 				String message = String.Format("Could not obtain component name from the #{0} directive", Name);
 				throw new ViewComponentException(message);
 			}
-			
-			 if (componentName.StartsWith("$")) 
-			 {
-				String nodeContent = compNameNode.Literal.Trim('"', '\'');
-				SimpleNode inlineNode = rsvc.Parse(new StringReader(nodeContent), context.CurrentTemplateName, false);
-
-				inlineNode.Init(context, rsvc);
-				componentName = (String) Evaluate(inlineNode, context);
-			}
 
 			component = viewComponentFactory.Create(componentName);
 
-			ASTDirective directiveNode = (ASTDirective) node;
-			IViewRenderer renderer = (IViewRenderer) directiveNode.Directive;
+			contextAdapter = new NVelocityViewContextAdapter(componentName, node);
+		}
 
-			contextAdapter = new NVelocityViewContextAdapter(componentName, node, viewEngine, renderer);
-
-			ProcessSubSections();
-
+		public override bool Render(IInternalContextAdapter context, TextWriter writer, INode node)
+		{
 			INode bodyNode = null;
 
 			IDictionary componentParams = CreateParameters(context, node);
@@ -118,32 +97,10 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 
 			if (contextAdapter.ViewToRender != null)
 			{
-				return RenderComponentView(context, contextAdapter.ViewToRender, writer, contextAdapter);
+				return RenderComponentView(context, writer, contextAdapter);
 			}
 
 			return true;
-		}
-
-		public bool RenderComponentView(IInternalContextAdapter context, String viewToRender, TextWriter writer, NVelocityViewContextAdapter contextAdapter)
-		{
-			foreach(DictionaryEntry entry in contextAdapter.ContextVars)
-			{
-				context.Put(entry.Key.ToString(), entry.Value);
-			}
-
-			viewToRender = viewToRender + NVelocityViewEngine.TemplateExtension;
-
-			CheckTemplateStack(context);
-
-			String encoding = SetUpEncoding(context);
-
-			Template template = GetTemplate(viewToRender, encoding);
-
-			return RenderView(context, viewToRender, template, writer);
-		}
-
-		protected virtual void ProcessSubSections()
-		{
 		}
 
 		protected virtual IDictionary CreateParameters(IInternalContextAdapter context, INode node)
@@ -287,6 +244,40 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 			}
 
 			return null;
+		}
+
+		private bool RenderComponentView(IInternalContextAdapter context, TextWriter writer, 
+		                                 NVelocityViewContextAdapter contextAdapter)
+		{
+			foreach(DictionaryEntry entry in contextAdapter.ContextVars)
+			{
+				context.Put(entry.Key.ToString(), entry.Value);
+			}
+
+			try
+			{
+				String viewToRender = contextAdapter.ViewToRender;
+
+				viewToRender = viewToRender + NVelocityViewEngine.TemplateExtension;
+
+				CheckTemplateStack(context);
+
+				String encoding = SetUpEncoding(context);
+
+				Template template = GetTemplate(viewToRender, encoding);
+
+				return RenderView(context, viewToRender, template, writer);
+			}
+			finally
+			{
+				// WTF!!
+				// this might make sense when contextAdapter was a copy of the context,
+				// but not now.
+				//foreach(DictionaryEntry entry in contextAdapter.ContextVars)
+				//{
+				//	context.Remove( entry.Key );
+				//}
+			}
 		}
 
 		private bool RenderView(IInternalContextAdapter context,

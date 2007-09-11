@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@ namespace Castle.Services.Logging.NLogIntegration
 {
 	using System;
 	using System.IO;
+
 	using Castle.Core.Logging;
+
 	using NLog;
 	using NLog.Config;
 
@@ -36,7 +38,7 @@ namespace Castle.Services.Logging.NLogIntegration
 		public override ILogger Create(String name)
 		{
 			Logger log = LogManager.GetLogger(name);
-			return new NLogLogger(log, this);
+			return new NLogLogger(log, this, name);
 		}
 
 		public override ILogger Create(String name, LoggerLevel level)

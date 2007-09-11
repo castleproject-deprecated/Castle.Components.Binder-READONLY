@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 
 	[Serializable]
-	public class HasManyModel : IVisitable
+	public class HasManyModel : IModelNode
 	{
 		private readonly PropertyInfo propInfo;
 		private readonly HasManyAttribute hasManyAtt;
-		private DependentObjectModel dependentObjectModel;
 
-		public HasManyModel(PropertyInfo propInfo, HasManyAttribute hasManyAtt)
+		public HasManyModel( PropertyInfo propInfo, HasManyAttribute hasManyAtt )
 		{
 			this.hasManyAtt = hasManyAtt;
 			this.propInfo = propInfo;
@@ -39,16 +38,6 @@ namespace Castle.ActiveRecord.Framework.Internal
 		public HasManyAttribute HasManyAtt
 		{
 			get { return hasManyAtt; }
-		}
-
-		/// <summary>
-		/// Gets/Sets the the dependent object model
-		/// </summary>
-		/// <value>The dependent object model.</value>
-		public DependentObjectModel DependentObjectModel
-		{
-			get { return dependentObjectModel; }
-			set { dependentObjectModel = value; }
 		}
 
 		#region IVisitable Members

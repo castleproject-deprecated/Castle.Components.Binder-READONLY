@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 	using System;
 	using System.Collections;
 	using System.Reflection;
+
 	using Castle.Core;
+
 	using Castle.MicroKernel;
 	using Castle.MicroKernel.ModelBuilder.Inspectors;
 	using Castle.MicroKernel.Facilities;
@@ -45,7 +47,7 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 		{
 			if (metaStore == null)
 			{
-				metaStore = (TransactionMetaInfoStore) kernel[typeof(TransactionMetaInfoStore)];
+				metaStore = (TransactionMetaInfoStore) kernel[ typeof(TransactionMetaInfoStore) ];
 			}
 
 			if (IsMarkedWithTransactional(model.Configuration))
@@ -60,7 +62,7 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 			}
 
 			Validate(model, metaStore);
-
+			
 			AddTransactionInterceptorIfIsTransactional(model, metaStore);
 		}
 
@@ -93,7 +95,9 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 		/// <param name="model">The model.</param>
 		/// <param name="methods">The methods.</param>
 		/// <param name="metaModel">The meta model.</param>
-		protected override void ProcessMeta(ComponentModel model, MethodInfo[] methods, MethodMetaModel metaModel)
+		protected override void ProcessMeta(ComponentModel model, 
+		                                    MethodInfo[] methods, 
+		                                    MethodMetaModel metaModel)
 		{
 			metaStore.CreateMetaFromConfig(model.Implementation, methods, metaModel.ConfigNode);
 		}
@@ -105,17 +109,11 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 		/// <param name="store">The store.</param>
 		private void Validate(ComponentModel model, TransactionMetaInfoStore store)
 		{
-			if (model.Service == null || model.Service.IsInterface)
-			{
-				return;
-			}
+			if (model.Service == null || model.Service.IsInterface) return;
 
 			TransactionMetaInfo meta = store.GetMetaFor(model.Implementation);
 
-			if (meta == null)
-			{
-				return;
-			}
+			if (meta == null) return;
 
 			ArrayList problematicMethods = new ArrayList();
 
@@ -123,21 +121,20 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 			{
 				if (!method.IsVirtual)
 				{
-					problematicMethods.Add(method.Name);
+					problematicMethods.Add( method.Name );
 				}
 			}
 
 			if (problematicMethods.Count != 0)
 			{
-				String[] methodNames = (String[]) problematicMethods.ToArray(typeof(String));
+				String[] methodNames = (String[]) problematicMethods.ToArray( typeof(String) );
 
-				String message = String.Format("The class {0} wants to use transaction interception, " +
-				                               "however the methods must be marked as virtual in order to do so. Please correct " +
-				                               "the following methods: {1}", model.Implementation.FullName,
-				                               String.Join(", ", methodNames));
+				String message = String.Format( "The class {0} wants to use transaction interception, " + 
+					"however the methods must be marked as virtual in order to do so. Please correct " + 
+					"the following methods: {1}", model.Implementation.FullName, String.Join(", ", methodNames) );
 
 				throw new FacilityException(message);
-			}
+			}		
 		}
 
 		/// <summary>
@@ -163,28 +160,23 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 
 			if (configuration != null && configuration.Children[TransactionNodeName] != null)
 			{
-				String message = String.Format("The class {0} has configured transaction in a child node but has not " +
-				                               "specified istransaction=\"true\" on the component node.",
-				                               model.Implementation.FullName);
+				String message = String.Format( "The class {0} has configured transaction in a child node but has not " + 
+					"specified istransaction=\"true\" on the component node.", model.Implementation.FullName );
 
 				throw new FacilityException(message);
 			}
 		}
-
+		
 		/// <summary>
 		/// Associates the transaction interceptor with the ComponentModel.
 		/// </summary>
 		/// <param name="model">The model.</param>
-		/// <param name="store">The meta information store.</param>
-		private static void AddTransactionInterceptorIfIsTransactional(ComponentModel model,
+		private static void AddTransactionInterceptorIfIsTransactional(ComponentModel model, 
 		                                                               TransactionMetaInfoStore store)
 		{
 			TransactionMetaInfo meta = store.GetMetaFor(model.Implementation);
 
-			if (meta == null)
-			{
-				return;
-			}
+			if (meta == null) return;
 
 			model.Dependencies.Add(
 				new DependencyModel(DependencyType.Service, null, typeof(TransactionInterceptor), false));

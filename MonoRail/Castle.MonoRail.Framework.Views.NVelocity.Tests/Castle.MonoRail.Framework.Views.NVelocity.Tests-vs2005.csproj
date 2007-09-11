@@ -126,8 +126,6 @@
     </Compile>
     <Compile Include="EmailTestCase.cs" />
     <Compile Include="FormHelperTestCase.cs" />
-    <Compile Include="HelperTestCase.cs" />
-    <Compile Include="JSGenerationTestCase.cs" />
     <Compile Include="NVelocityBasicFunctionalityTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -155,6 +153,6 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>copy "$(ProjectDir)\App.config" "$(TargetPath).config"</PostBuildEvent>
+    <PostBuildEvent>copy $(ProjectDir)\App.config $(TargetPath).config</PostBuildEvent>
   </PropertyGroup>
 </Project>

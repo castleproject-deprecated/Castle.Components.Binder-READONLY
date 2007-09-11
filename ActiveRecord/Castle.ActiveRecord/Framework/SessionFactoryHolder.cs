@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -141,6 +141,8 @@ namespace Castle.ActiveRecord.Framework
 
 			ISession session = OpenSession(sessionFactory);
 
+			System.Diagnostics.Debug.Assert( session != null );
+
 			return session;
 		}
 
@@ -173,7 +175,7 @@ namespace Castle.ActiveRecord.Framework
 		{
 			lock(sessionFactory)
 			{
-				return sessionFactory.OpenSession(HookDispatcher.Instance);
+				return sessionFactory.OpenSession( HookDispatcher.Instance );
 			}
 		}
 
@@ -193,8 +195,7 @@ namespace Castle.ActiveRecord.Framework
 			}
 			else
 			{
-				session.Flush();
-				session.Dispose();
+				session.Close();
 			}
 		}
 
@@ -222,7 +223,7 @@ namespace Castle.ActiveRecord.Framework
 			}
 			else
 			{
-				ISession session;
+				ISession session = null;
 
 				if (scope.WantsToCreateTheSession)
 				{

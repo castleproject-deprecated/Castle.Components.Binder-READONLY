@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Castle.MonoRail.Framework.Adapters
 	/// </summary>
 	public class RequestAdapter : IRequest
 	{
-		private HttpRequest _request;
+		internal HttpRequest _request;
 		private FileDictionaryAdapter _files;
 
 		public RequestAdapter( HttpRequest request )
@@ -44,11 +44,6 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return _request.Url.IsLoopback; } 
 		}
 
-		public string HttpMethod
-		{
-			get { return _request.HttpMethod; }
-		}
-		
 		public Uri Uri
 		{
 			get { return _request.Url; }

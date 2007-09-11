@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,30 +15,20 @@
 namespace Castle.ActiveRecord.Framework.Internal
 {
 	using System;
-
+	
 	internal class NHibernateNullablesSupport
 	{
-		private const String NullableAsm = "Nullables, Version=1.2.0.3001, Culture=neutral";
+		private const String NullableAsm = "Nullables, Version=1.0.4.0, Culture=neutral";
 
 		private const String NullableIType = "Nullables.NHibernate.{0}Type, Nullables.NHibernate";
-
+				
 		private static Type tINullableType;
-
+		
 		static NHibernateNullablesSupport()
 		{
-			try
-			{
-				tINullableType = Type.GetType("Nullables.INullableType, " + NullableAsm, false);
-			}
-			catch
-			{
-				//This can happen when someone is registerring to the AssemblyResolve event and doesn't handle
-				// missing assemblies correctly.
-				//For instance, MbUnit.AddIn.MbUnitTestRunner.AssemblyResolveHandler has this behavior.
-				tINullableType = null;
-			}
+			tINullableType = Type.GetType("Nullables.INullableType, " + NullableAsm, false);
 		}
-
+		
 		public static bool IsNHibernateNullableType(Type type)
 		{
 			return tINullableType != null && tINullableType.IsAssignableFrom(type);
@@ -50,7 +40,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			{
 				return null;
 			}
-
+			
 			bool isSupported = type.AssemblyQualifiedName.IndexOf(NullableAsm) > 0;
 
 			if (!isSupported)

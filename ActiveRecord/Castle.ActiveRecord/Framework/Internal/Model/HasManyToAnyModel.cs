@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,23 +15,21 @@
 namespace Castle.ActiveRecord.Framework.Internal
 {
 	using System;
-	using System.Collections;
 	using System.Reflection;
 
 	using Castle.ActiveRecord;
 
 
 	[Serializable]
-	public class HasManyToAnyModel : IVisitable
+	public class HasManyToAnyModel : IModelNode
 	{
 		private readonly PropertyInfo prop;
 		private readonly HasManyToAnyAttribute hasManyToAnyAtt;
-		private IList metaValues;
+
 		public HasManyToAnyModel(PropertyInfo prop, HasManyToAnyAttribute hasManyToAnyAtt)
 		{
 			this.prop = prop;
 			this.hasManyToAnyAtt = hasManyToAnyAtt;
-			metaValues = new ArrayList();
 		}
 
 		public PropertyInfo Property
@@ -49,16 +47,6 @@ namespace Castle.ActiveRecord.Framework.Internal
 			get { return  new Config(this); }
 		}
 
-		/// <summary>
-		/// Gets or sets the meta values.
-		/// </summary>
-		/// <value>The meta values.</value>
-		public IList MetaValues
-		{
-			get { return metaValues; }
-			set { metaValues = value; }
-		}
-
 		#region IVisitable Members
 
 		public void Accept(IVisitor visitor)
@@ -71,7 +59,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 		/// <summary>
 		/// I need this class to pass special configuration for the many-to-any
 		/// </summary>
-		public class Config : IVisitable
+		public class Config : IModelNode
 		{
 			HasManyToAnyModel parent;
 

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
 namespace Castle.ActiveRecord.Framework.Config
 {
 	using System;
+	using System.IO;
+	using System.Xml;
 	using System.Collections;
 	using System.Collections.Specialized;
 	using System.Configuration;
-	using System.IO;
-	using System.Text.RegularExpressions;
-	using System.Xml;
 
 	/// <summary>
 	/// Source of configuration based on Xml 
@@ -58,8 +57,6 @@ namespace Castle.ActiveRecord.Framework.Config
 			XmlAttribute isWebAtt = section.Attributes["isWeb"];
 			XmlAttribute threadInfoAtt = section.Attributes["threadinfotype"];
 			XmlAttribute isDebug = section.Attributes["isDebug"];
-			XmlAttribute lazyByDefault = section.Attributes["default-lazy"];
-			XmlAttribute pluralize = section.Attributes["pluralizeTableNames"];
 
 			SetUpThreadInfoType(isWebAtt != null && "true" == isWebAtt.Value,
 			                    threadInfoAtt != null ? threadInfoAtt.Value : String.Empty);
@@ -78,10 +75,6 @@ namespace Castle.ActiveRecord.Framework.Config
 
 			SetDebugFlag(isDebug != null && "true" == isDebug.Value);
 
-			SetIsLazyByDefault(lazyByDefault != null && lazyByDefault.Value == "true");
-
-			SetPluralizeTableNames(pluralize != null && pluralize.Value == "true");
-
 			PopulateConfigNodes(section);
 		}
 
@@ -99,7 +92,7 @@ namespace Castle.ActiveRecord.Framework.Config
 					                               Config_Node_Name, node.Name);
 
 #if DOTNET2
-					throw new ConfigurationErrorsException(message);
+					throw new System.Configuration.ConfigurationErrorsException(message);
 #else
 					throw new ConfigurationException(message);
 #endif
@@ -117,7 +110,7 @@ namespace Castle.ActiveRecord.Framework.Config
 						                               "The only supported attribute is 'type'", Config_Node_Name);
 
 #if DOTNET2
-						throw new ConfigurationErrorsException(message);
+						throw new System.Configuration.ConfigurationErrorsException(message);
 #else
 						throw new ConfigurationException(message);
 #endif
@@ -132,7 +125,7 @@ namespace Castle.ActiveRecord.Framework.Config
 						String message = String.Format("Could not obtain type from name '{0}'", typeName);
 
 #if DOTNET2
-						throw new ConfigurationErrorsException(message);
+						throw new System.Configuration.ConfigurationErrorsException(message);
 #else
 						throw new ConfigurationException(message);
 #endif
@@ -147,7 +140,8 @@ namespace Castle.ActiveRecord.Framework.Config
 		{
 			HybridDictionary dict = new HybridDictionary();
 #if DOTNET2
-			Regex connectionStringRegex = new Regex(@"ConnectionString\s*=\s*\$\{(?<ConnectionStringName>[\d\w_-]+)\}");
+			System.Text.RegularExpressions.Regex connectionStringRegex = new System.Text.RegularExpressions.
+				Regex(@"ConnectionString\s*=\s*\$\{(?<ConnectionStringName>[\d\w_-]+)\}");
 			string ConnectionStringKey = "hibernate.connection.connection_string";
 #endif
 			foreach(XmlNode addNode in node.SelectNodes("add"))
@@ -160,7 +154,7 @@ namespace Castle.ActiveRecord.Framework.Config
 					String message = String.Format("For each 'add' element you must specify 'key' and 'value' attributes");
 
 #if DOTNET2
-					throw new ConfigurationErrorsException(message);
+					throw new System.Configuration.ConfigurationErrorsException(message);
 #else
 					throw new ConfigurationException(message);
 #endif
@@ -173,7 +167,7 @@ namespace Castle.ActiveRecord.Framework.Config
 				{
 					string connectionStringName = connectionStringRegex.Match(value).
 						Groups["ConnectionStringName"].Value;
-					value = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
+					value = System.Configuration.ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
 				}
 #endif
 				dict.Add(keyAtt.Value, value);

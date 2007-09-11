@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,14 +26,12 @@ namespace Castle.ActiveRecord.Framework
 		private int _tablesize;
 		private Entry[] _table;
 		private object[] _values;
-		private string[] _keys;
 
 		public DictionaryAdapter(String[] names, object[] values)
 		{
 			_tablesize = names.Length;
 			_table = new Entry[_tablesize];
 			_values = values;
-			_keys = names;
 
 			for(int i=0; i<_tablesize; i++)
 			{
@@ -126,10 +124,7 @@ namespace Castle.ActiveRecord.Framework
 
 		public ICollection Keys
 		{
-			get			
-			{
-				return _keys;
-			}
+			get { throw new NotSupportedException(); }
 		}
 
 		public ICollection Values
@@ -151,9 +146,6 @@ namespace Castle.ActiveRecord.Framework
 		{
 			get 
 			{
-				if (_values == null || _values.Length.Equals(0))
-					return null;
-
 				int index = GetValuesIndexByKey(key);
 
 				if (index >= 0)

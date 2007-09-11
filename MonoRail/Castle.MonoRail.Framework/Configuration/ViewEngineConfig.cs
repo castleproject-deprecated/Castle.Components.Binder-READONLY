@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,198 +19,65 @@ namespace Castle.MonoRail.Framework.Configuration
 	using System.Configuration;
 	using System.IO;
 	using System.Xml;
+	
 	using Castle.MonoRail.Framework.Internal;
 
-	/// <summary>
-	/// Represents the view engines configuration
-	/// </summary>
 	public class ViewEngineConfig : ISerializedConfig
 	{
 		private String viewPathRoot;
+		private Type customEngine;
 		private AssemblySourceInfo[] sources = new AssemblySourceInfo[0];
-		private ViewEngineInfo[] viewEngines = new ViewEngineInfo[0];
-
+		private bool enableXhtmlRendering;
+		
 		#region ISerializedConfig implementation
 
 		public void Deserialize(XmlNode section)
 		{
-			XmlElement engines = (XmlElement) section.SelectSingleNode("viewEngines");
-
-			if (engines != null)
-			{
-				ConfigureMultipleViewEngines(engines);
-			}
-			else
-			{
-				// Backward compatibility
-				
-				ConfigureSingleViewEngine(section);
-			}
-
-			ResolveViewPath();
-		}
-
-		#endregion
-
-		/// <summary>
-		/// Gets or sets the view path root.
-		/// </summary>
-		/// <value>The view path root.</value>
-		public String ViewPathRoot
-		{
-			get { return viewPathRoot; }
-			set { viewPathRoot = value; }
-		}
-
-		/// <summary>
-		/// Gets the view engines.
-		/// </summary>
-		/// <value>The view engines.</value>
-		public ViewEngineInfo[] ViewEngines
-		{
-			get { return viewEngines; }
-		}
-
-		/// <summary>
-		/// Gets or sets the sources.
-		/// </summary>
-		/// <value>The sources.</value>
-		public AssemblySourceInfo[] Sources
-		{
-			get { return sources; }
-			set { sources = value; }
-		}
-
-		private void ConfigureMultipleViewEngines(XmlElement engines)
-		{
-			viewPathRoot = engines.GetAttribute("viewPathRoot");
-
-			if (viewPathRoot == null)
-			{
-				viewPathRoot = "views";
-			}
-
-			ArrayList viewEnginesList = new ArrayList();
-
-			foreach (XmlElement addNode in engines.SelectNodes("add"))
-			{
-				string typeName = addNode.GetAttribute("type");
-				string xhtmlVal = addNode.GetAttribute("xhtml");
-
-				if (typeName == null || typeName.Length == 0)
-				{
-					String message = "The attribute 'type' is required for the element 'add' under 'viewEngines'";
-#if DOTNET2
-					throw new ConfigurationErrorsException(message);
-#else
-					throw new ConfigurationException(message);
-#endif
-				}
-
-				Type engine = TypeLoadUtil.GetType(typeName, true);
-
-				if (engine == null)
-				{
-					String message = "The type '" + typeName + "' could not be loaded";
-#if DOTNET2
-					throw new ConfigurationErrorsException(message);
-#else
-					throw new ConfigurationException(message);
-#endif
-				}
-
-				viewEnginesList.Add(new ViewEngineInfo(engine, xhtmlVal == "true"));
-			}
-
-			if (viewEnginesList.Count == 0)
-			{
-				ConfigureDefaultViewEngine();
-			}
-
-			viewEngines = new ViewEngineInfo[viewEnginesList.Count];
-
-			viewEnginesList.CopyTo(viewEngines);
-		}
-
-		private void ResolveViewPath()
-		{
-			if (!Path.IsPathRooted(viewPathRoot))
-			{
-				viewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, viewPathRoot);
-			}
-		}
-
-		/// <summary>
-		/// Configures the default view engine.
-		/// </summary>
-		private void ConfigureDefaultViewEngine()
-		{
-			viewPathRoot = "views";
-
-			Type engineType = typeof(Castle.MonoRail.Framework.Views.Aspx.WebFormsViewEngine);
-
-			viewEngines = new ViewEngineInfo[] {new ViewEngineInfo(engineType, false)};
-		}
-
-		private void ConfigureSingleViewEngine(XmlNode section)
-		{
 			section = section.SelectSingleNode("viewEngine");
-
+			
 			if (section == null)
 			{
-				ConfigureDefaultViewEngine();
-
-				return;
+				throw new ConfigurationException("The 'viewEngine' node is not optional");
 			}
-
+			
 			XmlAttribute viewPath = section.Attributes["viewPathRoot"];
 
 			if (viewPath == null)
 			{
-				viewPathRoot = "views";
+				throw new ConfigurationException("The 'viewEngine' node must include a " + 
+					"'viewPathRoot' attribute indicating the root folder that contains the views");
 			}
 
 			viewPathRoot = viewPath.Value;
 
-			XmlAttribute xhtmlRendering = section.Attributes["xhtmlRendering"];
+			if (!Path.IsPathRooted(viewPathRoot))
+			{
+				viewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, viewPathRoot);
+			}
 
-			bool enableXhtmlRendering = false;
+			XmlAttribute xhtmlRendering = section.Attributes["xhtmlRendering"];
 
 			if (xhtmlRendering != null)
 			{
 				try
 				{
-					enableXhtmlRendering = xhtmlRendering.Value.ToLowerInvariant() == "true";
+					enableXhtmlRendering = bool.Parse(xhtmlRendering.Value);
 				}
-				catch(FormatException ex)
+				catch (FormatException ex)
 				{
-					String message = "The xhtmlRendering attribute of the views node must be a boolean value.";
-#if DOTNET2
-					throw new ConfigurationErrorsException(message, ex);
-#else
-					throw new ConfigurationException(message,ex);
-#endif
+					throw new ConfigurationException("The xhtmlRendering attribute of the views node must be a boolean value.", ex);
 				}
 			}
 
 			XmlAttribute customEngineAtt = section.Attributes["customEngine"];
 
-			Type engineType = typeof(Castle.MonoRail.Framework.Views.Aspx.WebFormsViewEngine);
-
 			if (customEngineAtt != null)
 			{
-				engineType = TypeLoadUtil.GetType(customEngineAtt.Value);
+				customEngine = TypeLoadUtil.GetType(customEngineAtt.Value);
 			}
 
-			viewEngines = new ViewEngineInfo[] {new ViewEngineInfo(engineType, enableXhtmlRendering)};
-
-			LoadAdditionalSources(section);
-		}
-
-		private void LoadAdditionalSources(XmlNode section)
-		{
 			ArrayList items = new ArrayList();
-
+			
 			foreach(XmlElement assemblyNode in section.SelectNodes("additionalSources/assembly"))
 			{
 				String assemblyName = assemblyNode.GetAttribute("name");
@@ -218,8 +85,34 @@ namespace Castle.MonoRail.Framework.Configuration
 
 				items.Add(new AssemblySourceInfo(assemblyName, ns));
 			}
-
+			
 			sources = (AssemblySourceInfo[]) items.ToArray(typeof(AssemblySourceInfo));
+		}
+		
+		#endregion
+
+		public String ViewPathRoot
+		{
+			get { return viewPathRoot; }
+			set { viewPathRoot = value; }
+		}
+
+		public Type CustomEngine
+		{
+			get { return customEngine; }
+			set { customEngine = value; }
+		}
+
+		public bool EnableXHtmlRendering
+		{
+			get { return enableXhtmlRendering; }
+			set { enableXhtmlRendering = value; }
+		}
+
+		public AssemblySourceInfo[] Sources
+		{
+			get { return sources; }
+			set { sources = value; }
 		}
 	}
 }

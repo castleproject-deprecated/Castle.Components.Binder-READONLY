@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 	using Castle.MonoRail.Framework.Helpers;
 	using Iesi.Collections;
 
-	public class ARFormHelper : FormHelper
+	public class ARFormHelper : HtmlHelper
 	{
 		private static readonly object[] Empty = new object[0];
 
@@ -37,24 +37,6 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 		
 		private FormHelper formHelper = new FormHelper();
 
-		private static readonly int[] Months = { 1,2,3,4,5,6,7,8,9,10,11,12 };
-		private static readonly int[] Days = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
-		                                       11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
-		                                       21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
-		private static readonly int[] Years;
-
-		static ARFormHelper()
-		{
-			int lastYear = DateTime.Now.Year;
-
-			Years = new int[lastYear - 1950];
-			
-			for(int year = 1950; year < lastYear; year++)
-			{
-				Years[year - 1950] = year;
-			}
-		}
-		
 		public override void SetController(Controller controller)
 		{
 			base.SetController(controller);
@@ -195,12 +177,23 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 
 		#region CreateControl methods
 
-		public String CreateControl(ActiveRecordModel model, String prefix, 
-		                            FieldModel fieldModel, object instance)
+		public String CreateControl(ActiveRecordModel model, String prefix, FieldModel fieldModel, object instance)
 		{
 			stringBuilder.Length = 0;
 
 			FieldInfo fieldInfo = fieldModel.Field;
+
+			object value = null;
+
+			if (instance != null)
+			{
+				if (model.IsNestedType)
+				{
+					instance = model2nestedInstance[model];
+				}
+
+				if (instance != null) value = fieldInfo.GetValue(instance);
+			}
 
 			String propName = CreatePropName(model, prefix, fieldInfo.Name);
 
@@ -215,14 +208,13 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 
 			FieldAttribute propAtt = fieldModel.FieldAtt;
 
-			RenderAppropriateControl(model, fieldInfo.FieldType, propName, null, null,
+			RenderAppropriateControl(model, fieldInfo.FieldType, propName, null, value,
 			                         propAtt.Unique, propAtt.NotNull, propAtt.ColumnType, propAtt.Length);
 
 			return stringBuilder.ToString();
 		}
 
-		public String CreateControl(ActiveRecordModel model, String prefix, 
-		                            PropertyModel propertyModel, object instance)
+		public String CreateControl(ActiveRecordModel model, String prefix, PropertyModel propertyModel, object instance)
 		{
 			stringBuilder.Length = 0;
 
@@ -233,6 +225,18 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 
 			// Skip indexers
 			if (prop.GetIndexParameters().Length != 0) return String.Empty;
+
+			object value = null;
+
+			if (instance != null)
+			{
+				if (model.IsNestedType)
+				{
+					instance = model2nestedInstance[model];
+				}
+
+				if (instance != null) value = prop.GetValue(instance, null);
+			}
 
 			String propName = CreatePropName(model, prefix, prop.Name);
 
@@ -247,14 +251,13 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 
 			PropertyAttribute propAtt = propertyModel.PropertyAtt;
 
-			RenderAppropriateControl(model, prop.PropertyType, propName, prop, null,
+			RenderAppropriateControl(model, prop.PropertyType, propName, prop, value,
 			                         propAtt.Unique, propAtt.NotNull, propAtt.ColumnType, propAtt.Length);
 
 			return stringBuilder.ToString();
 		}
 
-		public String CreateControl(ActiveRecordModel model, String prefix, 
-		                            PropertyInfo prop, object instance)
+		public String CreateControl(ActiveRecordModel model, String prefix, PropertyInfo prop, object instance)
 		{
 			stringBuilder.Length = 0;
 
@@ -263,6 +266,18 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 
 			// Skip indexers
 			if (prop.GetIndexParameters().Length != 0) return String.Empty;
+
+			object value = null;
+
+			if (instance != null)
+			{
+				if (model.IsNestedType)
+				{
+					instance = model2nestedInstance[model];
+				}
+
+				if (instance != null) value = prop.GetValue(instance, null);
+			}
 
 			String propName = CreatePropName(model, prefix, prop.Name);
 
@@ -276,13 +291,12 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			}
 
 			RenderAppropriateControl(model, prop.PropertyType,
-			                         propName, prop, null, false, false, null, 0);
+			                         propName, prop, value, false, false, null, 0);
 
 			return stringBuilder.ToString();
 		}
 
-		public String CreateControl(ActiveRecordModel model, String prefix, 
-		                            BelongsToModel belongsToModel, object instance)
+		public String CreateControl(ActiveRecordModel model, String prefix, BelongsToModel belongsToModel, object instance)
 		{
 			stringBuilder.Length = 0;
 
@@ -319,8 +333,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			return stringBuilder.ToString();
 		}
 
-		public String CreateControl(ActiveRecordModel model, String prefix, 
-		                            HasManyModel hasManyModel, object instance)
+		public String CreateControl(ActiveRecordModel model, String prefix, HasManyModel hasManyModel, object instance)
 		{
 			stringBuilder.Length = 0;
 
@@ -360,8 +373,8 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			return stringBuilder.ToString();
 		}
 
-		public String CreateControl(ActiveRecordModel model, String prefix, 
-		                            HasAndBelongsToManyModel hasAndBelongsModel, object instance)
+		public String CreateControl(ActiveRecordModel model, String prefix, HasAndBelongsToManyModel hasAndBelongsModel,
+		                            object instance)
 		{
 			stringBuilder.Length = 0;
 
@@ -416,40 +429,40 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			{
 				htmlAttributes["validators"] = validators;
 			}
-			
+
 			if (propType == typeof(String))
 			{
 				if (String.Compare("stringclob", columnType, true) == 0)
 				{
-					stringBuilder.AppendFormat(TextArea(propName));
+					stringBuilder.AppendFormat(TextArea(propName, 30, 3, (String) value));
+				}
+				else if (length != 0)
+				{
+					stringBuilder.AppendFormat(InputText(propName, (String) value, length, length, htmlAttributes));
 				}
 				else
 				{
-					if (length > 0)
-					{
-						htmlAttributes["maxlength"] = length.ToString();
-					}
-					
-					stringBuilder.AppendFormat(TextField(propName, htmlAttributes));
+					stringBuilder.AppendFormat(InputText(propName, (String) value, htmlAttributes));
 				}
 			}
 			else if (propType == typeof(Int16) || propType == typeof(Int32) || propType == typeof(Int64))
 			{
-				stringBuilder.AppendFormat(TextField(propName, htmlAttributes));
+				stringBuilder.AppendFormat(InputText(propName, value.ToString(), 10, 4, htmlAttributes));
 			}
 			else if (propType == typeof(Single) || propType == typeof(Double))
 			{
-				stringBuilder.AppendFormat(TextField(propName, htmlAttributes));
+				stringBuilder.AppendFormat(InputText(propName, value.ToString(), htmlAttributes));
 			}
 			else if (propType == typeof(DateTime))
 			{
-				stringBuilder.AppendFormat(Select(propName + "month", Months, htmlAttributes));
-				stringBuilder.AppendFormat(Select(propName + "day", Days, htmlAttributes));
-				stringBuilder.AppendFormat(Select(propName + "year", Years, htmlAttributes));
+				stringBuilder.AppendFormat(DateTime(propName, (DateTime) value, htmlAttributes));
 			}
 			else if (propType == typeof(bool))
 			{
-				stringBuilder.Append(CheckboxField(propName));
+				// stringBuilder.AppendFormat( InputCheckbox(propName, "true", (bool) value) );
+				stringBuilder.Append(Select(propName));
+				stringBuilder.Append(CreateOptionsFromPrimitiveArray(new bool[] {true, false}, value.ToString()));
+				stringBuilder.Append(EndSelect());
 			}
 			else if (propType == typeof(Enum))
 			{
@@ -462,13 +475,14 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 				foreach(String name in names)
 				{
 					options.Add(String.Format("{0} {1}\r\n",
-					                          RadioField(propName, name), LabelFor(name, name)));
+					                          InputRadio(propName, name), LabelFor(name, name)));
 				}
+
+				stringBuilder.AppendFormat(BuildUnorderedList(options));
 			}
 		}
 
-		private String PopulateCustomValidators(string initialValidation, Type type, 
-		                                        PropertyInfo property, IList validators)
+		private String PopulateCustomValidators(string initialValidation, Type type, PropertyInfo property, IList validators)
 		{
 			ArrayList list = new ArrayList();
 
@@ -484,7 +498,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 						}
 						else if (validator is EmailValidator)
 						{
-							list.Add("email|1");
+							list.Add("email|2");
 						}
 						else if (validator is ConfirmationValidator)
 						{

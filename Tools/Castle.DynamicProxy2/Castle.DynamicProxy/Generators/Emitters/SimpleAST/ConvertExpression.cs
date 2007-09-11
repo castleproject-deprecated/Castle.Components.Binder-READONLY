@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 	[CLSCompliant(false)]
 	public class ConvertExpression : Expression
 	{
+		private readonly Type target;
+		private readonly Type fromType;
 		private readonly Expression right;
-		private Type fromType;
-		private Type target;
 
 		public ConvertExpression(Type targetType, Expression right)
 			: this(targetType, typeof(object), right)
@@ -47,12 +47,12 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 
 			if (fromType.IsByRef)
 			{
-				fromType = fromType.GetElementType();
+				throw new NotSupportedException("Cannot convert from ByRef types");
 			}
 
 			if (target.IsByRef)
 			{
-				target = target.GetElementType();
+				throw new NotSupportedException("Cannot convert to ByRef types");
 			}
 
 			if (target.IsValueType)
@@ -87,7 +87,6 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 
 		private static void EmitCastIfNeeded(Type from, Type target, ILGenerator gen)
 		{
-#if DOTNET2
 			if (target.IsGenericParameter)
 			{
 				gen.Emit(OpCodes.Unbox_Any, target);
@@ -100,17 +99,10 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 			{
 				gen.Emit(OpCodes.Castclass, target);
 			}
-			else  if (target.IsSubclassOf(from))
+			else if (target.IsSubclassOf(from))
 			{
 				gen.Emit(OpCodes.Castclass, target);
 			}
-#else
-			if (target.IsSubclassOf(from))
-			{
-				gen.Emit(OpCodes.Castclass, target);
-			}
-#endif
-
 		}
 	}
 }

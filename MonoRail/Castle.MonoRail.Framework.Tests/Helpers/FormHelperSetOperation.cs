@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,37 +62,6 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			
 			Assert.IsTrue(iterated);
 		}
-
-		[Test]
-		public void ApplyingFormat()
-		{
-			OperationState state = SetOperation.IterateOnDataSource(
-				null, new int[] { 1, 2, 3, 4 }, DictHelper.Create("textformat=C"));
-
-			Assert.IsNotNull(state);
-			Assert.IsTrue(state is ListDataSourceState);
-			Assert.IsNull(state.TargetSuffix);
-
-			bool iterated = false;
-			int index = 1;
-
-			foreach(SetItem item in state)
-			{
-				iterated = true;
-
-				Assert.IsFalse(item.IsSelected);
-				Assert.IsNotNull(item.Text);
-				Assert.IsNotNull(item.Value);
-
-				Assert.AreEqual(index.ToString("C"), item.Text);
-				Assert.AreEqual(index.ToString(), item.Value);
-
-				index++;
-			}
-
-			Assert.IsTrue(iterated);
-		}
-
 
 		[Test]
 		public void NullDataSource()

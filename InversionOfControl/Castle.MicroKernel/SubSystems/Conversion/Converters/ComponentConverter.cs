@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,18 +23,6 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 	[Serializable]
 	public class ComponentConverter : AbstractTypeConverter, IKernelDependentConverter
 	{
-		public override bool CanHandleType(Type type, IConfiguration configuration)
-		{
-			if (configuration.Value != null)
-			{
-				return ReferenceExpressionUtil.IsReference(configuration.Value.Trim());
-			}
-			else
-			{
-				return CanHandleType(type);
-			}
-		}
-
 		public override bool CanHandleType(Type type)
 		{
 			if (Context.Kernel == null) return false;

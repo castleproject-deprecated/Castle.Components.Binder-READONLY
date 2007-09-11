@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
 namespace Castle.Facilities.Logging.Tests.Classes
 {
 	using System;
+
 	using Castle.Core.Logging;
+
 
 	public class SmtpServer : ISmtpServer
 	{
-		private IExtendedLogger logger;
+		private ILogger logger;
 
-		public IExtendedLogger Logger
+		public ILogger Logger
 		{
 			get { return logger; }
 			set { logger = value; }
@@ -39,7 +41,7 @@ namespace Castle.Facilities.Logging.Tests.Classes
 
 		public void InternalSend(String from, String to, String contents)
 		{
-			Logger.InfoFormat("InternalSend {0} {1} {2}", from, to, contents);
+			Logger.Info("InternalSend {0} {1} {2}", from, to, contents);
 		}
 	}
 }

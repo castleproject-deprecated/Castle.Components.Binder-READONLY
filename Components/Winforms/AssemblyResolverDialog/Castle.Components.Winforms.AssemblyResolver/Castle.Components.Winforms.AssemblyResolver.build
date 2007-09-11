@@ -2,7 +2,7 @@
 <project
 	name="Castle.Components.Winforms.AssemblyResolver"
 	default="build"
-	xmlns="http://nant.sf.net/release/0.85/nant.xsd"
+	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
 >
 
 	<property name="root.dir" value="../../../.." />
@@ -13,8 +13,6 @@
 
 		<assemblyfileset id="project.references" basedir="${build.dir}">
 			<include name="Castle.Core.dll" />
-			<include name="System.Windows.Forms.dll" />
-			<include name="System.Drawing.dll" />
 		</assemblyfileset>
 	</target>
 

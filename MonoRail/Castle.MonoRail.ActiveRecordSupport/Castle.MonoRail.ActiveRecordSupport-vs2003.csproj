@@ -150,11 +150,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "AssemblyInfo.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "Pagination\AbstractPaginableQuery.cs"
                     SubType = "Code"
                     BuildAction = "Compile"

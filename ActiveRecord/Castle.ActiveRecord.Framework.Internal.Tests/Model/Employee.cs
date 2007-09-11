@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 {
 	using System;
 
-	[ActiveRecord("Employee", Lazy = false)]
+	[ActiveRecord("Employee")]
 	public class Employee : ActiveRecordBase
 	{
 		private int id;
@@ -45,7 +45,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 			set { lastName = value; }
 		}
 
-		[OneToOne(Constrained=true, Fetch=FetchEnum.Join, ForeignKey="FK_FOREIGN_KEY")]
+		[OneToOne(Constrained=true, Fetch=FetchEnum.Join)]
 		public Award Award
 		{
 			get { return award; }
@@ -53,7 +53,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 		}
 	}
 
-	[ActiveRecord("Award", Lazy = false)]
+	[ActiveRecord("Award")]
 	public class Award : ActiveRecordBase
 	{
 		private Employee employee;

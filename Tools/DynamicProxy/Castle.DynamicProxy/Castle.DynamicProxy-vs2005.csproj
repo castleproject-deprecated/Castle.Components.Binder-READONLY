@@ -11,7 +11,8 @@
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>Castle.DynamicProxy</AssemblyName>
-    <AssemblyOriginatorKeyFile>..\..\..\CastleKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -25,7 +26,6 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\t\</OutputPath>
@@ -77,8 +77,6 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
@@ -315,7 +313,6 @@
     <Compile Include="Invocation\SameClassInvocation.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IProxy.cs" />
     <Compile Include="ProxyGenerator.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -328,11 +325,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DynProxy.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\CastleKey.snk">
-      <Link>CastleKey.snk</Link>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

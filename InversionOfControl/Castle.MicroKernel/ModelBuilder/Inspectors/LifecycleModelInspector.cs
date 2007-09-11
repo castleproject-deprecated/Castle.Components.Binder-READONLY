@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,10 +40,6 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 		/// <param name="model"></param>
 		public virtual void ProcessModel(IKernel kernel, ComponentModel model)
 		{
-			if (model == null)
-			{
-				throw new ArgumentNullException("model");
-			}
 			if (typeof (IInitializable).IsAssignableFrom(model.Implementation))
 			{
 				model.LifecycleSteps.Add( LifecycleStepType.Commission, InitializationConcern.Instance );

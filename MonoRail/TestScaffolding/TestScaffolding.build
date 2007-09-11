@@ -26,10 +26,10 @@
 				<include name="Castle.MonoRail.ActiveRecordScaffold.dll" />
 				<include name="Castle.MonoRail.ActiveRecordSupport.dll" />
 				<include name="Castle.Components.Binder.dll" />
-				<include name="Castle.Components.Validator.dll" />
 				<include name="Castle.Components.Common.TemplateEngine.dll" />
 				<include name="Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.dll" />
 				<include name="Castle.Components.Common.EmailSender.dll" />
+				<include name="Castle.Components.Common.EmailSender.SmtpEmailSender.dll" />
 				<include name="log4net.dll" />
 				<include name="NVelocity.dll" />
 				<include name="Castle.ActiveRecord.dll" />
@@ -85,6 +85,7 @@
 				<include name="${bin2.dir}/Castle.Components.Common.TemplateEngine.dll" />
 				<include name="${bin2.dir}/Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.dll" />
 				<include name="${bin2.dir}/Castle.Components.Common.EmailSender.dll" />
+				<include name="${bin2.dir}/Castle.Components.Common.EmailSender.SmtpEmailSender.dll" />
 			</references>
 		</csc>
 		<copy todir="../bin">

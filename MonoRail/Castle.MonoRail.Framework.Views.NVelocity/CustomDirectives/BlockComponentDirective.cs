@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 	using System;
 	using System.Collections;
 
+	using Castle.MonoRail.Framework.Internal;
+
 	/// <summary>
 	/// Pendent
 	/// </summary>
@@ -29,24 +31,20 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 	{
 		private IList sectionsCreated = new ArrayList();
 
-		public BlockComponentDirective(IViewComponentFactory viewComponentFactory, IViewEngine viewEngine)
-			: base(viewComponentFactory, viewEngine)
+		public BlockComponentDirective(IViewComponentFactory viewComponentFactory) : base(viewComponentFactory)
 		{
 		}
 
 		public override void Init(IRuntimeServices rs, IInternalContextAdapter context, INode node)
 		{
 			base.Init(rs, context, node);
-		}
-		
-		protected override void ProcessSubSections()
-		{
-			foreach (SubSectionDirective section in sectionsCreated)
+
+			foreach(SubSectionDirective section in sectionsCreated)
 			{
 				if (!Component.SupportsSection(section.Name))
 				{
 					throw new ViewComponentException(
-						String.Format("The section '{0}' is not supported by the ViewComponent '{1}'",
+						String.Format("The section '{0}' is not supported by the ViewComponent '{1}'", 
 							section.Name, ComponentName));
 				}
 

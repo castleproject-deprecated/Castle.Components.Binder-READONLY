@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Checking for entry existence with key {0}", key);
+				logger.Debug("Checking for entry existence with key {0}", key);
 			}
 			
 			return Get(key) != null;
@@ -63,7 +63,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Getting entry with key {0}", key);
+				logger.Debug("Getting entry with key {0}", key);
 			}
 
 			return GetCurrentContext().Cache.Get(key);
@@ -73,7 +73,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Storing entry {0} with data {1}", key, data);
+				logger.Debug("Storing entry {0} with data {1}", key, data);
 			}
 
 			GetCurrentContext().Cache.Insert(key, data);
@@ -83,7 +83,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Deleting entry with key {0}", key);
+				logger.Debug("Deleting entry with key {0}", key);
 			}
 
 			GetCurrentContext().Cache.Remove(key);

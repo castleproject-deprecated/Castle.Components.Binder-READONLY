@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@ namespace Castle.Facilities.NHibernateIntegration
 {
 	using System;
 	using System.Collections;
+
 	using NHibernate;
 	using NHibernate.Collection;
 	using NHibernate.Expression;
 	using NHibernate.Proxy;
+	
 	using Castle.Facilities.NHibernateIntegration.Util;
 
 	/// <summary>
@@ -63,7 +65,7 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public virtual Array FindAll(Type type, int firstRow, int maxRows)
 		{
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
@@ -72,13 +74,14 @@ namespace Castle.Facilities.NHibernateIntegration
 					if (firstRow != int.MinValue) criteria.SetFirstResult(firstRow);
 					if (maxRows != int.MinValue) criteria.SetMaxResults(maxRows);
 					IList result = criteria.List();
+					if (result == null || result.Count == 0) return null;
 
 					Array array = Array.CreateInstance(type, result.Count);
 					result.CopyTo(array, 0);
 
 					return array;
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform FindAll for " + type.Name, ex);
 				}
@@ -87,17 +90,17 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public virtual object FindById(Type type, object id)
 		{
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
 					return session.Load(type, id);
 				}
-				catch(ObjectNotFoundException)
+				catch (ObjectNotFoundException)
 				{
 					throw;
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform FindByPrimaryKey for " + type.Name, ex);
 				}
@@ -106,13 +109,13 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public virtual object Create(object instance)
 		{
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
 					return session.Save(instance);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform Create for " + instance.GetType().Name, ex);
 				}
@@ -121,13 +124,13 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public virtual void Delete(object instance)
 		{
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
 					session.Delete(instance);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform Delete for " + instance.GetType().Name, ex);
 				}
@@ -136,13 +139,13 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public virtual void Update(object instance)
 		{
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
 					session.Update(instance);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform Update for " + instance.GetType().Name, ex);
 				}
@@ -151,13 +154,13 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public virtual void DeleteAll(Type type)
 		{
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
 					session.Delete(String.Format("from {0}", type.Name));
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform DeleteAll for " + type.Name, ex);
 				}
@@ -166,13 +169,13 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public virtual void Save(object instance)
 		{
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
 					session.SaveOrUpdate(instance);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform Save for " + instance.GetType().Name, ex);
 				}
@@ -200,7 +203,7 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public virtual Array FindAll(Type type, ICriterion[] criterias, Order[] sortItems, int firstRow, int maxRows)
 		{
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
@@ -208,18 +211,14 @@ namespace Castle.Facilities.NHibernateIntegration
 
 					if (criterias != null)
 					{
-						foreach(ICriterion cond in criterias)
-						{
+						foreach (ICriterion cond in criterias)
 							criteria.Add(cond);
-						}
 					}
 
 					if (sortItems != null)
 					{
-						foreach(Order order in sortItems)
-						{
+						foreach (Order order in sortItems)
 							criteria.AddOrder(order);
-						}
 					}
 
 					if (firstRow != int.MinValue) criteria.SetFirstResult(firstRow);
@@ -232,7 +231,7 @@ namespace Castle.Facilities.NHibernateIntegration
 
 					return array;
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform FindAll for " + type.Name, ex);
 				}
@@ -248,7 +247,7 @@ namespace Castle.Facilities.NHibernateIntegration
 		{
 			if (queryString == null || queryString.Length == 0) throw new ArgumentNullException("queryString");
 
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
@@ -264,7 +263,7 @@ namespace Castle.Facilities.NHibernateIntegration
 
 					return array;
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform Find for custom query : " + queryString, ex);
 				}
@@ -281,7 +280,7 @@ namespace Castle.Facilities.NHibernateIntegration
 		{
 			if (namedQuery == null || namedQuery.Length == 0) throw new ArgumentNullException("queryString");
 
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				try
 				{
@@ -298,7 +297,7 @@ namespace Castle.Facilities.NHibernateIntegration
 
 					return array;
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					throw new DataException("Could not perform Find for named query : " + namedQuery, ex);
 				}
@@ -309,11 +308,11 @@ namespace Castle.Facilities.NHibernateIntegration
 		{
 			if (instance == null) throw new ArgumentNullException("instance");
 
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
-				foreach(object val in ReflectionUtil.GetPropertiesDictionary(instance).Values)
+				foreach (object val in ReflectionUtil.GetPropertiesDictionary(instance).Values)
 				{
-					if (val is INHibernateProxy || val is IPersistentCollection)
+					if (val is INHibernateProxy || val is PersistentCollection)
 					{
 						if (!NHibernateUtil.IsInitialized(val))
 						{
@@ -333,14 +332,14 @@ namespace Castle.Facilities.NHibernateIntegration
 			IDictionary properties = ReflectionUtil.GetPropertiesDictionary(instance);
 			if (! properties.Contains(propertyName))
 				throw new ArgumentOutOfRangeException("collectionPropertyName", "Property "
-				                                                                + propertyName + " doest not exist for type "
-				                                                                + instance.GetType().ToString() + ".");
+					+ propertyName + " doest not exist for type "
+					+ instance.GetType().ToString() + ".");
 
-			using(ISession session = GetSession())
+			using (ISession session = GetSession())
 			{
 				object val = properties[propertyName];
 
-				if (val is INHibernateProxy || val is IPersistentCollection)
+				if (val is INHibernateProxy || val is PersistentCollection)
 				{
 					if (!NHibernateUtil.IsInitialized(val))
 					{
@@ -354,7 +353,7 @@ namespace Castle.Facilities.NHibernateIntegration
 		#endregion
 
 		#region Private methods
-
+		
 		private ISession GetSession()
 		{
 			if (sessionFactoryAlias == null || sessionFactoryAlias.Length == 0)
@@ -366,7 +365,7 @@ namespace Castle.Facilities.NHibernateIntegration
 				return sessionManager.OpenSession(sessionFactoryAlias);
 			}
 		}
-
+		
 		#endregion
 	}
 }

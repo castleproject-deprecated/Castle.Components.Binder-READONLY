@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,35 +51,20 @@ namespace Castle.Windsor.Configuration.Interpreters
 
 		#region Constructors
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="XmlInterpreter"/> class.
-		/// </summary>
 		public XmlInterpreter()
 		{
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="XmlInterpreter"/> class.
-		/// </summary>
-		/// <param name="filename">The filename.</param>
 		public XmlInterpreter(String filename) : base(filename)
 		{
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="XmlInterpreter"/> class.
-		/// </summary>
-		/// <param name="source">The source.</param>
 		public XmlInterpreter(Castle.Core.Resource.IResource source) : base(source)
 		{
 		}
 
 		#endregion
 
-		/// <summary>
-		/// Gets or sets the kernel.
-		/// </summary>
-		/// <value>The kernel.</value>
 		public IKernel Kernel
 		{
 			get { return kernel ; }
@@ -88,10 +73,10 @@ namespace Castle.Windsor.Configuration.Interpreters
 
 		public override void ProcessResource(IResource source, IConfigurationStore store)
 		{
-			XmlProcessor.XmlProcessor processor = (kernel == null) ?
-				new XmlProcessor.XmlProcessor(EnvironmentName) :
-				new XmlProcessor.XmlProcessor(EnvironmentName, 
-					kernel.GetSubSystem(SubSystemConstants.ResourceKey) as IResourceSubSystem);
+			XmlProcessor.XmlProcessor processor = ( kernel == null ) ? 
+				new XmlProcessor.XmlProcessor() :
+				new XmlProcessor.XmlProcessor(
+					kernel.GetSubSystem( SubSystemConstants.ResourceKey ) as IResourceSubSystem );
 
 			try
 			{
@@ -124,11 +109,7 @@ namespace Castle.Windsor.Configuration.Interpreters
 
 		private void DeserializeElement(XmlNode node, IConfigurationStore store)
 		{
-			if (ContainersNodeName.Equals(node.Name))
-			{
-				DeserializeContainers(node.ChildNodes, store);
-			}
-			else if (FacilitiesNodeName.Equals(node.Name))
+			if (FacilitiesNodeName.Equals(node.Name))
 			{
 				DeserializeFacilities(node.ChildNodes, store);
 			}
@@ -136,48 +117,10 @@ namespace Castle.Windsor.Configuration.Interpreters
 			{
 				DeserializeComponents(node.ChildNodes, store);
 			}
-			else if (BootstrapNodeName.Equals(node.Name))
-			{
-				DeserializeBootstrapComponents(node.ChildNodes, store);
-			}
 			else
 			{
 				throw new ConfigurationException(String.Format("DeserializeElement cannot process element {0}", node.Name));
 			}
-		}
-
-		private void DeserializeContainers(XmlNodeList nodes, IConfigurationStore store)
-		{
-			foreach(XmlNode node in nodes)
-			{
-				if (node.NodeType == XmlNodeType.Element)
-				{
-					AssertNodeName(node, ContainerNodeName);
-
-					DeserializeContainer(node, store);
-				}
-			}
-		}
-
-		private void DeserializeContainer(XmlNode node, IConfigurationStore store)
-		{
-			String name = GetRequiredAttributeValue(node, "name");
-
-			IConfiguration config = GetDeserializedNode(node);
-			IConfiguration newConfig = new MutableConfiguration(config.Name, node.InnerXml);
-
-			// Copy all attributes
-			string[] allKeys = config.Attributes.AllKeys;
-			
-			foreach(string key in allKeys)
-			{
-				newConfig.Attributes.Add(key, config.Attributes[key]);
-			}
-
-			// Copy all children
-			newConfig.Children.AddRange(config.Children);
-
-			AddChildContainerConfig(name, newConfig, store);
 		}
 
 		private void DeserializeFacilities(XmlNodeList nodes, IConfigurationStore store)
@@ -215,19 +158,6 @@ namespace Castle.Windsor.Configuration.Interpreters
 			}
 		}
 
-		private void DeserializeBootstrapComponents(XmlNodeList nodes, IConfigurationStore store)
-		{
-			foreach(XmlNode node in nodes)
-			{
-				if (node.NodeType == XmlNodeType.Element)
-				{
-					AssertNodeName(node, ComponentNodeName);
-
-					DeserializeBootstrapComponent(node, store);
-				}
-			}
-		}
-
 		private void DeserializeComponent(XmlNode node, IConfigurationStore store)
 		{
 			String id = GetRequiredAttributeValue(node, "id");
@@ -237,18 +167,9 @@ namespace Castle.Windsor.Configuration.Interpreters
 			AddComponentConfig(id, config, store);
 		}
 
-		private void DeserializeBootstrapComponent(XmlNode node, IConfigurationStore store)
-		{
-			String id = GetRequiredAttributeValue(node, "id");
-
-			IConfiguration config = GetDeserializedNode(node);
-
-			AddBootstrapComponentConfig(id, config, store);
-		}
-
 		private IConfiguration GetDeserializedNode(XmlNode node)
 		{
-			MutableConfiguration config;
+			MutableConfiguration config = null;
 			ConfigurationCollection configChilds = new ConfigurationCollection();
 
 			StringBuilder configValue = new StringBuilder();
@@ -318,6 +239,16 @@ namespace Castle.Windsor.Configuration.Interpreters
 		private bool IsTextNode(XmlNode node)
 		{
 			return node.NodeType == XmlNodeType.Text || node.NodeType == XmlNodeType.CDATA;
+		}
+
+		private void AssertRequiredAttribute(IConfiguration config, string attrName, string parentName)
+		{
+			String content = config.Attributes[attrName];
+
+			if (content == null || content.Trim() == String.Empty)
+			{
+				throw new ConfigurationException(String.Format("{0} expects {1} attribute", parentName, attrName));
+			}
 		}
 
 		private void AssertNodeName(XmlNode node, string expectedName)

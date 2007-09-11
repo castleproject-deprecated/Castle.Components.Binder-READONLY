@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -109,14 +109,14 @@ namespace Castle.ActiveRecord
 		/// </example>
 		NosetterCamelcase,
 		/// <summary>
-		/// Use the property' getter to get the value, and use the field with the same name and in camel case
+		/// Use the property' getter to get the value, and use the field with the same name and in camle case
 		/// with initial "_" in order to set it.
 		/// </summary>
 		/// <example>
 		/// <code>
 		/// string _userName;//this will be use to set the value
 		/// 
-		/// [Property(Access=PropertyAccess.NosetterCamelcaseUnderscore)]
+		/// [Property(Access=PropertyAccess.NosetterPascalcaseMUndersc)]
 		/// public string UserName { get {... } set { ... } } // this will be used just to get the value
 		/// </code>
 		/// </example>
@@ -136,30 +136,17 @@ namespace Castle.ActiveRecord
 		NosetterPascalcaseMUndersc,
 		/// <summary>
 		/// Use the property' getter to get the value, and use the field with the same name and in lower case
-		/// with initial "_" in order to set it.
-		/// </summary>
-		/// <example>
-		/// <code>
-		/// string _username;//this will be use to set the value
-		/// 
-		/// [Property(Access=PropertyAccess.NosetterLowercaseUnderscore)]
-		/// public string UserName { get {... } set { ... } } // this will be used just to get the value
-		/// </code>
-		/// </example>
-		NosetterLowercaseUnderscore,
-		/// <summary>
-		/// Use the property' getter to get the value, and use the field with the same name and in lower case
 		/// in order to set it.
 		/// </summary>
 		/// <example>
 		/// <code>
 		/// string username;//this will be use to set the value
 		/// 
-		/// [Property(Access=PropertyAccess.NosetterLowercase)]
+		/// [Property(Access=PropertyAccess.NosetterPascalcaseMUndersc)]
 		/// public string UserName { get {... } set { ... } } // this will be used just to get the value
 		/// </code>
 		/// </example>
-		NosetterLowercase
+		NosetterLowercaseUnderscore
 	}
 	
 	/// <summary>
@@ -195,8 +182,6 @@ namespace Castle.ActiveRecord
 					return "nosetter.pascalcase-m-underscore";
 				case PropertyAccess.NosetterLowercaseUnderscore:
 					return "nosetter.lowercase-underscore";
-				case PropertyAccess.NosetterLowercase:
-					return "nosetter.lowercase";
 				default:
 					throw new InvalidOperationException("Invalid value for PropertyAccess");
 			}

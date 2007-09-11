@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,8 +52,7 @@ namespace Castle.DynamicProxy.Builder.CodeGenerators
 				sb.Append('_');
 				sb.Append(GetTypeName(inter));
 			}
-			return
-				String.Format("ProxyInterface{2}{0}{1}", GetTypeName(type), sb.ToString(), NormalizeNamespaceName(type.Namespace));
+			return String.Format("ProxyInterface{2}{0}{1}", GetTypeName(type), sb.ToString(), NormalizeNamespaceName(type.Namespace));
 		}
 
 		protected override void GenerateFields()
@@ -61,7 +60,6 @@ namespace Castle.DynamicProxy.Builder.CodeGenerators
 			base.GenerateFields();
 			_targetField = MainTypeBuilder.CreateField("__target", typeof(object));
 		}
-
 
 		protected override MethodInfo GenerateCallbackMethodIfNecessary(MethodInfo method, Reference invocationTarget)
 		{
@@ -173,25 +171,6 @@ namespace Castle.DynamicProxy.Builder.CodeGenerators
 			return _targetField.ToExpression();
 		}
 
-		protected override EasyProperty CreateProperty(PropertyInfo property)
-		{
-			//The Interceptor Property form the IProxy Interface -> Access the __interceptor Attribute
-			if ("Interceptor".Equals(property.Name) && typeof(IInterceptor).Equals(property.PropertyType))
-			{
-				return CreateInterceptorProperty(property);
-			}
-			return base.CreateProperty(property);
-		}
-
-		private EasyProperty CreateInterceptorProperty(PropertyInfo propertyInfo)
-		{
-			EasyProperty interceptorProperty = MainTypeBuilder.CreateProperty(propertyInfo);
-			EasyMethod getMethod = interceptorProperty.CreateGetMethod();
-			MethodInfo baseMethod = typeof(MulticastDelegate).GetMethod("get_Interceptor");
-			getMethod.CodeBuilder.AddStatement(new ReturnStatement(base.InterceptorField));
-			return interceptorProperty;
-		}
-
 		public virtual Type GenerateCode(Type[] interfaces, Type targetType)
 		{
 			if (Context.HasMixins)
@@ -201,8 +180,7 @@ namespace Castle.DynamicProxy.Builder.CodeGenerators
 				interfaces = Join(interfaces, mixinInterfaces);
 			}
 
-			//interfaces = AddISerializable(interfaces);
-			interfaces = AddInterfaces(new Type[] {typeof(ISerializable), typeof(IProxy)}, interfaces);
+			interfaces = AddISerializable(interfaces);
 
 			ReaderWriterLock rwlock = ModuleScope.RWLock;
 
@@ -218,16 +196,16 @@ namespace Castle.DynamicProxy.Builder.CodeGenerators
 			}
 
 			rwlock.UpgradeToWriterLock(-1);
-
+			
 			try
 			{
 				cacheType = GetFromCache(targetType, interfaces);
-
+				
 				if (cacheType != null)
 				{
 					return cacheType;
 				}
-
+				
 				_targetType = targetType;
 
 				CreateTypeBuilder(GenerateTypeName(targetType, interfaces), typeof(Object), interfaces);

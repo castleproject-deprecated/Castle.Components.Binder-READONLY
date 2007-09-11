@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,21 +53,6 @@ namespace Castle.MicroKernel.Tests
 		public void WithoutParameters()
 		{
 			CompB compb = kernel[typeof(CompB)] as CompB;
-		}
-
-		[Test]
-		public void WillAlwaysResolveCustomParameterFromServiceComponent()
-		{
-			kernel.AddComponent("compc", typeof(CompC));
-			Hashtable c_dependencies = new Hashtable();
-			c_dependencies["test"] = 15;
-			kernel.RegisterCustomDependencies(typeof(CompC), c_dependencies);
-			Hashtable b_dependencies = new Hashtable();
-			b_dependencies["myArgument"] = "foo";
-			kernel.RegisterCustomDependencies(typeof(CompB), b_dependencies);
-			CompB b = kernel["compb"] as CompB;
-			Assert.IsNotNull(b);
-			Assert.AreEqual(15, b.Compc.test);
 		}
 
 		[Test]

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ namespace Castle.Facilities.AspectSharp.Tests.Interceptors
 	/// <summary>
 	/// Summary description for CastleSimpleInterceptor.
 	/// </summary>
-	public class CastleSimpleInterceptor : IInterceptor
+	public class CastleSimpleInterceptor : IMethodInterceptor
 	{
 		int _executions;
 
@@ -29,11 +29,11 @@ namespace Castle.Facilities.AspectSharp.Tests.Interceptors
 		{
 		}
 
-		public void Intercept(IInvocation invocation)
+		public object Intercept(IMethodInvocation invocation, params object[] args)
 		{
 			_executions++;
 
-			invocation.Proceed();
+			return invocation.Proceed(args);
 		}
 
 		public int Executions

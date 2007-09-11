@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,25 +15,23 @@
 namespace Castle.ActiveRecord.Tests
 {
 	using System;
-	using System.Threading;
+	using NUnit.Framework;
+	
 	using Castle.ActiveRecord.Framework;
 	using Castle.ActiveRecord.Tests.Model;
 	using Castle.ActiveRecord.Tests.Model.CompositeModel;
-	using NHibernate.Expression;
-	using NUnit.Framework;
+
 
 	[TestFixture]
 	public class ActiveRecordTestCase : AbstractActiveRecordTest
 	{
-		[Test,
-		 ExpectedException(typeof(ActiveRecordInitializationException),
-		 	"You can't invoke ActiveRecordStarter.Initialize more than once")]
+		[Test, ExpectedException(typeof(ActiveRecordInitializationException), "You can't invoke ActiveRecordStarter.Initialize more than once")]
 		public void InitializeCantBeInvokedMoreThanOnce()
 		{
 			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(Post));
 			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(Blog));
 		}
-
+		
 		[Test]
 		public void SimpleOperations()
 		{
@@ -167,10 +165,10 @@ namespace Castle.ActiveRecord.Tests
 			// Groups HasAndBelongsToMany Users
 			// User HasMany Groups
 			// 
-			ActiveRecordStarter.Initialize(GetConfigSource(),
-			                               typeof(Group),
-			                               typeof(Agent),
-			                               typeof(Org));
+			ActiveRecordStarter.Initialize(GetConfigSource(), 
+				typeof(Group),
+				typeof(Agent),
+				typeof(Org));
 			Recreate();
 
 			Agent.DeleteAll();
@@ -203,7 +201,7 @@ namespace Castle.ActiveRecord.Tests
 			agent2.Groups.Add(group1);
 			agent2.Save();
 
-			using(new SessionScope())
+			using (new SessionScope())
 			{
 				org = Org.Find(org.Id);
 				group1 = Group.Find(group1.Id);
@@ -227,8 +225,9 @@ namespace Castle.ActiveRecord.Tests
 				foreach(Agent agentLoop in org.Agents)
 				{
 					Assert.IsTrue(agentLoop.Groups.Contains(group1));
-				}
+				}				
 			}
+
 		}
 
 		[Test]
@@ -250,9 +249,9 @@ namespace Castle.ActiveRecord.Tests
 			Post post3 = new Post(blog, "title3", "contents", "category3");
 
 			post1.Save();
-			Thread.Sleep(1000); // Its a smalldatetime (small precision)
+			System.Threading.Thread.Sleep(1000); // Its a smalldatetime (small precision)
 			post2.Save();
-			Thread.Sleep(1000); // Its a smalldatetime (small precision)
+			System.Threading.Thread.Sleep(1000); // Its a smalldatetime (small precision)
 			post3.Published = true;
 			post3.Save();
 
@@ -263,9 +262,9 @@ namespace Castle.ActiveRecord.Tests
 			Assert.AreEqual(1, blog.PublishedPosts.Count);
 
 			Assert.AreEqual(3, blog.RecentPosts.Count);
-			Assert.AreEqual(post3.Id, ((Post) blog.RecentPosts[0]).Id);
-			Assert.AreEqual(post2.Id, ((Post) blog.RecentPosts[1]).Id);
-			Assert.AreEqual(post1.Id, ((Post) blog.RecentPosts[2]).Id);
+			Assert.AreEqual(post3.Id, (blog.RecentPosts[0] as Post).Id);
+			Assert.AreEqual(post2.Id, (blog.RecentPosts[1] as Post).Id);
+			Assert.AreEqual(post1.Id, (blog.RecentPosts[2] as Post).Id);
 		}
 
 		[Test]
@@ -386,6 +385,7 @@ namespace Castle.ActiveRecord.Tests
 
 			Assert.IsNotNull(blogs);
 			Assert.AreEqual(0, blogs.Length);
+
 		}
 
 		[Test]
@@ -431,6 +431,7 @@ namespace Castle.ActiveRecord.Tests
 
 			Assert.IsNotNull(blogs);
 			Assert.AreEqual(0, blogs.Length);
+
 		}
 
 		[Test]
@@ -491,7 +492,7 @@ namespace Castle.ActiveRecord.Tests
 			ts.Save();
 			Assert.IsFalse(ts.LastSaved == DateTime.MinValue);
 
-			//DateTime origional_lastsaved = ts.LastSaved;
+			DateTime origional_lastsaved = ts.LastSaved;
 
 			ts.name = "another name";
 			ts.Save();
@@ -535,22 +536,14 @@ namespace Castle.ActiveRecord.Tests
 			blog2.Save();
 
 			Assert.AreEqual(2, Blog.FetchCount());
-			Assert.AreEqual(1, Blog.FetchCount("name=?", "hammett's blog"));
-			Assert.IsTrue(Blog.Exists("name=?", "hammett's blog"));
+			Assert.AreEqual(1, Blog.FetchCount("name=?","hammett's blog"));
+			Assert.IsTrue(Blog.Exists("name=?","hammett's blog"));
 
 			Blog retrieved = blogs[0];
 			Assert.IsNotNull(retrieved);
 
 			Assert.AreEqual(blog.Name, retrieved.Name);
 			Assert.AreEqual(blog.Author, retrieved.Author);
-
-			Assert.AreEqual(1, Blog.FetchCount(
-			                   	Expression.Eq("Name", blog.Name),
-			                   	Expression.Eq("Author", blog.Author)));
-
-			Assert.AreEqual(0, Blog.FetchCount(
-			                   	Expression.Eq("Name", "/\ndrew's Blog"),
-			                   	Expression.Eq("Author", "Andrew Peters")));
 		}
 
 		[Test]
@@ -619,7 +612,7 @@ namespace Castle.ActiveRecord.Tests
 		}
 
 		[Test]
-		public void TestName()
+		public void TestName() 
 		{
 			ActiveRecordStarter.Initialize(GetConfigSource());
 			ActiveRecordStarter.RegisterTypes(typeof(Blog), typeof(Post));
@@ -634,7 +627,7 @@ namespace Castle.ActiveRecord.Tests
 
 			Assert.IsTrue(blogs.Length == 1);
 
-			using(new SessionScope())
+			using (new SessionScope()) 
 			{
 				blog.Name = "Hammetts blog";
 				blog.Save();
@@ -649,65 +642,28 @@ namespace Castle.ActiveRecord.Tests
 			Assert.IsTrue(blogs.Length == 1);
 		}
 
-		[Test]
-		public void ExistsTest()
-		{
+        public void ExistsTest()
+        {
 			ActiveRecordStarter.Initialize(GetConfigSource());
 			ActiveRecordStarter.RegisterTypes(typeof(Blog), typeof(Post));
 			Recreate();
 
-			Blog blog = new Blog();
-			blog.Name = "hammett's blog";
-			blog.Author = "hamilton verissimo";
-			blog.Save();
+            Blog blog = new Blog();
+            blog.Name = "hammett's blog";
+            blog.Author = "hamilton verissimo";
+            blog.Save();
 
-			Assert.IsTrue(blog.Id > 0);
-			Assert.IsTrue(Blog.Exists(blog.Id));
+            Assert.IsTrue(blog.Id > 0);
+            Assert.IsTrue(Blog.Exists(blog.Id));
 
-			blog = new Blog();
-			blog.Name = "chad's blog";
-			blog.Author = "chad humphries";
-			blog.Save();
+            blog = new Blog();
+            blog.Name = "chad's blog";
+            blog.Author = "chad humphries";
+            blog.Save();
 
-			Assert.IsTrue(Blog.Exists(blog.Id));
+            Assert.IsTrue(Blog.Exists(blog.Id));
 
-			Assert.IsFalse(Blog.Exists(1000));
-		}
-
-		[Test]
-		public void ExistsByCriterion()
-		{
-			ActiveRecordStarter.Initialize(GetConfigSource());
-			ActiveRecordStarter.RegisterTypes(typeof(Blog), typeof(Post));
-			Recreate();
-
-			Blog[] blogs = Blog.FindAll();
-
-			Assert.IsNotNull(blogs);
-			Assert.AreEqual(0, blogs.Length);
-
-			Blog blog = new Blog();
-			blog.Name = "hammett's blog";
-			blog.Author = "hamilton verissimo";
-			blog.Save();
-
-			Assert.IsTrue(blog.Id > 0);
-			Assert.IsTrue(Blog.Exists(
-			              	Expression.Eq("Name", blog.Name),
-			              	Expression.Eq("Author", blog.Author)));
-
-			blog = new Blog();
-			blog.Name = "chad's blog";
-			blog.Author = "chad humphries";
-			blog.Save();
-
-			Assert.IsTrue(Blog.Exists(
-			              	Expression.Eq("Name", blog.Name),
-			              	Expression.Eq("Author", blog.Author)));
-
-			Assert.IsFalse(Blog.Exists(
-			               	Expression.Eq("Name", "/\ndrew's Blog"),
-			               	Expression.Eq("Author", "Andrew Peters")));
-		}
+            Assert.IsFalse(Blog.Exists(1000));
+        }
 	}
 }

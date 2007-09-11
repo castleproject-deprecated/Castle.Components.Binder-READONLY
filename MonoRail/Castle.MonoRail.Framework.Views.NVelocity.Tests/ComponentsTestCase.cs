@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 	using System;
 	using Castle.MonoRail.Framework.Tests;
 	using NUnit.Framework;
+	using Castle.MonoRail.TestSupport;
 
 	[TestFixture]
 	public class ComponentsTestCase : AbstractTestCase
@@ -198,14 +199,6 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 		{
 			DoGet("usingcomponent2/ChildContentComponent2.rails");
 			AssertReplyContains("View content and 1 2 True Something hello");
-		}
-
-		[Test]
-		public void CanRenderMultipleDynamicComponents() 
-		{
-			DoGet("usingcomponent/dynamiccomponent.rails");
-			AssertReplyContains("Hello from SimpleInlineViewComponent");
-			AssertReplyContains("This is a view used by a component");
 		}
 
 		void AssertOutput(String expected, object output)

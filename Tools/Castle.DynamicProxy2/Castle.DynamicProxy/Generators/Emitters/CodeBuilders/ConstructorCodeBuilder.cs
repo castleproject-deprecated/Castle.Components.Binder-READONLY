@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace Castle.DynamicProxy.Generators.Emitters.CodeBuilders
 
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	[CLSCompliant(false)]
+
 	public class ConstructorCodeBuilder : AbstractCodeBuilder
 	{
 		private readonly Type baseType;
@@ -40,7 +40,8 @@ namespace Castle.DynamicProxy.Generators.Emitters.CodeBuilders
 			AddStatement(new ConstructorInvocationStatement(constructor));
 		}
 
-		public void InvokeBaseConstructor(ConstructorInfo constructor, params ArgumentReference[] arguments)
+		public void InvokeBaseConstructor(ConstructorInfo constructor, 
+			params ArgumentReference[] arguments)
 		{
 			AddStatement(
 				new ConstructorInvocationStatement(constructor,
@@ -51,12 +52,12 @@ namespace Castle.DynamicProxy.Generators.Emitters.CodeBuilders
 		{
 			Type type = baseType;
 
-#if DOTNET2
+//#if DOTNET2
 			if (baseType.IsGenericType)
 			{
 				type = baseType.GetGenericTypeDefinition();
 			}
-#endif			
+//#endif			
 			BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 			
 			return type.GetConstructor(flags, null, new Type[0], null);

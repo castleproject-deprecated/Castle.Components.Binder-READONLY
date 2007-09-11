@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,68 +14,29 @@
 
 namespace Castle.MonoRail.Framework.ViewComponents
 {
+	using System;
+
 	/// <summary>
 	/// Only renders the body if the current user has the specified role
-	/// <example>
 	/// <code>
 	/// #blockcomponent(SecurityComponent with "role=IsAdmin")
 	///		Content only available to admin
 	/// #end
 	/// </code>
-	/// </example>
-	/// <para>or for multiple roles (using "or")</para>
-	/// <example>
-	/// <code>
-	/// #blockcomponent(SecurityComponent with "roles=Manager,Admin")
-	///		Content only available to admin or managers
-	/// #end
-	/// </code>
-	/// </example>
 	/// </summary>
 	public class SecurityComponent : ViewComponent
 	{
 		private bool shouldRender;
 
-		/// <summary>
-		/// Called by the framework once the component instance
-		/// is initialized
-		/// </summary>
 		public override void Initialize()
 		{
-			string role = (string) ComponentParams["role"];
-			string roles = (string) ComponentParams["roles"];
+			String role = (String) ComponentParams["role"];
 
-			if (role == null && roles == null)
-			{
-				throw new RailsException("SecurityComponent: you must supply a role (or roles) parameter");
-			}
+			if (role == null) throw new RailsException("SecurityComponent: you must supply a role parameter");
 
-			shouldRender = false;
-
-			if (RailsContext.CurrentUser != null)
-			{
-				if (role != null)
-				{
-					shouldRender = RailsContext.CurrentUser.IsInRole(role);
-				}
-				else
-				{
-					foreach(string itRole in roles.Split(','))
-					{
-						if (RailsContext.CurrentUser.IsInRole(itRole.Trim()))
-						{
-							shouldRender = true;
-							break;
-						}
-					}
-				}
-			}
+			shouldRender = RailsContext.CurrentUser.IsInRole(role);
 		}
 
-		/// <summary>
-		/// Called by the framework so the component can
-		/// render its content
-		/// </summary>
 		public override void Render()
 		{
 			if (shouldRender)

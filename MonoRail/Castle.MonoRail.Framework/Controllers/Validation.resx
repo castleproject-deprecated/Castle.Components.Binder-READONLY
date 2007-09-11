@@ -114,23 +114,15 @@
 					//	Element where box errors will appear
 					this.boxError = 'errors';
 					
-					// Added by Ivan to allow for a heading in the box error mode
-					this.boxErrorHeadingClass = 'errorsHeading';
-					
 					//	Prefix given to all error paragraphs in box error mode
 					this.boxErrorPrefix = 'fv_error_';
 					
 					this.displayName= 'displayName';
-					
-					
-					// Added by Ivan to designate a label to be an error label
-					this.errorSelectorCssClass = 'error';
 				}
 			]]></value>
   </data>
   <data name="fValidateCore" xml:space="preserve">
     <value><![CDATA[ 
-			 
 			/***************************************************************************************************
 			*
 			*-- Form validation script by Peter Bailey, Copyright (c) 2001-2003
@@ -368,7 +360,7 @@
 				this.validated  = true;
 				this.config     = new fValConfig();
 				this.i18n		= fvalidate.i18n;
-				var selectorClass = this.config.errorSelectorCssClass;
+				
 				//	Add reset action to clear visual error cues
 				f.onreset = function()
 				{
@@ -389,6 +381,7 @@
 					var labels = f.getElementsByTagName( "label" );
 					var label, i = j = 0;
 					var elem;
+
 					//	Loop through labels retrieved
 					while ( label = labels[i++] )
 					{
@@ -412,8 +405,6 @@
 								elem.item( j ).label = label;
 							}
 						}
-						
-						if(label.className.indexOf(selectorClass) > -1)
 						//	Regular label
 						elem.label = label;
 					}
@@ -507,8 +498,7 @@
 					label		= ( isHidden ) ? null : elem.label || null,
 					emsg		= ( elem.getAttribute( this.config.emsg ) ) ? elem.getAttribute( this.config.emsg ).replace( /\\n/g, "\n" ) : emsg,
 					errorClass	= this.config.errorClass,
-					singleCSS	= this.config.useSingleClassNames,
-					selectorClass = this.config.errorSelectorCssClass;
+					singleCSS	= this.config.useSingleClassNames;
 
 				if ( typeof this.showErrors == 'undefined' ) this.showErrors = new Array();	
 				
@@ -595,10 +585,10 @@
 				//	Appends error message to element's label
 				function appendError()
 				{
-					if ( label == null || label.className.indexOf(selectorClass) == -1 ) return;
+					if ( label == null || typeof label.innerHTML == 'undefined' ) return;
 					if ( typeof label.original == 'undefined' )
 						label.original = label.innerHTML;
-					label.innerHTML = label.original + emsg.toHTML();
+					label.innerHTML = label.original + " - " + emsg.toHTML();
 				}
 				//	Appends Error message to pre-defined element
 				function boxError()
@@ -618,7 +608,7 @@
 						errorElem;
 					if ( errorElem = document.getElementById( errorId ) ) // short-circuit
 					{
-						errorElem.firstChild.innerHTML = emsg.toHTML();
+						errorElem.firstChild.nodeValue = emsg.toHTML();
 					}
 					else
 					{
@@ -658,12 +648,10 @@
 					this.elem = error.elem;
 					this.showError( error.msg, Boolean( i == ( this.errors.length - 1 ) ) );
 				}
-				if(firstElem){
-					var focusElem = ( typeof firstElem.fields != 'undefined' )?
-						firstElem.fields[0]:
-						firstElem;
-					this.selectFocus( focusElem );
-				}
+				var focusElem = ( typeof firstElem.fields != 'undefined' )?
+					firstElem.fields[0]:
+					firstElem;
+				this.selectFocus( focusElem );
 			}
 
 			/*	Reverts any visible error notification upon event
@@ -675,8 +663,7 @@
 					errorClass	= this.config.errorClass,
 					i			= 0,
 					errorElem,
-					subelem,
-					headingClass = this.config.boxErrorHeadingClass;
+					subelem;
 
 				if ( ( typeof elem.length != 'undefined' && elem.length > 1 && elem.nodeName != 'SELECT' ) || isHidden )
 				{
@@ -718,16 +705,7 @@
 					{
 						this.boxError.removeChild( errorElem );
 					}
-					// Added by Ivan allow for a heading node to be in the error box.
-					var nodeCount = 0;
-					if(this.boxError.tagName.toUpperCase() == 'UL'){
-					    for(var i=0;i<this.boxError.childNodes.length;i++){
-    					        
-					        var node = this.boxError.childNodes[i];
-					        if(node.tagName && node.tagName == 'LI' && node.className != headingClass) nodeCount++;
-					    }
-					    if ( nodeCount == 0 ) this.boxError.style.display = 'none';
-					}
+					if ( this.boxError.childNodes.length == 0 ) this.boxError.style.display = "none";
 				}
 			}
 
@@ -973,8 +951,6 @@
 			{
 				return this.replace( /([\.\*\+\{\}\(\)\<\>\^\$\\])/g, "\\$1" );
 			}
-			
-			
 			]]></value>
   </data>
   <data name="fValidateValidators" xml:space="preserve">

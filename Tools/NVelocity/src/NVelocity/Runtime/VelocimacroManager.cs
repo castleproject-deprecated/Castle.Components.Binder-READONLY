@@ -163,11 +163,11 @@ namespace NVelocity.Runtime
 		/// <summary> gets a new living VelocimacroProxy object by the
 		/// name / source template duple
 		/// </summary>
-		public VelocimacroProxy get(String vmName, String ns)
+		public VelocimacroProxy get(String vmName, String namespace_Renamed)
 		{
-			if (UsingNamespaces(ns))
+			if (UsingNamespaces(namespace_Renamed))
 			{
-				Hashtable local = GetNamespace(ns, false);
+				Hashtable local = GetNamespace(namespace_Renamed, false);
 
 				/*
 				 *  if we have macros defined for this template
@@ -179,7 +179,7 @@ namespace NVelocity.Runtime
 
 					if (me != null)
 					{
-						return me.CreateVelocimacro(ns);
+						return me.CreateVelocimacro(namespace_Renamed);
 					}
 				}
 			}
@@ -194,7 +194,7 @@ namespace NVelocity.Runtime
 
 			if (me2 != null)
 			{
-				return me2.CreateVelocimacro(ns);
+				return me2.CreateVelocimacro(namespace_Renamed);
 			}
 
 			return null;
@@ -419,14 +419,14 @@ namespace NVelocity.Runtime
 			}
 
 
-			internal VelocimacroProxy CreateVelocimacro(String ns)
+			internal VelocimacroProxy CreateVelocimacro(String namespace_Renamed)
 			{
 				VelocimacroProxy vp = new VelocimacroProxy();
 				vp.Name = this.macroname;
 				vp.ArgArray = this.argarray;
 				vp.Macrobody = this.macrobody;
 				vp.NodeTree = this.nodeTree;
-				vp.Namespace = ns;
+				vp.Namespace = namespace_Renamed;
 				return vp;
 			}
 

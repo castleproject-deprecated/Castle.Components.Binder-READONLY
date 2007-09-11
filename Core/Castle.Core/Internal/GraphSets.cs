@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,17 +19,8 @@ namespace Castle.Core.Internal
 	internal enum VertexColor
 	{
 		NotInThisSet,
-		/// <summary>
-		/// The node has not been visited yet
-		/// </summary>
 		White,
-		/// <summary>
-		/// This node is in the process of being visited
-		/// </summary>
 		Gray,
-		/// <summary>
-		/// This now was visited
-		/// </summary>
 		Black
 	}
 

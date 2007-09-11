@@ -1,19 +1,6 @@
 Beta 2
 ======
 
-- Fixed COMP-8: Converter is not able to deal with Nullables<>
-
-- Fixed COMP-6: Nullable boolean cannot be bound
-
-- Updated to check argument inheritance for conversions.
-
-- Resolved COMP-3: Add support for generic collections.
-
-- Fixed MR-164: Allow and Exclude property acts on all objects, in any depth.
-
-- Applied patch by Lee Henson fixing MR-179
-  "Binder doesn't convert empty strings to null."
-
 - Fixed bug that wrongly defined empty strings as conversionSucceeded = false
 
 - Fixed COMP-1 "Binder fails on simple MonoRail binding, when using ASP.NET authentication"

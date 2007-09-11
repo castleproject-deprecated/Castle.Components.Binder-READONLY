@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,18 +20,8 @@ namespace Castle.Facilities.Remoting
 	using Castle.MicroKernel.ComponentActivator;
 
 
-	/// <summary>
-	/// Activates a client connecting to the remote server through the <see cref="RemotingRegistry"/>.
-	/// </summary>
 	public class RemoteActivatorThroughRegistry : DefaultComponentActivator
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="RemoteActivatorThroughRegistry"/> class.
-		/// </summary>
-		/// <param name="model">The model.</param>
-		/// <param name="kernel">The kernel.</param>
-		/// <param name="onCreation">The oncreation envent handler.</param>
-		/// <param name="onDestruction">The ondestruction event handler.</param>
 		public RemoteActivatorThroughRegistry(ComponentModel model, IKernel kernel, ComponentInstanceDelegate onCreation, ComponentInstanceDelegate onDestruction) : base(model, kernel, onCreation, onDestruction)
 		{
 		}
@@ -41,12 +31,6 @@ namespace Castle.Facilities.Remoting
 			RemotingRegistry registry = (RemotingRegistry) 
 				Model.ExtendedProperties["remoting.remoteregistry"];
 			
-#if DOTNET2
-			if (Model.Service.IsGenericType)
-			{
-				return registry.CreateRemoteInstance(Model.Service);
-			}
-#endif
 			return registry.CreateRemoteInstance(Model.Name);
 		}
 	}

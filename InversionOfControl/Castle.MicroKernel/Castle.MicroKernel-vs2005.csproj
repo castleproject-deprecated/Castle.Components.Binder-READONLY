@@ -11,7 +11,8 @@
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>Castle.MicroKernel</AssemblyName>
-    <AssemblyOriginatorKeyFile>..\..\CastleKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -25,7 +26,6 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\temp\</OutputPath>
@@ -35,15 +35,17 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE;DEBUG;DOTNET2</DefineConstants>
-    <DocumentationFile>..\bin\temp\Castle.MicroKernel.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -55,16 +57,18 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DOTNET2</DefineConstants>
-    <DocumentationFile>..\bin\Castle.MicroKernel.XML</DocumentationFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -73,7 +77,6 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
@@ -93,8 +96,6 @@
     <Compile Include="ComponentActivator\DefaultComponentActivator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ComponentActivator\WebUserControlComponentActivator.cs" />
-    <Compile Include="Context\DependencyTrackingScope.cs" />
     <Compile Include="ComponentActivator\ExternalInstanceActivator.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -183,7 +184,6 @@
     <Compile Include="Handlers\AbstractHandler.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Handlers\ParentHandlerWithChildResolver.cs" />
     <Compile Include="Handlers\DefaultGenericHandler.cs" />
     <Compile Include="Handlers\DefaultHandler.cs">
       <SubType>Code</SubType>
@@ -269,7 +269,6 @@
     <Compile Include="ModelBuilder\IContributeComponentModelConstruction.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ModelBuilder\Inspectors\ComponentActivatorInspector.cs" />
     <Compile Include="ModelBuilder\Inspectors\ConfigurationModelInspector.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -346,20 +345,15 @@
     <Compile Include="SubSystems\Conversion\Converters\ArrayConverter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SubSystems\Conversion\Converters\AttributeAwareConverter.cs" />
     <Compile Include="SubSystems\Conversion\Converters\ComponentConverter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SubSystems\Conversion\Converters\DefaultComplexConverter.cs" />
     <Compile Include="SubSystems\Conversion\Converters\DictionaryConverter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SubSystems\Conversion\Converters\EnumConverter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SubSystems\Conversion\Converters\Generics\GenericDictionaryConverter.cs" />
-    <Compile Include="SubSystems\Conversion\Converters\Generics\IGenericCollectionConverterHelper.cs" />
-    <Compile Include="SubSystems\Conversion\Converters\Generics\GenericListConverter.cs" />
     <Compile Include="SubSystems\Conversion\Converters\ListConverter.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -370,7 +364,6 @@
     <Compile Include="SubSystems\Conversion\Converters\TypeNameConverter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SubSystems\Conversion\ConvertibleAttribute.cs" />
     <Compile Include="SubSystems\Conversion\DefaultConversionManager.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -398,7 +391,6 @@
     <Compile Include="SubSystems\Naming\DefaultNamingSubSystem.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SubSystems\Naming\KeySearchNamingSubSystem.cs" />
     <Compile Include="SubSystems\Naming\INamingSubSystem.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -426,14 +418,6 @@
       <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
       <Name>Castle.Core-vs2005</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\CastleKey.snk">
-      <Link>CastleKey.snk</Link>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

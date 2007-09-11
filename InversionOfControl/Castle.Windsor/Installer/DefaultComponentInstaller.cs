@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,35 +18,24 @@ namespace Castle.Windsor.Installer
 	using System.Configuration;
 
 	using Castle.Core.Configuration;
-	using Castle.Core.Resource;
+
 	using Castle.MicroKernel;
-	using Castle.Windsor.Configuration.Interpreters;
 
 	/// <summary>
-	/// Default <see cref="IComponentsInstaller"/> implementation.
+	/// 
 	/// </summary>
 	public class DefaultComponentInstaller : IComponentsInstaller
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DefaultComponentInstaller"/> class.
-		/// </summary>
 		public DefaultComponentInstaller()
 		{
 		}
 
 		#region IComponentsInstaller Members
 
-		/// <summary>
-		/// Perform installation.
-		/// </summary>
-		/// <param name="container">Target container</param>
-		/// <param name="store">Configuration store</param>
 		public void SetUp(IWindsorContainer container, IConfigurationStore store)
 		{
-			SetUpComponents(store.GetBootstrapComponents(), container);
 			SetUpFacilities(store.GetFacilities(), container);
 			SetUpComponents(store.GetComponents(), container);
-			SetUpChildContainers(store.GetConfigurationForChildContainers(), container);
 		}
 
 		#endregion
@@ -94,19 +83,6 @@ namespace Castle.Windsor.Installer
 				System.Diagnostics.Debug.Assert( service != null );
 
 				container.AddComponent(id, service, type);
-			}
-		}
-
-		private void SetUpChildContainers(IConfiguration[] configurations, IWindsorContainer parentContainer)
-		{
-			foreach(IConfiguration childContainerConfig in configurations)
-			{
-				String id = childContainerConfig.Attributes["name"];
-				
-				System.Diagnostics.Debug.Assert( id != null );
-
-				new WindsorContainer(id, parentContainer, 
-					new XmlInterpreter(new StaticContentResource(childContainerConfig.Value)));
 			}
 		}
 

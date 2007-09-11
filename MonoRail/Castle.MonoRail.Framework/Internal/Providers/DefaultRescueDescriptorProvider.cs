@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,46 +50,11 @@ namespace Castle.MonoRail.Framework.Internal
 
 		#endregion
 
-		public RescueDescriptor[] CollectRescues(Type type)
+		public RescueDescriptor[] CollectRescues(MemberInfo memberInfo)
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Collecting rescue information for {0}", type.Name);
-			}
-
-			ArrayList descriptors = new ArrayList();
-
-			while(type != typeof(Controller))
-			{
-				object[] attributes = type.GetCustomAttributes(typeof(IRescueDescriptorBuilder), false);
-				
-				foreach(IRescueDescriptorBuilder builder in attributes)
-				{
-					RescueDescriptor[] descs = builder.BuildRescueDescriptors();
-
-					if (logger.IsDebugEnabled)
-					{
-						foreach(RescueDescriptor desc in descs)
-						{
-							logger.DebugFormat("Collected rescue with view name {0} for exception type {1}",
-											   desc.ViewName, desc.ExceptionType);
-						}
-					}
-
-					descriptors.AddRange(descs);
-				}
-
-				type = type.BaseType;
-			}
-
-			return (RescueDescriptor[]) descriptors.ToArray(typeof(RescueDescriptor));
-		}
-
-		public RescueDescriptor[] CollectRescues(MethodInfo memberInfo)
-		{
-			if (logger.IsDebugEnabled)
-			{
-				logger.DebugFormat("Collecting rescue information for {0}", memberInfo.Name);
+				logger.Debug("Collecting rescue information for {0}", memberInfo.Name);
 			}
 			
 			object[] attributes = memberInfo.GetCustomAttributes(typeof(IRescueDescriptorBuilder), true);
@@ -104,8 +69,8 @@ namespace Castle.MonoRail.Framework.Internal
 				{
 					foreach(RescueDescriptor desc in descs)
 					{
-						logger.DebugFormat("Collected rescue with view name {0} for exception type {1}", 
-						                   desc.ViewName, desc.ExceptionType);
+						logger.Debug("Collected rescue with view name {0} for exception type {1}", 
+						             desc.ViewName, desc.ExceptionType);
 					}
 				}
 				

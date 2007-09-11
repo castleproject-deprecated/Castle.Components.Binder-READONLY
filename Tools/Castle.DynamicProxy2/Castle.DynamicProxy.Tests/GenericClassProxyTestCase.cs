@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -142,23 +142,6 @@ namespace Castle.DynamicProxy.Tests
 			Assert.IsTrue(proxy.Invoked);
 			Assert.AreEqual("z param", proxy.SavedParam);
 			Assert.AreEqual("DoSomething ", logger.LogContents);
-		}
-
-		[Test]
-		public void ProxyWithGenericArgumentsAndMethodGenericArgumentsWithOneNotDefinedOnType()
-		{
-			GenClassWithGenMethods<ArrayList> proxy =
-				generator.CreateClassProxy<GenClassWithGenMethods<ArrayList>>(logger);
-
-			Assert.IsNotNull(proxy);
-
-			int value1 = 10;
-
-			proxy.DoSomethingElse<string>(delegate(int param1) { return param1.ToString(); }, value1);
-
-			Assert.IsTrue(proxy.Invoked);
-			Assert.AreEqual("10", proxy.SavedParam);
-			Assert.AreEqual("DoSomethingElse ", logger.LogContents);
 		}
 
 		[Test]

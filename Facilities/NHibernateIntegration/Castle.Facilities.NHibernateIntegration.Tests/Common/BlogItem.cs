@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,31 +25,31 @@ namespace Castle.Facilities.NHibernateIntegration.Tests
 		private String text;
 		private String title;
 
-		public virtual Blog ParentBlog
+		public Blog ParentBlog
 		{
 			get { return blog; }
 			set { blog = value; }
 		}
 
-		public virtual DateTime ItemDate
+		public DateTime ItemDate
 		{
 			get { return dateTime; }
 			set { dateTime = value; }
 		}
 
-		public virtual int Id
+		public int Id
 		{
 			get { return id; }
 			set { id = value; }
 		}
 
-		public virtual String Text
+		public String Text
 		{
 			get { return text; }
 			set { text = value; }
 		}
 
-		public virtual String Title
+		public String Title
 		{
 			get { return title; }
 			set { title = value; }

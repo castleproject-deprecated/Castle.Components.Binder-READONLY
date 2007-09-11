@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			if (collModel == null)
 			{
 				throw new ActiveRecordException( String.Format(
-					"A HiloAttribute should be used with CollectionIDAttribute, but we couldn't find it for the property " + 
+					"A HileAttribute should be used with CollectionIDAttribute, but we couldn't find it for the property " + 
 					currentModel.Type.FullName + "." + model.Property.Name) );
 			}
 

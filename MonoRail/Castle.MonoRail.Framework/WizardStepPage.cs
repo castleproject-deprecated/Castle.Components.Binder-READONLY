@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -95,12 +95,12 @@ namespace Castle.MonoRail.Framework
 		{
 			_wizardcontroller = wizardController;
 
-//			context = wizardController.Context;
-//
-//			UrlInfo urlInfo = context.UrlInfo;
-//
-//			InitializeFieldsFromServiceProvider(wizardController.Context);
-//			InitializeControllerState(urlInfo.Area, urlInfo.Controller, urlInfo.Action);
+			context = wizardController.Context;
+
+			UrlInfo urlInfo = context.UrlInfo;
+
+			InitializeFieldsFromServiceProvider(wizardController.Context);
+			InitializeControllerState(urlInfo.Area, urlInfo.Controller, urlInfo.Action);
 		}
 
 		/// <summary>
@@ -123,8 +123,7 @@ namespace Castle.MonoRail.Framework
 				Type thisType = GetType();
 				
 				// Hack fix for "dynamic proxied" controllers
-				if (thisType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen") ||
-					thisType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2"))
+				if (thisType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen"))
 				{
 					return thisType.BaseType.Name;
 				}
@@ -153,7 +152,7 @@ namespace Castle.MonoRail.Framework
 			return true;
 		}
 
-		protected internal override MethodInfo SelectMethod(String action, IDictionary actions, IRequest request, IDictionary actionArgs)
+		protected override MethodInfo SelectMethod(String action, IDictionary actions, IRequest request, params object[] actionArgs)
 		{
 			if (action == "RenderWizardView")
 			{
@@ -161,7 +160,7 @@ namespace Castle.MonoRail.Framework
 			}
 			else
 			{
-				return base.SelectMethod(action, actions, request, null);
+				return base.SelectMethod(action, actions, request);
 			}
 		}
 
@@ -288,7 +287,7 @@ namespace Castle.MonoRail.Framework
 
 			int currentIndex = (int) Context.Session[wizardName + "currentstepindex"];
 			
-			IList stepList = (IList) Context.Items["wizard.step.list"];
+			IList stepList = (IList) Context.UnderlyingContext.Items["wizard.step.list"];
 
 			if ((currentIndex + 1) < stepList.Count)
 			{
@@ -337,7 +336,7 @@ namespace Castle.MonoRail.Framework
 
 			int currentIndex = (int) Context.Session[wizardName + "currentstepindex"];
 			
-			IList stepList = (IList) Context.Items["wizard.step.list"];
+			IList stepList = (IList) Context.UnderlyingContext.Items["wizard.step.list"];
 
 			if ((currentIndex - 1) >= 0)
 			{
@@ -374,7 +373,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected void RedirectToFirstStep(IDictionary queryStringParameters)
 		{
-			IList stepList = (IList) Context.Items["wizard.step.list"];
+			IList stepList = (IList) Context.UnderlyingContext.Items["wizard.step.list"];
 
 			String firstStep = (String) stepList[0];
 
@@ -402,7 +401,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected bool RedirectToStep(String stepName, IDictionary queryStringParameters)
 		{
-			IList stepList = (IList) Context.Items["wizard.step.list"];
+			IList stepList = (IList) Context.UnderlyingContext.Items["wizard.step.list"];
 
 			for(int index = 0; index < stepList.Count; index++)
 			{
@@ -443,7 +442,8 @@ namespace Castle.MonoRail.Framework
 				// We need to preserve any attribute from the QueryString
 				// for example in case the url has an Id
 
-				string url = UrlBuilder.BuildUrl(Context.UrlInfo, _wizardcontroller.Name, step) + Context.Request.Uri.Query;
+				String url = UrlInfo.CreateAbsoluteRailsUrl( Context.ApplicationPath, 
+								_wizardcontroller.Name, step, Context.UrlInfo.Extension ) + Context.Request.Uri.Query;
 				
 				Context.Response.Redirect(url);
 			}

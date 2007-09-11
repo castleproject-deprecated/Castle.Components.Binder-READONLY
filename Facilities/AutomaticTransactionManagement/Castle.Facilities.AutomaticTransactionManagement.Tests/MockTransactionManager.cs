@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,19 +42,13 @@ namespace Castle.Facilities.AutomaticTransactionManagement.Tests
 		
 		public event TransactionDelegate TransactionDisposed;
 
-		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode,
-		                                      bool distributedTransaction)
+		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode)
 		{
 			_current = new MockTransaction();
 
 			_transactions++;
 
 			return _current;
-		}
-
-		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode)
-		{
-			return CreateTransaction(transactionMode, isolationMode, false);
 		}
 
 		public void Dispose(ITransaction tran)

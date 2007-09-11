@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@ namespace Castle.MonoRail.Framework.Tests
 {
 	using NUnit.Framework;
 
+	using Castle.MonoRail.TestSupport;
+
 	[TestFixture]
 	public class AccessibleThroughTestCase : AbstractTestCase
 	{
@@ -30,14 +32,14 @@ namespace Castle.MonoRail.Framework.Tests
         public void AccessibleThroughPostVerbByGet()
         {
             DoGet("home/PostOnlyMethod.rails");
-            AssertReplyContains("Access to the action [PostOnlyMethod] on controller [home] is not allowed by the http verb [GET].");
+            AssertReplyContains("Access to the action [postonlymethod] on controller [home] is not allowed by the http verb [GET].");
         }
 
 		[Test]
         public void AccessibleThroughGetVerbByPost()
 		{
             DoPost("home/GetOnlyMethod.rails");
-			AssertReplyContains("Access to the action [GetOnlyMethod] on controller [home] is not allowed by the http verb [POST].");
+            AssertReplyContains("Access to the action [getonlymethod] on controller [home] is not allowed by the http verb [POST].");
 		}
 
         [Test]

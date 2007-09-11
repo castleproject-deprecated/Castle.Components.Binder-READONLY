@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,53 +14,53 @@
 
 namespace Castle.Facilities.Logging.Tests
 {
-	using System;
-	using System.IO;
-	using Castle.Facilities.Logging.Tests.Classes;
-	using Castle.Windsor;
-	using NUnit.Framework;
+    using System;
+    using System.IO;
+    using Castle.Facilities.Logging.Tests.Classes;
+    using Castle.Windsor;
+    using NUnit.Framework;
 
-	/// <summary>
+    /// <summary>
 	/// Summary description for ConsoleFacitlyTest.
 	/// </summary>
 	[TestFixture]
 	public class ConsoleFacitlyTest : BaseTest
 	{
-		private IWindsorContainer container;
-		private StringWriter outWriter = new StringWriter();
-		private StringWriter errorWriter = new StringWriter();
+        private IWindsorContainer container;
+        private StringWriter outWriter = new StringWriter();
+        private StringWriter errorWriter = new StringWriter();
 
-		[SetUp]
-		public void Setup()
-		{
-			container = base.CreateConfiguredContainer(LoggerImplementation.Console);
+        [SetUp]
+        public void Setup()
+        {
+            container = base.CreateConfiguredContainer(LoggerImplementation.Console);
 
-			outWriter.GetStringBuilder().Length = 0;
-			errorWriter.GetStringBuilder().Length = 0;
+            outWriter.GetStringBuilder().Length = 0;
+            errorWriter.GetStringBuilder().Length = 0;
 
-			Console.SetOut(outWriter);
-			Console.SetError(errorWriter);
-		}
+            Console.SetOut(outWriter);
+            Console.SetError(errorWriter);
+        }
 
-		[TearDown]
-		public void Teardown()
-		{
-			container.Dispose();
-		}
+        [TearDown]
+        public void Teardown()
+        {
+            container.Dispose();
+        }
 
-		[Test]
-		public void SimpleTest()
-		{
-			container.AddComponent("component", typeof(SimpleLoggingComponent));
-			SimpleLoggingComponent test = container["component"] as SimpleLoggingComponent;
+        [Test]
+        public void SimpleTest() 
+        {
+			container.AddComponent("component", typeof(Classes.LoggingComponent));
+			Classes.LoggingComponent test = container["component"] as Classes.LoggingComponent;
 
-			String expectedLogOutput = String.Format("[Info] '{0}' Hello world" + Environment.NewLine, typeof(SimpleLoggingComponent).FullName);
-			String actualLogOutput = "";
+			String expectedLogOutput = String.Format("[Info] '{0}' Hello world\r\n", typeof(LoggingComponent).FullName);
+            String actualLogOutput = "";
 
-			test.DoSomething();
+            test.DoSomething();
 
-			actualLogOutput = outWriter.GetStringBuilder().ToString();
-			Assert.AreEqual(expectedLogOutput, actualLogOutput);
-		}
+            actualLogOutput = outWriter.GetStringBuilder().ToString();
+            Assert.AreEqual(expectedLogOutput, actualLogOutput);
+        }
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 {
 	using System;
 	using System.Collections;
-	using Castle.ActiveRecord.Framework;
 	using NHibernate;
+	using Castle.ActiveRecord.Framework;
+	using NHibernate.Type;
 
 	[ActiveRecord("Groups")]
 	public class Group : ActiveRecordBase
@@ -48,16 +49,14 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 			set { _name = value; }
 		}
 
-		[HasAndBelongsToMany(typeof(Agent), Table = "GroupAgents", CompositeKeyColumnRefs = new String[] {"OrgId", "Name"},
-			ColumnKey = "GroupId", Lazy = true, Inverse=true, Cascade = ManyRelationCascadeEnum.SaveUpdate)]
+		[HasAndBelongsToMany(typeof (Agent), Table = "GroupAgents", CompositeKeyColumnRefs = new String[] {"OrgId", "Name"}, ColumnKey = "GroupId", Lazy = true, Inverse=true, Cascade = ManyRelationCascadeEnum.SaveUpdate)]
 		public IList Agents
 		{
 			get { return _agents; }
 			set { _agents = value; }
 		}
 
-		[HasAndBelongsToMany(typeof(Group), Table = "GroupOrgs", ColumnRef = "GroupId", ColumnKey = "OrgId", Lazy = true,
-			Inverse=true, Cascade = ManyRelationCascadeEnum.SaveUpdate)]
+		[HasAndBelongsToMany(typeof (Group), Table = "GroupOrgs", ColumnRef = "GroupId", ColumnKey = "OrgId", Lazy = true, Inverse=true, Cascade = ManyRelationCascadeEnum.SaveUpdate)]
 		public IList Groups
 		{
 			get { return _groups; }
@@ -66,42 +65,42 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 
 		public static void DeleteAll()
 		{
-			ActiveRecordMediator.DeleteAll(typeof(Group));
+			ActiveRecordMediator.DeleteAll(typeof (Group));
 		}
 
 		public static void DeleteAll(string where)
 		{
-			ActiveRecordMediator.DeleteAll(typeof(Group), where);
+			ActiveRecordMediator.DeleteAll(typeof (Group), where);
 		}
 
 		public static Group[] FindAll()
 		{
-			return (Group[]) ActiveRecordMediator.FindAll(typeof(Group));
+			return (Group[]) ActiveRecordMediator.FindAll(typeof (Group));
 		}
 
 		public static Group Find(int id)
 		{
-			return (Group) ActiveRecordMediator.FindByPrimaryKey(typeof(Group), id);
+			return (Group) ActiveRecordMediator.FindByPrimaryKey(typeof (Group), id);
 		}
 
 		public static int FetchCount()
 		{
-			return Count(typeof(Group));
+			return ActiveRecordBase.CountAll(typeof (Group));
 		}
 
 		public static int FetchCount(string filter, params object[] args)
 		{
-			return Count(typeof(Group), filter, args);
+			return ActiveRecordBase.CountAll(typeof (Group), filter, args);
 		}
 
 		public static bool Exists()
 		{
-			return Exists(typeof(Group));
+			return ActiveRecordBase.Exists(typeof (Group));
 		}
 
 		public static bool Exists(string filter, params object[] args)
 		{
-			return Exists(typeof(Group), filter, args);
+			return ActiveRecordBase.Exists(typeof (Group), filter, args);
 		}
 
 		/// <summary>
@@ -158,7 +157,7 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 
 		public ISession CurrentSession
 		{
-			get { return (ISession) ActiveRecordMediator.Execute(typeof(Group), new NHibernateDelegate(GrabSession), this); }
+			get { return (ISession) ActiveRecordMediator.Execute(typeof (Group), new NHibernateDelegate(GrabSession), this); }
 		}
 
 		private object GrabSession(ISession session, object instance)
@@ -168,7 +167,7 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 
 		public void CustomAction()
 		{
-			ActiveRecordMediator.Execute(typeof(Group), new NHibernateDelegate(MyCustomMethod), this);
+			ActiveRecordMediator.Execute(typeof (Group), new NHibernateDelegate(MyCustomMethod), this);
 		}
 
 		private object MyCustomMethod(ISession session, object blogInstance)

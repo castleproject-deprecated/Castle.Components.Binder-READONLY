@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,24 +18,11 @@ namespace Castle.MonoRail.Framework
 	using System.Reflection;
 
 	using Castle.Components.Binder;
-	using Castle.Components.Validator;
 
-	/// <summary>
-	/// Defines where the parameters should be obtained from
-	/// </summary>
 	public enum ParamStore
 	{
-		/// <summary>
-		/// Query string
-		/// </summary>
 		QueryString,
-		/// <summary>
-		/// Only from the Form
-		/// </summary>
 		Form,
-		/// <summary>
-		/// From QueryString, Form and Environment variables.
-		/// </summary>
 		Params
 	}
 
@@ -50,10 +37,9 @@ namespace Castle.MonoRail.Framework
 	public class DataBindAttribute : Attribute, IParameterBinder
 	{
 		private ParamStore from = ParamStore.Params;
-		private string exclude = string.Empty;
-		private string allow = string.Empty;
-		private string prefix;
-		private bool validate;
+		private String exclude = String.Empty;
+		private String allow = String.Empty;
+		private String prefix;
 
 		/// <summary>
 		/// Creates a <see cref="DataBindAttribute"/>
@@ -61,7 +47,7 @@ namespace Castle.MonoRail.Framework
 		/// in the form data and is used to avoid name clashes.
 		/// </summary>
 		/// <param name="prefix"></param>
-		public DataBindAttribute(string prefix)
+		public DataBindAttribute(String prefix)
 		{
 			this.prefix = prefix;
 		}
@@ -69,10 +55,9 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Gets or sets the property names to exclude.
 		/// </summary>
-		/// <remarks>The property name should include the <i>prefix</i>.</remarks>
 		/// <value>A comma separated list 
 		/// of property names to exclude from databinding.</value>
-		public string Exclude
+		public String Exclude
 		{
 			get { return exclude; }
 			set { exclude = value; }
@@ -81,26 +66,14 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Gets or sets the property names to allow.
 		/// </summary>
-		/// <remarks>The property name should include the <i>prefix</i>.</remarks>
 		/// <value>A comma separated list 
 		/// of property names to allow from databinding.</value>
-		public string Allow
+		public String Allow
 		{
 			get { return allow; }
 			set { allow = value; }
 		}
-
-		/// <summary>
-		/// Gets or sets a value indicating whether 
-		/// the target should be validate during binding.
-		/// </summary>
-		/// <value><c>true</c> if should be validated; otherwise, <c>false</c>.</value>
-		public bool Validate
-		{
-			get { return validate; }
-			set { validate = value; }
-		}
-
+		
 		/// <summary>
 		/// Gets or sets <see cref="ParamStore"/> used to 
 		/// indicate where to get the values from
@@ -122,7 +95,7 @@ namespace Castle.MonoRail.Framework
 		/// on the source http request.
 		/// </remarks>
 		/// <value>The databinding prefix.</value>
-		public string Prefix
+		public String Prefix
 		{
 			get { return prefix; }
 		}
@@ -155,45 +128,16 @@ namespace Castle.MonoRail.Framework
 		{
 			DataBinder binder = controller.Binder;
 
-			ConfigureValidator(controller, binder);
-
 			CompositeNode node = controller.ObtainParamsNode(From);
 
 			object instance = binder.BindObject(parameterInfo.ParameterType, prefix, exclude, allow, node);
 
-			BindInstanceErrors(controller, binder, instance);
-			PopulateValidatorErrorSummary(controller, binder, instance);
-
-			return instance;
-		}
-
-		protected void ConfigureValidator(SmartDispatcherController controller, DataBinder binder)
-		{
-			if (validate)
-			{
-				binder.Validator = controller.Validator;
-			}
-			else
-			{
-				binder.Validator = null;
-			}
-		}
-
-		protected void PopulateValidatorErrorSummary(SmartDispatcherController controller, DataBinder binder, object instance)
-		{
-			if (validate)
-			{
-				ErrorSummary summary = binder.GetValidationSummary(instance);
-				controller.ValidationSummaryPerInstance[instance] = summary;
-			}
-		}
-
-		protected void BindInstanceErrors(SmartDispatcherController controller, DataBinder binder, object instance)
-		{
 			if (instance != null)
 			{
 				controller.BoundInstanceErrors[instance] = binder.ErrorList;
 			}
+
+			return instance;
 		}
 	}
 }

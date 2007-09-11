@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 {
 	using Castle.MonoRail.Framework.Tests;
 	using NUnit.Framework;
+
+	using Castle.MonoRail.TestSupport;
 
 	[TestFixture]
 	public class WizardSupportTestCase : AbstractTestCase
@@ -146,7 +148,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 		public void WizardWithinAnArea()
 		{
 			DoGet("wizard/TestWizardWithArea/start.rails");
-			AssertRedirectedTo("/wizard/TestWizardWithArea/Page1.rails");
+			AssertRedirectedTo("/wizard/testwizardwitharea/Page1.rails");
 
 			DoGet("wizard/TestWizardWithArea/index.rails");
 			AssertReplyEqualTo("Hello!");
@@ -169,12 +171,12 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 			AssertSuccess();
 			AssertFlashContains("InnerActionInvoked");
 
-			DoGet("wizard/testwizardwitharea/Page4-InnerAction.rails", "navigate.to=uri:/wizard/TestWizardWithArea/Page3.rails" );
-			AssertRedirectedTo("/wizard/TestWizardWithArea/Page3.rails");
+			DoGet("wizard/testwizardwitharea/Page4-InnerAction.rails", "navigate.to=uri:/wizard/testwizardwitharea/Page3.rails" );
+			AssertRedirectedTo("/wizard/testwizardwitharea/Page3.rails");
 			AssertFlashContains("InnerActionInvoked");
 
-			DoGet("wizard/TestWizardWithArea/Page4-InnerAction.rails", "navigate.to=uri:/wizard/TestWizardWithArea/Page3.rails" );
-			AssertRedirectedTo("/wizard/TestWizardWithArea/Page3.rails");
+			DoGet("wizard/TestWizardWithArea/Page4-InnerAction.rails", "navigate.to=uri:/wizard/testwizardwitharea/Page3.rails" );
+			AssertRedirectedTo("/wizard/testwizardwitharea/Page3.rails");
 			AssertFlashContains("InnerActionInvoked");
 
 			DoGet("wizard/TestWizardWithArea/Page4-InnerAction.rails", "navigate.to=uri:http://google/" );

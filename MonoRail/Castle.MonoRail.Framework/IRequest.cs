@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,34 +17,21 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
-	using System.Web;
 
-	/// <summary>
-	/// 
-	/// </summary>
 	public interface IRequest
 	{
-		/// <summary>
-		/// Gets the Http headers.
-		/// </summary>
-		/// <value>The Http headers.</value>
 		NameValueCollection Headers { get; }
 
-		/// <summary>
-		/// Gets the <see cref="HttpPostedFile"/> per key.
-		/// </summary>
 		IDictionary Files { get; }
 
 		NameValueCollection Params { get; }
 
 		bool IsLocal { get; }
 
-		String RawUrl { get; }
-
 		Uri Uri { get; }
 
-		String HttpMethod { get; }
-		
+		String RawUrl { get; }
+
 		String FilePath { get; }
 
 		byte[] BinaryRead(int count);
@@ -53,12 +40,12 @@ namespace Castle.MonoRail.Framework
 
 		String ReadCookie( String name );
 
+		void ValidateInput();
+
 		NameValueCollection QueryString { get; }
 
 		NameValueCollection Form { get; }
 
 		String[] UserLanguages { get; }
-
-		void ValidateInput();
 	}
 }

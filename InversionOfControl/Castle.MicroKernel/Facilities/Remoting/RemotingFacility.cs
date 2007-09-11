@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,15 +23,6 @@ namespace Castle.Facilities.Remoting
 	using Castle.MicroKernel.Facilities;
 	using Castle.MicroKernel.SubSystems.Conversion;
 
-	/// <summary>
-	/// Facility to allow the communication with remote kernel, using the .NET Remoting infraestructure.
-	/// </summary>
-	/// <remarks>
-	/// TODO
-	/// </remarks>
-	/// <example>
-	/// TODO
-	/// </example>
 	public class RemotingFacility : AbstractFacility
 	{
 		private ITypeConverter converter;
@@ -104,18 +95,10 @@ namespace Castle.Facilities.Remoting
 			if (!File.Exists(configurationFile))
 			{
 				String message = String.Format("Remoting configuration file '{0}' does not exist", configurationFile);
-#if DOTNET2
-				throw new ConfigurationErrorsException(message);
-#else
 				throw new ConfigurationException(message);
-#endif
 			}
 
-#if DOTNET2 && !MONO
-			RemotingConfiguration.Configure(configurationFile, false);
-#else
 			RemotingConfiguration.Configure(configurationFile);
-#endif
 		}
 
 		private void ConfigureServerFacility()
@@ -130,11 +113,7 @@ namespace Castle.Facilities.Remoting
 			{
 				String message = "When the remote facility is configured as " + 
 					"server you must supply the URI for the component registry using the attribute 'registryUri'";
-#if DOTNET2
-				throw new ConfigurationErrorsException(message);
-#else
 				throw new ConfigurationException(message);
-#endif
 			}
 
 			RemotingServices.Marshal(localRegistry, kernelUri, typeof(RemotingRegistry));
@@ -150,11 +129,7 @@ namespace Castle.Facilities.Remoting
 			{
 				String message = "When the remote facility is configured as " + 
 					"client you must supply the URI for the kernel using the attribute 'remoteKernelUri'";
-#if DOTNET2
-				throw new ConfigurationErrorsException(message);
-#else
 				throw new ConfigurationException(message);
-#endif
 			}
 
 			remoteRegistry = (RemotingRegistry) 
@@ -166,11 +141,6 @@ namespace Castle.Facilities.Remoting
 			converter = (ITypeConverter) Kernel.GetSubSystem(SubSystemConstants.ConversionManagerKey);
 		}
 
-		/// <summary>
-		/// Performs the tasks associated with freeing, releasing, or resetting
-		/// the facility resources.
-		/// </summary>
-		/// <remarks>It can be overriden.</remarks>
 		public override void Dispose()
 		{
 			if (disconnectLocalRegistry) RemotingServices.Disconnect(localRegistry);

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,9 +38,6 @@ namespace Castle.MonoRail.Framework.Services
 
 		private string[] assemblies;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DefaultControllerFactory"/> class.
-		/// </summary>
 		public DefaultControllerFactory()
 		{
 		}
@@ -67,11 +64,6 @@ namespace Castle.MonoRail.Framework.Services
 		
 		#endregion
 
-		/// <summary>
-		/// Invoked by the framework in order to give a chance to
-		/// obtain other services
-		/// </summary>
-		/// <param name="provider">The service proviver</param>
 		public override void Service(IServiceProvider provider)
 		{
 			base.Service(provider);
@@ -91,13 +83,8 @@ namespace Castle.MonoRail.Framework.Services
 				
 				if (assemblies == null || assemblies.Length == 0)
 				{
-#if DOTNET2
-					throw new System.Configuration.ConfigurationErrorsException("No assembly was informed on the configuration file. " +
-						"Unfortunatelly this cannot be inferred (we tried)");
-#else
 					throw new ConfigurationException("No assembly was informed on the configuration file. " + 
-						"Unfortunatelly this cannot be inferred (we tried)");
-#endif
+						"Unfortunatelly this cannot be infered (we tried)");
 				}
 			}
 		}
@@ -110,7 +97,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Inspecting assembly '{0}'", assemblyFileName);
+				logger.Debug("Inspecting assembly '{0}'", assemblyFileName);
 			}
 			
 			Assembly assembly = Assembly.Load( assemblyFileName );
@@ -145,8 +132,8 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Registering controller descriptor for Area: '{0}' Name: '{1}'", 
-				                   descriptor.Area, descriptor.Name);
+				logger.Debug("Registering controller descriptor for Area: '{0}' Name: '{1}'", 
+				             descriptor.Area, descriptor.Name);
 			}
 
 			Tree.AddController(descriptor.Area, descriptor.Name, descriptor.ControllerType);

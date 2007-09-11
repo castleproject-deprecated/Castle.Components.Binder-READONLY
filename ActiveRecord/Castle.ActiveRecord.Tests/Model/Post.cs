@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -97,27 +97,27 @@ namespace Castle.ActiveRecord.Tests.Model
 
 		public static void DeleteAll()
 		{
-			DeleteAll(typeof(Post));
+			ActiveRecordBase.DeleteAll( typeof(Post) );
 		}
 
 		public static Post[] FindAll()
 		{
-			return (Post[]) FindAll(typeof(Post));
+			return (Post[]) ActiveRecordBase.FindAll( typeof(Post) );
 		}
 
 		public static Post Find(int id)
 		{
-			return (Post) FindByPrimaryKey(typeof(Post), id);
+			return (Post) ActiveRecordBase.FindByPrimaryKey( typeof(Post), id );
 		}
 
 		public static int FetchCount()
 		{
-			return Count(typeof(Post));
+			return ActiveRecordBase.CountAll(typeof(Post));
 		}
 
 		public static int FetchCount(string filter, params object[] args)
 		{
-			return Count(typeof(Post), filter, args);
+			return ActiveRecordBase.CountAll(typeof(Post), filter, args);
 		}
 
 		public void SaveWithException()

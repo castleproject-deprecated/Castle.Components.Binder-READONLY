@@ -2,20 +2,14 @@
 <project 
 	name="Cache-facility"
 	default="build"
-	xmlns="http://nant.sf.net/release/0.85/nant.xsd"
+	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
 >
     
-	<property name="root.dir" value="../.." />
-	<include buildfile="${root.dir}/common-project.xml" />
-
-	<fileset id="buildfiles.all">
-		<!-- Files have to be in dependency order -->
-		<include name="Castle.Facilities.Cache/Castle.Facilities.Cache.build" />
-		<include name="Castle.Facilities.Cache.Tests/Castle.Facilities.Cache.Tests.build" />
-	</fileset>
-
-	<target name="build" depends="common.build" />
+	<target name="build" depends="facility" />
 	
-	<target name="generate-assemblyinfo" depends="common.assemblyinfo" />
+	<target name="facility">
+		<nant buildfile="Castle.Facilities.Cache/Castle.Facilities.Cache.build" />
+		<nant buildfile="Castle.Facilities.Cache.Tests/Castle.Facilities.Cache.Tests.build" />
+	</target>
 	
 </project>

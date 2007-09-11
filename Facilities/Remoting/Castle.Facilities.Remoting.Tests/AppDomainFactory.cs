@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 namespace Castle.Facilities.Remoting.Tests
 {
 	using System;
+	using System.IO;
 	using System.Security.Policy;
 
 	public class AppDomainFactory
@@ -23,12 +24,18 @@ namespace Castle.Facilities.Remoting.Tests
 		{
 			AppDomain currentDomain = AppDomain.CurrentDomain;
 
+			String baseDir = new FileInfo(currentDomain.BaseDirectory).FullName;
+
+			String configFile =  String.Format(
+				"{0}/{1}.config", 
+				baseDir, name); 
+
 			AppDomainSetup setup = new AppDomainSetup();
 
 			setup.ApplicationName = name;
 			setup.ApplicationBase = currentDomain.SetupInformation.ApplicationBase;
 			setup.PrivateBinPath = currentDomain.SetupInformation.PrivateBinPath;
-			setup.ConfigurationFile = currentDomain.SetupInformation.ConfigurationFile;
+			setup.ConfigurationFile = configFile;
 
 			Evidence baseEvidence = currentDomain.Evidence;
 			Evidence evidence = new Evidence(baseEvidence);

@@ -34,7 +34,7 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DEBUG;DOTNET2</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
@@ -45,7 +45,7 @@
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -57,7 +57,7 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DOTNET2</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
@@ -68,7 +68,7 @@
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -85,17 +85,12 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <ProjectReference Include="..\Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR\Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR.csproj">
-      <Project>{B1DEC754-7B3F-4F3F-A99E-CB475C1AAFA2}</Project>
-      <Name>Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine\Castle.Components.Common.NVelocityTemplateEngine-vs2005.csproj">
       <Name>Castle.Components.Common.NVelocityTemplateEngine-vs2005</Name>
       <Project>{AA95F54F-BEC7-469A-B420-B19D1BBB8C3F}</Project>
@@ -106,10 +101,6 @@
       <Project>{9698FE03-CD65-4FBC-B734-7326674A4894}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
-     <ProjectReference Include="..\Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR\Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR.csproj">
-       <Project>{B1DEC754-7B3F-4F3F-A99E-CB475C1AAFA2}</Project>
-       <Name>Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR</Name>
-     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">

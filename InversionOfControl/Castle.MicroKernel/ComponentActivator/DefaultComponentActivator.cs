@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.Remoting;
-
 namespace Castle.MicroKernel.ComponentActivator
 {
 	using System;
 	using System.Reflection;
 
 	using Castle.Core;
-	using Castle.Core.Interceptor;
 	using Castle.MicroKernel.LifecycleConcerns;
 
 	/// <summary>
@@ -45,7 +42,7 @@ namespace Castle.MicroKernel.ComponentActivator
 
 		#region AbstractComponentActivator Members
 
-		protected override object InternalCreate(CreationContext context)
+		protected override sealed object InternalCreate(CreationContext context)
 		{
 			object instance = Instantiate(context);
 
@@ -75,44 +72,35 @@ namespace Castle.MicroKernel.ComponentActivator
 
 		protected virtual object CreateInstance(CreationContext context, object[] arguments, Type[] signature)
 		{
-			object instance = null;
+			object instance;
 
 			Type implType = Model.Implementation;
 
-			bool createProxy = Model.Interceptors.HasInterceptors;
-			bool createInstance = true;
-			
-			if (createProxy)
+			if (Model.Interceptors.HasInterceptors)
 			{
-				createInstance = Kernel.ProxyFactory.RequiresTargetInstance(Kernel, Model);
+				try
+				{
+					instance = Kernel.ProxyFactory.Create(Kernel, Model, arguments);
+				}
+				catch(Exception ex)
+				{
+					throw new ComponentActivatorException("ComponentActivator: could not proxy " + Model.Implementation.FullName, ex);
+				}
 			}
-
-			if (createInstance)
+			else
 			{
 				try
 				{
 					ConstructorInfo cinfo = implType.GetConstructor(
-							BindingFlags.Public | BindingFlags.Instance, null, signature, null);
+							BindingFlags.Public|BindingFlags.Instance, null, signature, null);
 
 					instance = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(implType);
 
 					cinfo.Invoke(instance, arguments);
 				}
-				catch (Exception ex)
-				{
-					throw new ComponentActivatorException("ComponentActivator: could not instantiate " + Model.Implementation.FullName, ex);
-				}
-			}
-
-			if (createProxy)
-			{
-				try
-				{
-					instance = Kernel.ProxyFactory.Create(Kernel, instance, Model, arguments);
-				}
 				catch(Exception ex)
 				{
-					throw new ComponentActivatorException("ComponentActivator: could not proxy " + Model.Implementation.FullName, ex);
+					throw new ComponentActivatorException("ComponentActivator: could not instantiate " + Model.Implementation.FullName, ex);
 				}
 			}
 			
@@ -121,14 +109,12 @@ namespace Castle.MicroKernel.ComponentActivator
 
 		protected virtual void ApplyCommissionConcerns(object instance)
 		{
-			instance = GetUnproxiedInstance(instance);
 			object[] steps = Model.LifecycleSteps.GetCommissionSteps();
 			ApplyConcerns(steps, instance);
 		}
 
 		protected virtual void ApplyDecommissionConcerns(object instance)
 		{
-			instance = GetUnproxiedInstance(instance);
 			object[] steps = Model.LifecycleSteps.GetDecommissionSteps();
 			ApplyConcerns(steps, instance);
 		}
@@ -149,42 +135,46 @@ namespace Castle.MicroKernel.ComponentActivator
 				return null;
 			}
 
+			if (Model.Constructors.BestCandidate != null)
+			{
+				return Model.Constructors.BestCandidate;
+			}
+
 			if (Model.Constructors.Count == 1)
 			{
 				return Model.Constructors.FewerArgumentsCandidate;
 			}
 
-			ConstructorCandidate winnerCandidate = null;
+			ConstructorCandidate winnerCandidate = null; 
 
-			int winnerPoints = 0;
-			
 			foreach(ConstructorCandidate candidate in Model.Constructors)
 			{
-				int candidatePoints = 0;
-				
 				foreach(DependencyModel dep in candidate.Dependencies)
 				{
 					if (CanSatisfyDependency(context, dep))
 					{
-						candidatePoints += 2;
+						candidate.Points += 2;
 					}
 					else
 					{
-						candidatePoints -= 2;
+						candidate.Points -= 2;
 					}
 				}
 
-				if (winnerCandidate == null || winnerPoints < candidatePoints)
+				if (winnerCandidate == null) winnerCandidate = candidate;
+
+				if (winnerCandidate.Points < candidate.Points)
 				{
 					winnerCandidate = candidate;
-					winnerPoints = candidatePoints;
 				}
 			}
 
 			if (winnerCandidate == null)
 			{
-				throw new ComponentActivatorException("Could not find eligible constructor for " + Model.Implementation.FullName);
+				throw new ComponentActivatorException("Could not find eligible constructor.");
 			}
+
+			Model.Constructors.BestCandidate = winnerCandidate;
 
 			return winnerCandidate;
 		}
@@ -208,11 +198,14 @@ namespace Castle.MicroKernel.ComponentActivator
 
 			foreach(DependencyModel dependency in constructor.Dependencies)
 			{
-				object value;
-				using(new DependencyTrackingScope(context, Model, constructor.Constructor, dependency))
-				{
-					value = Kernel.Resolver.Resolve(context, context.Handler, Model, dependency);
-				}
+				// We track dependencies in order to detect cycled graphs
+				// This prevents a stack overflow
+				DependencyModel dependencyKey = context.TrackDependency(constructor.Constructor, dependency);
+				
+				object value = Kernel.Resolver.Resolve(context, context.Handler, Model, dependency);
+
+				// The dependency was resolved successfully, we can stop tracking it.
+				context.UntrackDependency(dependencyKey);
 				arguments[index] = value;
 				signature[index++] = dependency.TargetType;
 			}
@@ -222,15 +215,13 @@ namespace Castle.MicroKernel.ComponentActivator
 
 		protected virtual void SetUpProperties(object instance, CreationContext context)
 		{
-			instance = GetUnproxiedInstance(instance);
-
 			foreach(PropertySet property in Model.Properties)
 			{
-				object value;
-				using(new DependencyTrackingScope(context, Model, property.Property, property.Dependency))
-				{
-					value = Kernel.Resolver.Resolve(context, context.Handler, Model, property.Dependency);
-				}
+				DependencyModel dependencyKey = context.TrackDependency(property.Property, property.Dependency);
+				object value = Kernel.Resolver.Resolve(context, context.Handler, Model, property.Dependency);
+
+				//The dependency was resolved successfully, we can stop tracking it.
+				context.UntrackDependency(dependencyKey);
 
 				if (value == null) continue;
 
@@ -247,21 +238,6 @@ namespace Castle.MicroKernel.ComponentActivator
 					throw new ComponentActivatorException(message, ex);
 				}
 			}
-		}
-
-		private static object GetUnproxiedInstance(object instance)
-		{
-			if (!RemotingServices.IsTransparentProxy(instance))
-			{
-				IProxyTargetAccessor accessor = instance as IProxyTargetAccessor;
-
-				if (accessor != null)
-				{
-					instance = accessor.DynProxyGetTarget();
-				}
-			}
-			
-			return instance;
 		}
 	}
 }

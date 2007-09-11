@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace Castle.MicroKernel.Lifestyle
 				{
 					throw new ConfigurationException("Looks like you forgot to register the http module " +
 						typeof(PerWebRequestLifestyleModule).FullName +
-						"\r\nAdd '<add name=\"PerRequestLifestyle\" type=\"Castle.MicroKernel.Lifestyle.PerWebRequestLifestyleModule, Castle.MicroKernel\" />' " +
+						"\r\nAdd '<add name=\"PerRequestLifestyle\" type=\"ClientService.RBT.Components.IoC.PerWebRequestLifestyleModule, ClientService.RBT.Components\" />' " +
                         "to the <httpModules> section on your web.config");
 				}
 

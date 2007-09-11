@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace Castle.MonoRail.Framework.Internal
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Collecting helpers for {0}", controllerType);
+				logger.Debug("Collecting helpers for {0}", controllerType);
 			}
 
 			object[] attributes = controllerType.GetCustomAttributes(typeof(IHelperDescriptorBuilder), true);
@@ -68,7 +68,7 @@ namespace Castle.MonoRail.Framework.Internal
 				{
 					foreach(HelperDescriptor desc in descs)
 					{
-						logger.DebugFormat("Collected helper {0} with name {1}", desc.HelperType, desc.Name);
+						logger.Debug("Collected helper {0} with name {1}", desc.HelperType, desc.Name);
 					}
 				}
 				

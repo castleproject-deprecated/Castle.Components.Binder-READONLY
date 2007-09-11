@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Castle.Core.Interceptor;
+using Castle.DynamicProxy;
+using IInterceptor = Castle.DynamicProxy.IInterceptor;
+using IInvocation = Castle.DynamicProxy.IInvocation;
+
 namespace Castle.Windsor.Proxy
 {
 	using System;
 	using System.Reflection;
 	using System.Runtime.Serialization;
+	
 	using Castle.Core;
-	using Castle.Core.Interceptor;
-	using Castle.DynamicProxy;
 	using Castle.MicroKernel;
 
 	/// <summary>
@@ -46,70 +50,77 @@ namespace Castle.Windsor.Proxy
 			Init();
 		}
 
-		public override object Create(IKernel kernel, object target, ComponentModel model,
-		                              params object[] constructorArguments)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="kernel"></param>
+		/// <param name="model"></param>
+		/// <param name="constructorArguments"></param>
+		/// <returns></returns>
+		public override object Create(IKernel kernel, ComponentModel model, params object[] constructorArguments)
 		{
-			object proxy;
+			IMethodInterceptor[] interceptors = ObtainInterceptors(kernel, model);
+			IInterceptor interceptorChain = new InterceptorChain(interceptors);
 
-			IInterceptor[] interceptors = ObtainInterceptors(kernel, model);
+			// This is a hack to avoid unnecessary object creation 
+			// and unecessary delegations.
+			// We supply our contracts (Interceptor and Invocation)
+			// and the implementation for Invocation dispatchers
+			// DynamicProxy should be able to use them as long as the 
+			// signatures match
+			GeneratorContext context = new GeneratorContext();
+			context.Interceptor = typeof(IMethodInterceptor);
+			context.Invocation = typeof(IMethodInvocation);
+			context.SameClassInvocation = typeof(DefaultMethodInvocation);
+			context.InterfaceInvocation = typeof(DefaultMethodInvocation);
 
-			ProxyGenerationOptions options = ProxyUtil.ObtainProxyGenerationOptions(model, true);
+			CustomizeContext(context, kernel, model, constructorArguments);
 
-			CustomizeOptions(options, kernel, model, constructorArguments);
+			object proxy = null;
 
 			if (model.Service.IsInterface)
 			{
-				Type[] interfaces = null;
+				Object target = Activator.CreateInstance( model.Implementation, constructorArguments );
 
-				if (options.BaseTypeForInterfaceProxy == null)
-				{
-					options.BaseTypeForInterfaceProxy = typeof(MarshalByRefObject);
-				}
-
-				if (!options.UseSingleInterfaceProxy)
-				{
-					interfaces = CollectInterfaces(model);
-				}
-
-				proxy = generator.CreateInterfaceProxyWithTarget(model.Service, interfaces, 
-				                                                 target, options, interceptors);
+				proxy = generator.CreateCustomProxy( CollectInterfaces(model.Service, model.Implementation), 
+					interceptorChain, target, context);
 			}
 			else
 			{
-				proxy = generator.CreateClassProxy(model.Implementation, null, options,
-				                                   constructorArguments, interceptors);
+				proxy = generator.CreateCustomClassProxy(model.Implementation, 
+					interceptorChain, context, constructorArguments);
 			}
 
-			CustomizeProxy(proxy, options, kernel, model);
+			CustomizeProxy(proxy, context, kernel, model);
 
 			return proxy;
 		}
 
-		protected virtual void CustomizeProxy(object proxy, ProxyGenerationOptions options, 
-		                                      IKernel kernel, ComponentModel model)
+		protected virtual void CustomizeProxy(object proxy, GeneratorContext context, 
+			IKernel kernel, ComponentModel model)
 		{
 		}
 
-		protected virtual void CustomizeOptions(ProxyGenerationOptions options, IKernel kernel, 
-		                                        ComponentModel model, object[] arguments)
+		protected virtual void CustomizeContext(GeneratorContext context, IKernel kernel, 
+			ComponentModel model, object[] arguments)
 		{
-		}
-		
-		public override bool RequiresTargetInstance(IKernel kernel, ComponentModel model)
-		{
-			return model.Service.IsInterface;
 		}
 
-		protected Type[] CollectInterfaces(ComponentModel model)
+		protected Type[] CollectInterfaces(Type service, Type implementation)
 		{
-			return model.Implementation.FindInterfaces(new TypeFilter(EmptyTypeFilter), model.Service);
+			Type[] interfaces = implementation.FindInterfaces(new TypeFilter(EmptyTypeFilter), null);
+
+			if (interfaces.Length == 0)
+			{
+				return new Type[] { service };
+			}
+
+			return interfaces;
 		}
 
 		private bool EmptyTypeFilter(Type type, object criteria)
 		{
-			Type mainInterface = (Type) criteria;
-
-			return !type.IsAssignableFrom(mainInterface);
+			return true;
 		}
 
 		#region IDeserializationCallback

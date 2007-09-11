@@ -158,6 +158,10 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "facilityconfig.xml"
+                    BuildAction = "Content"
+                />
+                <File
                     RelPath = "Common\Blog.cs"
                     SubType = "Code"
                     BuildAction = "Compile"

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,13 +46,8 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 			Add( new EnumConverter() );
 			Add( new ListConverter() );
 			Add( new DictionaryConverter() );
-#if DOTNET2
-			Add( new GenericDictionaryConverter() );
-			Add( new GenericListConverter() );
-#endif
 			Add( new ArrayConverter() ); 
-			Add( new ComponentConverter() );
-			Add( new AttributeAwareConverter() );
+			Add( new ComponentConverter() ); 
 		}
 
 		#region IConversionManager Members
@@ -101,9 +96,10 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 
 	    public bool CanHandleType(Type type, IConfiguration configuration)
 	    {
-            foreach(ITypeConverter converter in converters)
+            foreach (ITypeConverter converter in converters)
             {
-                if (converter.CanHandleType(type, configuration)) return true;
+                if (converter.CanHandleType(type,configuration))
+                    return true;
             }
 
             return false;
@@ -113,10 +109,8 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 		{
 			foreach(ITypeConverter converter in converters)
 			{
-				if (converter.CanHandleType(targetType))
-				{
+				if (converter.CanHandleType(targetType)) 
 					return converter.PerformConversion(value, targetType);
-				}
 			}
 
 			String message = String.Format("No converter registered to handle the type {0}", 
@@ -129,10 +123,8 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 		{
 			foreach(ITypeConverter converter in converters)
 			{
-				if (converter.CanHandleType(targetType, configuration))
-				{
+				if (converter.CanHandleType(targetType,configuration)) 
 					return converter.PerformConversion(configuration, targetType);
-				}
 			}
 
 			String message = String.Format("No converter registered to handle the type {0}", 

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 {
 	using System;
 
-	[ActiveRecord(Lazy = false)]
+	[ActiveRecord]
 	public class BelongsToClassA : ActiveRecordBase
 	{
 		private int id;
@@ -29,7 +29,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 			set { id = value; }
 		}
 
-		[ BelongsTo( "classa_id", ForeignKey = "FK_FOREIGN_KEY_A" ) ]
+		[ BelongsTo( "classa_id" ) ]
 		public ClassA ClassA
 		{
 			get { return classA; }
@@ -37,7 +37,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 		}
 	}
 
-	[ActiveRecord(Lazy = false)]
+	[ActiveRecord]
 	public class BelongsToClassA2 : ActiveRecordBase
 	{
 		private int id;
@@ -50,8 +50,8 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 			set { id = value; }
 		}
 
-		[ BelongsTo( "classa_id", Update=false, Insert=false, NotNull=true, Unique=true,
-			Cascade = CascadeEnum.SaveUpdate, ForeignKey = "FK_FOREIGN_KEY_B")]
+		[ BelongsTo( "classa_id", Update=false, Insert=false, NotNull=true, Unique=true, 
+			  Cascade=CascadeEnum.SaveUpdate ) ]
 		public ClassA ClassA
 		{
 			get { return classA; }

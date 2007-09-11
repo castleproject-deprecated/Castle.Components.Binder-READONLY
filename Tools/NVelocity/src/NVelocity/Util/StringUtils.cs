@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ namespace NVelocity.Util
 		public static String RemoveUnderScores(String data)
 		{
 			String temp = null;
-			StringBuilder output = new StringBuilder();
+			StringBuilder out_Renamed = new StringBuilder();
 			temp = data;
 
 			SupportClass.Tokenizer st = new SupportClass.Tokenizer(temp, "_");
@@ -107,10 +107,10 @@ namespace NVelocity.Util
 			while (st.HasMoreTokens())
 			{
 				String element = (String) st.NextToken();
-				output.Append(FirstLetterCaps(element));
+				out_Renamed.Append(FirstLetterCaps(element));
 			}
 
-			return output.ToString();
+			return out_Renamed.ToString();
 		}
 
 		/// <summary> <p>
@@ -161,7 +161,7 @@ namespace NVelocity.Util
 		public static String RemoveAndHump(String data, String replaceThis)
 		{
 			String temp = null;
-			StringBuilder output = new StringBuilder();
+			StringBuilder out_Renamed = new StringBuilder();
 			temp = data;
 
 			SupportClass.Tokenizer st = new SupportClass.Tokenizer(temp, replaceThis);
@@ -169,10 +169,10 @@ namespace NVelocity.Util
 			while (st.HasMoreTokens())
 			{
 				String element = (String) st.NextToken();
-				output.Append(CapitalizeFirstLetter(element));
+				out_Renamed.Append(CapitalizeFirstLetter(element));
 			} //while
 
-			return output.ToString();
+			return out_Renamed.ToString();
 		}
 
 		/// <summary> <p>

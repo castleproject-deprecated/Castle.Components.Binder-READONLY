@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -246,22 +246,6 @@ namespace Castle.MicroKernel
 		/// <returns></returns>
 		object Resolve(String key, Type service);
 
-		/// <summary>
-		/// Returns component instances that implement TService
-		/// </summary>
-		/// <typeparam name="TService"></typeparam>
-		/// <returns></returns>
-		TService[] ResolveServices<TService>();
-
-		/// <summary>
-		/// Returns a component instance by the key
-		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="service"></param>
-		/// <param name="arguments"></param>
-		/// <returns></returns>
-		object Resolve(String key, Type service, IDictionary arguments);
-		
 		#endif
 		
 		/// <summary>

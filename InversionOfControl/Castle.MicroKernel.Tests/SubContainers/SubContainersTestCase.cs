@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@ namespace Castle.MicroKernel.Tests.SubContainers
 {
 	using System;
 	using System.Collections;
+
 	using NUnit.Framework;
-	using Castle.Core;
+
 	using Castle.MicroKernel.Tests.ClassComponents;
 
 	/// <summary>
@@ -41,107 +42,16 @@ namespace Castle.MicroKernel.Tests.SubContainers
 		}
 
 		[Test]
-		public void ChildDependenciesSatisfiedAmongContainers()
-		{
-			IKernel subkernel = new DefaultKernel();
-
-			kernel.AddComponent("templateengine", typeof(DefaultTemplateEngine)); 
-			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService));
-
-			kernel.AddChildKernel(subkernel);
-			subkernel.AddComponent("spamservice", typeof(DefaultSpamService));
-
-			DefaultSpamService spamservice = (DefaultSpamService) subkernel["spamservice"];
-
-			Assert.IsNotNull(spamservice);
-			Assert.IsNotNull(spamservice.MailSender);
-			Assert.IsNotNull(spamservice.TemplateEngine);
-		}
-
-		[Test, Ignore("Not passing")]
-		public void SameLevelDependenciesSatisfied()
-		{
-			IKernel subkernel = new DefaultKernel();
-
-			kernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
-			kernel.AddComponent("spamservice", typeof(DefaultSpamService));
-
-			kernel.AddChildKernel(subkernel);
-			subkernel.AddComponent("mailsender", typeof(DefaultMailSenderService));
-
-			DefaultSpamService spamservice = (DefaultSpamService) subkernel["spamservice"];
-
-			Assert.IsNotNull(spamservice);
-			Assert.IsNotNull(spamservice.MailSender);
-			Assert.IsNotNull(spamservice.TemplateEngine);
-		}
-
-		[Test, Ignore("This is not passing, and anyway, the goal should be reviewed")]
-		public void UseChildComponentsForParentDependenciesWhenRequestedFromChild()
-		{
-			IKernel subkernel = new DefaultKernel();
-
-			kernel.AddComponent("spamservice", typeof(DefaultSpamService), LifestyleType.Transient);
-			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService));
-			kernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
-
-			kernel.AddChildKernel(subkernel);
-			subkernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
-
-			DefaultTemplateEngine templateengine = (DefaultTemplateEngine) kernel["templateengine"];
-			DefaultTemplateEngine sub_templateengine = (DefaultTemplateEngine) subkernel["templateengine"];
-
-			DefaultSpamService spamservice = (DefaultSpamService) subkernel["spamservice"];
-			Assert.AreNotEqual(spamservice.TemplateEngine, templateengine);
-			Assert.AreEqual(spamservice.TemplateEngine, sub_templateengine);
-
-			spamservice = (DefaultSpamService) kernel["spamservice"];
-			Assert.AreNotEqual(spamservice.TemplateEngine, sub_templateengine);
-			Assert.AreEqual(spamservice.TemplateEngine, templateengine);
-
-			kernel.RemoveComponent("templateengine");
-			spamservice = (DefaultSpamService) kernel["spamservice"];
-			Assert.IsNull(spamservice.TemplateEngine);
-		}
-
-		[Test, Ignore("This is not passing, and anyway, the goal should be reviewed")]
-		public void Singleton_WithNonSingletonDependencies_DoesNotReResolveDependencies()
-		{
-			kernel.AddComponent("spamservice", typeof(DefaultSpamService));
-			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService));
-
-			IKernel subkernel1 = new DefaultKernel();
-			subkernel1.AddComponent("templateengine", typeof(DefaultTemplateEngine));
-			kernel.AddChildKernel(subkernel1);
-
-			IKernel subkernel2 = new DefaultKernel();
-			subkernel2.AddComponent("templateengine", typeof(DefaultTemplateEngine), LifestyleType.Transient);
-			kernel.AddChildKernel(subkernel2);
-
-			DefaultTemplateEngine templateengine1 = (DefaultTemplateEngine) subkernel1["templateengine"];
-			DefaultSpamService spamservice1 = (DefaultSpamService) subkernel1["spamservice"];
-			Assert.IsNotNull(spamservice1);
-			Assert.AreEqual(spamservice1.TemplateEngine.Key, templateengine1.Key);
-
-			DefaultTemplateEngine templateengine2 = (DefaultTemplateEngine) subkernel2["templateengine"];
-			DefaultSpamService spamservice2 = (DefaultSpamService) subkernel2["spamservice"];
-			Assert.IsNotNull(spamservice2);
-			Assert.AreEqual(spamservice1, spamservice2);
-			Assert.AreEqual(spamservice1.TemplateEngine.Key, templateengine1.Key);
-			Assert.AreNotEqual(spamservice2.TemplateEngine.Key, templateengine2.Key);
-		}
-
-		[Test]
 		public void DependenciesSatisfiedAmongContainers()
 		{
 			IKernel subkernel = new DefaultKernel();
 
-			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService));
-			kernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
+			kernel.AddComponent( "mailsender", typeof(DefaultMailSenderService) );
+			kernel.AddComponent( "templateengine", typeof(DefaultTemplateEngine) );
 
 			kernel.AddChildKernel(subkernel);
 
-			subkernel.AddComponent("spamservice", typeof(DefaultSpamService));
+			subkernel.AddComponent( "spamservice", typeof(DefaultSpamService) );
 
 			DefaultSpamService spamservice = (DefaultSpamService) subkernel["spamservice"];
 
@@ -155,14 +65,14 @@ namespace Castle.MicroKernel.Tests.SubContainers
 		{
 			IKernel subkernel = new DefaultKernel();
 
-			subkernel.AddComponent("spamservice", typeof(DefaultSpamServiceWithConstructor));
+			subkernel.AddComponent( "spamservice", typeof(DefaultSpamServiceWithConstructor) );
 
-			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService));
-			kernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
+			kernel.AddComponent( "mailsender", typeof(DefaultMailSenderService) );
+			kernel.AddComponent( "templateengine", typeof(DefaultTemplateEngine) );
 
 			kernel.AddChildKernel(subkernel);
 
-			DefaultSpamServiceWithConstructor spamservice =
+			DefaultSpamServiceWithConstructor spamservice = 
 				(DefaultSpamServiceWithConstructor) subkernel["spamservice"];
 
 			Assert.IsNotNull(spamservice);
@@ -175,13 +85,14 @@ namespace Castle.MicroKernel.Tests.SubContainers
 		{
 			IKernel subkernel = new DefaultKernel();
 
-			kernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
+			kernel.AddComponent( "templateengine", typeof(DefaultTemplateEngine) );
 
 			kernel.AddChildKernel(subkernel);
 
 
 			Assert.IsTrue(subkernel.HasComponent(typeof(DefaultTemplateEngine)));
 			Assert.IsNotNull(subkernel[typeof(DefaultTemplateEngine)]);
+
 		}
 
 		[Test]
@@ -190,7 +101,7 @@ namespace Castle.MicroKernel.Tests.SubContainers
 		{
 			IKernel subkernel = new DefaultKernel();
 
-			subkernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
+			subkernel.AddComponent( "templateengine", typeof(DefaultTemplateEngine) );
 
 			kernel.AddChildKernel(subkernel);
 
@@ -215,7 +126,7 @@ namespace Castle.MicroKernel.Tests.SubContainers
 			Assert.AreEqual(instance2, kernel["engine"]);
 
 			kernel.AddChildKernel(subkernel);
-			Assert.AreEqual(instance1, subkernel["engine"]);
+			Assert.AreEqual(instance1, subkernel["engine"]);			
 			Assert.AreEqual(instance2, kernel["engine"]);
 		}
 
@@ -241,32 +152,30 @@ namespace Castle.MicroKernel.Tests.SubContainers
 
 		[Test]
 		public void RemoveChildKernelCleansUp()
-		{
+		{					
 			IKernel subkernel = new DefaultKernel();
 			EventsCollector eventCollector = new EventsCollector(subkernel);
 			subkernel.RemovedAsChildKernel += new EventHandler(eventCollector.RemovedAsChildKernel);
 			subkernel.AddedAsChildKernel += new EventHandler(eventCollector.AddedAsChildKernel);
-
+			
 			kernel.AddChildKernel(subkernel);
 			Assert.AreEqual(kernel, subkernel.Parent);
 			Assert.AreEqual(1, eventCollector.Events.Count);
 			Assert.AreEqual(EventsCollector.Added, eventCollector.Events[0]);
-
+			
 			kernel.RemoveChildKernel(subkernel);
-			Assert.IsNull(subkernel.Parent);
+			Assert.IsNull(subkernel.Parent);			
 			Assert.AreEqual(2, eventCollector.Events.Count);
-			Assert.AreEqual(EventsCollector.Removed, eventCollector.Events[1]);
+			Assert.AreEqual(EventsCollector.Removed, eventCollector.Events[1]);		
 		}
 
 		[Test]
-		[ExpectedException(typeof(KernelException),
-			"You can not change the kernel parent once set, use the RemoveChildKernel and AddChildKernel methods together to achieve this."
-			)]
+		[ExpectedException(typeof(KernelException), "You can not change the kernel parent once set, use the RemoveChildKernel and AddChildKernel methods together to achieve this.")]
 		public void AddChildKernelToTwoParentsThrowsException()
 		{
 			IKernel kernel2 = new DefaultKernel();
 
-			IKernel subkernel = new DefaultKernel();
+			IKernel subkernel = new DefaultKernel();			
 
 			kernel.AddChildKernel(subkernel);
 			Assert.AreEqual(kernel, subkernel.Parent);
@@ -281,7 +190,7 @@ namespace Castle.MicroKernel.Tests.SubContainers
 			EventsCollector eventCollector = new EventsCollector(subkernel);
 			subkernel.RemovedAsChildKernel += new EventHandler(eventCollector.RemovedAsChildKernel);
 			subkernel.AddedAsChildKernel += new EventHandler(eventCollector.AddedAsChildKernel);
-
+			
 			kernel.AddChildKernel(subkernel);
 			kernel.RemoveChildKernel(subkernel);
 			kernel.AddChildKernel(subkernel);
@@ -291,7 +200,7 @@ namespace Castle.MicroKernel.Tests.SubContainers
 			Assert.AreEqual(EventsCollector.Added, eventCollector.Events[0]);
 			Assert.AreEqual(EventsCollector.Removed, eventCollector.Events[1]);
 			Assert.AreEqual(EventsCollector.Added, eventCollector.Events[2]);
-			Assert.AreEqual(EventsCollector.Removed, eventCollector.Events[3]);
+			Assert.AreEqual(EventsCollector.Removed, eventCollector.Events[3]);			
 		}
 
 		/// <summary>
@@ -301,11 +210,11 @@ namespace Castle.MicroKernel.Tests.SubContainers
 		private class EventsCollector
 		{
 			public const string Added = "added";
-			public const string Removed = "removed";
-
+			public const string Removed = "removed";						
+			
 			private ArrayList events;
 			private object expectedSender;
-
+		
 			public ArrayList Events
 			{
 				get { return events; }
@@ -316,7 +225,7 @@ namespace Castle.MicroKernel.Tests.SubContainers
 				this.expectedSender = expectedSender;
 				this.events = new ArrayList();
 			}
-
+			
 			public void AddedAsChildKernel(object sender, EventArgs e)
 			{
 				Assert.AreEqual(expectedSender, sender);

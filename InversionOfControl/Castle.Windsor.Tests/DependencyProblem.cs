@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,14 +82,6 @@ namespace Castle.Windsor.Tests
 			Assert.IsNotNull(container["C"]);
 		}
 
-		[Test]
-		public void CtorSourceOrderDoesNotMatter()
-		{
-			container.AddComponent("D", typeof(D));
-			Assert.IsNotNull(container["D"]);			
-		
-		}
-
 		public class A
 		{
 			public A(B b)
@@ -108,19 +100,6 @@ namespace Castle.Windsor.Tests
 		{
 			public C()
 			{
-			}
-		}
-
-		public class D
-		{
-			public D(B b)
-			{
-
-			}
-
-			public D()
-			{
-
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,29 +17,20 @@ namespace Castle.ActiveRecord
 	using System;
 
 	/// <summary>
-	/// Define how broken relations should be handled.
+	/// Defines the cascading behaviour of this association.
 	/// </summary>
-	[Serializable]
-	public enum NotFoundBehaviour
+	public enum CascadeEnum
 	{
-		/// <summary>
-		/// Throw an exception when the relation is broken.
-		/// </summary>
-		Default,
-		
-		/// <summary>
-		/// Throw an exception when the relation is broken.
-		/// </summary>
-		/// <remarks>this is the default behaviour</remarks>
-		Exception,
-
-		/// <summary>
-		/// Ignore the broken relation and update
-		/// the FK to null on the next save.
-		/// </summary>
-		Ignore
+		/// <summary> No cascading. This is the default. </summary>
+		None,
+		/// <summary> Cascade save, update and delete. </summary>
+		All,
+		/// <summary> Cascade save and update. </summary>
+		SaveUpdate,
+		/// <summary> Cascade delete. </summary>
+		Delete
 	}
-	
+
 	/// <summary>
 	/// Maps a one to one association.
 	/// </summary>
@@ -66,15 +57,12 @@ namespace Castle.ActiveRecord
 		private Type type;
 		private String column;
 		private String[] compositeKeyColumns;
-		private String uniqueKey;
-		private String foreignKey;
 		private bool update = true;
 		private bool insert = true;
 		private bool notnull;
 		private bool unique;
-		private FetchEnum fetchMethod = FetchEnum.Unspecified;
+		private OuterJoinEnum outerJoin = OuterJoinEnum.Auto;
 		private CascadeEnum cascade = CascadeEnum.None;
-		private NotFoundBehaviour notFoundBehaviour = NotFoundBehaviour.Default;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BelongsToAttribute"/> class.
@@ -130,56 +118,11 @@ namespace Castle.ActiveRecord
 
 		/// <summary>
 		/// Defines the outer join behavior of this association.
-		/// NHibernate has deprecated the outer-join attribute so this property is
-		/// marked obsolete - it now converts to and from the fetch value.
 		/// </summary>
-		[Obsolete("Use the Fetch property instead")]
 		public OuterJoinEnum OuterJoin
 		{
-			get
-			{
-				OuterJoinEnum returnValue = OuterJoinEnum.Auto;
-
-				switch(fetchMethod)
-				{
-					case FetchEnum.Unspecified:
-						returnValue = OuterJoinEnum.Auto;
-						break;
-					case FetchEnum.Join:
-						returnValue = OuterJoinEnum.True;
-						break;
-					case FetchEnum.Select:
-						returnValue = OuterJoinEnum.False;
-						break;
-				}
-
-				return returnValue;
-			}
-			set
-			{
-				switch(value)
-				{
-					case OuterJoinEnum.Auto:
-						fetchMethod = FetchEnum.Unspecified;
-						break;
-					case OuterJoinEnum.True:
-						fetchMethod = FetchEnum.Join;
-						break;
-					case OuterJoinEnum.False:
-						fetchMethod = FetchEnum.Select;
-						break;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Chooses between outer-join fetching
-		/// or sequential select fetching.
-		/// </summary>
-		public FetchEnum Fetch
-		{
-			get { return fetchMethod; }
-			set { fetchMethod = value; }
+			get { return outerJoin; }
+			set { outerJoin = value; }
 		}
 
 		/// <summary>
@@ -216,44 +159,6 @@ namespace Castle.ActiveRecord
 		{
 			get { return unique; }
 			set { unique = value; }
-		}
-
-		/// <summary>
-		/// Gets or sets the way broken relations are handled.
-		/// </summary>
-		/// <value>The behaviour.</value>
-		public NotFoundBehaviour NotFoundBehaviour
-		{
-			get { return notFoundBehaviour; }
-			set { notFoundBehaviour = value; }
-		}
-
-		/// <summary>
-		/// From NHibernate documentation:
-		/// A unique-key attribute can be used to group columns 
-		/// in a single unit key constraint. 
-		/// </summary>
-		/// <value>unique key name</value>
-		/// <remarks>
-		/// Currently, the 
-		/// specified value of the unique-key attribute is not 
-		/// used to name the constraint, only to group the columns 
-		/// in the mapping file.
-		/// </remarks>
-		public string UniqueKey
-		{
-			get { return uniqueKey; }
-			set { uniqueKey = value; }
-		}
-
-		/// <summary>
-		/// Gets and sets the name of the foreign key constraint 
-		/// generated for an association.
-		/// </summary>
-		public string ForeignKey
-		{
-			get { return foreignKey; }
-			set { foreignKey = value; }
 		}
 	}
 }

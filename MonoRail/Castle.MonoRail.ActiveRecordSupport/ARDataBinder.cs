@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,18 +16,12 @@ namespace Castle.MonoRail.ActiveRecordSupport
 {
 	using System;
 	using System.Collections;
-#if DOTNET2
-	using System.Collections.Generic;
-#endif
 	using System.Reflection;
 	using Castle.ActiveRecord;
 	using Castle.ActiveRecord.Framework.Internal;
 	using Castle.Components.Binder;
-
+	
 	using Iesi.Collections;
-#if DOTNET2
-	using Iesi.Collections.Generic;
-#endif
 
 	/// <summary>
 	/// Extends <see cref="DataBinder"/> class with some 
@@ -127,55 +121,7 @@ namespace Castle.MonoRail.ActiveRecordSupport
 
 			return instance;
 		}
-
-		/// <summary>
-		/// for joined subclasses HasAndBelongsToMany properties doesn't include the ones of the parent class
-		/// so we need to check them recursively
-		/// </summary>
-		protected bool FindPropertyInHasAndBelongsToMany(ActiveRecordModel model, string propertyName,
-			 ref Type foundType, ref ActiveRecordModel foundModel)
-		{
-			foreach (HasAndBelongsToManyModel hasMany2ManyModel in model.HasAndBelongsToMany)
-			{
-				// Inverse=true relations will be ignored
-				if (hasMany2ManyModel.Property.Name == propertyName && !hasMany2ManyModel.HasManyAtt.Inverse)
-				{
-					foundType = hasMany2ManyModel.HasManyAtt.MapType;
-					foundModel = ActiveRecordModel.GetModel(foundType);
-					return true;
-				}
-			}
-			if (model.IsJoinedSubClass || model.IsDiscriminatorSubClass)
-			{
-				return FindPropertyInHasAndBelongsToMany(model.Parent, propertyName, ref foundType, ref foundModel);
-			}
-			return false;
-		}
-
-		/// <summary>
-		/// for joined subclasses HasMany properties doesn't include the ones of the parent class
-		/// so we need to check them recursively
-		/// </summary>
-		protected bool FindPropertyInHasMany(ActiveRecordModel model, string propertyName,
-		                                     ref Type foundType, ref ActiveRecordModel foundModel)
-		{
-			foreach (HasManyModel hasManyModel in model.HasMany)
-			{
-				// Inverse=true relations will be ignored
-				if (hasManyModel.Property.Name == propertyName && !hasManyModel.HasManyAtt.Inverse)
-				{
-					foundType = hasManyModel.HasManyAtt.MapType;
-					foundModel = ActiveRecordModel.GetModel(foundType);
-					return true;
-				}
-			}
-			if (model.IsJoinedSubClass || model.IsDiscriminatorSubClass)
-			{
-				return FindPropertyInHasMany(model.Parent, propertyName, ref foundType, ref foundModel);
-			}
-			return false;
-		}
-
+		
 		protected override object BindSpecialObjectInstance(Type instanceType, string prefix, Node node, out bool succeeded)
 		{
 			succeeded = false;
@@ -193,11 +139,35 @@ namespace Castle.MonoRail.ActiveRecordSupport
 			Type targetType = null;
 			ActiveRecordModel targetModel = null;
 
-			found = FindPropertyInHasAndBelongsToMany(model, prefix, ref targetType, ref targetModel);
+			foreach(HasAndBelongsToManyModel hasMany2ManyModel in model.HasAndBelongsToMany)
+			{
+				// Inverse=true relations will be ignored
+				if (hasMany2ManyModel.Property.Name == prefix && !hasMany2ManyModel.HasManyAtt.Inverse)
+				{
+					targetType = hasMany2ManyModel.HasManyAtt.MapType;
 
+					targetModel = ActiveRecordModel.GetModel(targetType);
+
+					found = true;
+					break;
+				}
+			}
+			
 			if (!found)
 			{
-				found = FindPropertyInHasMany(model, prefix, ref targetType, ref targetModel);
+				foreach(HasManyModel hasManyModel in model.HasMany)
+				{
+					// Inverse=true relations will be ignored
+					if (hasManyModel.Property.Name == prefix && !hasManyModel.HasManyAtt.Inverse)
+					{
+						targetType = hasManyModel.HasManyAtt.MapType;
+
+						targetModel = ActiveRecordModel.GetModel(targetType);
+
+						found = true;
+						break;
+					}
+				}
 			}
 
 			if (found)
@@ -264,26 +234,6 @@ namespace Castle.MonoRail.ActiveRecordSupport
 			return IsContainerType(instanceType);
 		}
 
-		/// <summary>
-		/// for joined subclasses BelongsTo properties doesn't include the ones of the parent class
-		/// so we need to check them recursively
-		/// </summary>
-		protected bool IsBelongsToRef(ActiveRecordModel arModel, string prefix)
-		{
-			foreach (BelongsToModel model in arModel.BelongsTo)
-			{
-				if (model.Property.Name == prefix)
-				{
-					return true;
-				}
-			}
-			if (arModel.IsJoinedSubClass || arModel.IsDiscriminatorSubClass)
-			{
-				return IsBelongsToRef(arModel.Parent, prefix);
-			}
-			return false;
-		}
-
 		protected override bool ShouldRecreateInstance(object value, Type type, string prefix, Node node)
 		{
 			if (IsContainerType(type))
@@ -295,12 +245,16 @@ namespace Castle.MonoRail.ActiveRecordSupport
 			{
 				// If it's a belongsTo ref, we need to recreate it 
 				// instead of overwrite its properties, otherwise NHibernate will complain
-				if (IsBelongsToRef(CurrentARModel, prefix))
+
+				foreach(BelongsToModel model in CurrentARModel.BelongsTo)
 				{
-					return true;
+					if (model.Property.Name == prefix)
+					{
+						return true;
+					}
 				}
 			}
-
+			
 			return base.ShouldRecreateInstance(value, type, prefix, node);
 		}
 		
@@ -317,7 +271,15 @@ namespace Castle.MonoRail.ActiveRecordSupport
 		
 		private object ObtainPrimaryKeyValue(ActiveRecordModel model, CompositeNode node, String prefix, out PrimaryKeyModel pkModel)
 		{
-			pkModel = ObtainPrimaryKey(model);
+
+			if (model.IsJoinedSubClass)
+			{
+				pkModel = model.Parent.PrimaryKey;
+			}
+			else
+			{
+				pkModel = model.PrimaryKey;
+			}
 			
 			String pkPropName = pkModel.Property.Name;
 			
@@ -342,15 +304,6 @@ namespace Castle.MonoRail.ActiveRecordSupport
 			return Converter.Convert(pkModel.Property.PropertyType, lNode.ValueType, lNode.Value, out conversionSuc);
 		}
 		
-		private static PrimaryKeyModel ObtainPrimaryKey(ActiveRecordModel model)
-		{
-			if (model.IsJoinedSubClass || model.IsDiscriminatorSubClass)
-			{
-				return ObtainPrimaryKey(model.Parent);
-			}
-			return model.PrimaryKey;
-		}
-
 		private bool IsValidKey(object id)
 		{
 			if (id != null)
@@ -390,34 +343,15 @@ namespace Castle.MonoRail.ActiveRecordSupport
 
 		private object CreateContainer(Type type)
 		{
-#if DOTNET2
-			if (type.IsGenericType)
+			if (type == typeof(IList))
 			{
-				if (type.GetGenericTypeDefinition() == typeof(ISet<>))
-				{
-					Type[] genericArgs = type.GetGenericArguments();
-					Type genericType = typeof(HashedSet<>).MakeGenericType(genericArgs);
-					return Activator.CreateInstance(genericType);
-				}
-				else if (type.GetGenericTypeDefinition() == typeof(IList<>))
-				{
-					Type[] genericArgs = type.GetGenericArguments();
-					Type genericType = typeof(List<>).MakeGenericType(genericArgs);
-					return Activator.CreateInstance(genericType);
-				}
+				return new ArrayList();
 			}
-			else
-#endif
+			else if (type == typeof(ISet))
 			{
-				if (type == typeof(IList))
-				{
-					return new ArrayList();
-				}
-				else if (type == typeof(ISet))
-				{
-					return new HashedSet();
-				}
+				return new HashedSet();
 			}
+
 			return null;
 		}
 		

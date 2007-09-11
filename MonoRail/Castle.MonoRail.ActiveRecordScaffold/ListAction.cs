@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			base.PerformActionProcess(controller);
 			
 			controller.PropertyBag.Add( "items", 
-				PaginationHelper.CreatePagination(controller, PerformFindAll(), 10) );
+				PaginationHelper.CreatePagination(PerformFindAll(), 10) );
 			
 			controller.PropertyBag["properties"] = ObtainListableProperties(Model);
 

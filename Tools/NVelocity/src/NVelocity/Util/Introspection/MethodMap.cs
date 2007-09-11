@@ -2,7 +2,6 @@ namespace NVelocity.Util.Introspection
 {
 	using System;
 	using System.Collections;
-	using System.Collections.Specialized;
 	using System.Reflection;
 	using System.Runtime.Serialization;
 	using System.Text;
@@ -10,7 +9,7 @@ namespace NVelocity.Util.Introspection
 	public class MethodMap
 	{
 		/// <summary> Keep track of all methods with the same name.</summary>
-		internal IDictionary methodByNameMap = new HybridDictionary(true);
+		internal IDictionary methodByNameMap = new Hashtable();
 
 		private const int MORE_SPECIFIC = 0;
 		private const int LESS_SPECIFIC = 1;
@@ -92,6 +91,30 @@ namespace NVelocity.Util.Introspection
 			return GetMostSpecific(methodList, classes);
 		}
 
+		/// <summary>
+		/// simple distinguishable exception, used when
+		/// we run across ambiguous overloading
+		/// </summary>
+		[Serializable]
+		public class AmbiguousException : Exception
+		{
+			public AmbiguousException()
+			{
+			}
+
+			public AmbiguousException(string message) : base(message)
+			{
+			}
+
+			public AmbiguousException(string message, Exception innerException) : base(message, innerException)
+			{
+			}
+
+			public AmbiguousException(SerializationInfo info, StreamingContext context) : base(info, context)
+			{
+			}
+		}
+
 		private static MethodInfo GetMostSpecific(IList methods, Type[] classes)
 		{
 			ArrayList applicables = GetApplicables(methods, classes);
@@ -111,14 +134,14 @@ namespace NVelocity.Util.Introspection
 			// (the most specific method) otherwise we have ambiguity.
 			ArrayList maximals = new ArrayList();
 
-			foreach(MethodInfo app in applicables)
+			foreach (MethodInfo app in applicables)
 			{
 				ParameterInfo[] appArgs = app.GetParameters();
 				bool lessSpecific = false;
 
-				foreach(MethodInfo max in maximals.ToArray())
+				foreach (MethodInfo max in maximals)
 				{
-					switch(IsMoreSpecific(appArgs, max.GetParameters()))
+					switch (IsMoreSpecific(appArgs, max.GetParameters()))
 					{
 						case MORE_SPECIFIC:
 						{
@@ -366,10 +389,12 @@ namespace NVelocity.Util.Introspection
 		private static bool IsStrictMethodInvocationConvertible(ParameterInfo formal, ParameterInfo actual)
 		{
 			// we shouldn't get a null into, but if so
-			if (actual == null && !formal.ParameterType.IsPrimitive) return true;
+			if (actual == null && !formal.ParameterType.IsPrimitive)
+				return true;
 
 			// Check for identity or widening reference conversion
-			if (formal.ParameterType.IsAssignableFrom(actual.ParameterType)) return true;
+			if (formal.ParameterType.IsAssignableFrom(actual.ParameterType))
+				return true;
 
 			// Check for widening primitive conversion.
 			if (formal.ParameterType.IsPrimitive)
@@ -385,7 +410,6 @@ namespace NVelocity.Util.Introspection
 				if (formal.ParameterType == typeof(Double) && (actual.ParameterType == typeof(Single) || actual.ParameterType == typeof(Int64) || actual.ParameterType == typeof(Int32) || actual.ParameterType == typeof(Int16) || actual.ParameterType == typeof(Byte)))
 					return true;
 			}
-
 			return false;
 		}
 		

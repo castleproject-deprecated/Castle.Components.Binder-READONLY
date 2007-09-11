@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 namespace Castle.MicroKernel
 {
 	using System;
-	
+
 	using Castle.Core.Configuration;
 	using Castle.Core.Resource;
 
@@ -29,66 +29,34 @@ namespace Castle.MicroKernel
 		/// <summary>
 		/// Associates a configuration node with a facility key
 		/// </summary>
-		/// <param name="key">item key</param>
-		/// <param name="config">Configuration node</param>
-		void AddFacilityConfiguration(String key, IConfiguration config);
+		/// <param name="key"></param>
+		/// <param name="config"></param>
+		void AddFacilityConfiguration( String key, IConfiguration config );
 
 		/// <summary>
 		/// Associates a configuration node with a component key
 		/// </summary>
-		/// <param name="key">item key</param>
-		/// <param name="config">Configuration node</param>
-		void AddComponentConfiguration(String key, IConfiguration config);
-
-		/// <summary>
-		/// Associates a  configuration node with a bootstrap component key
-		/// </summary>
-		/// <param name="key">item key</param>
-		/// <param name="config">Configuration node</param>
-		void AddBootstrapComponentConfiguration(String key, IConfiguration config);
-
-		/// <summary>
-		/// Adds the child container configuration.
-		/// </summary>
-		/// <param name="name">The container's name.</param>
-		/// <param name="config">The config.</param>
-		void AddChildContainerConfiguration(String name, IConfiguration config);
-
-		/// <summary>
-		/// Returns the configuration node associated with 
-		/// the specified child container key. Should return null
-		/// if no association exists.
-		/// </summary>
-		/// <param name="key">item key</param>
-		/// <returns></returns>
-		IConfiguration GetChildContainerConfiguration(String key);
+		/// <param name="key"></param>
+		/// <param name="config"></param>
+		void AddComponentConfiguration( String key, IConfiguration config );
 
 		/// <summary>
 		/// Returns the configuration node associated with 
 		/// the specified facility key. Should return null
 		/// if no association exists.
 		/// </summary>
-		/// <param name="key">item key</param>
+		/// <param name="key"></param>
 		/// <returns></returns>
-		IConfiguration GetFacilityConfiguration(String key);
+		IConfiguration GetFacilityConfiguration( String key );
 
 		/// <summary>
 		/// Returns the configuration node associated with 
 		/// the specified component key. Should return null
 		/// if no association exists.
 		/// </summary>
-		/// <param name="key">item key</param>
+		/// <param name="key"></param>
 		/// <returns></returns>
-		IConfiguration GetComponentConfiguration(String key);
-
-		/// <summary>
-		/// Returns the configuration node associated with 
-		/// the specified component key. Should return null
-		/// if no association exists.
-		/// </summary>
-		/// <param name="key">item key</param>
-		/// <returns></returns>
-		IConfiguration GetBootstrapComponentConfiguration(String key);
+		IConfiguration GetComponentConfiguration( String key );
 
 		/// <summary>
 		/// Returns all configuration nodes for facilities
@@ -101,18 +69,6 @@ namespace Castle.MicroKernel
 		/// </summary>
 		/// <returns></returns>
 		IConfiguration[] GetComponents();
-
-		/// <summary>
-		/// Returns all configuration nodes for bootstrap components
-		/// </summary>
-		/// <returns></returns>
-		IConfiguration[] GetBootstrapComponents();
-
-		/// <summary>
-		/// Gets the child containers configuration nodes.
-		/// </summary>
-		/// <returns></returns>
-		IConfiguration[] GetConfigurationForChildContainers();
 
 		/// <summary>
 		/// 

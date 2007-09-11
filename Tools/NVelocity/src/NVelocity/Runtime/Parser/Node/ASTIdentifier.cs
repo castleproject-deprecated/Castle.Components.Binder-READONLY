@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,29 +73,12 @@ namespace NVelocity.Runtime.Parser.Node
 			return data;
 		}
 
+
 		/// <summary>
 		/// invokes the method on the object passed in
 		/// </summary>
 		public override Object Execute(Object o, IInternalContextAdapter context)
 		{
-			if (identifier == "to_quote" && (o.GetType() == typeof(string) || 
-				o.GetType().IsPrimitive || o.GetType() == typeof(decimal)))
-			{
-				return "\"" + o + "\"";
-			}
-			else if (identifier == "to_squote" && (o.GetType() == typeof(string) || 
-				o.GetType().IsPrimitive || o.GetType() == typeof(decimal)))
-			{
-				return "'" + o + "'";
-			}
-
-			IDuck duck = o as IDuck;
-
-			if (duck != null)
-			{
-				return duck.GetInvoke(identifier);
-			}
-
 			IVelPropertyGet vg = null;
 
 			try

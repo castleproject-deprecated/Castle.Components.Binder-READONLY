@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,12 +65,6 @@ namespace Castle.MonoRail.Framework.Helpers
 		int TotalItems { get; }
 
 		/// <summary>
-		/// Gets the size of the page.
-		/// </summary>
-		/// <value>The size of the page.</value>
-		int PageSize { get; }
-
-		/// <summary>
 		/// Returns true if a previous page 
 		/// is accessible from this page
 		/// </summary>
@@ -93,11 +87,5 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// exists
 		/// </summary>
 		bool HasLast { get; }
-
-		/// <summary>
-		/// Checks whether the specified page exists.
-		/// Useful for Google-like pagination.
-		/// </summary>
-		bool HasPage(int pageNumber);
 	}
 }

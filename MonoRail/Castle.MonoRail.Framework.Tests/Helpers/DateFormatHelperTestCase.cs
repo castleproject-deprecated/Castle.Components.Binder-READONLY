@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -96,32 +96,6 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		public void AlternativeFriendlyFormatFromNowWith120Days()
 		{
 			Assert.AreEqual("4 months ago", helper.AlternativeFriendlyFormatFromNow( DateTime.Now.AddDays(-120) ));
-		}
-
-		[Test]
-		public void ToShortDate()
-		{
-			DateTime now = DateTime.Now;
-
-			string expected = now.ToShortDateString();
-			Assert.AreEqual(expected, helper.ToShortDate(now));
-
-#if DOTNET2
-			Assert.AreEqual(String.Empty, helper.ToShortDate(null));
-#endif
-		}
-
-		[Test]
-		public void ToShortDateTime()
-		{
-			DateTime now = DateTime.Now;
-
-			string expected = now.ToShortDateString() + " " + now.ToShortTimeString();
-			Assert.AreEqual(expected, helper.ToShortDateTime(now));
-
-#if DOTNET2
-			Assert.AreEqual(String.Empty, helper.ToShortDateTime(null));
-#endif
 		}
 	}
 }

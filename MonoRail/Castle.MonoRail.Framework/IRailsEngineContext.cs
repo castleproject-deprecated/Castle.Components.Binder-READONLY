@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.ComponentModel.Design;
 	using System.Web;
+	using System.Web.Caching;
 	using System.Security.Principal;
 	using System.Collections;
 	using System.Collections.Specialized;
@@ -35,7 +36,7 @@ namespace Castle.MonoRail.Framework
 		String RequestType { get; }
 
 		/// <summary>
-		/// Gets the request URL.
+		/// Gets the URL.
 		/// </summary>
 		String Url { get; }
 
@@ -78,7 +79,7 @@ namespace Castle.MonoRail.Framework
 		/// Access the Cache associated with this 
 		/// web execution context.
 		/// </summary>
-		ICacheProvider Cache { get; }
+		Cache Cache { get; }
 
 		/// <summary>
 		/// Access a dictionary of volative items.
@@ -122,16 +123,5 @@ namespace Castle.MonoRail.Framework
 		/// Returns an <see cref="IServerUtility"/>.
 		/// </summary>
 		IServerUtility Server { get; }
-
-		/// <summary>
-		/// Returns the Items collection from the current HttpContext.
-		/// </summary>
-		IDictionary Items { get; }
-
-		/// <summary>
-		/// Gets or sets the current controller.
-		/// </summary>
-		/// <value>The current controller.</value>
-		Controller CurrentController { get; set; }
 	}
 }

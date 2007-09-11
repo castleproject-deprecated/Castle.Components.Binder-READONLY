@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,15 +15,12 @@
 namespace Castle.DynamicProxy.Tests
 {
 	using System;
-	using System.Reflection;
-	using Castle.Core.Interceptor;
+
 	using Castle.DynamicProxy.Generators;
-	using Castle.DynamicProxy.Tests.BugsReported;
 	using Castle.DynamicProxy.Tests.Classes;
 	using Castle.DynamicProxy.Tests.Interceptors;
-	using Castle.DynamicProxy.Tests.InterClasses;
+	
 	using NUnit.Framework;
-	using ClassWithIndexer=Castle.DynamicProxy.Tests.Classes.ClassWithIndexer;
 
 	[TestFixture]
 	public class BasicClassProxyTestCase : BasePEVerifyTestCase
@@ -64,28 +61,12 @@ namespace Castle.DynamicProxy.Tests
 			Assert.AreEqual(45, instance.Sum((ulong)20, (ulong)25)); // ulong
 		}
 
-		[Test]
-		public void Caching()
-		{
-			object proxy = generator.CreateClassProxy(
-				typeof(ServiceClass), new StandardInterceptor());
-			proxy = generator.CreateClassProxy(
-				typeof(ServiceClass), new StandardInterceptor());
-			proxy = generator.CreateClassProxy(
-				typeof(ServiceClass), new StandardInterceptor());
-			proxy = generator.CreateClassProxy(
-				typeof(ServiceClass), new StandardInterceptor());
-		}
-
 		[Test, ExpectedException(typeof(GeneratorException), "Type is not public, so a proxy " + 
-			"cannot be generated. Type: System.AppDomainInitializerInfo")]
+			"cannot be generated. Type: Castle.DynamicProxy.Tests.Classes.NonPublicClass")]
 		public void ProxyForNonPublicClass()
 		{
-			//have to use a type that is not from this assembly, because it is marked as internals visible to 
-			//DynamicProxy2
-
 			object proxy = generator.CreateClassProxy(
-				Type.GetType("System.AppDomainInitializerInfo, mscorlib"), new StandardInterceptor());
+				typeof(NonPublicClass), new StandardInterceptor());
 		}
 		
 		[Test]
@@ -139,14 +120,6 @@ namespace Castle.DynamicProxy.Tests
 			
 			Assert.AreEqual("Sum2 Sum ", logger.LogContents);
 		}
-
-		[Test]
-		public void ProxyForNestedClass()
-		{
-			object proxy = generator.CreateClassProxy(typeof(ServiceClass.InernalClass), new Type[] { typeof(IDisposable) });
-			Assert.IsNotNull(proxy);
-			Assert.IsTrue(proxy is ServiceClass.InernalClass);
-		}
 		
 		[Test]
 		public void ProxyForClassWithInterfaces()
@@ -175,82 +148,6 @@ namespace Castle.DynamicProxy.Tests
 				Assert.AreEqual("This is a DynamicProxy2 error: the interceptor attempted " + 
 					"to 'Proceed' for a method without a target, for example, an interface method", ex.Message);
 			}
-		}
-
-		[Test]
-		public void ProxyForCharReturnType()
-		{
-			LogInvocationInterceptor logger = new LogInvocationInterceptor();
-			object proxy = generator.CreateClassProxy(typeof(ClassWithCharRetType), logger);
-			Assert.IsNotNull(proxy);
-			ClassWithCharRetType classProxy = (ClassWithCharRetType) proxy;
-			Assert.AreEqual('c', classProxy.DoSomething());
-		}
-		
-		[Test]
-		public void ProxyForClassWithConstructors()
-		{
-			object proxy = generator.CreateClassProxy(
-				typeof(ClassWithConstructors), new IInterceptor[] { new StandardInterceptor() }, 
-				new object[] { "name" } );
-			
-			Assert.IsNotNull(proxy);
-			ClassWithConstructors classProxy = (ClassWithConstructors) proxy;
-			Assert.AreEqual("name", classProxy.Name);
-
-			proxy = generator.CreateClassProxy(
-				typeof(ClassWithConstructors), new IInterceptor[] { new StandardInterceptor() },
-				new object[] { "name", 10 });
-
-			Assert.IsNotNull(proxy);
-			classProxy = (ClassWithConstructors) proxy;
-			Assert.AreEqual("name", classProxy.Name);
-			Assert.AreEqual(10, classProxy.X);
-		}
-
-		/// <summary>
-		/// See http://support.castleproject.org/browse/DYNPROXY-43
-		/// </summary>
-		[Test]
-		public void MethodParamNamesAreReplicated()
-		{
-			MyClass mc = generator.CreateClassProxy<MyClass>(new StandardInterceptor());
-			ParameterInfo[] methodParams = GetMyTestMethodParams(mc.GetType());
-			Assert.AreEqual("myParam", methodParams[0].Name);
-		}
-
-		[Test]
-		public void ProducesInvocationsThatCantChangeTarget()
-		{
-			AssertCannotChangeTargetInterceptor invocationChecker = new AssertCannotChangeTargetInterceptor();
-			object proxy = generator.CreateClassProxy(typeof(ClassWithCharRetType), invocationChecker);
-			Assert.IsNotNull(proxy);
-			ClassWithCharRetType classProxy = (ClassWithCharRetType) proxy;
-			Assert.AreEqual('c', classProxy.DoSomething());
-		}
-
-		[Test]
-		[Ignore("Multi dimensional arrays seems to not work at all")]
-		public void ProxyTypeWithMultiDimentionalArrayAsParameters()
-		{
-			LogInvocationInterceptor log = new LogInvocationInterceptor();
-			
-			ClassWithMultiDimentionalArray proxy = 
-				generator.CreateClassProxy<ClassWithMultiDimentionalArray>(log);
-
-			int[,] x = new int[1, 2];
-
-			proxy.Do(new int[] { 1 });
-			proxy.Do2(x);
-			proxy.Do3(new string[] {"1", "2"});
-			
-			Assert.AreEqual("Do Do2 Do3 ", log.LogContents);
-		}
-
-		private ParameterInfo[] GetMyTestMethodParams(Type type)
-		{
-			MethodInfo methodInfo = type.GetMethod("MyTestMethod");
-			return methodInfo.GetParameters();
 		}
 	}
 }

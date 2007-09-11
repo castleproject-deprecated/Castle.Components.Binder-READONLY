@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,31 +29,20 @@ namespace Castle.ActiveRecord
 	/// </summary>
 	public abstract class ActiveRecordBaseQuery : IActiveRecordQuery, ICloneable
 	{
-		private readonly Type rootType;
+		private readonly Type targetType;
 		
 		private ILogger log = NullLogger.Instance;
 		
-		/// <summary>
-		/// list of modifiers for the query
-		/// </summary>
 		protected IList queryModifiers;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ActiveRecordBaseQuery"/> class.
-		/// </summary>
-		/// <param name="rootType">The type.</param>
-		protected ActiveRecordBaseQuery(Type rootType)
+		protected ActiveRecordBaseQuery(Type type)
 		{
-			this.rootType = rootType;
+			this.targetType = type;
 		}
 
-		/// <summary>
-		/// Gets the target type of this query
-		/// </summary>
-		/// <value></value>
-		public Type RootType
+		public Type Target
 		{
-			get { return rootType; }
+			get { return targetType; }
 		}
 		
 		/// <summary>
@@ -73,32 +62,19 @@ namespace Castle.ActiveRecord
 		}
 
 		#region IActiveRecordQuery implementation
-
-		/// <summary>
-		/// Executes the specified query and return the results
-		/// </summary>
-		/// <param name="session">The session to execute the query in.</param>
-		/// <returns></returns>
 		object IActiveRecordQuery.Execute(ISession session)
 		{
 			return InternalExecute(session);
 		}
 
-		/// <summary>
-		/// Enumerates over the result of the query.
-		/// Note: Only use if you expect most of your values to already exist in the second level cache!
-		/// </summary>
-		/// <param name="session"></param>
-		/// <returns></returns>
 		IEnumerable IActiveRecordQuery.Enumerate(ISession session)
 		{
 			return InternalEnumerate(session);
 		}
-
 		#endregion
 
 		/// <summary>
-		/// Simply creates the query and then call its <see cref="IQuery.List()"/> method.
+		/// Simply creates the query and then call its <see cref="IQuery.List"/> method.
 		/// </summary>
 		/// <param name="session">The <c>NHibernate</c>'s <see cref="ISession"/></param>
 		protected virtual object InternalExecute(ISession session)
@@ -107,8 +83,7 @@ namespace Castle.ActiveRecord
 		}
 
 		/// <summary>
-		/// Simply creates the query and then call its <see cref="IQuery.Enumerable()"/> method.
-		/// Note: Only use when you expect most of the results to be in the second level cache
+		/// Simply creates the query and then call its <see cref="IQuery.Enumerable"/> method.
 		/// </summary>
 		/// <param name="session">The <c>NHibernate</c>'s <see cref="ISession"/></param>
 		protected virtual IEnumerable InternalEnumerate(ISession session)
@@ -126,11 +101,9 @@ namespace Castle.ActiveRecord
 		/// </summary>
 		public virtual object Clone()
 		{
-			ActiveRecordBaseQuery clone = (ActiveRecordBaseQuery) MemberwiseClone();
-			if (queryModifiers != null)
-			{
-				clone.queryModifiers = new ArrayList(queryModifiers);
-			}
+			ActiveRecordBaseQuery clone = (ActiveRecordBaseQuery) this.MemberwiseClone();
+			if (this.queryModifiers != null)
+				clone.queryModifiers = new ArrayList(this.queryModifiers);
 			return clone;
 		}
 
@@ -161,7 +134,7 @@ namespace Castle.ActiveRecord
 		{
 			if (queryModifiers != null)
 			{
-				foreach(IQueryModifier modifier in queryModifiers)
+				foreach (IQueryModifier modifier in queryModifiers)
 				{
 					modifier.Apply(query);
 				}

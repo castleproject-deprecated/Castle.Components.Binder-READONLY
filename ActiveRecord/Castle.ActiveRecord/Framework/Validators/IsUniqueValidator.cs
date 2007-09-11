@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace Castle.ActiveRecord.Framework.Validators
 	using Castle.ActiveRecord.Framework.Internal;
 	using Castle.ActiveRecord.Framework.Scopes;
 	using NHibernate;
-	using NHibernate.Classic;
 	using NHibernate.Expression;
 
 	[Serializable]
@@ -90,8 +89,8 @@ namespace Castle.ActiveRecord.Framework.Validators
 			else
 			{
 				object id = _pkModel.Property.GetValue(instance, new object[0]);
-				ICriterion pKeyCriteria = (id == null) ? Expression.IsNull(_pkModel.Property.Name) : Expression.Eq(_pkModel.Property.Name, id);
-				criteria.Add(Expression.And(Expression.Eq(Property.Name, _fieldValue), Expression.Not(pKeyCriteria)));
+				criteria.Add(
+					Expression.And(Expression.Eq(Property.Name, _fieldValue), Expression.Not(Expression.Eq(_pkModel.Property.Name, id))));
 			}
 			return criteria.List().Count == 0;
 		}

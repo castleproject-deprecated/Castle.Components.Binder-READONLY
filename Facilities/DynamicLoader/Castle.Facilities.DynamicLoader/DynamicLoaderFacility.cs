@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,74 +15,36 @@
 namespace Castle.Facilities.DynamicLoader
 {
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Reflection;
-	using System.Security.Policy;
+	using System.Runtime.Remoting;
 	using System.Web;
-	using Castle.Core.Configuration;
-	using Castle.Core.Logging;
-	using Castle.MicroKernel;
-	using Castle.MicroKernel.Facilities;
 
-	/// <summary>
-	/// DynamicLoader facility.
-	/// </summary>
-	public class DynamicLoaderFacility : MarshalByRefObject, IFacility, IDisposable
+	using Castle.MicroKernel.Facilities;
+	using Castle.Core.Configuration;
+
+	public class DynamicLoaderFacility : AbstractFacility
 	{
 		private readonly DynamicLoaderRegistry registry = new DynamicLoaderRegistry();
 
-		private ILogger log = NullLogger.Instance;
+		bool isWeb;
+		List<AppDomain> domains = new List<AppDomain>();
+		Dictionary<AppDomain, RemoteLoader> loaders = new Dictionary<AppDomain, RemoteLoader>();
 
-		private bool isWeb;
-
-		private IKernel kernel;
-		private IConfiguration facilityConfig;
-
-		/// <summary>
-		/// Initializes the facility.
-		/// </summary>
-		public void Init(IKernel kernel, IConfiguration facilityConfig)
+		protected override void Init()
 		{
-			this.kernel = kernel;
-			this.facilityConfig = facilityConfig;
+			Kernel.AddComponentInstance("dynamicLoader.registry", registry);
+			Kernel.ComponentModelBuilder.AddContributor(new DynamicLoaderInspector(registry));
+			
+			isWeb = IsTrue(FacilityConfig.Attributes["isWeb"]);
 
-			this.Init();
-		}
-
-		/// <summary>
-		/// Terminates the facility.
-		/// </summary>
-		public void Terminate()
-		{
-			Dispose(true);
-
-			kernel = null;
-		}
-
-		~DynamicLoaderFacility()
-		{
-			Dispose(false);
-		}
-
-		protected void Init()
-		{
-			if (kernel.HasComponent(typeof(ILoggerFactory)))
-				log = ((ILoggerFactory) kernel.Resolve(typeof(ILoggerFactory), new Hashtable())).Create(GetType());
-
-			log.Info("DynamicLoader is being initialized");
-
-			kernel.ComponentModelBuilder.AddContributor(new DynamicLoaderInspector(registry));
-
-			isWeb = IsTrue(facilityConfig.Attributes["isWeb"]);
-
-			foreach(IConfiguration cfg in facilityConfig.Children)
+			foreach (IConfiguration cfg in FacilityConfig.Children)
 			{
-				switch(cfg.Name)
+				switch (cfg.Name)
 				{
 					case "domain":
-						CreateAppDomain(cfg);
+						domains.Add(CreateAppDomain(cfg));
 						break;
 					default:
 						throw new FacilityException("Unrecognized configuration node: " + cfg.Name);
@@ -95,10 +57,9 @@ namespace Castle.Facilities.DynamicLoader
 			IConfiguration cfg = domainNode.Children["config"];
 
 			string domainId = domainNode.Attributes["id"];
-
-			AppDomainSetup currentSetup = AppDomain.CurrentDomain.SetupInformation;
+			
 			AppDomainSetup setup = new AppDomainSetup();
-
+			
 			setup.ApplicationName = domainNode.Attributes["applicationName"];
 			setup.ApplicationBase = NormalizeDirectoryPath(GetChildNodeValue(cfg, "applicationBase"));
 			setup.ConfigurationFile = GetChildNodeValue(cfg, "configurationFile");
@@ -108,91 +69,49 @@ namespace Castle.Facilities.DynamicLoader
 			{
 				setup.PrivateBinPathProbe = Boolean.TrueString;
 			}
+			else
+			{
+				setup.DisallowApplicationBaseProbing = false;
+				setup.PrivateBinPath = AppDomain.CurrentDomain.BaseDirectory;
+				if (isWeb)
+					setup.PrivateBinPath = Path.Combine(setup.PrivateBinPath, "bin");
+			}
 
 			setup.ShadowCopyFiles = domainNode.Attributes["shadowCopyFiles"];
 
 			if (IsTrue(setup.ShadowCopyFiles))
 			{
-				setup.ShadowCopyDirectories = null;
-
 				setup.CachePath = cfg.Attributes["cachePath"];
 				if (IsEmpty(setup.CachePath))
-				{
-					// fix for ASP.NET:
-					// http://weblogs.asp.net/hernandl/archive/2004/10/28/appdomainshcopy.aspx
-					setup.CachePath = currentSetup.CachePath;
-				}
+					setup.CachePath = String.Format("{0}{1}shadow{1}", setup.ApplicationBase, Path.DirectorySeparatorChar);
+				setup.ShadowCopyDirectories = setup.ApplicationBase;
 			}
 
-			log.Info("Creating AppDomain '{0}'", setup.ApplicationName);
+			AppDomain appDomain = AppDomain.CreateDomain(setup.ApplicationName, null, setup);
+			//appDomain.AssemblyResolve += new HereLoader(typeof(DynamicLoaderFacility).Assembly).AssemblyResolve;
 
-			Evidence evidence = AppDomain.CurrentDomain.Evidence;
+			ObjectHandle h = appDomain.CreateInstance(typeof(RemoteLoader).Assembly.FullName,
+																								typeof(RemoteLoader).FullName);
 
-			AppDomain appDomain = AppDomain.CreateDomain(setup.ApplicationName, evidence, setup);
+			RemoteLoader l = (RemoteLoader) h.Unwrap();
 
-			log.Debug("  BaseDir: " + appDomain.BaseDirectory);
-			log.Debug("  RelativeSearchPath: " + appDomain.RelativeSearchPath);
-			log.Debug("  ShadowCopyDirectories: " + appDomain.SetupInformation.ShadowCopyDirectories);
-			log.Debug("  CachePath: " + appDomain.SetupInformation.CachePath);
-			log.Debug("  PrivateBinPath: " + appDomain.SetupInformation.PrivateBinPath);
-
-			RemoteLoader l = this.CreateRemoteLoader(appDomain);
-
-			// register the loader
 			registry.RegisterLoader(domainId, l);
 
-			this.InitializeBatchRegistration(l, domainNode.Children["batchRegistration"]);
+			InitializeBatchRegistration(l, domainNode.Children["batchRegistration"]);
 
-			log.Debug("Adding as child kernel");
-			kernel.AddChildKernel(l.Kernel);
-
-			log.Info("Domain '{0}' created successfully.", appDomain.FriendlyName);
+			Kernel.AddChildKernel(l.Kernel);
 
 			return appDomain;
-		}
-
-		private RemoteLoader CreateRemoteLoader(AppDomain appDomain)
-		{
-			string remoteLoaderAsmName = typeof(RemoteLoader).Assembly.FullName;
-			string remoteLoaderClsName = typeof(RemoteLoader).FullName;
-
-			try
-			{
-				appDomain.DoCallBack(
-					delegate
-						{
-							Assembly.Load("Castle.Core");
-							Assembly.Load("Castle.MicroKernel");
-							Assembly.Load("Castle.Facilities.DynamicLoader");
-						});
-			}
-			catch(Exception ex)
-			{
-				log.Fatal("Error while loading required assemblies", ex);
-				throw new FacilityException("Failed to load RemoteLoader required assemblies", ex);
-			}
-
-			try
-			{
-				// creates the RemoteLoader
-				log.Debug("Creating the RemoteLoader");
-				return (RemoteLoader) appDomain.CreateInstanceAndUnwrap(remoteLoaderAsmName, remoteLoaderClsName);
-			}
-			catch(Exception ex)
-			{
-				log.Fatal("Error while creating the RemoteLoader", ex);
-				throw new FacilityException("Failed to create the RemoteLoader", ex);
-			}
 		}
 
 		protected virtual void InitializeBatchRegistration(RemoteLoader loader, IConfiguration batchRegistrationNode)
 		{
 			if (batchRegistrationNode == null)
 				return;
-
-			foreach(IConfiguration comp in batchRegistrationNode.Children)
+			
+			foreach (IConfiguration comp in batchRegistrationNode.Children)
 			{
-				switch(comp.Name)
+				switch (comp.Name)
 				{
 					case "components":
 						InitializeBatchComponents(loader, comp);
@@ -222,13 +141,13 @@ namespace Castle.Facilities.DynamicLoader
 		{
 			if (componentsNode == null)
 				return;
-
+			
 			string componentIdMask = componentsNode.Attributes["id"];
 			List<Type> servicesProvided = new List<Type>();
-
-			foreach(IConfiguration cond in componentsNode.Children)
+			
+			foreach (IConfiguration cond in componentsNode.Children)
 			{
-				switch(cond.Name)
+				switch (cond.Name)
 				{
 					case "providesService":
 						servicesProvided.Add(Type.GetType(cond.Attributes["service"]));
@@ -242,7 +161,6 @@ namespace Castle.Facilities.DynamicLoader
 		}
 
 		#region Configuration utility methods
-
 		private string GetChildNodeValue(IConfiguration cfg, string nodeName)
 		{
 			if (cfg == null)
@@ -253,8 +171,7 @@ namespace Castle.Facilities.DynamicLoader
 			return node.Value;
 		}
 
-		protected string GetConfigAttribute(IConfiguration cfg, string attribute, string defaultValue,
-		                                    params object[] defaultValueArguments)
+		protected string GetConfigAttribute(IConfiguration cfg, string attribute, string defaultValue, params object[] defaultValueArguments)
 		{
 			string value = cfg.Attributes[attribute];
 			if (value == null || value.Length == 0)
@@ -272,11 +189,9 @@ namespace Castle.Facilities.DynamicLoader
 		{
 			return String.Compare(value, "true", true) == 0;
 		}
-
 		#endregion
 
 		#region Filesystem directory handling
-
 		/// <summary>
 		/// Normalizes a directory path. It includes resolving parent (<c>..</c>) paths
 		/// and the <c>~</c> prefix, which maps to the root of the current application.
@@ -303,24 +218,39 @@ namespace Castle.Facilities.DynamicLoader
 
 			return AppDomain.CurrentDomain.BaseDirectory;
 		}
-
 		#endregion
 
-		/// <summary>
-		/// <see cref="IDisposable"/> implementation. Releases all <see cref="RemoteLoader"/>s
-		/// and <see cref="AppDomain"/>s.
-		/// </summary>
-		public void Dispose()
+		private void Unload()
 		{
-			Dispose(true);
-
-			GC.SuppressFinalize(this);
+			foreach (RemoteLoader l in loaders.Values)
+			{
+				Kernel.RemoveChildKernel(l.Kernel);
+				l.Dispose();
+			}
+			foreach (AppDomain d in domains)
+				AppDomain.Unload(d);
 		}
 
-		protected virtual void Dispose(bool disposing)
+		public override void Dispose()
 		{
-			if (disposing)
-				registry.Dispose();
+			Unload();
+
+			base.Dispose();
+		}
+		
+		public class HereLoader : MarshalByRefObject
+		{
+			Assembly asm;
+
+			public HereLoader(Assembly asm)
+			{
+				this.asm = asm;
+			}
+
+			public Assembly AssemblyResolve(object sender, ResolveEventArgs args)
+			{
+				return asm;
+			}
 		}
 	}
 }

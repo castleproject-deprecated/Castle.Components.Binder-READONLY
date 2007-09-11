@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,113 +12,110 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework
+namespace Castle.MonoRail.Framework.Internal
 {
 	using System;
 
 	/// <summary>
-	/// Represents the tokenized information from an Url.
+	/// Represents the splitted information on a Url.
 	/// </summary>
 	[Serializable]
 	public class UrlInfo
 	{
-		private readonly int port;
-		private readonly string domain, subdomain, appVirtualDir, protocol;
-		private readonly string urlRaw;
-		private readonly string area, controller, action, extension;
+		private readonly String _urlRaw;
+		private readonly String _area;
+		private readonly String _controller;
+		private readonly String _action;
+		private readonly String _extension;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="UrlInfo"/> class.
-		/// </summary>
-		/// <param name="area">The area.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="action">The action.</param>
-		public UrlInfo(string area, string controller, string action)
+		public UrlInfo( String urlRaw, String area, String controller, String action, String extension )
 		{
-			this.area = area;
-			this.controller = controller;
-			this.action = action;
+			_controller = controller;
+			_area = area;
+			_action = action;
+			_urlRaw = urlRaw;
+			_extension = extension;
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="UrlInfo"/> class.
-		/// </summary>
-		/// <param name="domain">The domain (host).</param>
-		/// <param name="subdomain">The subdomain (first token on the domain).</param>
-		/// <param name="protocol">Protocol (http/https)</param>
-		/// <param name="port">The port.</param>
-		/// <param name="urlRaw">The raw URL.</param>
-		/// <param name="area">The area, or empty.</param>
-		/// <param name="controller">The controller name.</param>
-		/// <param name="action">The action name.</param>
-		/// <param name="extension">The file extension.</param>
-		/// <param name="appVirtualDir">The application virtual dir.</param>
-		public UrlInfo(string domain, string subdomain, string appVirtualDir, string protocol, int port, string urlRaw,
-		               string area, string controller, string action, string extension)
+		public String Controller
 		{
-			this.port = port;
-			this.domain = domain;
-			this.subdomain = subdomain;
-			this.urlRaw = urlRaw;
-			this.area = area;
-			this.controller = controller;
-			this.action = action;
-			this.extension = extension;
-			this.appVirtualDir = appVirtualDir;
-			this.protocol = protocol;
+			get { return _controller; }
 		}
 
-		public string AppVirtualDir
+		public String Action
 		{
-			get { return appVirtualDir; }
+			get { return _action; }
 		}
 
-		public int Port
+		public String Area
 		{
-			get { return port; }
+			get { return _area; }
 		}
 
-		public string Domain
+		public String UrlRaw
 		{
-			get { return domain; }
-		}
-
-		public string Subdomain
-		{
-			get { return subdomain; }
-		}
-
-		public string UrlRaw
-		{
-			get { return urlRaw; }
-		}
-
-		public string Area
-		{
-			get { return area; }
-		}
-
-		public string Controller
-		{
-			get { return controller; }
-		}
-
-		public string Action
-		{
-			get { return action; }
-		}
-
-		public string Protocol
-		{
-			get { return protocol; }
+			get { return _urlRaw; }
 		}
 
 		/// <summary>
 		/// The URL extension, without the leading dot.
 		/// </summary>
-		public string Extension
+		public String Extension
 		{
-			get { return extension; }
+			get { return _extension; }
+		}
+
+//		/// <summary>
+//		/// Creates the rails Url.
+//		/// </summary>
+//		/// <param name="controller"></param>
+//		/// <param name="action"></param>
+//		/// <param name="extension"></param>
+//		public static String GetRailsUrl(String controller, String action, String extension)
+//		{
+//			if (action == null || action.Length == 0) throw new ArgumentNullException("action");
+//			if (controller == null || controller.Length == 0) throw new ArgumentNullException("controller");
+//			if (extension == null || extension.Length == 0) throw new ArgumentNullException("extension");
+//
+//			return String.Format("../{0}/{1}.{2}", controller, action, extension);
+//		}
+//
+//		/// <summary>
+//		/// Creates the rails Url.
+//		/// </summary>
+//		/// <param name="area"></param>
+//		/// <param name="controller"></param>
+//		/// <param name="action"></param>
+//		/// <param name="extension"></param>
+//		public static String GetRailsUrl(String area, String controller, String action, String extension)
+//		{
+//			if (area == null || area.Length == 0) throw new ArgumentNullException("area");
+//			if (action == null || action.Length == 0) throw new ArgumentNullException("action");
+//			if (controller == null || controller.Length == 0) throw new ArgumentNullException("controller");
+//			if (extension == null || extension.Length == 0) throw new ArgumentNullException("extension");
+//
+//			return String.Format("../{0}/{1}/{2}.{3}", area, controller, action, extension);
+//		}
+
+		/// <summary>
+		/// Creates an absolute MonoRail url.
+		/// </summary>
+		public static String CreateAbsoluteRailsUrl( String appPath, String controller, 
+			String action, String extension )
+		{
+			return String.Format( "{0}/{1}/{2}.{3}", appPath, controller, action, extension );
+		}
+
+		/// <summary>
+		/// Creates an absolute MonoRail url.
+		/// </summary>
+		public static String CreateAbsoluteRailsUrl(String appPath, String area, String controller, 
+			String action, String extension )
+		{
+			if (area == null || area.Length == 0)
+				return CreateAbsoluteRailsUrl( appPath, controller, action, extension );
+			
+			return String.Format( "{0}/{1}/{2}/{3}.{4}", appPath, area, controller, action, extension );
 		}
 	}
 }

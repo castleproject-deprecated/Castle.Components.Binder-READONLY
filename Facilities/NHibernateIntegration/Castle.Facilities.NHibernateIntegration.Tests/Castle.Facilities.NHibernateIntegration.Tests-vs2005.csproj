@@ -49,7 +49,6 @@
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\bin\</OutputPath>
@@ -128,6 +127,9 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BlogItemDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Common\Blog.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -166,21 +168,16 @@
     <Compile Include="SessionCreation\MySecondDao.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Transactions\DistributedTransactionsTestCase.cs" />
     <Compile Include="Transactions\Model\FirstDao.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Transactions\Model\FirstDao2.cs" />
     <Compile Include="Transactions\Model\OrderDao.cs" />
-    <Compile Include="Transactions\Model\OrderDao2.cs" />
     <Compile Include="Transactions\Model\RootService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Transactions\Model\RootService2.cs" />
     <Compile Include="Transactions\Model\SecondDao.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Transactions\Model\SecondDao2.cs" />
     <Compile Include="Transactions\TransactionsTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -195,6 +192,7 @@
     <EmbeddedResource Include="Common\BlogItem.hbm.xml" />
     <EmbeddedResource Include="Common\BlogRef.hbm.xml" />
     <EmbeddedResource Include="Common\Order.hbm.xml" />
+    <Content Include="facilityconfig.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Castle.Facilities.NHibernateIntegration\Castle.Facilities.NHibernateIntegration-vs2005.csproj">

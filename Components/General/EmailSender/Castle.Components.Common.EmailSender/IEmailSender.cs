@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,22 +24,22 @@ namespace Castle.Components.Common.EmailSender
 		/// <summary>
 		/// Sends a message. 
 		/// </summary>
-		/// <param name="from">From field</param>
-		/// <param name="to">To field</param>
-		/// <param name="subject">e-mail's subject</param>
-		/// <param name="messageText">message's body</param>
+		/// <param name="from"></param>
+		/// <param name="to"></param>
+		/// <param name="subject"></param>
+		/// <param name="messageText"></param>
 		void Send(String from, String to, String subject, String messageText);
 
 		/// <summary>
 		/// Sends a message. 
 		/// </summary>
-		/// <param name="message">Message instance</param>
+		/// <param name="message"></param>
 		void Send(Message message);
 
 		/// <summary>
 		/// Sends multiple messages. 
 		/// </summary>
-		/// <param name="messages">Array of messages</param>
+		/// <param name="messages"></param>
 		void Send(Message[] messages);
 	}
 }

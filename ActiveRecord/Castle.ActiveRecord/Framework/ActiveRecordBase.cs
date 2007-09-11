@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@ namespace Castle.ActiveRecord
 {
 	using System;
 	using System.Collections;
-	using Castle.ActiveRecord.Framework;
-	using Castle.ActiveRecord.Framework.Internal;
-	using Castle.ActiveRecord.Queries;
 
+	using Castle.ActiveRecord.Framework;
+	using Castle.ActiveRecord.Queries;
+	
 	using NHibernate;
 	using NHibernate.Expression;
 
@@ -36,10 +36,14 @@ namespace Castle.ActiveRecord
 	[Serializable]
 	public abstract class ActiveRecordBase : ActiveRecordHooksBase
 	{
-		/// <summary>
-		/// The global holder for the session factories.
-		/// </summary>
 		protected internal static ISessionFactoryHolder holder;
+
+		/// <summary>
+		/// Constructs an ActiveRecordBase subclass.
+		/// </summary>
+		public ActiveRecordBase()
+		{
+		}
 
 		#region internal static
 
@@ -48,15 +52,15 @@ namespace Castle.ActiveRecord
 			if (holder == null)
 			{
 				String message = String.Format("An ActiveRecord class ({0}) was used but the framework seems not " +
-											   "properly initialized. Did you forget about ActiveRecordStarter.Initialize() ?",
-											   type.FullName);
+				                               "properly initialized. Did you forget about ActiveRecordStarter.Initialize() ?",
+				                               type.FullName);
 				throw new ActiveRecordException(message);
 			}
 			if (type != typeof(ActiveRecordBase) && GetModel(type) == null)
 			{
 				String message = String.Format("You have accessed an ActiveRecord class that wasn't properly initialized. " +
-											   "The only explanation is that the call to ActiveRecordStarter.Initialize() didn't include {0} class",
-											   type.FullName);
+				                               "The only explanation is that the call to ActiveRecordStarter.Initialize() didn't include {0} class",
+				                               type.FullName);
 				throw new ActiveRecordException(message);
 			}
 		}
@@ -64,21 +68,21 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Internally used
 		/// </summary>
-		/// <param name="arType">The type.</param>
-		/// <param name="model">The model.</param>
-		internal static void Register(Type arType, ActiveRecordModel model)
+		/// <param name="arType"></param>
+		/// <param name="model"></param>
+		internal static void Register(Type arType, Framework.Internal.ActiveRecordModel model)
 		{
-			ActiveRecordModel.Register(arType, model);
+			Framework.Internal.ActiveRecordModel.Register(arType, model);
 		}
 
 		/// <summary>
 		/// Internally used
 		/// </summary>
-		/// <param name="arType">The type.</param>
-		/// <returns>An <see cref="ActiveRecordModel"/></returns>
-		internal static ActiveRecordModel GetModel(Type arType)
+		/// <param name="arType"></param>
+		/// <returns></returns>
+		internal static Framework.Internal.ActiveRecordModel GetModel(Type arType)
 		{
-			return ActiveRecordModel.GetModel(arType);
+			return Framework.Internal.ActiveRecordModel.GetModel(arType);
 		}
 
 		#endregion
@@ -95,25 +99,6 @@ namespace Castle.ActiveRecord
 		/// <param name="instance">The ActiveRecord instance to be created on the database</param>
 		protected internal static void Create(object instance)
 		{
-			InternalCreate(instance, false);
-		}
-
-		/// <summary>
-		/// Creates (Saves) a new instance to the database and flushes the session.
-		/// </summary>
-		/// <param name="instance">The ActiveRecord instance to be created on the database</param>
-		protected internal static void CreateAndFlush(object instance)
-		{
-			InternalCreate(instance, true);
-		}
-
-		/// <summary>
-		/// Creates (Saves) a new instance to the database.
-		/// </summary>
-		/// <param name="instance">The ActiveRecord instance to be created on the database</param>
-		/// <param name="flush">if set to <c>true</c>, the operation will be followed by a session flush.</param>
-		private static void InternalCreate(object instance, bool flush)
-		{
 			if (instance == null) throw new ArgumentNullException("instance");
 
 			EnsureInitialized(instance.GetType());
@@ -124,10 +109,7 @@ namespace Castle.ActiveRecord
 			{
 				session.Save(instance);
 
-				if (flush)
-				{
-					session.Flush();
-				}
+				session.Flush();
 			}
 			catch(Exception ex)
 			{
@@ -157,25 +139,6 @@ namespace Castle.ActiveRecord
 		/// <param name="instance">The ActiveRecord instance to be deleted</param>
 		protected internal static void Delete(object instance)
 		{
-			InternalDelete(instance, false);
-		}
-
-		/// <summary>
-		/// Deletes the instance from the database and flushes the session.
-		/// </summary>
-		/// <param name="instance">The ActiveRecord instance to be deleted</param>
-		protected internal static void DeleteAndFlush(object instance)
-		{
-			InternalDelete(instance, true);
-		}
-
-		/// <summary>
-		/// Deletes the instance from the database.
-		/// </summary>
-		/// <param name="instance">The ActiveRecord instance to be deleted</param>
-		/// <param name="flush">if set to <c>true</c>, the operation will be followed by a session flush.</param>
-		private static void InternalDelete(object instance, bool flush)
-		{
 			if (instance == null) throw new ArgumentNullException("instance");
 
 			EnsureInitialized(instance.GetType());
@@ -186,10 +149,7 @@ namespace Castle.ActiveRecord
 			{
 				session.Delete(instance);
 
-				if (flush)
-				{
-					session.Flush();
-				}
+				session.Flush();
 			}
 			catch(Exception ex)
 			{
@@ -201,50 +161,6 @@ namespace Castle.ActiveRecord
 				else
 				{
 					throw new ActiveRecordException("Could not perform Delete for " + instance.GetType().Name, ex);
-				}
-			}
-			finally
-			{
-				holder.ReleaseSession(session);
-			}
-		}
-
-		#endregion
-
-		#region Replicate
-
-		/// <summary>
-		/// From NHibernate documentation: 
-		/// Persist all reachable transient objects, reusing the current identifier 
-		/// values. Note that this will not trigger the Interceptor of the Session.
-		/// </summary>
-		/// <param name="instance">The instance.</param>
-		/// <param name="replicationMode">The replication mode.</param>
-		protected internal static void Replicate(object instance, ReplicationMode replicationMode)
-		{
-			if (instance == null)
-			{
-				throw new ArgumentNullException("instance");
-			}
-
-			EnsureInitialized(instance.GetType());
-
-			ISession session = holder.CreateSession(instance.GetType());
-
-			try
-			{
-				session.Replicate(instance, replicationMode);
-			}
-			catch(Exception ex)
-			{
-				// NHibernate catches our ValidationException, and as such it is the innerexception here
-				if (ex.InnerException is ValidationException)
-				{
-					throw ex.InnerException;
-				}
-				else
-				{
-					throw new ActiveRecordException("Could not perform Replicate for " + instance.GetType().Name, ex);
 				}
 			}
 			finally
@@ -273,7 +189,7 @@ namespace Castle.ActiveRecord
 			{
 				session.Refresh(instance);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				// NHibernate catches our ValidationException, and as such it is the innerexception here
 				if (ex.InnerException is ValidationException)
@@ -314,11 +230,11 @@ namespace Castle.ActiveRecord
 
 				session.Flush();
 			}
-			catch (ValidationException)
+			catch(ValidationException)
 			{
 				throw;
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				throw new ActiveRecordException("Could not perform DeleteAll for " + type.Name, ex);
 			}
@@ -349,11 +265,11 @@ namespace Castle.ActiveRecord
 
 				session.Flush();
 			}
-			catch (ValidationException)
+			catch(ValidationException)
 			{
 				throw;
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				throw new ActiveRecordException("Could not perform DeleteAll for " + type.Name, ex);
 			}
@@ -379,7 +295,7 @@ namespace Castle.ActiveRecord
 
 			int counter = 0;
 
-			foreach (object pk in pkValues)
+			foreach(object pk in pkValues)
 			{
 				Object obj = FindByPrimaryKey(targetType, pk, false);
 
@@ -393,7 +309,7 @@ namespace Castle.ActiveRecord
 					}
 					else
 					{
-						Delete(obj);
+						ActiveRecordBase.Delete(obj);
 					}
 
 					counter++;
@@ -414,27 +330,6 @@ namespace Castle.ActiveRecord
 		/// <param name="instance">The ActiveRecord instance to be updated on the database</param>
 		protected internal static void Update(object instance)
 		{
-			InternalUpdate(instance, false);
-		}
-
-		/// <summary>
-		/// Persists the modification on the instance
-		/// state to the database and flushes the session.
-		/// </summary>
-		/// <param name="instance">The ActiveRecord instance to be updated on the database</param>
-		protected internal static void UpdateAndFlush(object instance)
-		{
-			InternalUpdate(instance, true);
-		}
-
-		/// <summary>
-		/// Persists the modification on the instance
-		/// state to the database.
-		/// </summary>
-		/// <param name="instance">The ActiveRecord instance to be updated on the database</param>
-		/// <param name="flush">if set to <c>true</c>, the operation will be followed by a session flush.</param>
-		private static void InternalUpdate(object instance, bool flush)
-		{
 			if (instance == null) throw new ArgumentNullException("instance");
 
 			EnsureInitialized(instance.GetType());
@@ -445,16 +340,13 @@ namespace Castle.ActiveRecord
 			{
 				session.Update(instance);
 
-				if (flush)
-				{
-					session.Flush();
-				}
+				session.Flush();
 			}
-			catch (ValidationException)
+			catch(ValidationException)
 			{
 				throw;
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				throw new ActiveRecordException("Could not perform Update for " + instance.GetType().Name, ex);
 			}
@@ -479,35 +371,6 @@ namespace Castle.ActiveRecord
 		/// <param name="instance">The ActiveRecord instance to be saved</param>
 		protected internal static void Save(object instance)
 		{
-			InternalSave(instance, false);
-		}
-
-		/// <summary>
-		/// Saves the instance to the database and flushes the session. If the primary key is unitialized
-		/// it creates the instance on the database. Otherwise it updates it.
-		/// <para>
-		/// If the primary key is assigned, then you must invoke <see cref="Create()"/>
-		/// or <see cref="Update()"/> instead.
-		/// </para>
-		/// </summary>
-		/// <param name="instance">The ActiveRecord instance to be saved</param>
-		protected internal static void SaveAndFlush(object instance)
-		{
-			InternalSave(instance, true);
-		}
-
-		/// <summary>
-		/// Saves the instance to the database. If the primary key is unitialized
-		/// it creates the instance on the database. Otherwise it updates it.
-		/// <para>
-		/// If the primary key is assigned, then you must invoke <see cref="Create()"/>
-		/// or <see cref="Update()"/> instead.
-		/// </para>
-		/// </summary>
-		/// <param name="instance">The ActiveRecord instance to be saved</param>
-		/// <param name="flush">if set to <c>true</c>, the operation will be followed by a session flush.</param>
-		private static void InternalSave(object instance, bool flush)
-		{
 			if (instance == null) throw new ArgumentNullException("instance");
 
 			EnsureInitialized(instance.GetType());
@@ -518,10 +381,7 @@ namespace Castle.ActiveRecord
 			{
 				session.SaveOrUpdate(instance);
 
-				if (flush)
-				{
-					session.Flush();
-				}
+				session.Flush();
 			}
 			catch(Exception ex)
 			{
@@ -540,8 +400,6 @@ namespace Castle.ActiveRecord
 				holder.ReleaseSession(session);
 			}
 		}
-		
-		
 
 		#endregion
 
@@ -570,11 +428,11 @@ namespace Castle.ActiveRecord
 			{
 				return call(session, instance);
 			}
-			catch (ValidationException)
+			catch(ValidationException)
 			{
 				throw;
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				throw new ActiveRecordException("Error performing Execute for " + targetType.Name, ex);
 			}
@@ -588,27 +446,21 @@ namespace Castle.ActiveRecord
 
 		#region ExecuteQuery
 
-		/// <summary>
-		/// Enumerates the query
-		/// Note: only use if you expect most of the values to exist on the second level cache.
-		/// </summary>
-		/// <param name="query">The query.</param>
-		/// <returns>An <see cref="IEnumerable"/></returns>
 		protected internal static IEnumerable EnumerateQuery(IActiveRecordQuery query)
 		{
-			Type rootType = query.RootType;
+			Type targetType = query.Target;
 
-			EnsureInitialized(rootType);
+			EnsureInitialized(targetType);
 
-			ISession session = holder.CreateSession(rootType);
+			ISession session = holder.CreateSession(targetType);
 
 			try
 			{
 				return query.Enumerate(session);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
-				throw new ActiveRecordException("Could not perform EnumerateQuery for " + rootType.Name, ex);
+				throw new ActiveRecordException("Could not perform EnumerateQuery for " + targetType.Name, ex);
 			}
 			finally
 			{
@@ -620,26 +472,21 @@ namespace Castle.ActiveRecord
 
 		#region ExecuteQuery
 
-		/// <summary>
-		/// Executes the query.
-		/// </summary>
-		/// <param name="query">The query.</param>
-		/// <returns>The query result.</returns>
 		public static object ExecuteQuery(IActiveRecordQuery query)
 		{
-			Type rootType = query.RootType;
+			Type targetType = query.Target;
 
-			EnsureInitialized(rootType);
+			EnsureInitialized(targetType);
 
-			ISession session = holder.CreateSession(rootType);
+			ISession session = holder.CreateSession(targetType);
 
 			try
 			{
 				return query.Execute(session);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
-				throw new ActiveRecordException("Could not perform ExecuteQuery for " + rootType.Name, ex);
+				throw new ActiveRecordException("Could not perform ExecuteQuery for " + targetType.Name, ex);
 			}
 			finally
 			{
@@ -664,18 +511,18 @@ namespace Castle.ActiveRecord
 		///   
 		///   public static int CountAllUsers()
 		///   {
-		///     return Count(typeof(User));
+		///     return CountAll(typeof(User));
 		///   }
 		/// }
 		/// </code>
 		/// </example>
-		/// <param name="targetType">The target type.</param>
+		/// <param name="targetType">Type of the target.</param>
 		/// <returns>The count result</returns>
-		protected internal static int Count(Type targetType)
+		protected internal static int CountAll(Type targetType)
 		{
 			CountQuery query = new CountQuery(targetType);
 
-			return (int)ExecuteQuery(query);
+			return (int) ExecuteQuery(query);
 		}
 
 		/// <summary>
@@ -691,32 +538,18 @@ namespace Castle.ActiveRecord
 		///   
 		///   public static int CountAllUsersLocked()
 		///   {
-		///     return Count(typeof(User), "IsLocked = ?", true);
+		///     return CountAll(typeof(User), "IsLocked = ?", true);
 		///   }
 		/// }
 		/// </code>
 		/// </example>
-		/// <param name="targetType">The target type.</param>
+		/// <param name="targetType">Type of the target.</param>
 		/// <param name="filter">A sql where string i.e. Person=? and DOB &gt; ?</param>
 		/// <param name="args">Positional parameters for the filter string</param>
 		/// <returns>The count result</returns>
-		protected internal static int Count(Type targetType, string filter, params object[] args)
+		protected internal static int CountAll(Type targetType, string filter, params object[] args)
 		{
 			CountQuery query = new CountQuery(targetType, filter, args);
-
-			return (int)ExecuteQuery(query);
-		}
-
-		/// <summary>
-		/// Returns the number of records of the specified 
-		/// type in the database
-		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="criteria">The criteria expression</param>
-		/// <returns>The count result</returns>
-		protected internal static int Count(Type targetType, ICriterion[] criteria)
-		{
-			CountQuery query = new CountQuery(targetType, criteria);
 
 			return (int) ExecuteQuery(query);
 		}
@@ -728,45 +561,34 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Check if there is any records in the db for the target type
 		/// </summary>
-		/// <param name="targetType">The target type.</param>
+		/// <param name="targetType">Type of the target.</param>
 		/// <returns><c>true</c> if there's at least one row</returns>
 		protected internal static bool Exists(Type targetType)
 		{
-			return Count(targetType) > 0;
+			return CountAll(targetType) != 0;
 		}
 
 		/// <summary>
 		/// Check if there is any records in the db for the target type
 		/// </summary>
-		/// <param name="targetType">The target type.</param>
+		/// <param name="targetType">Type of the target.</param>
 		/// <param name="filter">A sql where string i.e. Person=? and DOB &gt; ?</param>
 		/// <param name="args">Positional parameters for the filter string</param>
 		/// <returns><c>true</c> if there's at least one row</returns>
 		protected internal static bool Exists(Type targetType, string filter, params object[] args)
 		{
-			return Count(targetType, filter, args) > 0;
+			return CountAll(targetType, filter, args) != 0;
 		}
 
 		/// <summary>
 		/// Check if the <paramref name="id"/> exists in the database.
 		/// </summary>
-		/// <param name="targetType">The target type.</param>
+		/// <param name="targetType">Type of the target.</param>
 		/// <param name="id">The id to check on</param>
 		/// <returns><c>true</c> if the ID exists; otherwise <c>false</c>.</returns>
 		protected internal static bool Exists(Type targetType, object id)
 		{
-			return FindByPrimaryKey(targetType, id, false) != null;
-		}
-
-		/// <summary>
-		/// Check if any instance matching the criteria exists in the database.
-		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="criteria">The criteria expression</param>		
-		/// <returns><c>true</c> if an instance is found; otherwise <c>false</c>.</returns>
-		protected internal static bool Exists(Type targetType, params ICriterion[] criteria)
-		{
-			return Count(targetType, criteria) > 0;
+			return Exists(targetType, "id=?", id);
 		}
 
 		#endregion
@@ -774,23 +596,45 @@ namespace Castle.ActiveRecord
 		#region FindAll
 
 		/// <summary>
-		/// Returns all instances found for the specified type according to the criteria
+		/// Returns all instances found for the specified type.
 		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="detachedCriteria">The criteria.</param>
-		/// <param name="orders">An <see cref="Array"/> of <see cref="Order"/> objects.</param>
-		/// <returns>The <see cref="Array"/> of results.</returns>
-		protected internal static Array FindAll(Type targetType, DetachedCriteria detachedCriteria, params Order[] orders)
+		/// <param name="targetType"></param>
+		/// <returns></returns>
+		protected internal static Array FindAll(Type targetType)
+		{
+			return FindAll(targetType, (Order[]) null);
+		}
+
+		/// <summary>
+		/// Returns all instances found for the specified type 
+		/// using sort orders and criterias.
+		/// </summary>
+		/// <param name="targetType"></param>
+		/// <param name="orders"></param>
+		/// <param name="criterias"></param>
+		/// <returns></returns>
+		protected internal static Array FindAll(Type targetType, Order[] orders, params ICriterion[] criterias)
 		{
 			EnsureInitialized(targetType);
 
 			ISession session = holder.CreateSession(targetType);
-			
+
 			try
 			{
-				ICriteria criteria = detachedCriteria.GetExecutableCriteria(session);
+				ICriteria criteria = session.CreateCriteria(targetType);
 
-				AddOrdersToCriteria(criteria, orders);
+				foreach(ICriterion cond in criterias)
+				{
+					criteria.Add(cond);
+				}
+
+				if (orders != null)
+				{
+					foreach(Order order in orders)
+					{
+						criteria.AddOrder(order);
+					}
+				}
 
 				return SupportingUtils.BuildArray(targetType, criteria.List());
 			}
@@ -809,77 +653,15 @@ namespace Castle.ActiveRecord
 		}
 
 		/// <summary>
-		/// Returns all instances found for the specified type.
-		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <returns>The <see cref="Array"/> of results</returns>
-		protected internal static Array FindAll(Type targetType)
-		{
-			return FindAll(targetType, (Order[])null);
-		}
-
-		/// <summary>
 		/// Returns all instances found for the specified type 
-		/// using sort orders and criteria.
+		/// using criterias.
 		/// </summary>
-		/// <param name="targetType">The The target type.</param>
-		/// <param name="orders">An <see cref="Array"/> of <see cref="Order"/> objects.</param>
-		/// <param name="criteria">The criteria expression</param>
-		/// <returns>The <see cref="Array"/> of results.</returns>
-		protected internal static Array FindAll(Type targetType, Order[] orders, params ICriterion[] criteria)
+		/// <param name="targetType"></param>
+		/// <param name="criterias"></param>
+		/// <returns></returns>
+		protected internal static Array FindAll(Type targetType, params ICriterion[] criterias)
 		{
-			EnsureInitialized(targetType);
-
-			ISession session = holder.CreateSession(targetType);
-
-			try
-			{
-				ICriteria sessionCriteria = session.CreateCriteria(targetType);
-
-				foreach(ICriterion cond in criteria)
-				{
-					sessionCriteria.Add(cond);
-				}
-
-				AddOrdersToCriteria(sessionCriteria, orders);
-
-				return SupportingUtils.BuildArray(targetType, sessionCriteria.List());
-			}
-			catch (ValidationException)
-			{
-				throw;
-			}
-			catch (Exception ex)
-			{
-				throw new ActiveRecordException("Could not perform FindAll for " + targetType.Name, ex);
-			}
-			finally
-			{
-				holder.ReleaseSession(session);
-			}
-		}
-
-		private static void AddOrdersToCriteria(ICriteria criteria, Order[] orders)
-		{
-			if (orders != null)
-			{
-				foreach (Order order in orders)
-				{
-					criteria.AddOrder(order);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Returns all instances found for the specified type 
-		/// using criteria.
-		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="criteria">The criteria expression</param>
-		/// <returns>The <see cref="Array"/> of results.</returns>
-		protected internal static Array FindAll(Type targetType, params ICriterion[] criteria)
-		{
-			return FindAll(targetType, null, criteria);
+			return FindAll(targetType, null, criterias);
 		}
 
 		#endregion
@@ -892,7 +674,7 @@ namespace Castle.ActiveRecord
 		/// <param name="targetType">The target type</param>
 		/// <param name="property">A property name (not a column name)</param>
 		/// <param name="value">The value to be equals to</param>
-		/// <returns>The <see cref="Array"/> of results.</returns>
+		/// <returns></returns>
 		protected internal static Array FindAllByProperty(Type targetType, String property, object value)
 		{
 			ICriterion criteria = (value == null) ? Expression.IsNull(property) : Expression.Eq(property, value);
@@ -906,11 +688,11 @@ namespace Castle.ActiveRecord
 		/// <param name="orderByColumn">The column name to be ordered ASC</param>
 		/// <param name="property">A property name (not a column name)</param>
 		/// <param name="value">The value to be equals to</param>
-		/// <returns>The <see cref="Array"/> of results.</returns>
+		/// <returns></returns>
 		protected internal static Array FindAllByProperty(Type targetType, String orderByColumn, String property, object value)
 		{
 			ICriterion criteria = (value == null) ? Expression.IsNull(property) : Expression.Eq(property, value);
-			return FindAll(targetType, new Order[] {Order.Asc(orderByColumn)}, criteria);
+			return FindAll(targetType, new Order[] { Order.Asc(orderByColumn) }, criteria);
 		}
 
 		#endregion
@@ -922,7 +704,7 @@ namespace Castle.ActiveRecord
 		/// </summary>
 		/// <param name="targetType">The AR subclass type</param>
 		/// <param name="id">ID value</param>
-		/// <returns>The object instance.</returns>
+		/// <returns></returns>
 		protected internal static object FindByPrimaryKey(Type targetType, object id)
 		{
 			return FindByPrimaryKey(targetType, id, true);
@@ -935,50 +717,34 @@ namespace Castle.ActiveRecord
 		/// <param name="id">ID value</param>
 		/// <param name="throwOnNotFound"><c>true</c> if you want to catch an exception 
 		/// if the object is not found</param>
-		/// <returns>The object instance.</returns>
+		/// <returns></returns>
 		/// <exception cref="ObjectNotFoundException">if <c>throwOnNotFound</c> is set to 
 		/// <c>true</c> and the row is not found</exception>
 		protected internal static object FindByPrimaryKey(Type targetType, object id, bool throwOnNotFound)
 		{
 			EnsureInitialized(targetType);
-			bool hasScope = holder.ThreadScopeInfo.HasInitializedScope;
+
 			ISession session = holder.CreateSession(targetType);
 
 			try
 			{
-				object loaded;
-				// Load() and Get() has different semantics with regard to the way they
-				// handle null values, Get() _must_ check that the value exists, Load() is allowed
-				// to return an uninitialized proxy that will throw when you access it later.
-				// in order to play well with proxies, we need to use this approach.
+				return session.Load(targetType, id);
+			}
+			catch(ObjectNotFoundException ex)
+			{
 				if (throwOnNotFound)
 				{
-					loaded = session.Load(targetType, id);
+					String message = String.Format("Could not find {0} with id {1}", targetType.Name, id);
+					throw new NotFoundException(message, ex);
 				}
-				else
-				{
-					loaded = session.Get(targetType, id);
-				}
-				//If we are not in a scope, we want to initialize the entity eagerly, since other wise the 
-				//user will get an exception when it access the entity's property, and it will try to lazy load itself and find that
-				//it has no session.
-				//If we are in a scope, it is the user responsability to keep the scope alive if he wants to use 
-				if (!hasScope)
-				{
-					NHibernateUtil.Initialize(loaded);
-				}
-				return loaded;
+
+				return null;
 			}
-			catch (ObjectNotFoundException ex)
-			{
-				String message = String.Format("Could not find {0} with id {1}", targetType.Name, id);
-				throw new NotFoundException(message, ex);
-			}
-			catch (ValidationException)
+			catch(ValidationException)
 			{
 				throw;
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				throw new ActiveRecordException("Could not perform FindByPrimaryKey for " + targetType.Name + ". Id: " + id, ex);
 			}
@@ -995,26 +761,13 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Searches and returns the first row.
 		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="detachedCriteria">The criteria.</param>
-		/// <param name="orders">The sort order - used to determine which record is the first one.</param>
-		/// <returns>A <c>targetType</c> instance or <c>null.</c></returns>
-		protected internal static object FindFirst(Type targetType, DetachedCriteria detachedCriteria, params Order[] orders)
-		{
-			Array result = SlicedFindAll(targetType, 0, 1, orders, detachedCriteria);
-			return (result != null && result.Length > 0 ? result.GetValue(0) : null);
-		}
-
-		/// <summary>
-		/// Searches and returns the first row.
-		/// </summary>
 		/// <param name="targetType">The target type</param>
 		/// <param name="orders">The sort order - used to determine which record is the first one</param>
-		/// <param name="criteria">The criteria expression</param>
+		/// <param name="criterias">The criteria expression</param>
 		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
-		protected internal static object FindFirst(Type targetType, Order[] orders, params ICriterion[] criteria)
+		protected internal static object FindFirst(Type targetType, Order[] orders, params ICriterion[] criterias)
 		{
-			Array result = SlicedFindAll(targetType, 0, 1, orders, criteria);
+			Array result = SlicedFindAll(targetType, 0, 1, orders, criterias);
 			return (result != null && result.Length > 0 ? result.GetValue(0) : null);
 		}
 
@@ -1022,11 +775,11 @@ namespace Castle.ActiveRecord
 		/// Searches and returns the first row.
 		/// </summary>
 		/// <param name="targetType">The target type</param>
-		/// <param name="criteria">The criteria expression</param>
+		/// <param name="criterias">The criteria expression</param>
 		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
-		protected internal static object FindFirst(Type targetType, params ICriterion[] criteria)
+		protected internal static object FindFirst(Type targetType, params ICriterion[] criterias)
 		{
-			return FindFirst(targetType, null, criteria);
+			return FindFirst(targetType, null, criterias);
 		}
 
 		#endregion
@@ -1038,31 +791,11 @@ namespace Castle.ActiveRecord
 		/// throws <see cref="ActiveRecordException"/>
 		/// </summary>
 		/// <param name="targetType">The target type</param>
-		/// <param name="criteria">The criteria expression</param>
+		/// <param name="criterias">The criteria expression</param>
 		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
-		protected internal static object FindOne(Type targetType, params ICriterion[] criteria)
+		protected internal static object FindOne(Type targetType, params ICriterion[] criterias)
 		{
-			Array result = SlicedFindAll(targetType, 0, 2, criteria);
-
-			if (result.Length > 1)
-			{
-				throw new ActiveRecordException(targetType.Name + ".FindOne returned " + result.Length +
-												" rows. Expecting one or none");
-			}
-
-			return (result.Length == 0) ? null : result.GetValue(0);
-		}
-
-		/// <summary>
-		/// Searches and returns a row. If more than one is found, 
-		/// throws <see cref="ActiveRecordException"/>
-		/// </summary>
-		/// <param name="targetType">The target type</param>
-		/// <param name="criteria">The criteria</param>
-		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
-		protected internal static object FindOne(Type targetType, DetachedCriteria criteria)
-		{
-			Array result = SlicedFindAll(targetType, 0, 2, criteria);
+			Array result = SlicedFindAll(targetType, 0, 2, criterias);
 
 			if (result.Length > 1)
 			{
@@ -1080,14 +813,8 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Returns a portion of the query results (sliced)
 		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="firstResult">The number of the first row to retrieve.</param>
-		/// <param name="maxResults">The maximum number of results retrieved.</param>
-		/// <param name="orders">An <see cref="Array"/> of <see cref="Order"/> objects.</param>
-		/// <param name="criteria">The criteria expression</param>
-		/// <returns>The sliced query results.</returns>
-		protected internal static Array SlicedFindAll(Type targetType, int firstResult, int maxResults,
-		                                              Order[] orders, params ICriterion[] criteria)
+		protected internal static Array SlicedFindAll(Type targetType, int firstResult, int maxResults, 
+		                                              Order[] orders, params ICriterion[] criterias)
 		{
 			EnsureInitialized(targetType);
 
@@ -1095,64 +822,25 @@ namespace Castle.ActiveRecord
 
 			try
 			{
-				ICriteria sessionCriteria = session.CreateCriteria(targetType);
+				ICriteria criteria = session.CreateCriteria(targetType);
 
-				foreach(ICriterion cond in criteria)
+				foreach(ICriterion cond in criterias)
 				{
-					sessionCriteria.Add(cond);
+					criteria.Add(cond);
 				}
 
 				if (orders != null)
 				{
-					foreach (Order order in orders)
+					foreach(Order order in orders)
 					{
-						sessionCriteria.AddOrder(order);
+						criteria.AddOrder(order);
 					}
 				}
 
-				sessionCriteria.SetFirstResult(firstResult);
-				sessionCriteria.SetMaxResults(maxResults);
+				criteria.SetFirstResult(firstResult);
+				criteria.SetMaxResults(maxResults);
 
-				return SupportingUtils.BuildArray(targetType, sessionCriteria.List());
-			}
-			catch (ValidationException)
-			{
-				throw;
-			}
-			catch (Exception ex)
-			{
-				throw new ActiveRecordException("Could not perform SlicedFindAll for " + targetType.Name, ex);
-			}
-			finally
-			{
-				holder.ReleaseSession(session);
-			}
-		}
-
-		/// <summary>
-		/// Returns a portion of the query results (sliced)
-		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="firstResult">The number of the first row to retrieve.</param>
-		/// <param name="maxResults">The maximum number of results retrieved.</param>
-		/// <param name="orders">An <see cref="Array"/> of <see cref="Order"/> objects.</param>
-		/// <param name="criteria">The criteria expression</param>
-		/// <returns>The sliced query results.</returns>
-		protected internal static Array SlicedFindAll(Type targetType, int firstResult, int maxResults,
-		                                              Order[] orders, DetachedCriteria criteria)
-		{
-			EnsureInitialized(targetType);
-
-			ISession session = holder.CreateSession(targetType);
-
-			try
-			{
-				ICriteria executableCriteria = criteria.GetExecutableCriteria(session);
-				AddOrdersToCriteria(executableCriteria, orders);
-				executableCriteria.SetFirstResult(firstResult);
-				executableCriteria.SetMaxResults(maxResults);
-
-				return SupportingUtils.BuildArray(targetType, executableCriteria.List());
+				return SupportingUtils.BuildArray(targetType, criteria.List());
 			}
 			catch(ValidationException)
 			{
@@ -1171,29 +859,10 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Returns a portion of the query results (sliced)
 		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="firstResult">The number of the first row to retrieve.</param>
-		/// <param name="maxResults">The maximum number of results retrieved.</param>
-		/// <param name="criteria">The criteria expression</param>
-		/// <returns>The sliced query results.</returns>
 		protected internal static Array SlicedFindAll(Type targetType, int firstResult, int maxResults,
-		                                              params ICriterion[] criteria)
+		                                              params ICriterion[] criterias)
 		{
-			return SlicedFindAll(targetType, firstResult, maxResults, null, criteria);
-		}
-
-		/// <summary>
-		/// Returns a portion of the query results (sliced)
-		/// </summary>
-		/// <param name="targetType">The target type.</param>
-		/// <param name="firstResult">The number of the first row to retrieve.</param>
-		/// <param name="maxResults">The maximum number of results retrieved.</param>
-		/// <param name="criteria">The criteria expression</param>
-		/// <returns>The sliced query results.</returns>
-		protected internal static Array SlicedFindAll(Type targetType, int firstResult, int maxResults,
-		                                              DetachedCriteria criteria)
-		{
-			return SlicedFindAll(targetType, firstResult, maxResults, null, criteria);
+			return SlicedFindAll(targetType, firstResult, maxResults, null, criterias);
 		}
 
 		#endregion
@@ -1222,109 +891,34 @@ namespace Castle.ActiveRecord
 		/// May Create or Update the instance depending 
 		/// on whether it has a valid ID.
 		/// </summary>
-		/// <remarks>
-		/// If within a <see cref="SessionScope"/> the operation
-		/// is going to be on hold until NHibernate (or you) decides to flush
-		/// the session.
-		/// </remarks>
 		public virtual void Save()
 		{
-			Save(this);
-		}
-
-		/// <summary>
-		/// Saves the instance information to the database.
-		/// May Create or Update the instance depending 
-		/// on whether it has a valid ID.
-		/// </summary>
-		/// <remarks>
-		/// Even within a <see cref="SessionScope"/> the operation
-		/// is going to be flushed immediately. This might have side effects such as
-		/// flushing (persisting) others operations that were on hold.
-		/// </remarks>
-		public virtual void SaveAndFlush()
-		{
-			SaveAndFlush(this);
+			ActiveRecordBase.Save(this);
 		}
 
 		/// <summary>
 		/// Creates (Saves) a new instance to the database.
 		/// </summary>
-		/// <remarks>
-		/// If within a <see cref="SessionScope"/> the operation
-		/// is going to be on hold until NHibernate (or you) decides to flush
-		/// the session.
-		/// </remarks>
 		public virtual void Create()
 		{
-			Create(this);
-		}
-
-		/// <summary>
-		/// Creates (Saves) a new instance to the database.
-		/// </summary>
-		/// <remarks>
-		/// Even within a <see cref="SessionScope"/> the operation
-		/// is going to be flushed immediately. This might have side effects such as
-		/// flushing (persisting) others operations that were on hold.
-		/// </remarks>
-		public virtual void CreateAndFlush()
-		{
-			CreateAndFlush(this);
+			ActiveRecordBase.Create(this);
 		}
 
 		/// <summary>
 		/// Persists the modification on the instance
 		/// state to the database.
 		/// </summary>
-		/// <remarks>
-		/// If within a <see cref="SessionScope"/> the operation
-		/// is going to be on hold until NHibernate (or you) decides to flush
-		/// the session.
-		/// </remarks>
 		public virtual void Update()
 		{
-			Update(this);
-		}
-
-		/// <summary>
-		/// Persists the modification on the instance
-		/// state to the database.
-		/// </summary>
-		/// <remarks>
-		/// Even within a <see cref="SessionScope"/> the operation
-		/// is going to be flushed immediately. This might have side effects such as
-		/// flushing (persisting) others operations that were on hold.
-		/// </remarks>
-		public virtual void UpdateAndFlush()
-		{
-			UpdateAndFlush(this);
+			ActiveRecordBase.Update(this);
 		}
 
 		/// <summary>
 		/// Deletes the instance from the database.
 		/// </summary>
-		/// <remarks>
-		/// If within a <see cref="SessionScope"/> the operation
-		/// is going to be on hold until NHibernate (or you) decides to flush
-		/// the session.
-		/// </remarks>
 		public virtual void Delete()
 		{
-			Delete(this);
-		}
-
-		/// <summary>
-		/// Deletes the instance from the database.
-		/// </summary>
-		/// <remarks>
-		/// Even within a <see cref="SessionScope"/> the operation
-		/// is going to be flushed immediately. This might have side effects such as
-		/// flushing (persisting) others operations that were on hold.
-		/// </remarks>
-		public virtual void DeleteAndFlush()
-		{
-			DeleteAndFlush(this);
+			ActiveRecordBase.Delete(this);
 		}
 
 		/// <summary>
@@ -1332,28 +926,23 @@ namespace Castle.ActiveRecord
 		/// </summary>
 		public virtual void Refresh()
 		{
-			Refresh(this);
+			ActiveRecordBase.Refresh(this);
 		}
 
 		#endregion
 
 		#region public override
 
-		/// <summary>
-		/// Return the type of the object with its PK value.
-		/// Useful for logging/debugging
-		/// </summary>
-		/// <returns>A string representation of this object.</returns>
 		public override String ToString()
 		{
-			ActiveRecordModel model = GetModel(GetType());
+			Framework.Internal.ActiveRecordModel model = GetModel(GetType());
 
 			if (model == null || model.PrimaryKey == null)
 			{
 				return base.ToString();
 			}
 
-			PrimaryKeyModel pkModel = model.PrimaryKey;
+			Framework.Internal.PrimaryKeyModel pkModel = model.PrimaryKey;
 
 			object pkVal = pkModel.Property.GetValue(this, null);
 

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
 namespace Castle.ActiveRecord
 {
 	using System;
-	using NHibernate.Persister.Entity;
-
+	
 	/// <summary>
 	/// Associate meta information related to the
 	/// desired table mapping.
@@ -53,12 +52,13 @@ namespace Castle.ActiveRecord
 		private int batchSize = 1;
 		private Polymorphism polymorphism = Polymorphism.Implicit;
 		private OptimisticLocking locking = OptimisticLocking.Version;
-		private bool lazySpecified;
 
 		/// <summary>
 		/// Uses the class name as table name
 		/// </summary>
-		public ActiveRecordAttribute() {}
+		public ActiveRecordAttribute()
+		{
+		}
 
 		/// <summary>
 		/// Associates the specified table with the target type
@@ -150,21 +150,7 @@ namespace Castle.ActiveRecord
 		public bool Lazy
 		{
 			get { return lazy; }
-			set
-			{
-				lazySpecified = true;
-				lazy = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether explicit lazy behavior was specified.
-		/// If explicit lazy behavior was not specified, it goes to the configuration to decide if the type should
-		/// be lazy or not.
-		/// </summary>
-		public bool LazySpecified
-		{
-			get { return this.lazySpecified; }
+			set { lazy = value; }
 		}
 
 		/// <summary>
@@ -193,7 +179,7 @@ namespace Castle.ActiveRecord
 
 		/// <summary>
 		/// From NHibernate documentation:
-		/// Specifies a custom <see cref="IEntityPersister"/>.
+		/// Specifies a custom <see cref="NHibernate.Persister.IClassPersister"/>.
 		/// </summary>
 		public Type Persister
 		{

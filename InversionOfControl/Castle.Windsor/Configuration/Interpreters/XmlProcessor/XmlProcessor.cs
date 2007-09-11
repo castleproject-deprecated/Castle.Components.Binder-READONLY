@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,30 +29,15 @@ namespace Castle.Windsor.Configuration.Interpreters.XmlProcessor
 	{
 		private IXmlProcessorEngine engine;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="XmlProcessor"/> class.
-		/// </summary>
-		public XmlProcessor() : this(null)
+		public XmlProcessor(IResourceSubSystem resourceSubSystem)
 		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="XmlProcessor"/> class.
-		/// </summary>
-		/// <param name="environmentName">Name of the environment.</param>
-		/// <param name="resourceSubSystem">The resource sub system.</param>
-		public XmlProcessor(string environmentName, IResourceSubSystem resourceSubSystem)
-		{
-			engine = new DefaultXmlProcessorEngine(environmentName, resourceSubSystem);
+			engine = new DefaultXmlProcessorEngine(resourceSubSystem);
 			RegisterProcessors();
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="XmlProcessor"/> class.
-		/// </summary>
-		public XmlProcessor(string environmentName)
+		public XmlProcessor()
 		{
-			engine = new DefaultXmlProcessorEngine(environmentName);
+			engine = new DefaultXmlProcessorEngine();
 			RegisterProcessors();
 		}
 
@@ -69,7 +54,6 @@ namespace Castle.Windsor.Configuration.Interpreters.XmlProcessor
 			AddElementProcessor(typeof(DefinedProcessingInstructionProcessor));
 			AddElementProcessor(typeof(UndefProcessingInstructionProcessor));
 			AddElementProcessor(typeof(DefaultTextNodeProcessor));
-			AddElementProcessor(typeof(EvalProcessingInstructionProcessor));
 		}
 
 		protected void AddElementProcessor(Type t)

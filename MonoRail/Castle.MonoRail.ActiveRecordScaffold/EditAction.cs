@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,14 +45,11 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 
 			try
 			{
-				if (!controller.Flash.Contains(Model.Type.Name))
-				{
-					object instance = ActiveRecordMediator.FindByPrimaryKey(Model.Type, idVal, true);
-					controller.PropertyBag["instance"] = instance;
-					controller.PropertyBag[Model.Type.Name] = instance;
-				}
-
+				object instance = ActiveRecordMediator.FindByPrimaryKey(Model.Type, idVal, true);
+				
 				controller.PropertyBag["prefix"] = Model.Type.Name;
+				controller.PropertyBag["instance"] = instance;
+				controller.PropertyBag[Model.Type.Name] = instance;
 				controller.PropertyBag["id"] = idVal;
 			}
 			catch(Exception ex)

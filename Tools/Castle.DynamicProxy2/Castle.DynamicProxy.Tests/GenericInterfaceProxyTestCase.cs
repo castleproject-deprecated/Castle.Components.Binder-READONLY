@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ namespace Castle.DynamicProxy.Tests
 {
 	using System;
 	using System.Collections.Generic;
-	using Castle.DynamicProxy.Generators;
 	using Castle.DynamicProxy.Tests.GenInterfaces;
 	using Castle.DynamicProxy.Tests.Interceptors;
 	using NUnit.Framework;
@@ -76,64 +75,22 @@ namespace Castle.DynamicProxy.Tests
 			Assert.AreEqual("DoSomething ", logger.LogContents);
 		}
 		
-//		[Test]
-//		public void ProxyWithGenInterfaceWithGenericTypes()
-//		{
-//			GenInterfaceWithGenericTypes proxy =
-//				generator.CreateInterfaceProxyWithTarget<GenInterfaceWithGenericTypes>(
-//					new GenInterfaceWithGenericTypesImpl(), logger);
-//
-//			Assert.IsNotNull(proxy);
-//
-//			Assert.IsNotNull(proxy.Find(""));
-//			Assert.IsNotNull(proxy.Find<String>(""));
-//			
-//			proxy.Populate<String>(new List<String>());
-//
-//			Assert.AreEqual("Find Find Populate ", logger.LogContents);
-//
-//		}
-
 		[Test]
-		public void ProxyWithGenInterfaceWithGenericArrays()
+		public void ProxyWithGenInterfaceWithGenericTypes()
 		{
-			IGenInterfaceWithGenArray<int> proxy =
-				generator.CreateInterfaceProxyWithTarget<IGenInterfaceWithGenArray<int>>(
-					new GenInterfaceWithGenArray<int>(), logger);
+			GenInterfaceWithGenericTypes proxy =
+				generator.CreateInterfaceProxyWithTarget<GenInterfaceWithGenericTypes>(
+					new GenInterfaceWithGenericTypesImpl(), logger);
 
 			Assert.IsNotNull(proxy);
 
-			int[] items = new int[] { 1,2,3 };
-			proxy.CopyTo(items);
-			items = proxy.CreateItems();
-			Assert.IsNotNull(items);
-			Assert.AreEqual(3, items.Length);
+			Assert.IsNotNull(proxy.Find(""));
+			Assert.IsNotNull(proxy.Find<String>(""));
+			
+			proxy.Populate<String>(new List<String>());
 
-			Assert.AreEqual("CopyTo CreateItems ", logger.LogContents);
-		}
+			Assert.AreEqual("Find Find Populate ", logger.LogContents);
 
-		[Test]
-		public void ProxyWithGenInterfaceWithBase()
-		{
-			IGenInterfaceHierarchySpecialization<int> proxy =
-				generator.CreateInterfaceProxyWithTarget<IGenInterfaceHierarchySpecialization<int>>(
-					new GenInterfaceHierarchy<int>(), logger);
-
-			Assert.IsNotNull(proxy);
-
-			proxy.Add();
-			proxy.Add(1);
-			Assert.IsNotNull(proxy.FetchAll());
-
-			Assert.AreEqual("Add Add FetchAll ", logger.LogContents);
-		}
-
-		[Test]
-		[ExpectedException(typeof(GeneratorException), "DynamicProxy cannot create an interface (with target) proxy for 'InterfaceWithExplicitImpl`1' as the target 'GenExplicitImplementation`1' has an explicit implementation of one of the methods exposed by the interface. The runtime prevents use from invoking the private method on the target. Method Castle.DynamicProxy.Tests.GenInterfaces.InterfaceWithExplicitImpl<T>.GetEnum1")]
-		public void ProxyWithGenExplicitImplementation()
-		{
-			generator.CreateInterfaceProxyWithTarget<InterfaceWithExplicitImpl<int>>(
-				new GenExplicitImplementation<int>(), logger);
 		}
 	}
 }

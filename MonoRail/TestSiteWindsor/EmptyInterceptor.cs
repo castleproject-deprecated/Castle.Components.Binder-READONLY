@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@ namespace TestSiteWindsor
 {
 	using Castle.Core.Interceptor;
 
-	public class EmptyInterceptor : IInterceptor
+	public class EmptyInterceptor : IMethodInterceptor
 	{
-		public void Intercept(IInvocation invocation)
+		public object Intercept(IMethodInvocation invocation, params object[] args)
 		{
-			invocation.Proceed();
+			return invocation.Proceed(args);
 		}
 	}
 }

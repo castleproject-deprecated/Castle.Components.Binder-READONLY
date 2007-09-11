@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,9 +35,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 		public static Pair[] GetGeneralSettings()
 		{
 			return new Pair[] {
-				new Pair("hibernate.connection.provider", "NHibernate.Connection.DriverConnectionProvider"),
-				new Pair("hibernate.command_timeout", "5000"),
 				new Pair("hibernate.cache.use_query_cache", "true"), 
+				new Pair("hibernate.use_reflection_optimizer", "true"), 
 				new Pair("hibernate.connection.isolation", "ReadCommitted"),
 				new Pair("hibernate.show_sql", "false"),
 			};
@@ -57,6 +56,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 				return new Pair[] {
 					new Pair("hibernate.dialect", "NHibernate.Dialect.MsSql2000Dialect"), 
 					new Pair("hibernate.connection.driver_class", "NHibernate.Driver.SqlClientDriver")
+					//new Pair("hibernate.query.substitutions", "true 1, false 0, yes 'Y', no 'N'")
 				};
 			}
 			else if (database == "MySql")

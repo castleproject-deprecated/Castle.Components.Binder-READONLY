@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 
 #if DOTNET2
 
@@ -25,10 +26,6 @@ namespace Castle.ActiveRecord.Queries
 	/// of the type <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">The resulting object type</typeparam>
-	/// <remarks>
-	/// If the query result is null, and <typeparamref name="T"/> is a value type,
-	/// the default value for that type will be returned.
-	/// </remarks>
 	public class ScalarQuery<T> : ScalarQuery, IActiveRecordQuery<T>
 	{
 		#region Constructors
@@ -84,8 +81,7 @@ namespace Castle.ActiveRecord.Queries
 		#region IActiveRecordQuery<T> implementation
 		T IActiveRecordQuery<T>.Execute(ISession session)
 		{
-			object result = InternalExecute(session);
-			return result == null ? default(T) : (T)result;
+			return (T) InternalExecute(session);
 		}
 		#endregion
 
@@ -94,8 +90,7 @@ namespace Castle.ActiveRecord.Queries
 		/// </summary>
 		public T Execute()
 		{
-			object result = ActiveRecordMediator.ExecuteQuery(this);
-			return result == null ? default(T) : (T) result;
+			return (T) ActiveRecordMediator.ExecuteQuery(this);
 		}
 	}
 }

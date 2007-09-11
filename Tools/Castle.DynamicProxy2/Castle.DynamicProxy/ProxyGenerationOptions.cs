@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@ namespace Castle.DynamicProxy
 	using System;
 	using System.Collections;
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public class ProxyGenerationOptions
 	{
 		public static readonly ProxyGenerationOptions Default = new ProxyGenerationOptions();
@@ -25,22 +28,14 @@ namespace Castle.DynamicProxy
 		private IInterceptorSelector selector;
 		private ArrayList mixins;
 		private Type baseTypeForInterfaceProxy = typeof(object);
-		private bool useSingleInterfaceProxy;
 		private bool useSelector;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ProxyGenerationOptions"/> class.
-		/// </summary>
-		/// <param name="hook">The hook.</param>
 		public ProxyGenerationOptions(IProxyGenerationHook hook)
 		{
 			this.hook = hook;
 			useSelector = false;
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ProxyGenerationOptions"/> class.
-		/// </summary>
 		public ProxyGenerationOptions() : this(new AllMethodsHook())
 		{
 		}
@@ -61,12 +56,6 @@ namespace Castle.DynamicProxy
 		{
 			get { return useSelector; }
 			set { useSelector = value; }
-		}
-
-		public bool UseSingleInterfaceProxy
-		{
-			get { return useSingleInterfaceProxy; }
-			set { useSingleInterfaceProxy = value; }
 		}
 
 		public void AddMixinInstance(object instance)
@@ -100,31 +89,6 @@ namespace Castle.DynamicProxy
 		{
 			get { return baseTypeForInterfaceProxy; }
 			set { baseTypeForInterfaceProxy = value; }
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (this == obj) return true;
-			ProxyGenerationOptions proxyGenerationOptions = obj as ProxyGenerationOptions;
-			if (proxyGenerationOptions == null) return false;
-			if (!Equals(hook.GetType(), proxyGenerationOptions.hook.GetType())) return false;
-			if (!Equals(selector, proxyGenerationOptions.selector)) return false;
-			if (!Equals(mixins, proxyGenerationOptions.mixins)) return false;
-			if (!Equals(baseTypeForInterfaceProxy, proxyGenerationOptions.baseTypeForInterfaceProxy)) return false;
-			if (!Equals(useSelector, proxyGenerationOptions.useSelector)) return false;
-			if (!Equals(useSingleInterfaceProxy, proxyGenerationOptions.useSingleInterfaceProxy)) return false;
-			return true;
-		}
-
-		public override int GetHashCode()
-		{
-			int result = hook != null ? hook.GetType().GetHashCode() : 0;
-			result = 29 * result + (selector != null ? selector.GetHashCode() : 0);
-			result = 29 * result + (mixins != null ? mixins.GetHashCode() : 0);
-			result = 29 * result + (baseTypeForInterfaceProxy != null ? baseTypeForInterfaceProxy.GetHashCode() : 0);
-			result = 29 * result + useSelector.GetHashCode();
-			result = 29 * result + useSingleInterfaceProxy.GetHashCode();
-			return result;
 		}
 	}
 }

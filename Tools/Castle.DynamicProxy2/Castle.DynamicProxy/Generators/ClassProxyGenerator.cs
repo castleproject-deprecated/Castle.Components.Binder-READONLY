@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,39 +16,28 @@ namespace Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Collections;
-#if DOTNET2
 	using System.Collections.Generic;
-#endif
 	using System.Reflection;
 	using System.Reflection.Emit;
 	using System.Threading;
 	using System.Xml.Serialization;
-	using Castle.Core.Interceptor;
+	
 	using Castle.DynamicProxy.Generators.Emitters;
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	using System.Collections.Specialized;
-	using System.Runtime.Serialization;
-	using Castle.DynamicProxy.Generators.Emitters.CodeBuilders;
 
 	/// <summary>
 	/// 
 	/// </summary>
-	[CLSCompliant(false)]
 	public class ClassProxyGenerator : BaseProxyGenerator
 	{
-		bool delegateToBaseGetObjectData = false;
-		
-		public ClassProxyGenerator(ModuleScope scope, Type targetType)
-			: base(scope, targetType)
+		public ClassProxyGenerator(ModuleScope scope, Type targetType) : base(scope, targetType)
 		{
 		}
 
 		public Type GenerateCode(Type[] interfaces, ProxyGenerationOptions options)
 		{
 			Type type;
-
 			
-
 			ReaderWriterLock rwlock = Scope.RWLock;
 
 			rwlock.AcquireReaderLock(-1);
@@ -64,21 +53,14 @@ namespace Castle.DynamicProxy.Generators
 				return cacheType;
 			}
 
-			rwlock.UpgradeToWriterLock(-1);
+			LockCookie lc = rwlock.UpgradeToWriterLock(-1);
 
 			try
 			{
-				cacheType = GetFromCache(cacheKey);
-
-				if (cacheType != null)
-				{
-					return cacheType;
-				}
-
 				generationHook = options.Hook;
-
+				
 				String newName = targetType.Name + "Proxy" + Guid.NewGuid().ToString("N");
-
+				
 				// Add Interfaces that the proxy implements 
 
 				ArrayList interfaceList = new ArrayList();
@@ -89,18 +71,12 @@ namespace Castle.DynamicProxy.Generators
 				}
 
 				AddDefaultInterfaces(interfaceList);
-				if (targetType.IsSerializable)
-				{
-					delegateToBaseGetObjectData = VerifyIfBaseImplementsGetObjectData(targetType);
-					if (!interfaceList.Contains(typeof(ISerializable)))
-						interfaceList.Add(typeof(ISerializable));
-				}
 
 				ClassEmitter emitter = BuildClassEmitter(newName, targetType, interfaceList);
 				emitter.DefineCustomAttribute(new XmlIncludeAttribute(targetType));
 
 				// Custom attributes
-
+				
 				ReplicateNonInheritableAttributes(targetType, emitter);
 
 				// Implement builtin Interfaces
@@ -111,37 +87,30 @@ namespace Castle.DynamicProxy.Generators
 
 				FieldReference interceptorsField =
 					emitter.CreateField("__interceptors", typeof(IInterceptor[]));
-
+				
 				emitter.DefineCustomAttributeFor(interceptorsField, new XmlIgnoreAttribute());
 
 				// Collect methods
 
 				PropertyToGenerate[] propsToGenerate;
-				EventToGenerate[] eventToGenerates;
-				MethodInfo[] methods = CollectMethodsAndProperties(emitter, targetType, out propsToGenerate, out eventToGenerates);
+				MethodInfo[] methods = CollectMethodsAndProperties(emitter, targetType, out propsToGenerate);
 
 				options.Hook.MethodsInspected();
 
 				// Constructor
 
-				ConstructorEmitter typeInitializer = GenerateStaticConstructor(emitter);
+				initCacheMethod = CreateInitializeCacheMethod(targetType, methods, emitter);
 
-				CreateInitializeCacheMethodBody(targetType, methods, emitter, typeInitializer);
-				GenerateConstructors(emitter, targetType, interceptorsField);
-				GenerateParameterlessConstructor(emitter, targetType, interceptorsField);
-
-				if (delegateToBaseGetObjectData)
-				{
-					GenerateSerializationConstructor(emitter, interceptorsField, delegateToBaseGetObjectData);
-				}
+				GenerateConstructor(initCacheMethod, emitter, interceptorsField);
+				GenerateParameterlessConstructor(initCacheMethod, emitter, interceptorsField);
 
 				// Implement interfaces
 
 				if (interfaces != null && interfaces.Length != 0)
 				{
-					foreach (Type inter in interfaces)
+					foreach(Type inter in interfaces)
 					{
-						ImplementBlankInterface(targetType, inter, emitter, interceptorsField, typeInitializer);
+						ImplementBlankInterface(targetType, inter, emitter, interceptorsField);
 					}
 				}
 
@@ -149,7 +118,7 @@ namespace Castle.DynamicProxy.Generators
 
 				Dictionary<MethodInfo, MethodBuilder> method2Callback = new Dictionary<MethodInfo, MethodBuilder>();
 
-				foreach (MethodInfo method in methods)
+				foreach(MethodInfo method in methods)
 				{
 					method2Callback[method] = CreateCallbackMethod(emitter, method, method);
 				}
@@ -158,41 +127,41 @@ namespace Castle.DynamicProxy.Generators
 
 				Dictionary<MethodInfo, NestedClassEmitter> method2Invocation = new Dictionary<MethodInfo, NestedClassEmitter>();
 
-				foreach (MethodInfo method in methods)
+				foreach(MethodInfo method in methods)
 				{
 					MethodBuilder callbackMethod = method2Callback[method];
 
 					method2Invocation[method] = BuildInvocationNestedType(emitter, targetType,
-																		  emitter.TypeBuilder,
-																		  method, callbackMethod,
-																		  ConstructorVersion.WithoutTargetMethod);
+					                                                      emitter.TypeBuilder,
+																		  method, callbackMethod, 
+					                                                      ConstructorVersion.WithoutTargetMethod);
 				}
 
 				// Create methods overrides
 
 				Dictionary<MethodInfo, MethodEmitter> method2Emitter = new Dictionary<MethodInfo, MethodEmitter>();
 
-				foreach (MethodInfo method in methods)
+				foreach(MethodInfo method in methods)
 				{
-					if (method.IsSpecialName && (method.Name.StartsWith("get_") || method.Name.StartsWith("set_")) || methodsToSkip.Contains(method))
+					if (method.IsSpecialName && (method.Name.StartsWith("get_") || method.Name.StartsWith("set_")))
 					{
 						continue;
 					}
-
+					
 					NestedClassEmitter nestedClass = method2Invocation[method];
 
 					// TODO: Should the targetType be a generic definition or instantiation?
 
 					MethodEmitter newProxiedMethod = CreateProxiedMethod(
-						targetType, method, emitter, nestedClass, interceptorsField, SelfReference.Self,
+						targetType, method, emitter, nestedClass, interceptorsField, SelfReference.Self, 
 						ConstructorVersion.WithoutTargetMethod, null);
 
 					ReplicateNonInheritableAttributes(method, newProxiedMethod);
-
+					
 					method2Emitter[method] = newProxiedMethod;
 				}
 
-				foreach (PropertyToGenerate propToGen in propsToGenerate)
+				foreach(PropertyToGenerate propToGen in propsToGenerate)
 				{
 					if (propToGen.CanRead)
 					{
@@ -203,13 +172,13 @@ namespace Castle.DynamicProxy.Generators
 						MethodEmitter getEmitter = propToGen.Emitter.CreateGetMethod(atts);
 
 						ImplementProxiedMethod(targetType, getEmitter,
-											   propToGen.GetMethod, emitter,
-											   nestedClass, interceptorsField, SelfReference.Self,
-											   ConstructorVersion.WithoutTargetMethod, null);
+						                       propToGen.GetMethod, emitter,
+											   nestedClass, interceptorsField, SelfReference.Self, 
+						                       ConstructorVersion.WithoutTargetMethod, null);
 
 						ReplicateNonInheritableAttributes(propToGen.GetMethod, getEmitter);
 					}
-
+					
 					if (propToGen.CanWrite)
 					{
 						NestedClassEmitter nestedClass = method2Invocation[propToGen.SetMethod];
@@ -219,53 +188,19 @@ namespace Castle.DynamicProxy.Generators
 						MethodEmitter setEmitter = propToGen.Emitter.CreateSetMethod(atts);
 
 						ImplementProxiedMethod(targetType, setEmitter,
-											   propToGen.SetMethod, emitter,
-											   nestedClass, interceptorsField, SelfReference.Self,
-											   ConstructorVersion.WithoutTargetMethod, null);
+						                       propToGen.SetMethod, emitter,
+											   nestedClass, interceptorsField, SelfReference.Self, 
+						                       ConstructorVersion.WithoutTargetMethod, null);
 
 						ReplicateNonInheritableAttributes(propToGen.SetMethod, setEmitter);
 					}
 				}
+				
+				// Complete Initialize 
 
-				foreach (EventToGenerate eventToGenerate in eventToGenerates)
-				{
-
-					NestedClassEmitter add_nestedClass = method2Invocation[eventToGenerate.AddMethod];
-
-					MethodAttributes add_atts = ObtainMethodAttributes(eventToGenerate.AddMethod);
-
-					MethodEmitter addEmitter = eventToGenerate.Emitter.CreateAddMethod(add_atts);
-
-					ImplementProxiedMethod(targetType, addEmitter,
-										   eventToGenerate.AddMethod, emitter,
-											add_nestedClass, interceptorsField, SelfReference.Self,
-										   ConstructorVersion.WithoutTargetMethod, null);
-
-					ReplicateNonInheritableAttributes(eventToGenerate.AddMethod, addEmitter);
-
-					NestedClassEmitter remove_nestedClass = method2Invocation[eventToGenerate.RemoveMethod];
-
-					MethodAttributes remove_atts = ObtainMethodAttributes(eventToGenerate.RemoveMethod);
-
-					MethodEmitter removeEmitter = eventToGenerate.Emitter.CreateRemoveMethod(remove_atts);
-
-					ImplementProxiedMethod(targetType, removeEmitter,
-										   eventToGenerate.RemoveMethod, emitter,
-											remove_nestedClass, interceptorsField, SelfReference.Self,
-										   ConstructorVersion.WithoutTargetMethod, null);
-
-					ReplicateNonInheritableAttributes(eventToGenerate.RemoveMethod, removeEmitter);
-
-
-				}
-
-				ImplementGetObjectData(emitter, interceptorsField, interfaces);
-
-				// Complete type initializer code body
-
-				CompleteInitCacheMethod(typeInitializer.CodeBuilder);
-
-				// Build type
+				CompleteInitCacheMethod(initCacheMethod);
+				
+				// Crosses fingers and build type
 
 				type = emitter.BuildType();
 
@@ -273,7 +208,7 @@ namespace Castle.DynamicProxy.Generators
 			}
 			finally
 			{
-				rwlock.ReleaseWriterLock();
+				rwlock.DowngradeFromWriterLock(ref lc);
 			}
 
 			Scope.SaveAssembly();
@@ -289,78 +224,6 @@ namespace Castle.DynamicProxy.Generators
 		protected override bool CanOnlyProxyVirtual()
 		{
 			return true;
-		}
-
-		protected void GenerateSerializationConstructor(ClassEmitter emitter, FieldReference interceptorField, bool delegateToBaseGetObjectData)
-		{
-			ArgumentReference arg1 = new ArgumentReference(typeof(SerializationInfo));
-			ArgumentReference arg2 = new ArgumentReference(typeof(StreamingContext));
-
-			ConstructorEmitter constr = emitter.CreateConstructor(arg1, arg2);
-
-			constr.CodeBuilder.AddStatement(
-				new ConstructorInvocationStatement(serializationConstructor,
-					arg1.ToExpression(), arg2.ToExpression()));
-
-			Type[] object_arg = new Type[] { typeof(String), typeof(Type) };
-			MethodInfo getValueMethod = typeof(SerializationInfo).GetMethod("GetValue", object_arg);
-
-			MethodInvocationExpression getInterceptorInvocation =
-				new MethodInvocationExpression(arg1, getValueMethod,
-				new ConstReference("__interceptors").ToExpression(),
-				new TypeTokenExpression(typeof(IInterceptor[])));
-
-			constr.CodeBuilder.AddStatement(new AssignStatement(
-				interceptorField, getInterceptorInvocation));
-
-			constr.CodeBuilder.AddStatement(new ReturnStatement());
-		}
-
-		protected override void CustomizeGetObjectData(AbstractCodeBuilder codebuilder, 
-		                                               ArgumentReference arg1, ArgumentReference arg2)
-		{
-			Type[] key_and_object = new Type[] {typeof (String), typeof (Object)};
-			Type[] key_and_bool = new Type[] {typeof (String), typeof (bool)};
-			MethodInfo addValueMethod = typeof (SerializationInfo).GetMethod("AddValue", key_and_object);
-			MethodInfo addValueBoolMethod = typeof (SerializationInfo).GetMethod("AddValue", key_and_bool);
-
-			codebuilder.AddStatement( new ExpressionStatement(
-				new MethodInvocationExpression(arg1, addValueBoolMethod, 
-				new ConstReference("__delegateToBase").ToExpression(), 
-				new ConstReference( delegateToBaseGetObjectData ? 1 : 0 ).ToExpression() ) ) );
-
-			if (delegateToBaseGetObjectData)
-			{
-				MethodInfo baseGetObjectData = targetType.GetMethod("GetObjectData", 
-					new Type[] { typeof(SerializationInfo), typeof(StreamingContext) });
-
-				codebuilder.AddStatement( new ExpressionStatement(
-					new MethodInvocationExpression( baseGetObjectData, 
-						arg1.ToExpression(), arg2.ToExpression() )) );
-			}
-			else
-			{
-				LocalReference members_ref = codebuilder.DeclareLocal( typeof(MemberInfo[]) );
-				LocalReference data_ref = codebuilder.DeclareLocal( typeof(object[]) );
-
-				MethodInfo getSerMembers = typeof(FormatterServices).GetMethod("GetSerializableMembers", 
-					new Type[] { typeof(Type) });
-				MethodInfo getObjData = typeof(FormatterServices).GetMethod("GetObjectData", 
-					new Type[] { typeof(object), typeof(MemberInfo[]) });
-				
-				codebuilder.AddStatement( new AssignStatement( members_ref,
-					new MethodInvocationExpression( null, getSerMembers, 
-					new TypeTokenExpression( targetType ) )) );
-				
-				codebuilder.AddStatement( new AssignStatement( data_ref, 
-					new MethodInvocationExpression( null, getObjData, 
-					SelfReference.Self.ToExpression(), members_ref.ToExpression() )) );
-
-				codebuilder.AddStatement( new ExpressionStatement(
-					new MethodInvocationExpression(arg1, addValueMethod, 
-					new ConstReference("__data").ToExpression(), 
-					data_ref.ToExpression() ) ) );
-			}
 		}
 	}
 }

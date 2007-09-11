@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ namespace Castle.ActiveRecord
 	
 	using NHibernate;
 	using NHibernate.Type;
-	using NHibernate.Classic;
 
 	/// <summary>
 	/// Base class for ActiveRecord entities
@@ -112,20 +111,6 @@ namespace Castle.ActiveRecord
 		                                           IType[] types)
 		{
 			return null;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="id"></param>
-		/// <param name="previousState"></param>
-		/// <param name="currentState"></param>
-		/// <param name="types"></param>
-		/// <returns></returns>
-		protected virtual internal bool OnFlushDirty(object id, IDictionary previousState, IDictionary currentState,
-		                                           IType[] types)
-		{
-			return false;
 		}
 
 		#region ILifecycle

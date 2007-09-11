@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
 
 namespace Castle.Facilities.ActiveRecordIntegration
 {
+	using System;
+	
 	using Castle.ActiveRecord;
+
 	using Castle.Services.Transaction;
+
 	using TransactionMode = Castle.Services.Transaction.TransactionMode;
+
 
 	public class TransactionScopeResourceAdapter : IResource
 	{
 		private readonly TransactionMode transactionMode;
+		
 		private TransactionScope scope;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="TransactionScopeResourceAdapter"/> class.
-		/// </summary>
-		/// <param name="transactionMode">The transaction mode.</param>
+
 		public TransactionScopeResourceAdapter(TransactionMode transactionMode)
 		{
 			this.transactionMode = transactionMode;
@@ -35,10 +38,9 @@ namespace Castle.Facilities.ActiveRecordIntegration
 		public void Start()
 		{
 			Castle.ActiveRecord.TransactionMode mode = (transactionMode == TransactionMode.Requires)
-			                                           	? Castle.ActiveRecord.TransactionMode.Inherits
-			                                           	: Castle.ActiveRecord.TransactionMode.New;
+				? Castle.ActiveRecord.TransactionMode.Inherits : Castle.ActiveRecord.TransactionMode.New;
 
-			scope = new TransactionScope(mode);
+			scope = new TransactionScope( mode );
 		}
 
 		public void Commit()

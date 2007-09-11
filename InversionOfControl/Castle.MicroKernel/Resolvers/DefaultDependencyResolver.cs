@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -97,18 +97,7 @@ namespace Castle.MicroKernel.Resolvers
 				}
 			}
 
-            // 2 - check with the model's handler, if not the same as the parent resolver
-            IHandler handler = kernel.GetHandler(model.Name);
-
-            if (handler != null && handler != parentResolver)
-            {
-                if (handler.CanResolve(context, parentResolver, model, dependency))
-                {
-                    return true;
-                }
-            }
-
-			// 3 - check within parent resolver, if present
+			// 2 - check within parent resolver, if present
 
 			if (parentResolver != null)
 			{
@@ -118,7 +107,7 @@ namespace Castle.MicroKernel.Resolvers
 				}
 			}
 
-			// 4 - check within subresolvers
+			// 3 - check within subresolvers
 
 			foreach(ISubDependencyResolver subResolver in subResolvers)
 			{
@@ -128,7 +117,7 @@ namespace Castle.MicroKernel.Resolvers
 				}
 			}
 
-			// 5 - normal flow, checking against the kernel
+			// 4 - normal flow, checking against the kernel
 
 			if (dependency.DependencyType == DependencyType.Service || 
 			    dependency.DependencyType == DependencyType.ServiceOverride)
@@ -186,19 +175,7 @@ namespace Castle.MicroKernel.Resolvers
 				}
 			}
 
-			// 2 - check with the model's handler, if not the same as the parent resolver
-			IHandler handler = kernel.GetHandler(model.Name);
-
-			if (!resolved && handler != parentResolver)
-			{
-				if (handler.CanResolve(context, parentResolver, model, dependency))
-				{
-					value = handler.Resolve(context, parentResolver, model, dependency);
-					resolved = true;
-				}
-			}
-
-			// 3 - check within parent resolver, if present
+			// 2 - check within parent resolver, if present
 
 			if (!resolved && parentResolver != null)
 			{
@@ -209,7 +186,7 @@ namespace Castle.MicroKernel.Resolvers
 				}
 			}
 
-			// 4 - check within subresolvers
+			// 3 - check within subresolvers
 
 			if (!resolved)
 			{
@@ -224,7 +201,7 @@ namespace Castle.MicroKernel.Resolvers
 				}
 			}
 
-			// 5 - normal flow, checking against the kernel
+			// 4 - normal flow, checking against the kernel
 
 			if (!resolved)
 			{
@@ -262,11 +239,6 @@ namespace Castle.MicroKernel.Resolvers
 
 		protected virtual bool CanResolveServiceDependency(ComponentModel model, DependencyModel dependency)
 		{
-			if (dependency.DependencyType == DependencyType.ServiceOverride)
-			{
-				return HasComponentInValidState(dependency.DependencyKey);	
-			}
-
 			ParameterModel parameter = ObtainParameterModelMatchingDependency(dependency, model);
 
 			if (parameter != null)
@@ -364,7 +336,7 @@ namespace Castle.MicroKernel.Resolvers
 
 				try
 				{
-					if (parameter.Value != null || parameter.ConfigValue == null)
+					if (parameter.Value != null)
 					{
 						return converter.PerformConversion(parameter.Value, dependency.TargetType);
 					}

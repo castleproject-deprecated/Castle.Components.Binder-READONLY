@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -105,100 +105,30 @@ namespace Castle.ActiveRecord
 	}
 
 	/// <summary>
-	/// Define the possible fetch option values
+	/// Define relation cascade options
 	/// </summary>
-	public enum FetchEnum
-	{
-		/// <summary>
-		/// Let NHibernate decide what to do here
-		/// </summary>
-		Unspecified,
-		/// <summary>
-		/// Use a JOIN to load the data
-		/// </summary>
-		Join,
-		/// <summary>
-		/// Use a seperate SELECT statement to load the data
-		/// </summary>
-		Select
-	}
-
-	/// <summary>
-	/// Defines the cascading behaviour of this association.
-	/// </summary>
-	/// <remarks>
-	/// Entities has associations to other objects, this may be an association to a single item (<see cref="BelongsToAttribute" />)
-	/// or an association to a collection (<see cref="HasManyAttribute" />, <see cref="HasManyToAnyAttribute" />).
-	/// At any rate, you are able to tell NHibernate to automatically traverse an entity's associations, and act according 
-	/// to the cascade option. For instance, adding an unsaved entity to a collection with <see cref="CascadeEnum.SaveUpdate" />
-	/// cascade will cause it to be saved along with its parent object, without any need for explicit instructions on our side.
-	/// </remarks>
-	public enum CascadeEnum
-	{
-		/// <summary>
-		/// No cascading. This is the default.
-		/// The cascade should be handled manually.
-		/// </summary>
-		None,
-		/// <summary>
-		/// Cascade save, update and delete.
-		/// When the object is saved, updated or deleted, the associations will be checked
-		/// and the objects found will also be saved, updated or deleted.
-		/// </summary>
-		All,
-		/// <summary>
-		/// Cascade save and update.
-		/// When the object is saved or updated, the associations will be checked and any object that requires
-		/// will be saved or updated (including saving or updating the associations in many-to-many scenario).
-		/// </summary>
-		SaveUpdate,
-		/// <summary>
-		/// Cascade delete.
-		/// When the object is deleted, all the objects in the association will be deleted as well.
-		/// </summary>
-		Delete
-	}
-
-	/// <summary>
-	/// Defines the cascading behaviour of this association.
-	/// </summary>
-	/// <remarks>
-	/// Entities has associations to other objects, this may be an association to a single item (<see cref="BelongsToAttribute" />)
-	/// or an association to a collection (<see cref="HasManyAttribute" />, <see cref="HasManyToAnyAttribute" />).
-	/// At any rate, you are able to tell NHibernate to automatically traverse an entity's associations, and act according 
-	/// to the cascade option. For instance, adding an unsaved entity to a collection with <see cref="CascadeEnum.SaveUpdate" />
-	/// cascade will cause it to be saved along with its parent object, without any need for explicit instructions on our side.
-	/// </remarks>
 	[Serializable]
 	public enum ManyRelationCascadeEnum
 	{
 		/// <summary>
-		/// No cascading. This is the default.
-		/// The cascade should be handled manually.
+		/// No cascading will be done
 		/// </summary>
 		None,
 		/// <summary>
-		/// Cascade save, update and delete.
-		/// When the object is saved, updated or deleted, the associations will be checked
-		/// and the objects found will also be saved, updated or deleted.
+		/// Cascade save/update/delete operation
 		/// </summary>
 		All,
 		/// <summary>
-		/// Cascade save and update.
-		/// When the object is saved or updated, the associations will be checked and any object that requires
-		/// will be saved or updated (including saving or updating the associations in many-to-many scenario).
+		/// Cascade save/update operation
 		/// </summary>
 		SaveUpdate,
 		/// <summary>
-		/// Cascade delete.
-		/// When the object is deleted, all the objects in the association will be deleted as well.
+		/// Cascade delete operation
 		/// </summary>
 		Delete,
 		/// <summary>
-		/// Cascade save, update and delete, removing orphan children.
-		/// When an object is saved, updated or deleted, the associations will be checked and all objects found
-		/// will be saved, updated or deleted as well.
-		/// In additional to that, when an object is removed from the association and not associated with another object (orphaned), it will also be deleted.
+		/// Cascade save/update/delete operation, and remove an orphan children
+		/// when deleting.
 		/// </summary>
 		AllDeleteOrphan
 	}

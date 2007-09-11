@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 namespace Castle.MicroKernel.Tests
 {
 	using System;
-	using System.Collections;
+
 	using NUnit.Framework;
 
 	using Castle.MicroKernel.Tests.ClassComponents;
@@ -36,20 +36,6 @@ namespace Castle.MicroKernel.Tests
 		public void Dispose()
 		{
 			kernel.Dispose();
-		}
-
-		[Test]
-		public void IOC_50_AddTwoComponentWithSameService_RequestFirstByKey_RemoveFirst_RequestByService_ShouldReturnSecond()
-		{
-			kernel.AddComponent("key", typeof(ICustomer), typeof(CustomerImpl));
-			kernel.AddComponent("key2", typeof(ICustomer), typeof(CustomerImpl));
-			object result = kernel["key"];
-			Assert.IsNotNull(result);
-
-			kernel.RemoveComponent("key");
-
-			result = kernel[typeof(ICustomer)];
-			Assert.IsNotNull(result);
 		}
 
 		[Test]
@@ -143,34 +129,5 @@ namespace Castle.MicroKernel.Tests
 			object component = kernel[ typeof(IDisposable) ];
 		}
 
-		[Test]
-		public void AddClassThatHasTwoParametersOfSameTypeAndNoOverloads()
-		{
-			kernel.AddComponent("test",typeof(ClassWithTwoParametersWithSameType));
-			kernel.AddComponent("test2",typeof(ICommon),typeof(CommonImpl1));
-			object resolved = kernel.Resolve(typeof (ClassWithTwoParametersWithSameType), new Hashtable());
-			Assert.IsNotNull(resolved);
-		}
-
-		#if DOTNET2
-		
-		[Test]
-		public void ResolveServices()
-		{
-			kernel.AddComponent("test", typeof(ICommon), typeof(CommonImpl2));
-			kernel.AddComponent("test2", typeof(ICommon), typeof(CommonImpl1));
-			ICommon[] services = kernel.ResolveServices<ICommon>();
-			Assert.AreEqual(2, services.Length);
-		}
-
-		[Test]
-		public void ResolveServicesWaitingOnDependencies()
-		{
-			kernel.AddComponent("test", typeof(ICommon), typeof(CommonImplWithDependancy));
-			ICommon[] services = kernel.ResolveServices<ICommon>();
-			Assert.AreEqual(0, services.Length);
-		}
-
-		#endif
 	}
 }

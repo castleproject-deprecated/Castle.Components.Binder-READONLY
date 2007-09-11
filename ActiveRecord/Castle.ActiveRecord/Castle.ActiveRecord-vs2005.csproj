@@ -11,7 +11,8 @@
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>Castle.ActiveRecord</AssemblyName>
-    <AssemblyOriginatorKeyFile>..\..\CastleKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -43,15 +44,17 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE;DEBUG;DOTNET2</DefineConstants>
-    <DocumentationFile>..\bin\Castle.ActiveRecord.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -64,7 +67,8 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE;DOTNET2</DefineConstants>
-    <DocumentationFile>bin\Release\Castle.ActiveRecord.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
@@ -73,7 +77,7 @@
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -91,7 +95,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Iesi.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=b32731d11ce58905">
+    <Reference Include="log4net, Version=1.2.9.0, Culture=neutral, PublicKeyToken=b32731d11ce58905">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\log4net.dll</HintPath>
     </Reference>
@@ -262,6 +266,9 @@
     <Compile Include="Framework\Internal\Model\HiloModel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Framework\Internal\Model\IModelNode.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Framework\Internal\Model\KeyModel.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -371,29 +378,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\Enums.cs" />
-    <Compile Include="Attributes\HqlNamedQueryAttribute.cs" />
     <Compile Include="Attributes\ImportAttribute.cs" />
-    <Compile Include="Attributes\RawXmlMappingAttribute.cs" />
     <Compile Include="Attributes\Validations\ValidateCreditCardAttribute.cs" />
     <Compile Include="Attributes\Validations\ValidateLengthAttribute.cs" />
     <Compile Include="Framework\ActiveRecordBase.Generic.cs" />
     <Compile Include="Framework\ActiveRecordHooksBase.cs" />
     <Compile Include="Framework\ARSchemaCreator.cs" />
     <Compile Include="Framework\ActiveRecordValidationBase.Generic.cs" />
-    <Compile Include="Framework\Internal\Constants.cs" />
-    <Compile Include="Framework\Internal\Inflector.cs" />
     <Compile Include="Framework\Internal\Model\CompositeKeyModel.cs" />
-    <Compile Include="Framework\Internal\Model\DependentObjectModel.cs" />
     <Compile Include="Framework\Internal\Model\ImportModel.cs" />
     <Compile Include="Framework\Internal\NHibernateNullablesSupport.cs" />
-    <Compile Include="Framework\Internal\AssemblyXmlGenerator.cs" />
     <Compile Include="Framework\Queries\CountQuery.cs" />
     <Compile Include="Framework\Queries\HqlBasedQuery.cs" />
     <Compile Include="Framework\Queries\IActiveRecordQuery.Generic.cs" />
     <Compile Include="Framework\Queries\Modifiers\IQueryModifier.cs" />
     <Compile Include="Framework\Queries\Modifiers\QueryRange.cs" />
     <Compile Include="Framework\Queries\Modifiers\QueryParameter.cs" />
-    <Compile Include="Framework\Queries\ScalarProjectionQuery.cs" />
     <Compile Include="Framework\Queries\Modifiers\SqlQueryReturnDefinition.cs" />
     <Compile Include="Framework\Queries\ScalarQuery.Generic.cs" />
     <Compile Include="Framework\Queries\SimpleQuery.Generic.cs" />
@@ -404,12 +404,6 @@
     <Compile Include="Framework\SessionScopeWebModule.cs" />
     <Compile Include="Framework\Validators\CreditCardValidator.cs" />
     <Compile Include="Framework\Validators\LengthValidator.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\CastleKey.snk">
-      <Link>CastleKey.snk</Link>
-    </None>
-    <None Include="Diagrams\Queries.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

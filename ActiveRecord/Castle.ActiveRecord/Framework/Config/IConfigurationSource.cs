@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 namespace Castle.ActiveRecord.Framework
 {
 	using System;
+	
 	using Castle.Core.Configuration;
 
 	/// <summary>
@@ -49,21 +50,5 @@ namespace Castle.ActiveRecord.Framework
 		IConfiguration GetConfiguration(Type type);
 
 		bool Debug { get; }
-
-		/// <summary>
-		/// Gets a value indicating whether the entities should be lazy by default.
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if entities should be lazy by default; otherwise, <c>false</c>.
-		/// </value>
-		bool IsLazyByDefault { get; }
-
-		/// <summary>
-		/// Gets a value indicating whether table names are assumed plural by default. 
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if table names should be pluralized by default; otherwise, <c>false</c>.
-		/// </value>
-		bool PluralizeTableNames { get; }
 	}
 }

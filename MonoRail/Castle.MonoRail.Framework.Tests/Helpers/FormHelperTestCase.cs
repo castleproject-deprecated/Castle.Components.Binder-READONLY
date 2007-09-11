@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 	using System.Globalization;
 	using System.IO;
 	using System.Threading;
-	using Castle.DynamicProxy;
+
 	using Castle.MonoRail.Framework.Helpers;
 	using Castle.MonoRail.Framework.Tests.Controllers;
 	
@@ -32,11 +32,10 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 	public class FormHelperTestCase
 	{
 		private FormHelper helper;
-		private Product product, productProxy;
+		private Product product;
 		private SimpleUser user;
 		private Subscription subscription;
 		private Month[] months;
-		private ProxyGenerator generator = new ProxyGenerator();
 
 		[SetUp]
 		public void Init()
@@ -51,19 +50,11 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			subscription = new Subscription();
 			months = new Month[] {new Month(1, "January"), new Month(1, "February")};
 			product = new Product("memory card", 10, (decimal) 12.30);
-			
-			productProxy = (Product) generator.CreateClassProxy(typeof(Product), new StandardInterceptor());
-			
-			productProxy.Name = "memory card";
-			productProxy.Quantity = 10;
-			productProxy.Price = (decimal) 12.30;
-
 			user = new SimpleUser();
 
 			HomeController controller = new HomeController();
 
 			controller.PropertyBag.Add("product", product);
-			controller.PropertyBag.Add("productproxy", productProxy);
 			controller.PropertyBag.Add("user", user);
 			controller.PropertyBag.Add("roles", new Role[] { new Role(1, "a"), new Role(2, "b"), new Role(3, "c") });
 			controller.PropertyBag.Add("sendemail", true);
@@ -106,8 +97,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			list.Add("cat1");
 			list.Add("cat2");
 
-			Assert.AreEqual("<select id=\"something\" name=\"product.category.id\" >" + Environment.NewLine +
-				"<option value=\"cat1\">cat1</option>" + Environment.NewLine + "<option value=\"cat2\">cat2</option>" + Environment.NewLine + "</select>",
+			Assert.AreEqual("<select id=\"something\" name=\"product.category.id\" >\r\n" + 
+				"<option value=\"cat1\">cat1</option>\r\n<option value=\"cat2\">cat2</option>\r\n</select>",
 				helper.Select("product.category.id", list, DictHelper.Create("id=something")));
 		}
 
@@ -118,34 +109,6 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 				helper.TextField("product.name"));
 			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" />", 
 				helper.TextField("product.quantity"));
-		}
-
-		[Test]
-		public void ProxiedComponent()
-		{
-			Assert.AreEqual("<input type=\"text\" id=\"productproxy_name\" name=\"productproxy.name\" value=\"memory card\" />",
-				helper.TextField("productproxy.name"));
-			Assert.AreEqual("<input type=\"text\" id=\"productproxy_quantity\" name=\"productproxy.quantity\" value=\"10\" />",
-				helper.TextField("productproxy.quantity"));
-		}
-
-		[Test]
-		public void NumberField()
-		{
-			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [], []);\" />",
-				helper.NumberField("product.quantity"));
-			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [1], []);\" />",
-				helper.NumberField("product.quantity", DictHelper.Create("exceptions=1")));
-			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [1,2], []);\" />",
-				helper.NumberField("product.quantity", DictHelper.Create("exceptions=1,2")));
-		}
-
-		[Test]
-		public void MaskedNumberField()
-		{
-			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [], []);\" " +
-				"onBlur=\"javascript:void(0);return monorail_formhelper_mask(event,this,'2,5','-');\" onKeyUp=\"javascript:void(0);return monorail_formhelper_mask(event,this,'2,5','-');\" />",
-				helper.NumberField("product.quantity", DictHelper.Create("mask=2,5")));
 		}
 
 		[Test]
@@ -170,7 +133,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		public void TextFieldFormat()
 		{
 			Assert.AreEqual("<input type=\"text\" id=\"product_price\" name=\"product.price\" value=\"$12.30\" />", 
-				helper.TextField("product.price", DictHelper.Create("textformat=C")));
+				helper.TextFieldFormat("product.price", "C"));
 		}
 
 		[Test]
@@ -390,8 +353,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 
 		public IList<Month> Months4
 		{
-			get { return months4; }
-			set { months4 = value; }
+			get { return this.months4; }
+			set { this.months4 = value; }
 		}
 
 #endif
@@ -399,15 +362,11 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 
 	public class Product
 	{
-		private string name;
+		private String name;
 		private int quantity;
+		private Decimal price;
 		private bool isAvailable;
-		private decimal price;
 		private ProductCategory category = new ProductCategory();
-
-		public Product()
-		{
-		}
 
 		public Product(string name, int quantity, decimal price)
 		{
@@ -416,31 +375,31 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			this.price = price;
 		}
 
-		public virtual string Name
+		public string Name
 		{
 			get { return name; }
 			set { name = value; }
 		}
 
-		public virtual int Quantity
+		public int Quantity
 		{
 			get { return quantity; }
 			set { quantity = value; }
 		}
 
-		public virtual decimal Price
+		public decimal Price
 		{
 			get { return price; }
 			set { price = value; }
 		}
 
-		public virtual bool IsAvailable
+		public bool IsAvailable
 		{
 			get { return isAvailable; }
 			set { isAvailable = value; }
 		}
 
-		public virtual ProductCategory Category
+		public ProductCategory Category
 		{
 			get { return category; }
 			set { category = value; }
@@ -547,18 +506,10 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 
 	public class SimpleUser
 	{
-		public enum RegistrationEnum
-		{
-			unregistered = 1,
-			pending = 2,
-			registered = 6
-		}
-
 		private int id;
 		private String name;
 		private ArrayList roles = new ArrayList();
 		private bool isActive;
-		private RegistrationEnum registration;
 
 		public int Id
 		{
@@ -576,12 +527,6 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		{
 			get { return name; }
 			set { name = value; }
-		}
-
-		public RegistrationEnum Registration
-		{
-			get { return registration; }
-			set { registration = value; }
 		}
 
 		public Role[] RolesAsArray
@@ -681,68 +626,6 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 	}
 
 #endif
-
-	public interface IInterfacedList
-	{
-		int Id { get; set;}
-		string Name { get; set;}
-	}
-
-	public class InterfacedClassA : IInterfacedList
-	{
-		private int id;
-		private string name;
-
-		public InterfacedClassA(int id, string name)
-		{
-			this.id = id;
-			this.name = name;
-		}
-
-		#region IInterfacedList Members
-
-		public int Id
-		{
-			get{ return id; }
-			set{ id = value; }
-		}
-
-		public string Name
-		{
-			get{ return name; }
-			set{ name = value; }
-		}
-
-		#endregion
-	}
-
-	public class InterfacedClassB : IInterfacedList
-	{
-		private int id;
-		private string name;
-
-		public InterfacedClassB(int id, string name)
-		{
-			this.id = id;
-			this.name = name;
-		}
-
-		#region IInterfacedList Members
-
-		public int Id
-		{
-			get { return id; }
-			set { id = value; }
-		}
-
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
-
-		#endregion
-	}
 
 	#endregion
 }

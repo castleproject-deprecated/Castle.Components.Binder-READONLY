@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ namespace Castle.Facilities.Cache.Manager
 		/// Generates the key for a cache entry.
 		/// </summary>
 		/// <param name="invocation">the description of an invocation to the intercepted method.</param>
+		/// <param name="arguments">the arguments of the invocation</param>
 		/// <returns>the key for a cache entry.</returns>
-		 string GenerateKey(IInvocation invocation);
+		 string GenerateKey(IMethodInvocation invocation, object[] arguments);
 	}
 }

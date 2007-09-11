@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,14 +45,19 @@ namespace Castle.MonoRail.WindsorExtension
 				throw new RailsException("ControllerTree not found. Check whether RailsFacility is properly configured/registered");
 			}
 
-			Type implType = tree.GetController(urlInfo.Area, urlInfo.Controller);
+			String key = (String) tree.GetController(urlInfo.Area, urlInfo.Controller);
 
-			if (implType == null)
+			if (key == null || key.Length == 0)
 			{
 				throw new ControllerNotFoundException(urlInfo);
 			}
 
-			return (Controller) container[implType];
+			if (container.Kernel.HasComponent(key))
+			{
+				return (Controller) container[key];
+			}
+			
+			return null;
 		}
 
 		public void Release(Controller controller)

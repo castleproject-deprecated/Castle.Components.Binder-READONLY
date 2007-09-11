@@ -2,27 +2,28 @@
 <project
 	name="TestSiteBrail"
 	default="build"
-	xmlns="http://nant.sf.net/release/0.85/nant.xsd"
+	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
 >
 
 	<property name="root.dir" value="../.." />
 	<include buildfile="${root.dir}/common-project.xml" />
 
 	<target name="init" depends="common.init">
-		<property overwrite="false" name="assembly.is-cls-compliant" value="false" />
+		<loadtasks assembly="${root.dir}/${lib.framework.dir}/Boo.NAnt.Tasks.dll" />
+
 		<fileset id="project.sources">
-			<include name="${src.dir}/**.cs" />
+			<include name="${src.dir}/**.boo" />
+			<exclude name="Views/**.boo" />
 		</fileset>
 
 		<assemblyfileset id="project.references" basedir="${build.dir}">
 			<include name="Castle.MonoRail.Views.Brail.dll"/>
 			<include name="Castle.MonoRail.Framework.dll"/>
 			<include name="Castle.Core.dll" />
-			<include name="Castle.DynamicProxy.dll" />
 			<include name="Castle.Services.Logging.Log4netIntegration.dll"/>
 			<include name="Castle.Components.Binder.dll" />
-			<include name="Castle.Components.Validator.dll" />
 			<include name="Castle.Components.Common.EmailSender.dll" />
+			<include name="Castle.Components.Common.EmailSender.SmtpEmailSender.dll" />
 			<include name="Boo.Lang.dll" />
 			<include name="Boo.Lang.Compiler.dll" />
 			<include name="Boo.Lang.Parser.dll" />
@@ -39,9 +40,20 @@
 		<mkdir dir="${bin.dir}" />
 	</target>
 
-	<target name="generate-assemblyinfo" depends="init common.generate-assemblyinfo" />
+	<target name="generate-assemblyinfo" depends="init" />
 	
-	<target name="build" description="Build ${project::get-name()}" depends="generate-assemblyinfo common.compile-website"/>
+	<target name="build" description="Build ${project::get-name()}" depends="generate-assemblyinfo, common.copy-references">
+		<booc
+			target="library" 
+			debug="${build.debug}" 
+			output="${bin.dir}\${project::get-name()}.dll" 
+			rebuild="${build.rebuild}"
+		>
 
+			<sources refid="project.sources" />
+			<references refid="project.references" />
+			<resources refid="project.resources" />
+		</booc>
+	</target>
 
 </project>

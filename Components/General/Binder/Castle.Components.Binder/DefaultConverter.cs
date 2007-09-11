@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 namespace Castle.Components.Binder
 {
 	using System;
-	using System.Collections;
 	using System.ComponentModel;
 	using System.Web;
 
@@ -53,11 +52,6 @@ namespace Castle.Components.Binder
 						conversionSucceeded = false;
 						return null;
 					}
-					else if (input.ToString().Length == 0)
-					{
-						conversionSucceeded = true;
-						return null;
-					}
 					else
 					{
 						conversionSucceeded = true;
@@ -69,6 +63,12 @@ namespace Castle.Components.Binder
 					conversionSucceeded = true;
 					return input;
 				}
+			}
+			
+			if (desiredType == inputType) // Not conversion required
+			{
+				conversionSucceeded = true;
+				return input;
 			}
 			
 			return Convert(desiredType, input, out conversionSucceeded);
@@ -95,11 +95,7 @@ namespace Castle.Components.Binder
 			{
 				conversionSucceeded = (input != null);
 
-				if (desiredType.IsInstanceOfType(input))
-				{
-					return input;
-				}
-				else if (desiredType == typeof(String))
+				if (desiredType == typeof(String))
 				{
 					if (conversionSucceeded && ((String) input) == String.Empty)
 					{
@@ -108,6 +104,10 @@ namespace Castle.Components.Binder
 					
 					return conversionSucceeded ? input.ToString().Trim(' ') : null;
 				}
+//				else if (desiredType == typeof(int))
+//				{
+//					return ConvertInt32(input, ref conversionSucceeded);
+//				}
 				else if (desiredType.IsArray)
 				{
 					return conversionSucceeded ? 
@@ -125,13 +125,6 @@ namespace Castle.Components.Binder
 				{
 					return ConvertPrimitive(desiredType, input, ref conversionSucceeded);
 				}
-#if DOTNET2
-				else if (desiredType.IsGenericType &&
-				         desiredType.GetGenericTypeDefinition() == typeof(Nullable<>))
-				{
-					return ConvertNullable(desiredType, input, ref conversionSucceeded);
-				}
-#endif
 				else if (desiredType == typeof(Guid))
 				{
 					return ConvertGuid(input, ref conversionSucceeded);
@@ -144,13 +137,6 @@ namespace Castle.Components.Binder
 				{
 					return input;
 				}
-#if DOTNET2
-				else if (DataBinder.IsGenericList(desiredType))
-				{
-					return conversionSucceeded ? 
-					       ConvertGenericList(desiredType, input, ref conversionSucceeded) : null;
-				}
-#endif
 				else
 				{
 					return ConvertUsingTypeConverter(desiredType, input, ref conversionSucceeded);
@@ -166,80 +152,6 @@ namespace Castle.Components.Binder
 				
 				ThrowInformativeException(desiredType, input, inner); return null;
 			}
-		}
-
-#if DOTNET2		
-		private object ConvertNullable(Type desiredType, object input, ref bool conversionSucceeded)
-		{
-			Type underlyingType = Nullable.GetUnderlyingType(desiredType);
-
-			object value = Convert(underlyingType, input, out conversionSucceeded);
-
-			if (conversionSucceeded)
-			{
-				Type typeToConstruct = typeof(Nullable<>).MakeGenericType(underlyingType);
-
-				return Activator.CreateInstance(typeToConstruct, value);
-			}
-
-			return null;
-		}
-
-		private object ConvertGenericList(Type desiredType, object input, ref bool conversionSucceeded)
-		{
-			Type elemType = desiredType.GetGenericArguments()[0];
-
-			input = FixInputForMonoIfNeeded(elemType, input);
-
-			Type listType = typeof(System.Collections.Generic.List<>).MakeGenericType(elemType);
-			IList result = (IList) Activator.CreateInstance(listType);
-			Array values = input as Array;
-			
-			bool elementConversionSucceeded;
-
-			for (int i = 0; i < values.Length; i++)
-			{
-				result.Add(Convert(elemType, values.GetValue(i), out elementConversionSucceeded));
-
-				// if at least one list element get converted 
-				// we consider the conversion a success
-				if (elementConversionSucceeded && !conversionSucceeded) conversionSucceeded = true;
-			}
-
-			return result;
-		}
-#endif
-		
-		/// <summary>
-		/// Fix for mod_mono issue where array values are passed as a comma seperated String.
-		/// </summary>
-		/// <param name="elemType"></param>
-		/// <param name="input"></param>
-		/// <returns></returns>
-		private static object FixInputForMonoIfNeeded(Type elemType, object input)
-		{
-			if (!input.GetType().IsArray)
-			{
-				if (input.GetType() == typeof(String))
-				{
-					input = NormalizeInput(input);
-
-					if (input.ToString() == String.Empty)
-					{
-						input = Array.CreateInstance(elemType, 0);
-					}
-					else
-					{
-						input = input.ToString().Split(',');
-					}
-				}
-				else
-				{
-					throw new BindingException("Cannot convert to collection of {0} from type {1}", elemType.FullName, input.GetType().FullName);
-				}
-			}
-			
-			return input;
 		}
 
 		private object ConvertGuid(object input, ref bool conversionSucceeded)
@@ -282,9 +194,44 @@ namespace Castle.Components.Binder
 
 			String value = NormalizeInput(input);
 			
-			if (IsBool(desiredType))
+			if (desiredType == typeof(Boolean))
 			{
-				return SpecialBoolConversion(value, input, ref conversionSucceeded);
+				if (input == null)
+				{
+					conversionSucceeded = false;
+					return null;
+				}
+				else if (value == String.Empty)
+				{
+					return false;
+				}
+				else
+				{
+					if (value.IndexOf(',') != -1)
+					{
+						value = value.Substring(0, value.IndexOf(','));
+					}
+					
+					bool performNumericConversion = false;
+					
+					foreach(char c in value.ToCharArray())
+					{
+						if (Char.IsNumber(c))
+						{
+							performNumericConversion = true;
+							break;
+						}
+					}
+					
+					if (performNumericConversion)
+					{
+						return System.Convert.ToBoolean(System.Convert.ToInt32(value));
+					}
+					else
+					{
+						return !(String.Compare("false", value, true) == 0);
+					}
+				}
 			}
 			else if (input == null || value == String.Empty)
 			{
@@ -296,58 +243,6 @@ namespace Castle.Components.Binder
 			{
 				return System.Convert.ChangeType(input, desiredType);
 			}
-		}
-
-		private object SpecialBoolConversion(string value, object input, ref bool conversionSucceeded)
-		{
-			if (input == null)
-			{
-				conversionSucceeded = false;
-				return null;
-			}
-			else if (value == String.Empty)
-			{
-				return false;
-			}
-			else
-			{
-				if (value.IndexOf(',') != -1)
-				{
-					value = value.Substring(0, value.IndexOf(','));
-				}
-
-				bool performNumericConversion = false;
-
-				foreach (char c in value.ToCharArray())
-				{
-					if (Char.IsNumber(c))
-					{
-						performNumericConversion = true;
-						break;
-					}
-				}
-
-				if (performNumericConversion)
-				{
-					return System.Convert.ToBoolean(System.Convert.ToInt32(value));
-				}
-				else
-				{
-					return !(String.Compare("false", value, true) == 0);
-				}
-			}
-		}
-
-		private bool IsBool(Type desiredType)
-		{
-			bool isBool = desiredType == typeof(Boolean);
-#if DOTNET2
-			if (!isBool)
-			{
-				isBool = desiredType == typeof(bool?);
-			}
-#endif
-			return isBool;
 		}
 
 		private object ConvertEnum(Type desiredType, object input, ref bool conversionSucceeded)
@@ -389,15 +284,35 @@ namespace Castle.Components.Binder
 		{
 			Type elemType = desiredType.GetElementType();
 
-			input = FixInputForMonoIfNeeded(elemType, input);
+			// Fix for mod_mono issue where array values are passed 
+			// as a comma seperated String
+			if (!input.GetType().IsArray)
+			{
+				if (input.GetType() == typeof(String))
+				{
+					input = NormalizeInput(input);
+
+					if (input.ToString() == String.Empty)
+					{
+						input = Array.CreateInstance(elemType, 0);
+					}
+					else
+					{
+						input = input.ToString().Split(',');
+					}
+				}
+				else
+				{
+					throw new BindingException("Cannot convert to array type {0} from type {1}", elemType.FullName, input.GetType().FullName);
+				}
+			}
 
 			Array values = input as Array;
 			Array result = Array.CreateInstance(elemType, values.Length);
+			bool elementConversionSucceeded;
 
 			for(int i = 0; i < values.Length; i++)
 			{
-				bool elementConversionSucceeded;
-
 				result.SetValue(Convert(elemType, values.GetValue(i), out elementConversionSucceeded), i);
 				
 				// if at least one array element get converted 

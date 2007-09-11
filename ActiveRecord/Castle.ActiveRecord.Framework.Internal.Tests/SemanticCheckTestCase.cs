@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,21 +21,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests
 
 	[TestFixture]
 	public class SemanticCheckTestCase : AbstractActiveRecordTest
-	{
-		[Test,Ignore("meta-type is optional")]
-		[ExpectedException(typeof(ActiveRecordException), "MetaType is a required attribute of AnyAttribute on Castle.ActiveRecord.Framework.Internal.Tests.Model.BadClassWithAnyAttribute.PaymentMethod.")]
-		public void UsingAnyWithoutSpecifyingTheMetaType()
-		{
-			ActiveRecordModelBuilder builder = new ActiveRecordModelBuilder();
-			ActiveRecordModel model = builder.Create(typeof(BadClassWithAnyAttribute));
-			Assert.IsNotNull(model);
-
-			Assert.IsNotNull(model);
-
-			SemanticVerifierVisitor semanticVisitor = new SemanticVerifierVisitor(builder.Models);
-			semanticVisitor.VisitNode(model);
-		}
-
+	{			
 		[Test]
 		[ExpectedException( typeof(ActiveRecordException), "Unfortunatelly you can't have a discriminator class and a joined subclass at the same time - check type Castle.ActiveRecord.Framework.Internal.Tests.Model.Company" )]
 		public void JoinedAndDiscriminatorClass()

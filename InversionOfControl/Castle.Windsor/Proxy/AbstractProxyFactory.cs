@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,39 +16,44 @@ namespace Castle.Windsor.Proxy
 {
 	using System;
 
+	using Castle.MicroKernel;
+	
 	using Castle.Core;
 	using Castle.Core.Interceptor;
-	using Castle.MicroKernel;
+
 
 	public abstract class AbstractProxyFactory : IProxyFactory
 	{
-		public abstract object Create(IKernel kernel, object instance, 
-		                              ComponentModel model, params object[] constructorArguments);
-
-		public abstract bool RequiresTargetInstance(IKernel kernel, ComponentModel model);
+		public AbstractProxyFactory()
+		{
+		}
 
 		/// <summary>
-		/// Obtains the interceptors associated with the component.
+		/// Implementors must create a proxy based on 
+		/// the information exposed by ComponentModel
 		/// </summary>
-		/// <param name="kernel">The kernel instance</param>
-		/// <param name="model">The component model</param>
-		/// <returns>interceptors array</returns>
-		protected IInterceptor[] ObtainInterceptors(IKernel kernel, ComponentModel model)
+		/// <param name="kernel"></param>
+		/// <param name="model"></param>
+		/// <param name="constructorArguments"></param>
+		/// <returns></returns>
+		public abstract object Create(IKernel kernel, ComponentModel model, params object[] constructorArguments);
+
+		protected IMethodInterceptor[] ObtainInterceptors(IKernel kernel, ComponentModel model)
 		{
-			IInterceptor[] interceptors = new IInterceptor[model.Interceptors.Count];
+			IMethodInterceptor[] interceptors = new IMethodInterceptor[model.Interceptors.Count];
 			int index = 0;
 
 			foreach(InterceptorReference interceptorRef in model.Interceptors)
 			{
-				IHandler handler;
+				IHandler handler = null;
 
 				if (interceptorRef.ReferenceType == InterceptorReferenceType.Interface)
 				{
-					handler = kernel.GetHandler(interceptorRef.ServiceType);
+					handler = kernel.GetHandler( interceptorRef.ServiceType );
 				}
 				else
 				{
-					handler = kernel.GetHandler(interceptorRef.ComponentKey);
+					handler = kernel.GetHandler( interceptorRef.ComponentKey );
 				}
 
 				if (handler == null)
@@ -60,7 +65,7 @@ namespace Castle.Windsor.Proxy
 
 				try
 				{
-					IInterceptor interceptor = (IInterceptor) handler.Resolve(CreationContext.Empty);
+					IMethodInterceptor interceptor = (IMethodInterceptor) handler.Resolve(CreationContext.Empty);
 					
 					interceptors[index++] = interceptor;
 

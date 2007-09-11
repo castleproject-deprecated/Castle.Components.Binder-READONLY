@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,35 +17,20 @@ namespace Castle.MonoRail.Framework.Configuration
 	using System;
 	using System.Xml;
 
-	/// <summary>
-	/// Represents the SMTP configuration
-	/// on the configuration file
-	/// </summary>
 	public class SmtpConfig : ISerializedConfig
 	{
 		private String host = "localhost";
-		private int port = 25;
-		private String username;
-		private String password;
+		private String username, password;
 
-		/// <summary>
-		/// Deserializes the specified smtp section.
-		/// </summary>
-		/// <param name="section">The smtp section.</param>
 		public void Deserialize(XmlNode section)
 		{
 			XmlAttribute smtpHostAtt = section.Attributes["smtpHost"];
-			XmlAttribute smtpPortAtt = section.Attributes["smtpPort"];
 			XmlAttribute smtpUserAtt = section.Attributes["smtpUsername"];
 			XmlAttribute smtpPwdAtt = section.Attributes["smtpPassword"];
 
 			if (smtpHostAtt != null && smtpHostAtt.Value != String.Empty)
 			{
 				host = smtpHostAtt.Value;
-			}
-			if (smtpPortAtt != null && smtpPortAtt.Value != String.Empty)
-			{
-				port = int.Parse(smtpPortAtt.Value);
 			}
 			if (smtpUserAtt != null && smtpUserAtt.Value != String.Empty)
 			{
@@ -54,43 +39,21 @@ namespace Castle.MonoRail.Framework.Configuration
 			if (smtpPwdAtt != null && smtpPwdAtt.Value != String.Empty)
 			{
 				password = smtpPwdAtt.Value;
-			}
+			}		
 		}
 
-		/// <summary>
-		/// Gets or sets the smtp host.
-		/// </summary>
-		/// <value>The host.</value>
 		public String Host
 		{
 			get { return host; }
 			set { host = value; }
 		}
 
-		/// <summary>
-		/// Gets or sets the smtp port.
-		/// </summary>
-		/// <value>The port.</value>
-		public int Port
-		{
-			get { return port; }
-			set { port = value; }
-		}
-
-		/// <summary>
-		/// Gets or sets the smtp username.
-		/// </summary>
-		/// <value>The username.</value>
 		public String Username
 		{
 			get { return username; }
 			set { username = value; }
 		}
 
-		/// <summary>
-		/// Gets or sets the smtp password.
-		/// </summary>
-		/// <value>The password.</value>
 		public String Password
 		{
 			get { return password; }

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,11 +27,6 @@ namespace Castle.MonoRail.Framework.Internal
 		private readonly IDictionary entries = new HybridDictionary(true);
 		private Assembly loadedAssembly;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="AssemblySourceInfo"/> class.
-		/// </summary>
-		/// <param name="assemblyName">Name of the assembly.</param>
-		/// <param name="_namespace">The _namespace.</param>
 		public AssemblySourceInfo(string assemblyName, string _namespace)
 		{
 			this.assemblyName = assemblyName;
@@ -42,19 +37,11 @@ namespace Castle.MonoRail.Framework.Internal
 			RegisterEntries();
 		}
 
-		/// <summary>
-		/// Gets the name of the assembly.
-		/// </summary>
-		/// <value>The name of the assembly.</value>
 		public string AssemblyName
 		{
 			get { return assemblyName; }
 		}
 
-		/// <summary>
-		/// Gets the namespace.
-		/// </summary>
-		/// <value>The namespace.</value>
 		public string Namespace
 		{
 			get { return _namespace; }
@@ -82,9 +69,9 @@ namespace Castle.MonoRail.Framework.Internal
 			
 			for(int i=0; i < names.Length; i++)
 			{
-				String name = names[i].ToLower(System.Globalization.CultureInfo.InvariantCulture);
+				String name = names[i].ToLower();
 
-				if (_namespace != null && name.StartsWith(_namespace.ToLower(System.Globalization.CultureInfo.InvariantCulture)))
+				if (_namespace != null && name.StartsWith(_namespace.ToLower()))
 				{
 					if (name[toStripLength] == '.')
 					{
@@ -96,7 +83,7 @@ namespace Castle.MonoRail.Framework.Internal
 					}
 				}
 
-				if (name.StartsWith(dirName.ToLower(System.Globalization.CultureInfo.InvariantCulture)))
+				if (name.StartsWith(dirName.ToLower()))
 				{
 					views.Add(name);
 				}
@@ -116,9 +103,9 @@ namespace Castle.MonoRail.Framework.Internal
 	
 			for(int i=0; i < names.Length; i++)
 			{
-				String name = names[i].ToLower(System.Globalization.CultureInfo.InvariantCulture);
+				String name = names[i].ToLower();
 
-				if (_namespace != null && name.StartsWith(_namespace.ToLower(System.Globalization.CultureInfo.InvariantCulture)))
+				if (_namespace != null && name.StartsWith(_namespace.ToLower()))
 				{
 					if (name[toStripLength] == '.')
 					{

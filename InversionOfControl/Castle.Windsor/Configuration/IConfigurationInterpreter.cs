@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,12 +24,6 @@ namespace Castle.Windsor.Configuration
 	/// </summary>
 	public interface IConfigurationInterpreter
 	{
-		/// <summary>
-		/// Gets or sets the name of the environment.
-		/// </summary>
-		/// <value>The name of the environment.</value>
-		string EnvironmentName { get; set; }
-
 		/// <summary>
 		/// Exposes the reference to <see cref="IResource"/>
 		/// which the interpreter is likely to hold

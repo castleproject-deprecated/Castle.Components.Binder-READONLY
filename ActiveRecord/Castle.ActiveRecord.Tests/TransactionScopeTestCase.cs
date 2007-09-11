@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace Castle.ActiveRecord.Tests
 
 	using NHibernate;
 
-	using Castle.ActiveRecord.Tests.Model;
+    using Castle.ActiveRecord.Tests.Model;
 
 	[TestFixture]
 	public class TransactionScopeTestCase : AbstractActiveRecordTest
@@ -92,33 +92,6 @@ namespace Castle.ActiveRecord.Tests
 
 			Post[] posts = Post.FindAll();
 			Assert.AreEqual( 0, posts.Length );
-		}
-
-		[Test]
-		public void RollbackOnDispose()
-		{
-			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(Post), typeof(Blog));
-			Recreate();
-
-			Post.DeleteAll();
-			Blog.DeleteAll();
-
-			using(TransactionScope transaction = new TransactionScope(OnDispose.Rollback))
-			{
-				Blog blog = new Blog();
-				blog.Author = "hammett";
-				blog.Name = "some name";
-				blog.Save();
-
-				Post post = new Post(blog, "title", "post contents", "Castle");
-				post.Save();
-			}
-
-			Blog[] blogs = Blog.FindAll();
-			Assert.AreEqual(0, blogs.Length);
-
-			Post[] posts = Post.FindAll();
-			Assert.AreEqual(0, posts.Length);
 		}
 
 		[Test]
@@ -529,52 +502,6 @@ namespace Castle.ActiveRecord.Tests
 
 			Post[] posts = Post.FindAll();
 			Assert.AreEqual( 1, posts.Length );
-		}
-
-		[Test]
-		public void NestedTransactionWithRollbackOnDispose()
-		{
-			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(Post), typeof(Blog));
-			Recreate();
-
-			Post.DeleteAll();
-			Blog.DeleteAll();
-
-			using(new TransactionScope())
-			{
-				Blog blog = new Blog();
-
-				using(TransactionScope t1 = new TransactionScope(TransactionMode.Inherits, OnDispose.Rollback))
-				{
-					blog.Author = "hammett";
-					blog.Name = "some name";
-					blog.Save();
-
-					t1.VoteCommit();
-				}
-
-				using(TransactionScope t2 = new TransactionScope(TransactionMode.Inherits, OnDispose.Rollback))
-				{
-					Post post = new Post(blog, "title", "post contents", "Castle");
-
-					try
-					{
-						post.SaveWithException();
-						
-						t2.VoteCommit(); // Will never be called
-					}
-					catch (Exception)
-					{
-						// t2.VoteRollBack();
-					}
-				}
-			}
-
-			Blog[] blogs = Blog.FindAll();
-			Assert.AreEqual(0, blogs.Length);
-
-			Post[] posts = Post.FindAll();
-			Assert.AreEqual(0, posts.Length);
 		}
 		
 		[Test]

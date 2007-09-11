@@ -99,7 +99,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DuckTestCase.cs" />
     <Compile Include="MultiThreadTestCase.cs" />
     <Compile Include="Test\AjaxHelper2.cs" />
     <Compile Include="Test\AmbiguousExceptionTestCase.cs" />
@@ -130,7 +129,6 @@
     <Compile Include="Test\IntrospectorTest.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Test\MethodCallTestCase.cs" />
     <Compile Include="Test\ObjectComparisonTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -170,9 +168,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace Castle.DynamicProxy.Tests
 	using System.Configuration;
 	using System.Diagnostics;
 	using System.IO;
-	using Castle.Core.Interceptor;
 	using NUnit.Framework;
 
 	public abstract class BasePEVerifyTestCase
@@ -28,16 +27,7 @@ namespace Castle.DynamicProxy.Tests
 		{
 			Process process = new Process();
 
-			string path = Path.Combine(ConfigurationManager.AppSettings["sdkDir"], "peverify.exe");
-			if (!File.Exists(path))
-			{
-				path = Path.Combine(ConfigurationManager.AppSettings["x86SdkDir"], "peverify.exe");
-			}
-			if (!File.Exists(path))
-			{
-				throw new FileNotFoundException("Please check the sdkDir configuration setting and set it to the location of peverify.exe");
-			}
-			process.StartInfo.FileName = path;
+			process.StartInfo.FileName = Path.Combine(ConfigurationSettings.AppSettings["sdkDir"],"peverify.exe");
 			process.StartInfo.RedirectStandardOutput = true;
 			process.StartInfo.UseShellExecute = false;
 			process.StartInfo.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;

@@ -9,35 +9,26 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Castle.Core</RootNamespace>
     <AssemblyName>Castle.Core</AssemblyName>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\CastleKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DOTNET2</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>bin\Debug\Castle.Core.XML</DocumentationFile>
-    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;DOTNET2</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Castle.Core.XML</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -45,17 +36,13 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Attributes\CastleComponent.cs" />
-    <Compile Include="Attributes\ComponentActivatorAttribute.cs" />
-    <Compile Include="Attributes\ComponentProxyBehaviorAttribute.cs" />
-    <Compile Include="Attributes\DoNotWireAttribute.cs" />
     <Compile Include="Attributes\InterceptorAttribute.cs" />
     <Compile Include="Attributes\LifestyleAttributes.cs" />
-    <Compile Include="Interceptor\IChangeProxyTarget.cs" />
     <Compile Include="Interceptor\IInterceptor.cs" />
     <Compile Include="Interceptor\IInvocation.cs" />
+    <Compile Include="Interceptor\IMethodInterceptor.cs" />
+    <Compile Include="Interceptor\IMethodInvocation.cs" />
     <Compile Include="Interceptor\IOnBehalfAware.cs" />
-    <Compile Include="Interceptor\IProxyTargetAccessor.cs" />
-    <Compile Include="Interceptor\StandardInterceptor.cs" />
     <Compile Include="Internal\GraphNode.cs" />
     <Compile Include="Internal\GraphSets.cs" />
     <Compile Include="Internal\IVertex.cs" />
@@ -65,18 +52,12 @@
     <Compile Include="Lifecycle\IInitializable.cs" />
     <Compile Include="Lifecycle\IRecyclable.cs" />
     <Compile Include="Lifecycle\IStartable.cs" />
-    <Compile Include="Logging\Factories\AbstractExtendedLoggerFactory.cs" />
-    <Compile Include="Logging\IContextProperties.cs" />
     <Compile Include="Logging\Factories\AbstractLoggerFactory.cs" />
     <Compile Include="Logging\Factories\ConsoleFactory.cs" />
     <Compile Include="Logging\Factories\DiagnosticsLoggerFactory.cs" />
     <Compile Include="Logging\Factories\NullLogFactory.cs" />
     <Compile Include="Logging\Factories\StreamLoggerFactory.cs" />
     <Compile Include="Logging\Factories\WebLoggerFactory.cs" />
-    <Compile Include="Logging\IContextStack.cs" />
-    <Compile Include="Logging\IContextStacks.cs" />
-    <Compile Include="Logging\IExtendedLogger.cs" />
-    <Compile Include="Logging\IExtendedLoggerFactory.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILoggerFactory.cs" />
     <Compile Include="Logging\LoggerException.cs" />
@@ -104,6 +85,7 @@
     <Compile Include="Model\ParameterModelCollection.cs" />
     <Compile Include="Model\PropertySet.cs" />
     <Compile Include="Model\PropertySetCollection.cs" />
+    <Compile Include="Interceptor\StandardInterceptor.cs" />
     <Compile Include="Resource\AbstractResource.cs" />
     <Compile Include="Resource\AbstractStreamResource.cs" />
     <Compile Include="Resource\AssemblyResource.cs" />
@@ -119,11 +101,6 @@
     <Compile Include="Resource\StaticContentResource.cs" />
     <Compile Include="Resource\UncResource.cs" />
     <Compile Include="Resource\UncResourceFactory.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\CastleKey.snk">
-      <Link>CastleKey.snk</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

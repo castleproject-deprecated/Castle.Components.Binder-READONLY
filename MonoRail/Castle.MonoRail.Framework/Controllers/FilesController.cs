@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,13 +28,30 @@ namespace Castle.MonoRail.Framework.Controllers
 	[Resource("Effects2", "Castle.MonoRail.Framework.Controllers.Effects2", CultureName="neutral")]
 	[Resource("EffectsFat", "Castle.MonoRail.Framework.Controllers.EffectsFat", CultureName="neutral")]
 	[Resource("Validation", "Castle.MonoRail.Framework.Controllers.Validation", CultureName="neutral")]
-	[Resource("FormHelper", "Castle.MonoRail.Framework.Controllers.FormHelper", CultureName="neutral")]
 	public sealed class FilesController : Controller
 	{
+		private string _jsContentType = "application/x-javascript";
+		private string _jsCacheControl = "max-age=86400"; // cache valid for 1 day
+
+		public FilesController()
+		{
+		}
+
+		public string JavascriptContentType
+		{
+			get { return _jsContentType; }
+			set { _jsContentType = value; }
+		}
+
+		public string JavascriptCacheControl
+		{
+			get { return _jsCacheControl; }
+			set { _jsCacheControl = value; }
+		}
+
 		/// <summary>
 		/// Script used by <see cref="AjaxHelper"/>.
 		/// </summary>
-		[Cache(HttpCacheability.Public, Duration=86400)] // 1 day
 		public void AjaxScripts()
 		{	
 			RenderJavascriptFile( "Ajax", "jsfunctions" );
@@ -96,24 +113,23 @@ namespace Castle.MonoRail.Framework.Controllers
 			RenderJavascriptFile( "Validation", "fValidateLang" );
 		}
 
-		/// <summary>
-		/// Script used by <see cref="AjaxHelper"/>.
-		/// </summary>
-		public void FormHelperScript()
+		private String GetResourceValue( String resName, String resKey )
 		{
-			RenderJavascriptFile("FormHelper", "jsfunctions");
+			return (String)(Resources[resName])[resKey];
 		}
 
 		private void RenderJavascriptFile( String resourceName, String resourceKey )
 		{
-			Response.ContentType = "text/javascript";
-			String fileContent = GetResourceValue(resourceName, resourceKey);
-			RenderText(fileContent);
+			Response.ContentType = JavascriptContentType;
+			Response.AppendHeader("Cache-Control", JavascriptCacheControl);
+			// Response.CacheControlHeader = JavascriptCacheControl;
+			RenderFile( resourceName, resourceKey );
 		}
 
-		private String GetResourceValue(String resName, String resKey)
+		private void RenderFile( String resourceName, String resourceKey )
 		{
-			return (String) (Resources[resName])[resKey];
+			String fileContent = GetResourceValue( resourceName, resourceKey );
+			RenderText( fileContent );
 		}
 	}
 }

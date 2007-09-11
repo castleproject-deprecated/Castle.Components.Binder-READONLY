@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,12 +35,6 @@ namespace Castle.Facilities.NHibernateIntegration.Internal
 		private readonly ISessionFactoryResolver factoryResolver;
 		private FlushMode defaultFlushMode = FlushMode.Auto;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DefaultSessionManager"/> class.
-		/// </summary>
-		/// <param name="sessionStore">The session store.</param>
-		/// <param name="kernel">The kernel.</param>
-		/// <param name="factoryResolver">The factory resolver.</param>
 		public DefaultSessionManager(ISessionStore sessionStore, IKernel kernel, ISessionFactoryResolver factoryResolver)
 		{
 			this.kernel = kernel;
@@ -104,6 +98,8 @@ namespace Castle.Facilities.NHibernateIntegration.Internal
 			{
 				list = new ArrayList();
 
+				transaction.Context["nh.session.enlisted"] = list;
+
 				shouldEnlist = true;
 			}
 			else
@@ -124,19 +120,14 @@ namespace Castle.Facilities.NHibernateIntegration.Internal
 			{
 				// TODO: propagate IsolationLevel, expose as transaction property
 
-				if (!transaction.DistributedTransaction)
-				{
-					transaction.Context["nh.session.enlisted"] = list;
+				transaction.Enlist(new ResourceAdapter(session.BeginTransaction()));
 
-					transaction.Enlist(new ResourceAdapter(session.BeginTransaction()));
-
-					list.Add(session);
-				}
+				list.Add(session);
 
 				if (weAreSessionOwner)
 				{
-					transaction.RegisterSynchronization(
-						new SessionDisposeSynchronization(session));
+					transaction.RegisterSynchronization( 
+						new SessionDisposeSynchronization(session) );
 				}
 			}
 

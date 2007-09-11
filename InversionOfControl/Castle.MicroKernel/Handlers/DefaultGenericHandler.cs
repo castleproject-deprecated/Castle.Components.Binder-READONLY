@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ namespace Castle.MicroKernel.Handlers
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Text;
+
 	using Castle.Core;
 
 	/// <summary>
@@ -33,10 +33,6 @@ namespace Castle.MicroKernel.Handlers
 	{
 		private readonly IDictionary<Type, IHandler> type2SubHandler;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DefaultGenericHandler"/> class.
-		/// </summary>
-		/// <param name="model"></param>
 		public DefaultGenericHandler(ComponentModel model) : base(model)
 		{
 			type2SubHandler = new Dictionary<Type, IHandler>();
@@ -60,9 +56,9 @@ namespace Castle.MicroKernel.Handlers
 
 		protected IHandler GetSubHandler(CreationContext context, Type genericType)
 		{
-			lock(type2SubHandler)
+			lock (type2SubHandler)
 			{
-				IHandler handler;
+				IHandler handler = null;
 
 				if (type2SubHandler.ContainsKey(genericType))
 				{
@@ -74,10 +70,6 @@ namespace Castle.MicroKernel.Handlers
 
 					ComponentModel newModel = Kernel.ComponentModelBuilder.BuildModel(
 						ComponentModel.Name, service, genericType, null);
-
-					newModel.ExtendedProperties[ComponentModel.SkipRegistration] = true;
-
-					Kernel.AddCustomComponent(newModel);
 
 					handler = Kernel.HandlerFactory.Create(newModel);
 

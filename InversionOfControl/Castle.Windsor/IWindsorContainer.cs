@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ namespace Castle.Windsor
 {
 	using System;
 	using System.Collections;
+
 	using Castle.Core;
 	using Castle.MicroKernel;
 
@@ -25,15 +26,6 @@ namespace Castle.Windsor
 	/// </summary>
 	public interface IWindsorContainer : IDisposable
 	{
-		/// <summary>
-		/// Gets the container's name
-		/// </summary>
-		/// <remarks>
-		/// Only useful when child containers are being used
-		/// </remarks>
-		/// <value>The container's name.</value>
-		string Name { get; }
-
 		/// <summary>
 		/// Registers a facility within the kernel.
 		/// </summary>
@@ -100,21 +92,12 @@ namespace Castle.Windsor
 		/// <returns></returns>
 		object Resolve(String key);
 
-		/// <summary>
-		/// Returns a component instance by the key
-		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="arguments"></param>
-		/// <returns></returns>
-		object Resolve(String key, IDictionary arguments);
-		
 		#if DOTNET2
 
 		/// <summary>
 		/// Returns a component instance by the key
 		/// </summary>
 		/// <param name="key"></param>
-		/// <param name="service"></param>
 		/// <returns></returns>
 		object Resolve(String key, Type service);
 
@@ -127,14 +110,6 @@ namespace Castle.Windsor
 		/// <returns></returns>
 		object Resolve(Type service);
 
-		/// <summary>
-		/// Returns a component instance by the service
-		/// </summary>
-		/// <param name="service"></param>
-		/// <param name="arguments"></param>
-		/// <returns></returns>
-		object Resolve(Type service, IDictionary arguments);
-		
 		/// <summary>
 		/// Releases a component instance
 		/// </summary>
@@ -155,21 +130,14 @@ namespace Castle.Windsor
 		void RemoveChildContainer(IWindsorContainer childContainer);
 
 		/// <summary>
-		/// Shortcut to <see cref="Resolve(string)"/>
+		/// Shortcut to the method <see cref="Resolve"/>
 		/// </summary>
 		object this [String key] { get; }
 
 		/// <summary>
-		/// Shortcut to <see cref="Resolve(Type)"/>
+		/// Shortcut to the method <see cref="Resolve"/>
 		/// </summary>
 		object this [Type service] { get; }
-
-		/// <summary>
-		/// Gets a child container instance by name.
-		/// </summary>
-		/// <param name="name">The container's name.</param>
-		/// <returns>The child container instance or null</returns>
-		IWindsorContainer GetChildContainer(string name);
 
 		#if DOTNET2
 
@@ -181,14 +149,6 @@ namespace Castle.Windsor
 		T Resolve<T>();
 
 		/// <summary>
-		/// Returns a component instance by the service
-		/// </summary>
-		/// <typeparam name="T">Service type</typeparam>
-		/// <param name="arguments"></param>
-		/// <returns>The component instance</returns>
-		T Resolve<T>(IDictionary arguments);
-		
-		/// <summary>
 		/// Returns a component instance by the key
 		/// </summary>
 		/// <param name="key">Component's key</param>
@@ -196,25 +156,6 @@ namespace Castle.Windsor
 		/// <returns>The Component instance</returns>
 		T Resolve<T>(String key);
 
-		/// <summary>
-		/// Returns a component instance by the key
-		/// </summary>
-		/// <typeparam name="T">Service type</typeparam>
-		/// <param name="key">Component's key</param>
-		/// <param name="arguments"></param>
-		/// <returns>The Component instance</returns>
-		T Resolve<T>(String key, IDictionary arguments);
-
-		
-		/// <summary>
-		/// Returns a component instance by the key
-		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="service"></param>
-		/// <param name="arguments"></param>
-		/// <returns></returns>
-		object Resolve(String key, Type service, IDictionary arguments);
-		
 		#endif
 
 		/// <summary>

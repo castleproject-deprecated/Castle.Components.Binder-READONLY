@@ -73,7 +73,6 @@
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
@@ -111,7 +110,6 @@
     <Compile Include="ClassComponents\ClassWithListConstructor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ClassComponents\ClassWithTwoParametersWithSameType.cs" />
     <Compile Include="ClassComponents\CommonImpl1.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -127,7 +125,6 @@
     <Compile Include="ClassComponents\ComponentFactory.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ClassComponents\CommonImplWithDependancy.cs" />
     <Compile Include="ClassComponents\CustomerImpl.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -162,14 +159,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ClassComponents\Repository.cs" />
-    <Compile Include="Configuration\Components\ClassWithComplexParameter.cs" />
     <Compile Include="Configuration\Components\ClassWithConstructors.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Configuration\ConfigurationTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="KeySearchNamingSubSystemTestCase.cs" />
     <Compile Include="DefaultConversionManagerTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -250,13 +245,9 @@
     <Compile Include="SubContainers\SubContainersTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TransientMultiConstructorTestCase.cs" />
     <Compile Include="UnsatisfiedDependenciesTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

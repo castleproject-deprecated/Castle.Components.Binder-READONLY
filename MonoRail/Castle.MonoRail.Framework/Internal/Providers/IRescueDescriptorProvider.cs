@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 namespace Castle.MonoRail.Framework.Internal
 {
-	using System;
 	using System.Reflection;
 
 	/// <summary>
@@ -33,17 +32,8 @@ namespace Castle.MonoRail.Framework.Internal
 		/// and return descriptors instances, or an empty array if none 
 		/// was found.
 		/// </summary>
-		/// <param name="memberInfo">The controller type</param>
+		/// <param name="memberInfo">The controller type or the action (MethodInfo)</param>
 		/// <returns>An array of <see cref="RescueDescriptor"/></returns>
-		RescueDescriptor[] CollectRescues(Type memberInfo);
-
-		/// <summary>
-		/// Implementors should collect the rescue information
-		/// and return descriptors instances, or an empty array if none 
-		/// was found.
-		/// </summary>
-		/// <param name="memberInfo">The action (MethodInfo)</param>
-		/// <returns>An array of <see cref="RescueDescriptor"/></returns>
-		RescueDescriptor[] CollectRescues(MethodInfo memberInfo);
+		RescueDescriptor[] CollectRescues(MemberInfo memberInfo);
 	}
 }

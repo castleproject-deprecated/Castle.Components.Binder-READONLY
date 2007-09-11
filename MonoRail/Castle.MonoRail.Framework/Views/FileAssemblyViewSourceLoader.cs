@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	public class FileAssemblyViewSourceLoader : IViewSourceLoader, IServiceEnabledComponent
 	{
-		private IList additionalSources = new ArrayList();
+		private readonly IList additionalSources = new ArrayList();
 		private String viewRootDir;
 		private bool enableCache = true;
 		private FileSystemWatcher viewFolderWatcher;
@@ -42,7 +42,6 @@ namespace Castle.MonoRail.Framework
 			if (config != null)
 			{
 				viewRootDir = config.ViewEngineConfig.ViewPathRoot;
-				additionalSources = config.ViewEngineConfig.Sources;
 			}
 		}
 

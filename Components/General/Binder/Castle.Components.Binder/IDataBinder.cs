@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 namespace Castle.Components.Binder
 {
 	using System;
-	using Castle.Components.Validator;
 
 	public delegate void BinderHandler(object instance, String prefix, Node node);
 
@@ -79,12 +78,6 @@ namespace Castle.Components.Binder
 		ErrorList ErrorList { get; }
 
 		/// <summary>
-		/// Gets the validation error summary.
-		/// </summary>
-		/// <param name="instance">The instance.</param>
-		ErrorSummary GetValidationSummary(object instance);
-
-		/// <summary>
 		/// Exposes the <see cref="IBinderTranslator"/> implementation
 		/// if one was provided
 		/// </summary>
@@ -94,12 +87,6 @@ namespace Castle.Components.Binder
 		/// Exposes the <see cref="IConverter"/> implementation
 		/// </summary>
 		IConverter Converter { get; set; }
-
-		/// <summary>
-		/// Gets or sets the validator runner instance.
-		/// </summary>
-		/// <value>The validator instance.</value>
-		ValidatorRunner Validator { get; set; }
 		
 		/// <summary>
 		/// Invoked before the data binder implementation starts to

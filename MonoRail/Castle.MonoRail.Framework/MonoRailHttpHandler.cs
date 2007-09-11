@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace Castle.MonoRail.Framework
 	using System.Web;
 	using System.Web.SessionState;
 	using Castle.Core.Logging;
-	using Castle.MonoRail.Framework.Adapters;
 	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
@@ -72,62 +71,37 @@ namespace Castle.MonoRail.Framework
 		/// <param name="context"></param>
 		public virtual void Process(IRailsEngineContext context)
 		{
-			ControllerLifecycleExecutor executor = 
-				(ControllerLifecycleExecutor) context.Items[ControllerLifecycleExecutor.ExecutorEntry];
-
-			DefaultRailsEngineContext contextImpl = (DefaultRailsEngineContext) context;
-			contextImpl.ResolveRequestSession();
-
-			context.Items["mr.controller"] = executor.Controller;
-			context.Items["mr.flash"] = executor.Controller.Flash;
-			context.Items["mr.propertybag"] = executor.Controller.PropertyBag;
-			context.Items["mr.session"] = context.Session;
+			UrlInfo info = ExtractUrlInfo(context);
 			
-			// At this point, the before filters were executed. 
-			// So we just need to perform the secondary initialization
-			// and invoke the action
-			
-			try
+			if (logger.IsDebugEnabled)
 			{
-				if (executor.HasError) // Some error happened
-				{
-					executor.PerformErrorHandling();
-				}
-				else
-				{
-					executor.ProcessSelectedAction();
-				}
+				logger.Debug("Starting request process for '{0}'/'{1}.{2}' Extension '{3}' with url '{4}'", 
+				             info.Area, info.Controller, info.Action, info.Extension, info.UrlRaw);
 			}
-			catch(Exception ex)
+
+			IControllerFactory controllerFactory = (IControllerFactory) context.GetService(typeof(IControllerFactory));
+
+			Controller controller = controllerFactory.CreateController(info);
+
+			if (controller == null)
 			{
+				String message = String.Format("No controller for {0}\\{1}", info.Area, info.Controller);
+				
 				if (logger.IsErrorEnabled)
 				{
-					logger.Error("Error processing " + context.Url, ex);
+					logger.Error(message);
 				}
 
-				throw;
+				throw new RailsException(message);
+			}
+
+			try
+			{
+				controller.Process(context, info.Area, info.Controller, info.Action);
 			}
 			finally
 			{
-				try
-				{
-					executor.Dispose();
-				}
-				finally
-				{
-					IControllerFactory controllerFactory = 
-						(IControllerFactory) context.GetService(typeof(IControllerFactory));
-				
-					controllerFactory.Release(executor.Controller);
-				}
-				
-				if (logger.IsDebugEnabled)
-				{
-					Controller controller = executor.Controller;
-					
-					logger.DebugFormat("Ending request process for '{0}'/'{1}.{2}' Extension '{3}' with url '{4}'", 
-						controller.AreaName, controller.Name, controller.Action, context.UrlInfo.Extension, context.UrlInfo.UrlRaw);
-				}
+				controllerFactory.Release(controller);
 
 				// Remove items from flash before leaving the page
 				context.Flash.Sweep();
@@ -139,6 +113,12 @@ namespace Castle.MonoRail.Framework
 				else if (context.Session.Contains(Flash.FlashKey))
 				{
 					context.Session.Remove(Flash.FlashKey);
+				}
+				
+				if (logger.IsDebugEnabled)
+				{
+					logger.Debug("Ending request process for '{0}'/'{1}.{2}' Extension '{3}' with url '{4}'", 
+						info.Area, info.Controller, info.Action, info.Extension, info.UrlRaw);
 				}
 			}
 		}

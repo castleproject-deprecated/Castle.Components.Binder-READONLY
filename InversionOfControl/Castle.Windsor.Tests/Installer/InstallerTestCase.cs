@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,22 +30,6 @@ namespace Castle.Windsor.Tests.Installer
 
 			Assert.IsTrue( container.Kernel.HasComponent( typeof(ICalcService) ) );
 			Assert.IsTrue( container.Kernel.HasComponent( "calcservice" ) );
-		}
-
-		[Test]
-		public void InstallChildContainer()
-		{
-			IWindsorContainer container = new WindsorContainer(ConfigHelper.ResolveConfigPath("installerconfig.xml"));
-			IWindsorContainer child1 = container.GetChildContainer("child1");
-
-			Assert.IsNotNull(child1);
-			Assert.AreEqual(child1.Parent, container);
-			Assert.IsTrue(child1.Kernel.HasComponent(typeof(ICalcService)));
-			Assert.IsTrue(child1.Kernel.HasComponent("child_calcservice"));
-
-			ICalcService calcservice = container.Resolve("calcservice") as ICalcService;
-			ICalcService child_calcservice = child1.Resolve(typeof(ICalcService)) as ICalcService;
-			Assert.AreNotEqual(calcservice, child_calcservice);
 		}		
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,16 +18,19 @@ using AspectSharp.Lang.AST;
 
 namespace Castle.Facilities.AspectSharp
 {
-	using System;
 	using Castle.Core;
 	using Castle.Core.Interceptor;
+
 	using Castle.MicroKernel;
+
+	using Castle.DynamicProxy;
+	using IInvocation=Castle.DynamicProxy.IInvocation;
 
 	/// <summary>
 	/// Summary description for AopInterceptor.
 	/// </summary>
 	[Transient]
-	public class AopInterceptor : IInterceptor, IOnBehalfAware
+	public class AopInterceptor : IMethodInterceptor, IOnBehalfAware
 	{
 		private IKernel _kernel;
 		private AspectEngine _engine;
@@ -50,9 +53,9 @@ namespace Castle.Facilities.AspectSharp
 			_dispatcher.Init(_engine);
 		}
 
-		public void Intercept(IInvocation invocation)
+		public object Intercept(IMethodInvocation invocation, params object[] args)
 		{
-			_dispatcher.Intercept( invocation);
+			return _dispatcher.Intercept( (IInvocation) invocation, args);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,17 +22,40 @@ namespace Castle.Core.Interceptor
 	/// </summary>
 	public interface IInvocation
 	{
-		object Proxy { get; }
+		// object Proxy { get; }
 
-		object InvocationTarget { get; }
+		// object InvocationTarget { get;set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		Type TargetType { get; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		object[] Arguments { get; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		void SetArgumentValue(int index, object value);
 
+		/// <summary>
+		/// 
+		/// </summary>
 		object GetArgumentValue(int index);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		void Proceed();
+
+		/// <summary>
+		/// 
+		/// </summary>
+		object ReturnValue { get; set; }
 
 		/// <summary>
 		/// 
@@ -40,17 +63,10 @@ namespace Castle.Core.Interceptor
 		MethodInfo Method { get; }
 
 		/// <summary>
-		/// For interface proxies, this will point to the
-		/// <see cref="MethodInfo"/> on the target class
+		/// Returns the method on the target of invocation, 
+		/// which can be for example the method defined on an
+		/// interface, if dealing with an interface proxy
 		/// </summary>
 		MethodInfo MethodInvocationTarget { get; }
-
-		object ReturnValue { get; set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-		void Proceed();
 	}
 }

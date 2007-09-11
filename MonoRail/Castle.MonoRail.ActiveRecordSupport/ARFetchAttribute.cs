@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -123,14 +123,14 @@ namespace Castle.MonoRail.ActiveRecordSupport
 			set { required = value; }
 		}
 
-		public virtual int CalculateParamPoints(SmartDispatcherController controller, ParameterInfo parameterInfo)
+		int IParameterBinder.CalculateParamPoints(SmartDispatcherController controller, ParameterInfo parameterInfo)
 		{
 			String paramName = RequestParameterName != null ? RequestParameterName : parameterInfo.Name;
 
 			return controller.Request.Params.Get(paramName) != null ? 10 : 0;
 		}
 
-		public virtual object Bind(SmartDispatcherController controller, ParameterInfo parameterInfo)
+		object IParameterBinder.Bind(SmartDispatcherController controller, ParameterInfo parameterInfo)
 		{
 			ARFetcher fetcher = new ARFetcher(controller.Binder.Converter);
 			

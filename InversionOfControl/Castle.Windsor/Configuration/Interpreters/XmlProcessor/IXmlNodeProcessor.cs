@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ namespace Castle.Windsor.Configuration.Interpreters.XmlProcessor
 
 	public interface IXmlNodeProcessor
 	{
+		void Process(IXmlProcessorNodeList nodeList, IXmlProcessorEngine engine);
+
 		String Name { get; }
 
 		XmlNodeType[] AcceptNodeTypes { get; }
-
-		void Process(IXmlProcessorNodeList nodeList, IXmlProcessorEngine engine);
 
 		bool Accept( XmlNode node );
 	}

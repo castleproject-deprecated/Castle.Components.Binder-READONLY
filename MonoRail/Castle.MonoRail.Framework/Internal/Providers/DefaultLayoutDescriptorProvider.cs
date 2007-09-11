@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace Castle.MonoRail.Framework.Internal
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Collecting layout information for {0}", memberInfo.Name);
+				logger.Debug("Collecting layout information for {0}", memberInfo.Name);
 			}
 			
 			object[] attributes = memberInfo.GetCustomAttributes(typeof(ILayoutDescriptorBuilder), true);
@@ -64,7 +64,7 @@ namespace Castle.MonoRail.Framework.Internal
 				
 				if (logger.IsDebugEnabled)
 				{
-					logger.DebugFormat("Collected layout with name {0}", desc.LayoutName);
+					logger.Debug("Collected layout with name {0}", desc.LayoutName);
 				}
 				
 				return desc;

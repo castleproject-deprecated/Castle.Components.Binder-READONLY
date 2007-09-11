@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ namespace Castle.ActiveRecord.Tests
 	using System;
 	using System.Collections;
 
-	[ActiveRecord("PostTable", Lazy=true)]
+	[ActiveRecord("PostTable")]
 	public class PostLazy : ActiveRecordBase
 	{
 		private int _id;
@@ -41,49 +41,49 @@ namespace Castle.ActiveRecord.Tests
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
-		public virtual int Id
+		public int Id
 		{
 			get { return _id; }
 			set { _id = value; }
 		}
 
 		[Property]
-		public virtual String Title
+		public String Title
 		{
 			get { return _title; }
 			set { _title = value; }
 		}
 
 		[Property(ColumnType="StringClob")]
-		public virtual String Contents
+		public String Contents
 		{
 			get { return _contents; }
 			set { _contents = value; }
 		}
 
 		[Property]
-		public virtual String Category
+		public String Category
 		{
 			get { return _category; }
 			set { _category = value; }
 		}
 
 		[BelongsTo("blogid")]
-		public virtual BlogLazy Blog
+		public BlogLazy Blog
 		{
 			get { return _blog; }
 			set { _blog = value; }
 		}
 
 		[Property("created")]
-		public virtual DateTime Created
+		public DateTime Created
 		{
 			get { return _created; }
 			set { _created = value; }
 		}
 
 		[Property("published")]
-		public virtual bool Published
+		public bool Published
 		{
 			get { return _published; }
 			set { _published = value; }
@@ -104,13 +104,8 @@ namespace Castle.ActiveRecord.Tests
 		{
 			return (PostLazy[]) ActiveRecordBase.FindAll( typeof(PostLazy) );
 		}
-		
-		public static PostLazy Find(int id)
-		{
-			return (PostLazy) FindByPrimaryKey(typeof (PostLazy), id);
-		}
 
-		public virtual void SaveWithException()
+		public void SaveWithException()
 		{
 			Save();
 

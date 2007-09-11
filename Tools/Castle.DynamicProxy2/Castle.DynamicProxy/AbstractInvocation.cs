@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 namespace Castle.DynamicProxy
 {
-
 	using System;
 	using System.Reflection;
-	using System.Runtime.Serialization;
-	using Castle.Core.Interceptor;
-
 
 	[Serializable]
-	public abstract class AbstractInvocation : IInvocation, ISerializable
+	public abstract class AbstractInvocation : IInvocation
 	{
 		private readonly object proxy;
 		private readonly object target;
@@ -35,9 +30,8 @@ namespace Castle.DynamicProxy
 		private object[] arguments;
 		private int execIndex = -1;
 
-		protected AbstractInvocation(
-			object target, object proxy, IInterceptor[] interceptors,
-			Type targetType, MethodInfo targetMethod, object[] arguments)
+		protected AbstractInvocation(object proxy, object target, IInterceptor[] interceptors, 
+		                             Type targetType, MethodInfo targetMethod, object[] arguments)
 		{
 			this.proxy = proxy;
 			this.target = target;
@@ -47,11 +41,9 @@ namespace Castle.DynamicProxy
 			this.arguments = arguments;
 		}
 
-		protected AbstractInvocation(
-			object target, object proxy, IInterceptor[] interceptors,
-			Type targetType, MethodInfo targetMethod, MethodInfo interfMethod,
-			object[] arguments)
-			: this(target, proxy, interceptors, targetType, targetMethod, arguments)
+		protected AbstractInvocation(object proxy, object target, IInterceptor[] interceptors, 
+		                             Type targetType, MethodInfo targetMethod, MethodInfo interfMethod, 
+		                             object[] arguments) : this(proxy, target, interceptors, targetType, targetMethod, arguments)
 		{
 			this.interfMethod = interfMethod;
 		}
@@ -123,11 +115,5 @@ namespace Castle.DynamicProxy
 		}
 
 		protected abstract void InvokeMethodOnTarget();
-
-		public void GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			info.SetType(typeof(RemotableInvocation));
-			info.AddValue("invocation", new RemotableInvocation(this));
-		}
 	}
 }

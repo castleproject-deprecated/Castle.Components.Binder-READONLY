@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	using System;
 	using System.Collections;
 	using System.Reflection;
+	using System.Xml.Serialization;
+	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	[CLSCompliant(false)]
 	public class ClassEmitter : AbstractTypeEmitter
 	{
 		private static IDictionary signedAssemblyCache = new Hashtable();
@@ -37,20 +38,19 @@ namespace Castle.DynamicProxy.Generators.Emitters
             
 			typebuilder = modulescope.ObtainDynamicModule(isAssemblySigned).DefineType(name, flags);
 			
-#if DOTNET2
+//#if DOTNET2
 			if (baseType.IsGenericType)
 			{
 			 	CreateGenericParameters(baseType.GetGenericArguments());
 			 
 				baseType = baseType.MakeGenericType(genericTypeParams);
 			}
-#endif
+//#endif
 			
 			if (interfaces != null)
 			{
 				foreach(Type inter in interfaces)
 				{
-#if DOTNET2
 					if (inter.IsGenericType)
 					{
 						CreateGenericParameters(inter.GetGenericArguments());
@@ -58,7 +58,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 						typebuilder.AddInterfaceImplementation(inter.MakeGenericType(GenericTypeParams));
 					}
 					else
-#endif
 					{
 						typebuilder.AddInterfaceImplementation(inter);
 					}

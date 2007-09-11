@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Common
 	/// An implementation of the <see cref="IInterceptor"/> interface for testing
 	/// purposes.
 	/// </summary>
-	public class TestInterceptor : EmptyInterceptor
+	public class TestInterceptor : IInterceptor
 	{
 		private bool onSaveCall;
 		private bool instantiationCall;
@@ -43,47 +43,47 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Common
 		
 		#region IInterceptor Members
 
-		public override int[] FindDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, NHibernate.Type.IType[] types)
+		public int[] FindDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, NHibernate.Type.IType[] types)
 		{
 			return null;
 		}
 
-		public override object Instantiate(System.Type type, object id)
+		public object Instantiate(System.Type type, object id)
 		{
 			instantiationCall = true;
 			return null;
 		}
 
-		public override bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, NHibernate.Type.IType[] types)
+		public bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, NHibernate.Type.IType[] types)
 		{
 			return false;
 		}
 
-		public override object IsUnsaved(object entity)
+		public object IsUnsaved(object entity)
 		{
 			return null;
 		}
 
-		public override bool OnLoad(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+		public bool OnLoad(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
 		{
 			return false;
 		}
 
-		public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+		public bool OnSave(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
 		{
 			onSaveCall = true;
 			return false;
 		}
 
-		public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+		public void OnDelete(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
 		{
 		}
 
-		public override void PreFlush(System.Collections.ICollection entities)
+		public void PreFlush(System.Collections.ICollection entities)
 		{
 		}
 
-		public override void PostFlush(System.Collections.ICollection entities)
+		public void PostFlush(System.Collections.ICollection entities)
 		{
 		}
 

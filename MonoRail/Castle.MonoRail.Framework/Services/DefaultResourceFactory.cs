@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,12 +68,11 @@ namespace Castle.MonoRail.Framework.Services
 
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Creating resource name {0}, assembly {1}, resource {2}", 
-				                   descriptor.Name, descriptor.AssemblyName, descriptor.ResourceName);
+				logger.Debug("Creating resource name {0}, assembly {1}, resource {2}", 
+				             descriptor.Name, descriptor.AssemblyName, descriptor.ResourceName);
 			}
 			
-			ResourceManager rm = new ResourceManager(descriptor.ResourceName, 
-			                                         resAssembly, descriptor.ResourceType);
+			ResourceManager rm = new ResourceManager(descriptor.ResourceName, resAssembly, descriptor.ResourceType);
 
 			return new ResourceFacade(rm.GetResourceSet(culture, true, true));
 		}
@@ -91,7 +90,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Resolving culture {0}", name);
+				logger.Debug("Resolving culture {0}", name);
 			}
 
 			if ("neutral".Equals(name))
@@ -112,7 +111,7 @@ namespace Castle.MonoRail.Framework.Services
 			
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Resolving assembly {0}", name);
+				logger.Debug("Resolving assembly {0}", name);
 			}
 
 			try

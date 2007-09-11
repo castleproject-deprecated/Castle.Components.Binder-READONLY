@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,13 @@ namespace Castle.Windsor.Configuration.Interpreters.XmlProcessor.ElementProcesso
 
 		public abstract String Name { get; }
 
+		protected virtual bool IgnoreNode(XmlNode node)
+		{
+			return node.NodeType == XmlNodeType.Comment ||
+				node.NodeType == XmlNodeType.Entity ||
+				node.NodeType == XmlNodeType.EntityReference;
+		}
+
 		public virtual XmlNodeType[] AcceptNodeTypes
 		{
 			get { return acceptNodes; }
@@ -45,13 +52,6 @@ namespace Castle.Windsor.Configuration.Interpreters.XmlProcessor.ElementProcesso
 		}
 
 		public abstract void Process(IXmlProcessorNodeList nodeList, IXmlProcessorEngine engine);
-
-		protected virtual bool IgnoreNode(XmlNode node)
-		{
-			return node.NodeType == XmlNodeType.Comment ||
-				node.NodeType == XmlNodeType.Entity ||
-				node.NodeType == XmlNodeType.EntityReference;
-		}
 
 		/// <summary>
 		/// Convert and return child parameter into an XmlElement

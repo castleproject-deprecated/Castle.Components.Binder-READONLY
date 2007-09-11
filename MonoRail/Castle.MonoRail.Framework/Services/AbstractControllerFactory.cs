@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -119,14 +119,14 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Creating controller instance. Area '{0}' Name '{1}'", area, name);
+				logger.Debug("Creating controller instance. Area '{0}' Name '{1}'", area, name);
 			}
 
 			Type type = (Type) Tree.GetController(area, name);
 
 			if (type == null)
 			{
-				logger.ErrorFormat("Controller not found. Area '{0}' Name '{1}'", area, name);
+				logger.Error("Controller not found. Area '{0}' Name '{1}'", area, name);
 				
 				throw new ControllerNotFoundException(area, name);
 			}

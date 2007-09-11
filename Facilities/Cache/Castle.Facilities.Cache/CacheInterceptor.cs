@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace Castle.Facilities.Cache
 	/// <summary>
 	/// Caches the return value of the intercepted method.
 	/// </summary>
-	public class CacheInterceptor : IInterceptor
+	public class CacheInterceptor : IMethodInterceptor
 	{
 		public static readonly object NULL_OBJECT = new Object(); 
 
@@ -40,22 +40,22 @@ namespace Castle.Facilities.Cache
 		/// value is saved in the cached and returned by this method.
 		/// </summary>
 		/// <param name="invocation">the description of the intercepted method.</param>
+		/// <param name="args">the arguments of the intercepted method.</param>
 		/// <returns>the object stored in the cache.</returns>
-		public void Intercept(IInvocation invocation)
+		public object Intercept(IMethodInvocation invocation, params object[] args)
 		{
-			CacheConfig config = _cacheConfigHolder.GetConfig( invocation.MethodInvocationTarget.DeclaringType );
+			CacheConfig config = _cacheConfigHolder.GetConfig( invocation.Method.DeclaringType );
 
-			if (config != null && config.IsMethodCache( invocation.MethodInvocationTarget ))
+			if (config != null && config.IsMethodCache( invocation.Method ))
 			{
-				ICacheManager cacheManager = config.GetCacheManager(invocation.MethodInvocationTarget);
-				String cacheKey = cacheManager.CacheKeyGenerator.GenerateKey( invocation );
+				ICacheManager cacheManager = config.GetCacheManager( invocation.Method );
+				String cacheKey = cacheManager.CacheKeyGenerator.GenerateKey( invocation, args );
 				object result = cacheManager[ cacheKey ];
 
 				if (result == null)
 				{
 					//call target/sub-interceptor
-					invocation.Proceed();
-					result = invocation.ReturnValue;
+					result = invocation.Proceed(args);
 
 					//cache method result
 					if (result == null)
@@ -71,12 +71,13 @@ namespace Castle.Facilities.Cache
 				{ 
 					// convert the marker object back into a null value 
 					result = null; 
-				}
-				invocation.ReturnValue = result;
+				} 
+
+				return result;
 			}
 			else
 			{
-				invocation.Proceed();
+				return invocation.Proceed(args);
 			}
 		}
 	}

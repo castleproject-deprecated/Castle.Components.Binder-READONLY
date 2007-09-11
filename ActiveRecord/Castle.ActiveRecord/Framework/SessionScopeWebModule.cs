@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ namespace Castle.ActiveRecord.Framework
 {
 	using System;
 	using System.Web;
-	using Castle.ActiveRecord.Framework.Scopes;
 
 	/// <summary>
 	/// HttpModule to set up a session for the request lifetime.
@@ -37,43 +36,21 @@ namespace Castle.ActiveRecord.Framework
 	public class SessionScopeWebModule : IHttpModule
 	{
 		protected static readonly String SessionKey = "SessionScopeWebModule.session";
-		
-		/// <summary>
-		/// Used to check whether the ThreadScopeInfo being used is suitable for a web environment
-		/// </summary>
-		private static bool isWebConfigured;
 
 		public void Init(HttpApplication app)
 		{
-			if (ActiveRecordBase.holder == null)
-			{
-				// Not properly initialized, most probably due to a container initialization failure
-				// We cannot throw an exception as it will hide the original error, so we just
-				// skip our process completely
-
-				return;
-			}
-
 			app.BeginRequest += new EventHandler(OnBeginRequest);
 			app.EndRequest += new EventHandler(OnEndRequest);
-			
-			isWebConfigured = (ActiveRecordBase.holder.ThreadScopeInfo is WebThreadScopeInfo);
 		}
 
 		public void Dispose()
 		{
+			
 		}
 
 		private void OnBeginRequest(object sender, EventArgs e)
 		{
-			if (isWebConfigured) 
-			{
-				HttpContext.Current.Items.Add(SessionKey, new SessionScope());
-			} 
-			else 
-			{
-				throw new ActiveRecordException("Seems that the framework isn't configured properly. (isWeb != true and SessionScopeWebModule is in use) Check the documentation for further information");
-			}
+			HttpContext.Current.Items.Add(SessionKey, new SessionScope());
 		}
 
 		private void OnEndRequest(object sender, EventArgs e)

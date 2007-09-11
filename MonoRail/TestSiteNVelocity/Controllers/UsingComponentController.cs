@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,25 +14,28 @@
 
 namespace TestSiteNVelocity.Controllers
 {
+	using System;
 	using System.Collections;
+
 	using Castle.MonoRail.Framework;
+
 
 	public class UsingComponentController : Controller
 	{
 		public void CaptureForDirective()
-		{
+		{			
 		}
 
 		public void CaptureFor()
-		{
+		{			
 		}
 
 		public void CaptureForAppend()
-		{
+		{			
 		}
 
 		public void CaptureForAppendBefore()
-		{
+		{			
 		}
 
 		public void InlineComponentUsingTemplatedRender()
@@ -63,11 +66,11 @@ namespace TestSiteNVelocity.Controllers
 		public void Index4()
 		{
 		}
-
+	
 		public void Index5()
 		{
 		}
-
+	
 		public void Index6()
 		{
 		}
@@ -98,14 +101,6 @@ namespace TestSiteNVelocity.Controllers
 			items.Add("2");
 
 			PropertyBag.Add("items", items);
-		}
-
-		public void DynamicComponent()
-		{
-			ArrayList cmps = new ArrayList(2);
-			cmps.Add("SimpleInlineViewComponent");
-			cmps.Add("SimpleInlineViewComponent2");
-			PropertyBag.Add("components", cmps);
 		}
 	}
 }

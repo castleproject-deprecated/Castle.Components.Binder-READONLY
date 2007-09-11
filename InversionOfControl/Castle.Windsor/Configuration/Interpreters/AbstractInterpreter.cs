@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Castle.Windsor.Configuration.Interpreters
 
 	using Castle.Core.Resource;
 	using Castle.Core.Configuration;
+
 	using Castle.MicroKernel;
 
 	/// <summary>
@@ -29,22 +30,16 @@ namespace Castle.Windsor.Configuration.Interpreters
 	public abstract class AbstractInterpreter : IConfigurationInterpreter
 	{
 		#region Fields
-
-		protected static readonly string ContainersNodeName = "containers";
-		protected static readonly string ContainerNodeName = "container";
-		protected static readonly string FacilitiesNodeName = "facilities";
-		protected static readonly string FacilityNodeName = "facility";
-		protected static readonly string ComponentsNodeName = "components";
-		protected static readonly string BootstrapNodeName = "bootstrap";
-		protected static readonly string ComponentNodeName = "component";
-		protected static readonly string IncludeNodeName = "include";
-		protected static readonly string PropertiesNodeName = "properties";		
+		protected static readonly String FacilitiesNodeName = "facilities";
+		protected static readonly String FacilityNodeName = "facility";
+		protected static readonly String ComponentsNodeName = "components";
+		protected static readonly String ComponentNodeName = "component";
+		protected static readonly String IncludeNodeName = "include";
+		protected static readonly String PropertiesNodeName = "properties";		
 
 		// private ImportDirectiveCollection imports = new ImportDirectiveCollection();
 		private IResource source;
 		private Stack resourceStack = new Stack();
-		private string environmentName;
-
 		#endregion
 
 		#region Constructors
@@ -58,7 +53,7 @@ namespace Castle.Windsor.Configuration.Interpreters
 			PushResource(source);
 		} 
 
-		public AbstractInterpreter(string filename) : this(new FileResource(filename))
+		public AbstractInterpreter(String filename) : this(new FileResource(filename))
 		{
 		} 
 
@@ -103,25 +98,16 @@ namespace Castle.Windsor.Configuration.Interpreters
 
 		#region Properties
 
-		/// <summary>
-		/// Exposes the reference to <see cref="IResource"/>
-		/// which the interpreter is likely to hold
-		/// </summary>
-		/// <value></value>
 		public IResource Source
 		{
-			get { return source; }
+			get { return this.source; }
 		}
 
-		/// <summary>
-		/// Gets or sets the name of the environment.
-		/// </summary>
-		/// <value>The name of the environment.</value>
-		public string EnvironmentName
-		{
-			get { return environmentName; }
-			set { environmentName = value; }
-		}
+//		protected ImportDirectiveCollection Imports
+//		{
+//			get { return this.imports; }
+//			set { this.imports = value; }
+//		}
 
 		#endregion
 
@@ -137,16 +123,7 @@ namespace Castle.Windsor.Configuration.Interpreters
 			AddComponentConfig( component.Attributes["id"], component, store );
 		}
 
-		protected void AddChildContainerConfig(string name, IConfiguration childContainer, IConfigurationStore store)
-		{
-			AssertValidId(name);
-
-			// TODO: Use import collection on type attribute (if it exists)
-
-			store.AddChildContainerConfiguration(name, childContainer);
-		}
-
-		protected void AddFacilityConfig(string id, IConfiguration facility, IConfigurationStore store)
+		protected void AddFacilityConfig(String id, IConfiguration facility, IConfigurationStore store)
 		{
 			AssertValidId(id);
 
@@ -155,22 +132,13 @@ namespace Castle.Windsor.Configuration.Interpreters
 			store.AddFacilityConfiguration( id, facility );
 		}
 
-		protected void AddComponentConfig(string id, IConfiguration component, IConfigurationStore store)
+		protected void AddComponentConfig(String id, IConfiguration component, IConfigurationStore store)
 		{
 			AssertValidId(id);
 
 			// TODO: Use import collection on type and service attribute (if they exist)
 			
 			store.AddComponentConfiguration( id, component );
-		}
-
-		protected void AddBootstrapComponentConfig(string id, IConfiguration component, IConfigurationStore store)
-		{
-			AssertValidId(id);
-
-			// TODO: Use import collection on type and service attribute (if they exist)
-
-			store.AddBootstrapComponentConfiguration(id, component);
 		}
 
 		private void AssertValidId(string id)
@@ -183,9 +151,9 @@ namespace Castle.Windsor.Configuration.Interpreters
 
 		#endregion
 		
-		protected void ProcessInclude(string uri, IConfigurationStore store)
+		protected void ProcessInclude(String uri, IConfigurationStore store)
 		{
-			IResource resource = store.GetResource(uri, CurrentResource);
+			IResource resource = store.GetResource( uri, CurrentResource );
 
 			if (resource == null)
 			{

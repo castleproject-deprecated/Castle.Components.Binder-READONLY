@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -193,6 +193,11 @@ namespace Castle.ActiveRecord.Tests
 			product.Categories.Add( new CategoryLazy("y") );
 			product.Categories.Add( new CategoryLazy("z") );
 
+			foreach(CategoryLazy cat in product.Categories)
+			{
+				cat.Save();
+			}
+
 			product.Save();
 
 			using(new SessionScope())
@@ -226,63 +231,6 @@ namespace Castle.ActiveRecord.Tests
 						object dummy = cat.Name;
 					}
 				}
-			}
-		}
-
-		[Test]
-		public void SessionScopeFlushModeNever()
-		{
-			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(Post), typeof(Blog));
-			Recreate();
-
-			Post.DeleteAll();
-			Blog.DeleteAll();
-
-			using(new SessionScope(FlushAction.Never))
-			{
-				Blog blog = new Blog();					
-				blog.Author = "hammett";
-				blog.Name = "some name";
-				
-				//This gets flushed automatically because of the identity field
-				blog.Save();
-
-				Blog[] blogs = Blog.FindAll();
-				Assert.AreEqual(1, blogs.Length);
-
-				//This change won't be saved to the db
-				blog.Author = "A New Author";
-				blog.Save();
-
-				//The change should not be in the db
-				blogs = Blog.FindByProperty("Author", "A New Author");
-				Assert.AreEqual(0, blogs.Length);
-								
-				SessionScope.Current.Flush();
-
-				//The change should now be in the db
-				blogs = Blog.FindByProperty("Author", "A New Author");
-				Assert.AreEqual(1, blogs.Length);
-
-				//This change will be save to the db because it uses the SaveNow method
-				blog.Name = "A New Name";
-				blog.SaveAndFlush();
-
-				//The change should now be in the db
-				blogs = Blog.FindByProperty("Name", "A New Name");
-				Assert.AreEqual(1, blogs.Length);
-
-				//This deletion should not get to the db
-				blog.Delete();
-
-				blogs = Blog.FindAll();
-				Assert.AreEqual(1, blogs.Length);
-				
-				SessionScope.Current.Flush();
-
-				//The deletion should now be in the db
-				blogs = Blog.FindAll();
-				Assert.AreEqual(0, blogs.Length);
 			}
 		}
 	}

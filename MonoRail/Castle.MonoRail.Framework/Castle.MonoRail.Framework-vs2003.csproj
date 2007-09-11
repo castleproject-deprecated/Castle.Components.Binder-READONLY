@@ -85,6 +85,11 @@
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
                 />
                 <Reference
+                    Name = "Castle.Components.Common.EmailSender.SmtpEmailSender"
+                    AssemblyName = "Castle.Components.Common.EmailSender.SmtpEmailSender"
+                    HintPath = "..\..\build\net-1.1\debug\Castle.Components.Common.EmailSender.SmtpEmailSender.dll"
+                />
+                <Reference
                     Name = "Castle.Components.Common.EmailSender"
                     AssemblyName = "Castle.Components.Common.EmailSender"
                     HintPath = "..\..\build\net-1.1\debug\Castle.Components.Common.EmailSender.dll"
@@ -104,11 +109,6 @@
         <Files>
             <Include>
                 <File
-                    RelPath = "AssemblyInfo.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "Constants.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -120,11 +120,6 @@
                 />
                 <File
                     RelPath = "ControllerException.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ControllerLifecycleExecutor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -165,16 +160,6 @@
                 />
                 <File
                     RelPath = "IControllerFactory.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "IControllerLifecycleExecutor.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "IControllerLifecycleExecutorFactory.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -890,11 +875,6 @@
                 />
                 <File
                     RelPath = "Services\DefaultControllerFactory.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Services\DefaultControllerLifecycleExecutorFactory.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

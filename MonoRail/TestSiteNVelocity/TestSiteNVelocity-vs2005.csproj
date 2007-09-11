@@ -78,11 +78,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Castle.Components.Common.EmailSender.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Components.Common.EmailSender.SmtpEmailSender, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\net-2.0\debug\Castle.Components.Common.EmailSender.SmtpEmailSender.dll</HintPath>
+    </Reference>
     <Reference Include="Nullables, Version=1.0.1.0, Culture=neutral, PublicKeyToken=154fdcb44c4484fc">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Nullables.dll</HintPath>
     </Reference>
-    <Reference Include="NVelocity, Version=0.5.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
+    <Reference Include="NVelocity">
+      <Name>NVelocity</Name>
+      <HintPath>..\..\build\net-2.0\debug\NVelocity.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -173,7 +180,6 @@
     <Compile Include="Controllers\HomeController.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Controllers\JSGenerationController.cs" />
     <Compile Include="Controllers\LayoutController.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -227,31 +233,11 @@
     <None Include="views\flash\flashIt.vm" />
     <None Include="views\flash\validateRequest.vm" />
     <None Include="views\formhelper\index.vm" />
-    <None Include="views\formhelper\numbersonly.vm" />
     <None Include="views\formhelper\useparamstofillinputs.vm" />
-    <None Include="views\helper\StaticHelpers.vm" />
     <None Include="views\helper\DictHelperUsage.vm" />
     <None Include="views\home\display.vm" />
-    <Content Include="views\jsgeneration\_partial1.vm" />
-    <None Include="views\jsgeneration\CheckCNPJ.njs" />
-    <None Include="views\jsgeneration\collectionaccess.njs" />
-    <None Include="views\jsgeneration\collectionfirstlast.njs" />
-    <None Include="views\jsgeneration\index.vm" />
-    <None Include="views\jsgeneration\multipleactions.njs" />
-    <None Include="views\jsgeneration\replace.njs" />
-    <None Include="views\jsgeneration\InsertHtml.njs" />
-    <None Include="views\jsgeneration\replacehtml.njs" />
-    <None Include="views\jsgeneration\elementmethoddepth.njs" />
-    <None Include="views\jsgeneration\elementattributedepth.njs" />
-    <None Include="views\jsgeneration\elementattribute.njs" />
-    <None Include="views\jsgeneration\elementmethod.njs" />
-    <None Include="views\jsgeneration\elementreplace.njs" />
-    <None Include="views\jsgeneration\elementreplacehtml.njs" />
-    <None Include="views\jsgeneration\replacehtmlwithpartial.njs" />
-    <None Include="views\jsgeneration\elementaccess.njs" />
     <None Include="views\home\heyhello.vm" />
     <None Include="views\home\index.vm" />
-    <None Include="views\jsgeneration\visualeffect.njs" />
     <None Include="views\layoutable\changelayout.vm" />
     <None Include="views\layoutable\index.vm" />
     <None Include="views\layouts\master.vm" />
@@ -268,8 +254,6 @@
     <None Include="views\rescues\updateerrormsg.vm" />
     <None Include="views\resourced\getresources.vm" />
     <None Include="views\SubArea\home\index.vm" />
-    <None Include="views\testwizardconditions\InnerAction2.vm" />
-    <None Include="views\testwizardconditions\page1.vm" />
     <None Include="views\testwizard\InnerAction2.vm" />
     <None Include="views\testwizard\page1.vm" />
     <None Include="views\testwizard\page3.vm" />
@@ -294,14 +278,8 @@
     <None Include="views\UsingComponent\index8.vm" />
     <None Include="views\UsingComponent\index9.vm" />
     <None Include="views\validated\default.vm" />
-    <None Include="views\wizard\testwizardwitharea\InnerAction2.vm" />
-    <None Include="views\wizard\testwizardwitharea\page1.vm" />
-    <None Include="views\wizard\testwizardwitharea\page3.vm" />
-    <None Include="views\wizard\testwizardwitharea\page4.vm" />
     <None Include="web.config" />
-    <EmbeddedResource Include="Controllers\ResourceFile.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Controllers\ResourceFile.resx" />
     <Content Include="views\ajax\autocom.vm" />
     <Content Include="views\ajax\index.vm" />
     <Content Include="views\filter\index.vm" />
@@ -311,27 +289,10 @@
     <Content Include="views\home\bag2.vm" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v8.0\WebApplications\Microsoft.WebApplication.targets" />
-
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-        <WebProjectProperties>
-          <UseIIS>False</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>2709</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>
-          </IISUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-        </WebProjectProperties>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
 </Project>

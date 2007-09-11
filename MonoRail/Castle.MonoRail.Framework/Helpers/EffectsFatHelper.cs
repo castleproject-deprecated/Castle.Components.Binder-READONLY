@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,15 +40,11 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// Renders a Javascript library inside a single script tag.
 		/// </summary>
 		/// <returns></returns>
-		public String InstallScripts()
-		{
-			return RenderScriptBlockToSource("/MonoRail/Files/EffectsFatScripts");
-		}
-
-		[Obsolete("Please use the preferred InstallScripts function.")]
 		public String GetJavascriptFunctions()
 		{
-			return InstallScripts();
+			return String.Format("<script type=\"text/javascript\" src=\"{0}.{1}\"></script>", 
+			                     Controller.Context.ApplicationPath + "/MonoRail/Files/EffectsFatScripts", 
+								 Controller.Context.UrlInfo.Extension);
 		}
 	}
 }

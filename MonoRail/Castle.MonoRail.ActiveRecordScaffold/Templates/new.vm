@@ -2,15 +2,15 @@ $ValidationHelper.InstallScripts()
 
 <h2>New ${model.Type.Name}</h2>
 
-<ul id="errors">
 #if($flash.errors)
+<ul id="errors">
 #foreach($error in $flash.errors)
   <li>$error</li>
 #end
-#end
 </ul>
+#end
 
-#set ($validatorForm = "return validateForm( this, false, false, false, true, 16 )" )
+#set ($validatorForm = "return validateForm( this, false, false, false, false, 5 )" )
 
 #if($useModelName)
 $PresentationHelper.Form("create${model.Type.Name}", "scaffoldingform", "post", $validatorForm)
@@ -68,7 +68,7 @@ $PresentationHelper.Form("create", "scaffoldingform", "post", $validatorForm)
 
 #end
 
-<input type="submit" value="Create" />
+$HtmlHelper.SubmitButton("Create")
 
 </div>
 
@@ -76,4 +76,4 @@ $PresentationHelper.Form("create", "scaffoldingform", "post", $validatorForm)
 $PresentationHelper.LinkToBack("Back", null) | $PresentationHelper.LinkToList($model, $useModelName, "List", null)
 </p>
 
-</form>
+$HtmlHelper.EndForm()

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,20 +37,17 @@ namespace Castle.Facilities.DynamicLoader
 
 		private int seqComponent;
 		private string componentIdMask;
-		private AppDomain appDomain;
 
 		/// <summary>
 		/// Creates a new <see cref="RemoteLoader"/>. This constructor should not be called
-		/// directly in the code, but via <see cref="System.AppDomain.CreateInstance(string,string)"/>.
+		/// directly in the code, but via <see cref="AppDomain.CreateInstance(string,string)"/>.
 		/// </summary>
 		public RemoteLoader()
 		{
-			this.appDomain = AppDomain.CurrentDomain;
+			this.kernel = new DefaultKernel();
 
 			// forces the loading of every library on the AppDomain directory
-			this.LoadAllAssemblies();
-
-			this.kernel = new DefaultKernel();
+			LoadAllAssemblies();
 		}
 		
 		/// <summary>
@@ -101,14 +98,6 @@ namespace Castle.Facilities.DynamicLoader
 		public IKernel Kernel
 		{
 			get { return kernel; }
-		}
-
-		/// <summary>
-		/// The <see cref="AppDomain"/>.
-		/// </summary>
-		public AppDomain AppDomain
-		{
-			get { return appDomain; }
 		}
 
 		/// <summary>
@@ -172,7 +161,7 @@ namespace Castle.Facilities.DynamicLoader
 			{
 				try
 				{
-					instance = Kernel.ProxyFactory.Create(Kernel, null, model, arguments);
+					instance = Kernel.ProxyFactory.Create(Kernel, model, arguments);
 				}
 				catch (Exception ex)
 				{
@@ -197,16 +186,6 @@ namespace Castle.Facilities.DynamicLoader
 			}
 
 			return instance;
-		}
-
-		/// <summary>
-		/// Overrides <see cref="MarshalByRefObject.InitializeLifetimeService"/>,
-		/// so no lease is returned and the object is kept in memory
-		/// as long as the host application domain is running.
-		/// </summary>
-		public override object InitializeLifetimeService()
-		{
-			return null;
 		}
 	}
 }

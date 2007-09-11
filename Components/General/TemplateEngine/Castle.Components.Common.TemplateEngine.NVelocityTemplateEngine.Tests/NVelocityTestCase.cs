@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests
 		{
 			NVelocityTemplateEngine engine = new NVelocityTemplateEngine();
 
-			engine.AddResourceAssembly("Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests");
+			engine.AssemblyName = "Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests";
 			
 			(engine as ISupportInitialize).BeginInit();
 
@@ -61,42 +61,5 @@ namespace Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests
 
 			Assert.AreEqual("This is a simple template", writer.GetStringBuilder().ToString());
 		}
-
-
-		[Test]
-		public void SimpleTemplateProcessingWithinTwoResources()
-		{
-			NVelocityTemplateEngine engine = new NVelocityTemplateEngine();
-
-			engine.AddResourceAssembly("Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests");
-			engine.AddResourceAssembly("Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR");
-
-			(engine as ISupportInitialize).BeginInit();
-
-			StringWriter writer = new StringWriter();
-
-			string templateFile = "Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests/compiledres/simple.vm";
-			Assert.IsTrue(engine.Process(
-				new Hashtable(),
-				templateFile,
-				writer));
-
-			Assert.AreEqual("This is a simple template", writer.GetStringBuilder().ToString());
-
-			// clear the writer for the second run
-			writer = new StringWriter();
-			
-			string secondTemplateFile = "Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine.Tests.SR/compiledres/simple.vm"; 
-			Assert.IsTrue(engine.Process(
-				new Hashtable(),
-				secondTemplateFile,
-				writer));
-			
-			Assert.AreEqual("This is the second simple template", writer.GetStringBuilder().ToString());
-			
-		}
-		
-		
-		
 	}
 }

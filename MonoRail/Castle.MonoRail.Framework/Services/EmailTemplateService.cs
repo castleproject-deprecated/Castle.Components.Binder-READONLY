@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,9 +38,6 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		private ILogger logger = NullLogger.Instance;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="EmailTemplateService"/> class.
-		/// </summary>
 		public EmailTemplateService()
 		{
 		}
@@ -76,9 +73,8 @@ namespace Castle.MonoRail.Framework
 		/// Dictionary with parameters 
 		/// that you can use on the email template
 		/// </param>
-		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		public Message RenderMailMessage(String templateName, IDictionary parameters, bool doNotApplyLayout)
+		public Message RenderMailMessage(String templateName, IDictionary parameters)
 		{
 			if (HttpContext.Current == null)
 			{
@@ -87,12 +83,12 @@ namespace Castle.MonoRail.Framework
 			
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Rendering email message. Template name {0}", templateName);
+				logger.Debug("Rendering email message. Template name {0}", templateName);
 			}
 
 			IRailsEngineContext context = EngineContextModule.ObtainRailsEngineContext(HttpContext.Current);
 
-			Controller controller = context.CurrentController;
+			Controller controller = Controller.CurrentController;
 
 			if (controller == null)
 			{
@@ -109,7 +105,7 @@ namespace Castle.MonoRail.Framework
 
 			try
 			{
-				return RenderMailMessage(templateName, context, controller, doNotApplyLayout);
+				return RenderMailMessage(templateName, context, controller);
 			}
 			finally
 			{
@@ -133,10 +129,8 @@ namespace Castle.MonoRail.Framework
 		/// </param>
 		/// <param name="context">Context that represents the current request</param>
 		/// <param name="controller">Controller instance</param>
-		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		public Message RenderMailMessage(String templateName, IRailsEngineContext context,
-		                                 Controller controller, bool doNotApplyLayout)
+		public Message RenderMailMessage(String templateName, IRailsEngineContext context, Controller controller)
 		{
 			// create a message object
 			Message message = new Message();
@@ -144,19 +138,7 @@ namespace Castle.MonoRail.Framework
 			// use the template engine to generate the body of the message
 			StringWriter writer = new StringWriter();
 
-			String oldLayout = controller.LayoutName;
-
-			if (doNotApplyLayout)
-			{
-				controller.LayoutName = null;
-			}
-
 			controller.InPlaceRenderSharedView(writer, Path.Combine(Constants.EmailTemplatePath, templateName));
-
-			if (doNotApplyLayout)
-			{
-				controller.LayoutName = oldLayout;
-			}
 
 			String body = writer.ToString();
 			
@@ -184,7 +166,7 @@ namespace Castle.MonoRail.Framework
 			
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Rendering email message to {0} cc {1} bcc {2}", message.To, message.Cc, message.Bcc);
+				logger.Debug("Rendering email message to {0} cc {1} bcc {2}", message.To, message.Cc, message.Bcc);
 			}
 
 			body = Constants.readdress.Replace(body, String.Empty);
@@ -206,7 +188,7 @@ namespace Castle.MonoRail.Framework
 				String header	= matches2[i].Groups[Constants.HeaderKey].ToString();
 				String strval	= matches2[i].Groups[Constants.ValueKey].ToString();
 
-				if (header.ToLower(System.Globalization.CultureInfo.InvariantCulture) == Constants.Subject)
+				if (header.ToLower() == Constants.Subject)
 				{
 					message.Subject = strval;
 				}
@@ -217,7 +199,7 @@ namespace Castle.MonoRail.Framework
 				
 				if (logger.IsDebugEnabled)
 				{
-					logger.DebugFormat("Adding header {0} value {1}", header, strval);
+					logger.Debug("Adding header {0} value {1}", header, strval);
 				}
 			}
 			
@@ -227,11 +209,11 @@ namespace Castle.MonoRail.Framework
 			
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Email message body {0}", body);
+				logger.Debug("Email message body {0}", body);
 			}
 
 			// a little magic to see if the body is html
-			if (message.Body.ToLower(System.Globalization.CultureInfo.InvariantCulture).IndexOf(Constants.HtmlTag) != -1)
+			if (message.Body.ToLower().IndexOf(Constants.HtmlTag) != -1)
 			{
 				message.Format = Format.Html;
 				

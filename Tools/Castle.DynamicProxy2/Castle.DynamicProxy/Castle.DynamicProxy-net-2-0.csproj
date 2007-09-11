@@ -11,7 +11,8 @@
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>Castle.DynamicProxy</AssemblyName>
-    <AssemblyOriginatorKeyFile>..\..\..\CastleKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -25,7 +26,6 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -34,16 +34,18 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DEBUG;DOTNET2 PHYSICALASSEMBLY</DefineConstants>
-    <DocumentationFile>bin\Debug\Castle.DynamicProxy.XML</DocumentationFile>
+    <DefineConstants>TRACE;DEBUG;DOTNET2</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -56,15 +58,17 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE;PHYSICALASSEMBLY,DOTNET2</DefineConstants>
-    <DocumentationFile>bin\Release\Castle.DynamicProxy.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -238,26 +242,28 @@
     <Compile Include="Generators\Emitters\StindOpCodesDictionary.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Generators\Emitters\TypeConstructorEmitter.cs" />
     <Compile Include="Generators\Emitters\TypeUtil.cs" />
-    <Compile Include="Generators\EventToGenerate.cs" />
     <Compile Include="Generators\GeneratorException.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Generators\InterfaceProxyGeneratorWithoutTarget.cs" />
     <Compile Include="Generators\InterfaceProxyWithTargetGenerator.cs" />
-    <Compile Include="Generators\InterfaceProxyWithTargetInterfaceGenerator.cs" />
     <Compile Include="Generators\PropertyToGenerate.cs" />
+    <Compile Include="IInterceptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IInterceptorSelector.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="InternalsHelper.cs" />
+    <Compile Include="IInvocation.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IProxyBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IProxyGenerationHook.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IProxyTargetAccessor.cs" />
     <Compile Include="ModuleScope.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -265,20 +271,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ProxyGenerator.cs" />
-    <Compile Include="RemotableInvocation.cs" />
-    <Compile Include="Serialization\ProxyObjectReference.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\CastleKey.snk">
-      <Link>CastleKey.snk</Link>
-    </None>
-    <EmbeddedResource Include="DynProxy.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\Castle.Core\Castle.Core-vs2005.csproj">
-      <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
-      <Name>Castle.Core-vs2005</Name>
-    </ProjectReference>
+    <Compile Include="StandardInterceptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

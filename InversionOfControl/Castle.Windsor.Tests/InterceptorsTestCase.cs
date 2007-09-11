@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -191,57 +191,29 @@ namespace Castle.Windsor.Tests
 		}
 	}
 
-	public class MyInterceptorGreedyFacility2 : IFacility
+	public class ResultModifierInterceptor : IMethodInterceptor
 	{
-		#region IFacility Members
-
-		public void Init(IKernel kernel, Core.Configuration.IConfiguration facilityConfig)
-		{
-			kernel.ComponentRegistered += new ComponentDataDelegate(OnComponentRegistered);
-		}
-
-		public void Terminate()
-		{
-		}
-
-		#endregion
-
-		private void OnComponentRegistered(String key, IHandler handler)
-		{
-			if (typeof(IInterceptor).IsAssignableFrom(handler.ComponentModel.Service))
-			{
-				return;
-			}
-
-			handler.ComponentModel.Interceptors.Add(new InterceptorReference("interceptor"));
-		}
-	}
-
-	public class ResultModifierInterceptor : IInterceptor
-	{
-		public void Intercept(IInvocation invocation)
+		public object Intercept(IMethodInvocation invocation, params object[] args)
 		{
 			if (invocation.Method.Name.Equals("Sum"))
 			{
-				invocation.Proceed();
-				object result = invocation.ReturnValue;
-				invocation.ReturnValue = ((int)result) + 1;
-				return;
+				object result = invocation.Proceed(args);
+				return ((int)result) + 1;
 			}
 			
-			invocation.Proceed();
+			return invocation.Proceed(args);
 		}
 	}
 
-	public class InterceptorWithOnBehalf : IInterceptor, IOnBehalfAware
+	public class InterceptorWithOnBehalf : IMethodInterceptor, IOnBehalfAware
 	{
 		private static ComponentModel _model;
 
 		#region IMethodInterceptor Members
 
-		public void Intercept(IInvocation invocation)
+		public object Intercept(IMethodInvocation invocation, params object[] args)
 		{
-			invocation.Proceed();
+			return invocation.Proceed(args);
 		}
 
 		#endregion

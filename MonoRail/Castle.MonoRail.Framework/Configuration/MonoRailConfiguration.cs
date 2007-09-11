@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		private RoutingRuleCollection routingRules;
 		private ExtensionEntryCollection extensions;
 		private ServiceEntryCollection services;
-		private DefaultUrlCollection defaultUrls;
 		
 		/// <summary>
 		/// Pendent
@@ -55,7 +54,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			routingRules = new RoutingRuleCollection();
 			extensions = new ExtensionEntryCollection();
 			services = new ServiceEntryCollection();
-			defaultUrls = new DefaultUrlCollection();
 			
 			checkClientIsConnected = false;
 			
@@ -105,7 +103,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			services.Deserialize(node);
 			extensions.Deserialize(node);
 			routingRules.Deserialize(node);
-			defaultUrls.Deserialize(node);
 
 			ProcessFilterFactoryNode(node.SelectSingleNode("customFilterFactory"));
 			
@@ -131,6 +128,20 @@ namespace Castle.MonoRail.Framework.Configuration
 		
 		#endregion
 		
+		private void ProcessFilterFactoryNode(XmlNode node)
+		{
+			if (node == null) return;
+			
+			XmlAttribute type = node.Attributes["type"];
+
+			if (type == null)
+			{
+				throw new ConfigurationException("The custom filter factory node must specify a 'type' attribute");
+			}
+
+			customFilterFactory = TypeLoadUtil.GetType(type.Value);
+		}
+
 		public SmtpConfig SmtpConfig
 		{
 			get { return smtpConfig; }
@@ -191,30 +202,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			get { return configurationSection; }
 		}
 
-		public DefaultUrlCollection DefaultUrls
-		{
-			get { return defaultUrls; }
-		}
-
-		private void ProcessFilterFactoryNode(XmlNode node)
-		{
-			if (node == null) return;
-
-			XmlAttribute type = node.Attributes["type"];
-
-			if (type == null)
-			{
-				String message = "The custom filter factory node must specify a 'type' attribute";
-#if DOTNET2
-				throw new ConfigurationErrorsException(message);
-#else
-				throw new ConfigurationException(message);
-#endif
-			}
-
-			customFilterFactory = TypeLoadUtil.GetType(type.Value);
-		}
-
 		private void ConfigureWindsorIntegration()
 		{
 			const String windsorAssembly = "Castle.MonoRail.WindsorExtension";
@@ -228,5 +215,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			customFilterFactory = TypeLoadUtil.GetType(
 				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorFilterFactory, " + windsorAssembly));
 		}
+		
 	}
 }

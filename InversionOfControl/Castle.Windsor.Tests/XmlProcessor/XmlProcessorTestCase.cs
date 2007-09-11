@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,11 +66,6 @@ namespace Castle.Windsor.Tests.XmlProcessor
 			foreach(String fileName in Directory.GetFiles(dirFullPath, "*Test.xml"))
 			{
 				// Debug.WriteLine("Running " + fileName.Substring( fileName.LastIndexOf("/") + 1 ));
-
-				if(fileName.EndsWith("PropertiesWithAttributesTest.xml"))
-				{
-					continue;
-				}
 
 				XmlDocument doc = GetXmlDocument(fileName);
 

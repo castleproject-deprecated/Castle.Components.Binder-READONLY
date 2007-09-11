@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,27 +17,6 @@ namespace TestSiteNVelocity.Controllers
 	using System;
 
 	using Castle.MonoRail.Framework;
-
-	[Rescue("general")]
-	public abstract class BaseController : SmartDispatcherController
-	{
-	}
-
-	[Rescue("saveerror")]
-	[Rescue("updateerror", typeof(ApplicationException))]
-	[ControllerDetails("rescuable2")]
-	public class RescueExtendedController : BaseController
-	{
-		public void Save()
-		{
-			throw new Exception();
-		}
-
-		public void Save2()
-		{
-			throw new ApplicationException();
-		}
-	}
 
 	[Rescue("general")]
 	[ControllerDetails("rescuable")]
@@ -99,11 +78,6 @@ namespace TestSiteNVelocity.Controllers
 				throw new ArgumentException("argException");
 				
 			throw new Exception();
-		}
-
-		[AccessibleThrough(Verb.Post)]
-		public void OnlyPost()
-		{
-		}
+		}		
 	}
 }

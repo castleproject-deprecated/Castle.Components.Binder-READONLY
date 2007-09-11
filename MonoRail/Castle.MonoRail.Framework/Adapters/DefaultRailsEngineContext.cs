@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@ namespace Castle.MonoRail.Framework.Adapters
 	using System;
 	using System.ComponentModel.Design;
 	using System.Web;
+	using System.Web.Caching;
 	using System.Web.SessionState;
 	using System.Security.Principal;
 	using System.Collections;
 	using System.Collections.Specialized;
+
 	using Castle.MonoRail.Framework;
 	using Castle.MonoRail.Framework.Internal;
 	using Castle.MonoRail.Framework.Services;
@@ -41,69 +43,41 @@ namespace Castle.MonoRail.Framework.Adapters
 		private Flash _flash;
 		private UrlInfo _urlInfo;
 		private String _url;
-		private bool customSessionSet;
-		private ICacheProvider _cache;
-		private Controller currentController;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DefaultRailsEngineContext"/> class.
-		/// </summary>
-		/// <param name="parent">The parent.</param>
-		/// <param name="urlInfo">Url information</param>
-		/// <param name="context">The context.</param>
-		public DefaultRailsEngineContext(IServiceContainer parent, UrlInfo urlInfo, HttpContext context) : base(parent)
+		public DefaultRailsEngineContext(IServiceContainer parent, HttpContext context) : base(parent)
 		{
-			_urlInfo = urlInfo;
 			_context = context;
 			_request = new RequestAdapter(context.Request);
 			_trace = new TraceAdapter(context.Trace);
 			_server = new ServerUtilityAdapter(context.Server);
 			_response = new ResponseAdapter(context.Response, this, ApplicationPath);
 			_url = _context.Request.RawUrl;
-			_cache = parent.GetService(typeof(ICacheProvider)) as ICacheProvider;
 		}
 
-		/// <summary>
-		/// Gets the last exception raised during
-		/// the execution of an action.
-		/// </summary>
-		/// <value></value>
 		public Exception LastException
 		{
 			get { return _lastException; }
 			set { _lastException = value; }
 		}
 
-		/// <summary>
-		/// Gets the request type (GET, POST, etc)
-		/// </summary>
-		/// <value></value>
 		public String RequestType
 		{
 			get { return _context.Request.RequestType; }
 		}
 
-		/// <summary>
-		/// Gets the request URL.
-		/// </summary>
-		/// <value></value>
 		public String Url
 		{
 			get { return _url; }
 			set { _url = value; }
 		}
 
-		/// <summary>
-		/// Gets the referring URL.
-		/// </summary>
-		/// <value></value>
 		public String UrlReferrer
 		{
 			get
 			{
 				Uri referrer = _context.Request.UrlReferrer;
 
-				if (referrer != null)
+				if ( referrer != null )
 				{
 					return referrer.ToString();
 				}
@@ -114,148 +88,122 @@ namespace Castle.MonoRail.Framework.Adapters
 			}
 		}
 
-		/// <summary>
-		/// Gets the underlying context of the API being used.
-		/// </summary>
-		/// <value></value>
 		public HttpContext UnderlyingContext
 		{
 			get { return _context; }
 		}
 
-		/// <summary>
-		/// Access the params (Query, Post, headers and Cookies)
-		/// </summary>
-		/// <value></value>
 		public NameValueCollection Params
 		{
 			get { return _context.Request.Params; }
 		}
 
-		/// <summary>
-		/// Access the session objects.
-		/// </summary>
-		/// <value></value>
 		public IDictionary Session
 		{
 			get
 			{
+				if ( _session == null )
+				{
+					object session;
+					
+					if( _context.Items["AspSession"] != null )
+					{
+						// Windows and Testing
+						session = _context.Items["AspSession"];
+					}
+					else
+					{
+						// Mono
+						session = _context.Session;
+					}
+
+					if ( session is HttpSessionState )
+					{
+						_session = new SessionAdapter( session as HttpSessionState );
+					}
+					else
+					{
+						_session = (IDictionary) session;
+					}
+				}
+
 				return _session;
 			}
-			set
-			{
-				customSessionSet = true;
-				_session = value;
-			}
+			set { _session = value; }
 		}
 
-		/// <summary>
-		/// Gets the request object.
-		/// </summary>
-		/// <value></value>
 		public IRequest Request
 		{
 			get { return _request; }
 		}
 
-		/// <summary>
-		/// Gets the response object.
-		/// </summary>
-		/// <value></value>
 		public IResponse Response
 		{
 			get { return _response; }
 		}
 
-		/// <summary>
-		/// Gets the trace object.
-		/// </summary>
-		/// <value></value>
 		public ITrace Trace
 		{
 			get { return _trace; }
 		}
 
-		/// <summary>
-		/// Returns an <see cref="IServerUtility"/>.
-		/// </summary>
-		/// <value></value>
 		public IServerUtility Server
 		{
 			get { return _server; }
 		}
 
-		/// <summary>
-		/// Access the Cache associated with this
-		/// web execution context.
-		/// </summary>
-		/// <value></value>
-		public ICacheProvider Cache
+		public Cache Cache
 		{
-			get { return _cache; }
+			get { return _context.Cache; }
 		}
 
-		/// <summary>
-		/// Access a dictionary of volative items.
-		/// </summary>
-		/// <value></value>
 		public Flash Flash
 		{
 			get
 			{
-				if (_flash == null && Session != null)
+				if (_flash == null)
 				{
-					_flash = new Flash((Flash) Session[Flash.FlashKey]);
+					_flash = new Flash( (Flash) Session[Flash.FlashKey] );
 				}
 
 				return _flash;
 			}
 		}
 
-		/// <summary>
-		/// Transfer the execution to another resource.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <param name="preserveForm"></param>
-		public void Transfer(String path, bool preserveForm)
+		public void Transfer( String path, bool preserveForm )
 		{
 			_context.Server.Transfer(path, preserveForm);
 		}
 
-		/// <summary>
-		/// Gets or sets the current user.
-		/// </summary>
-		/// <value></value>
 		public IPrincipal CurrentUser
 		{
 			get { return _context.User; }
 			set { _context.User = value; }
 		}
 
-		/// <summary>
-		/// Returns the <see cref="UrlInfo"/> of the the current request.
-		/// </summary>
-		/// <value></value>
 		public UrlInfo UrlInfo
 		{
-			get { return _urlInfo; }
+			get
+			{
+				if ( _urlInfo == null )
+				{
+					_urlInfo = UrlTokenizer.ExtractInfo( _request.FilePath, ApplicationPath );
+				}
+				return _urlInfo;
+			}
 		}
 
-		/// <summary>
-		/// Returns the application path.
-		/// </summary>
-		/// <value></value>
 		public String ApplicationPath
 		{
 			get
 			{
-				String path;
+				String path = String.Empty;
 
 				if (UnderlyingContext != null)
 				{
 					path = UnderlyingContext.Request.ApplicationPath;
-
-					if ("/".Equals(path))
+			
+					if("/".Equals(path))
 					{
 						path = String.Empty;
 					}
@@ -274,57 +222,7 @@ namespace Castle.MonoRail.Framework.Adapters
 		/// </summary>
 		public String ApplicationPhysicalPath
 		{
-			get { return _context.Server.MapPath("/"); }
-		}
-
-		/// <summary>
-		/// Resolves the request session.
-		/// </summary>
-		public void ResolveRequestSession()
-		{
-			// Someone set a custom session, so we skip this
-			if (customSessionSet) return;
-			
-			object session;
-
-			if (_context.Items["AspSession"] != null)
-			{
-				// Windows and Testing
-				session = _context.Items["AspSession"];
-			}
-			else
-			{
-				// Mono
-				session = _context.Session;
-			}
-
-			if (session is HttpSessionState)
-			{
-				_session = new SessionAdapter(session as HttpSessionState);
-			}
-			else
-			{
-				_session = (IDictionary) session;
-			}			
-		}
-
-		/// <summary>
-		/// Returns the Items collection from the current HttpContext.
-		/// </summary>
-		/// <value></value>
-		public IDictionary Items
-		{
-			get { return UnderlyingContext.Items; }
-		}
-
-		/// <summary>
-		/// Gets or sets the current controller.
-		/// </summary>
-		/// <value>The current controller.</value>
-		public Controller CurrentController
-		{
-			get { return currentController; }
-			set { currentController = value; }
+			get { return _context.Server.MapPath( "/" ); }
 		}
 	}
 }

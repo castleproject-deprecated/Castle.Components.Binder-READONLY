@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Castle.DynamicProxy.Builder.CodeGenerators
 	public class ModuleScope
 	{
 		public static readonly String FILE_NAME = "GeneratedAssembly.dll";
-		public static readonly String ASSEMBLY_NAME = "DynamicAssemblyProxyGen";
+        public static readonly String ASSEMBLY_NAME = "DynamicAssemblyProxyGen";
         
 		/// <summary>
 		/// Avoid leaks caused by non disposal of generated types.

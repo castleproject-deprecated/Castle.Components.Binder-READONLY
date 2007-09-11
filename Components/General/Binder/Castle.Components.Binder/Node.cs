@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ namespace Castle.Components.Binder
 	{
 		private readonly String name;
 		private readonly NodeType nodeType;
-		private Node parent;
 
 		protected Node(String name, NodeType nodeType)
 		{
@@ -46,25 +45,6 @@ namespace Castle.Components.Binder
 		public NodeType NodeType
 		{
 			get { return nodeType; }
-		}
-		
-		public String FullName
-		{
-			get
-			{
-				if (Parent != null)
-				{
-					return string.Format("{0}.{1}", Parent.FullName, Name);
-				}
-				
-				return Name;
-			}
-		}
-
-		public Node Parent
-		{
-			get { return parent; }
-			set { parent = value; }
 		}
 	}
 	
@@ -87,7 +67,6 @@ namespace Castle.Components.Binder
 			
 			name2Node[node.Name] = node;
 			nodeList.Add(node);
-			node.Parent = this;
 		}
 		
 		public Node GetChildNode(String name)

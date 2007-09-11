@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 namespace Castle.DynamicProxy
 {
 	using System;
@@ -22,7 +21,6 @@ namespace Castle.DynamicProxy
 	using System.Collections;
 	using System.Threading;
 	using Castle.DynamicProxy.Generators;
-	using System.Resources;
 
 	/// <summary>
 	/// Summary description for ModuleScope.
@@ -114,9 +112,7 @@ namespace Castle.DynamicProxy
 
 			using(Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Castle.DynamicProxy.DynProxy.snk"))
 			{
-				if (stream == null)
-					throw new MissingManifestResourceException(
-						"Should have a Castle.DynamicProxy.DynProxy.snk as an embedded resource, so Dynamic Proxy could sign generated assembly");
+				if (stream == null) return null;
 				
 				int length = (int) stream.Length;
 				keyPair = new byte[length];

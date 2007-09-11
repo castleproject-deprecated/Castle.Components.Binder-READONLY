@@ -73,7 +73,6 @@
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
@@ -93,10 +92,6 @@
     <ProjectReference Include="..\..\Core\Castle.Core\Castle.Core-vs2005.csproj">
       <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
       <Name>Castle.Core-vs2005</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Tools\Castle.DynamicProxy2\Castle.DynamicProxy\Castle.DynamicProxy-net-2-0.csproj">
-      <Project>{2DE7CC8C-6F06-43BC-A7B6-9466BEDEAC28}</Project>
-      <Name>Castle.DynamicProxy-net-2-0</Name>
     </ProjectReference>
     <ProjectReference Include="..\Castle.MicroKernel.Tests\Castle.MicroKernel.Tests-vs2005.csproj">
       <Project>{EF9313A4-C6E0-40F7-9E3F-530D547D3AEF}</Project>
@@ -137,11 +132,8 @@
     <Compile Include="Components\CalculatorServiceWithLifecycle.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Components\Camera.cs" />
     <Compile Include="Components\CircularDependencyComponents.cs" />
     <Compile Include="Components\ComponentWithProperties.cs" />
-    <Compile Include="Components\ComponentWithStringProperty.cs" />
-    <Compile Include="Components\CalculatorServiceWithProxyBehavior.cs" />
     <Compile Include="Components\DotNet2Components.cs" />
     <Compile Include="Components\Employee.cs">
       <SubType>Code</SubType>
@@ -158,7 +150,6 @@
     <Compile Include="Components\IReviewer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Components\MailServer.cs" />
     <Compile Include="Components\MarshalCalculatorService.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -172,11 +163,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ConfigHelper.cs" />
-    <Compile Include="Configuration2\ConfigurationEnvTestCase.cs" />
     <Compile Include="Configuration2\ConfigWithStatementsTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Configuration2\EvalSupportTestCase.cs" />
     <Compile Include="Configuration2\IncludesTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -192,11 +181,9 @@
     <Compile Include="ContainerProblem.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ContainerProblem2.cs" />
     <Compile Include="DependencyProblem.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Content Include="ignoreprop.xml" />
     <Content Include="DotNet2Config\ComplexGenericConfig.xml" />
     <Content Include="DotNet2Config\GenericDecoratorConfig.xml" />
     <Content Include="DotNet2Config\MissingDecoratorConfig.xml" />
@@ -205,10 +192,30 @@
       <SubType>
       </SubType>
     </Content>
+    <Compile Include="Facilities\EventWiring\EventWiringTestCase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Facilities\EventWiring\Model\Handlers.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Facilities\EventWiring\Model\MultiListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Facilities\EventWiring\Model\MultiPublisher.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Facilities\EventWiring\Model\PublisherListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Facilities\EventWiring\Model\SimpleListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Facilities\EventWiring\Model\SimplePublisher.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Facilities\SlowlyInitFacility.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IgnoreWireTestCase.cs" />
     <Compile Include="Installer\InstallerTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -216,8 +223,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PropertiesInspectionBehaviorTestCase.cs" />
-    <Compile Include="Proxy\ProxyBehaviorInvalidTestCase.cs" />
-    <Compile Include="Proxy\ProxyBehaviorTestCase.cs" />
+    <Compile Include="RealProxyTestCase.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ReportedProblemTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -240,6 +248,9 @@
     <Content Include="Configuration2\Properties\properties.xml" />
     <Content Include="Configuration2\Properties\properties_using_properties.xml" />
     <Content Include="DotNet2Config\GenericsConfig.xml" />
+    <Content Include="Facilities\EventWiring\badconfig.xml" />
+    <Content Include="Facilities\EventWiring\multi.xml" />
+    <Content Include="Facilities\EventWiring\simple.xml" />
     <Content Include="installerconfig.xml" />
     <Content Include="propertyInspectionBehavior.xml" />
     <Content Include="propertyInspectionBehaviorInvalid.xml" />
@@ -319,14 +330,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="Configuration2\env_config.xml" />
-    <EmbeddedResource Include="Configuration2\eval_config.xml" />
-    <Content Include="IOC-51.xml" />
-    <Content Include="Proxy\proxyBehaviorInvalidConfig.xml" />
-    <Content Include="Proxy\proxyBehavior.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

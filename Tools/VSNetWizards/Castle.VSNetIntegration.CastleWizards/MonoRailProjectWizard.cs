@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -237,11 +237,6 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 					AddBrailCommonConfiguration(webConfigDoc);
 				}
-				else if (optionsPanel.VeWebForms)
-				{
-					viewEngineElem.SetAttribute("customEngine",
-																			"Castle.MonoRail.Framework.Views.Aspx.WebFormsViewEngine, Castle.MonoRail.Framework");
-				}
 
 				mrNode.AppendChild(viewEngineElem);
 			}
@@ -252,14 +247,14 @@ namespace Castle.VSNetIntegration.CastleWizards
 			XmlNode configSectionsNode = webConfigDoc.SelectSingleNode("configuration/configSections");
 			XmlElement castleSectionElem = webConfigDoc.CreateElement("section");
 
-			castleSectionElem.SetAttribute("name", "brail");
+			castleSectionElem.SetAttribute("name", "Brail");
 			castleSectionElem.SetAttribute("type", "Castle.MonoRail.Views.Brail.BrailConfigurationSection, Castle.MonoRail.Views.Brail");
 
 			configSectionsNode.AppendChild(castleSectionElem);
 
 			XmlComment comment = webConfigDoc.CreateComment("For more on Brail " + 
 				"configuration see http://www.castleproject.org/index.php/MonoRail:Brail#Configuring_Brail:");
-			XmlElement brailElem = webConfigDoc.CreateElement("brail");
+			XmlElement brailElem = webConfigDoc.CreateElement("Brail");
 
 			brailElem.SetAttribute("debug", "false");
 			brailElem.SetAttribute("saveToDisk", "false");
@@ -326,8 +321,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 			}
 			else if (optionsPanel.VeBrail)
 			{
-				viewFile = "index.brail";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\index.brail");
+				viewFile = "index.boo";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\index.boo");
 			}
 			else
 			{
@@ -352,8 +347,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 			}
 			else if (optionsPanel.VeBrail)
 			{
-				viewFile = "generalerror.brail";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\rescue_default.brail");
+				viewFile = "generalerror.boo";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\rescue_default.boo");
 			}
 			else
 			{
@@ -378,8 +373,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 			}
 			else if (optionsPanel.VeBrail)
 			{
-				viewFile = "default.brail";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\layout_default.brail");
+				viewFile = "default.boo";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\layout_default.boo");
 			}
 			else
 			{

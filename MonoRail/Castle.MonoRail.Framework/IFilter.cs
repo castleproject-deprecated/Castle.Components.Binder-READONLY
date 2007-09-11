@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+
+	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
 	/// Enum (flag) to indicate when the filter should 
@@ -38,31 +40,23 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		[Obsolete("Use ExecuteEnum.Always or combine the ExecuteEnum values you want")]
 		Around = BeforeAction | AfterAction,
-
-		/// <summary>
-		/// The filter is invoked 
-		/// when the MonoRail request is started.
-		/// It is the best place to run authentication check
-		/// if you are using caching. However, the Session will
-		/// not be available.
-		/// </summary>
-		StartRequest = 0x01,
+		
 		/// <summary>
 		/// The filter is invoked before the action.
 		/// </summary>
-		BeforeAction = 0x02,
+		BeforeAction = 0x01,
 		/// <summary>
 		/// The filter is invoked after the action.
 		/// </summary>
-		AfterAction = 0x04,
+		AfterAction = 0x02,
 		/// <summary>
 		/// The filter is invoked after the rendering.
 		/// </summary>
-		AfterRendering = 0x08,
+		AfterRendering = 0x04,
 		/// <summary>
 		/// The filter is invoked around all steps.
 		/// </summary>
-		Always = StartRequest | BeforeAction | AfterAction | AfterRendering
+		Always = BeforeAction | AfterAction | AfterRendering
 	}
 
 	/// <summary>

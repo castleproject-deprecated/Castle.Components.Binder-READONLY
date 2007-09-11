@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace Castle.Components.Binder.Tests
 	using System.Globalization;
 	using System.IO;
 	using System.Threading;
-	using Nullables;
 	using NUnit.Framework;
 
 	[TestFixture]
@@ -236,64 +235,6 @@ namespace Castle.Components.Binder.Tests
 
 			Assert.AreEqual(new DateTime(2006, 03, 09), binder.BindParameter(typeof(DateTime), "name", node));
 		}
-
-		[Test]
-		public void DateTimeAlternativeSourceBindingWithNullableDateTime()
-		{
-			CompositeNode node = new CompositeNode("unnamed");
-
-			node.AddChildNode(new LeafNode(typeof(String), "nameday", "09"));
-			node.AddChildNode(new LeafNode(typeof(String), "namemonth", "03"));
-			node.AddChildNode(new LeafNode(typeof(String), "nameyear", "2006"));
-
-			NullableDateTime expected = new NullableDateTime(new DateTime(2006, 03, 09));
-			NullableDateTime actual = (NullableDateTime) binder.BindParameter(typeof(NullableDateTime), "name", node);
-
-			Assert.IsTrue(actual.HasValue);
-			Assert.AreEqual(expected.Value.Year, actual.Value.Year);
-			Assert.AreEqual(expected.Value.Month, actual.Value.Month);
-			Assert.AreEqual(expected.Value.Day, actual.Value.Day);
-
-			node = new CompositeNode("unnamed");
-
-			node.AddChildNode(new LeafNode(typeof(int), "nameday", 9));
-			node.AddChildNode(new LeafNode(typeof(int), "namemonth", 3));
-			node.AddChildNode(new LeafNode(typeof(int), "nameyear", 2006));
-
-			expected = new NullableDateTime(new DateTime(2006, 03, 09));
-			actual = (NullableDateTime)binder.BindParameter(typeof(NullableDateTime), "name", node);
-
-			Assert.IsTrue(actual.HasValue);
-			Assert.AreEqual(expected.Value.Year, actual.Value.Year);
-			Assert.AreEqual(expected.Value.Month, actual.Value.Month);
-			Assert.AreEqual(expected.Value.Day, actual.Value.Day);
-		}
-
-#if DOTNET2
-		
-		[Test]
-		public void DateTimeAlternativeSourceBindingWithNullableDateTime2()
-		{
-			CompositeNode node = new CompositeNode("unnamed");
-
-			node.AddChildNode(new LeafNode(typeof(String), "nameday", "09"));
-			node.AddChildNode(new LeafNode(typeof(String), "namemonth", "03"));
-			node.AddChildNode(new LeafNode(typeof(String), "nameyear", "2006"));
-
-			Assert.AreEqual(new DateTime?(new DateTime(2006, 03, 09)),
-							binder.BindParameter(typeof(DateTime?), "name", node));
-
-			node = new CompositeNode("unnamed");
-
-			node.AddChildNode(new LeafNode(typeof(int), "nameday", 9));
-			node.AddChildNode(new LeafNode(typeof(int), "namemonth", 3));
-			node.AddChildNode(new LeafNode(typeof(int), "nameyear", 2006));
-
-			Assert.AreEqual(new DateTime?(new DateTime(2006, 03, 09)),
-							binder.BindParameter(typeof(DateTime?), "name", node));
-		}
-		
-#endif
 
 		/// <summary>
 		/// Common Enum convertion

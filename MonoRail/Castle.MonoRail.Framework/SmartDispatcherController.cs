@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ namespace Castle.MonoRail.Framework
 	using System.Collections.Specialized;
 
 	using Castle.Components.Binder;
-	using Castle.Components.Validator;
 
 	/// <summary>
 	/// Specialization of <see cref="Controller"/> that tries
@@ -28,8 +27,8 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	/// <remarks>
 	/// You don't even need to always use databinding within
-	/// arguments. <see cref="BindObject(ParamStore,Type,string)"/> 
-	/// and <see cref="BindObjectInstance(object,string)"/>
+	/// arguments. <see cref="SmartDispatcherController.BindObject"/> 
+	/// and <see cref="SmartDispatcherController.BindObjectInstance"/>
 	/// provides the same functionality to be used in place.
 	/// </remarks>
 	public abstract class SmartDispatcherController : Controller
@@ -38,20 +37,13 @@ namespace Castle.MonoRail.Framework
 
 		private DataBinder binder;
 		private TreeBuilder treeBuilder = new TreeBuilder();
+	
 		private CompositeNode paramsNode, formNode, queryStringNode;
-		private IDictionary validationSummaryPerInstance = new Hashtable();
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="SmartDispatcherController"/> class.
-		/// </summary>
-		protected SmartDispatcherController() : this(new DataBinder())
+		public SmartDispatcherController() : this(new DataBinder())
 		{
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="SmartDispatcherController"/> class.
-		/// </summary>
-		/// <param name="binder">The binder.</param>
 		protected SmartDispatcherController(DataBinder binder)
 		{
 			this.binder = binder;
@@ -68,47 +60,11 @@ namespace Castle.MonoRail.Framework
 			set { boundInstances = value; }
 		}
 
-		/// <summary>
-		/// Gets the validation summary (key is the object instance)
-		/// </summary>
-		/// <value>The validation summary per instance.</value>
-		public IDictionary ValidationSummaryPerInstance
+		protected override void Initialize()
 		{
-			get { return validationSummaryPerInstance; }
 		}
 
-		/// <summary>
-		/// Gets the error summary.
-		/// <para>
-		/// Will only work for instances populated by the <c>DataBinder</c>
-		/// </para>
-		/// </summary>
-		/// <param name="instance">object instance</param>
-		/// <returns>Error summary instance (can be null if the DataBinder wasn't configured to validate)</returns>
-		protected ErrorSummary GetErrorSummary(object instance)
-		{
-			return (ErrorSummary) validationSummaryPerInstance[instance];
-		}
-
-		/// <summary>
-		/// Returns <c>true</c> if the given instance had 
-		/// validation errors during binding.
-		/// <para>
-		/// Will only work for instances populated by the <c>DataBinder</c>
-		/// </para>
-		/// </summary>
-		/// <param name="instance">object instance</param>
-		/// <returns><c>true</c> if the validation had an error</returns>
-		protected bool HasValidationError(object instance)
-		{
-			ErrorSummary summary = GetErrorSummary(instance);
-
-			if (summary == null) return false;
-
-			return summary.ErrorsCount != 0;
-		}
-
-		protected internal override void InvokeMethod(MethodInfo method, IRequest request, IDictionary actionArgs)
+		protected override void InvokeMethod(MethodInfo method, IRequest request, params object[] actionArgs)
 		{
 			ParameterInfo[] parameters = method.GetParameters();
 
@@ -117,8 +73,7 @@ namespace Castle.MonoRail.Framework
 			method.Invoke(this, methodArgs);
 		}
 
-		protected internal override MethodInfo SelectMethod(String action, IDictionary actions,
-		                                                    IRequest request, IDictionary actionArgs)
+		protected override MethodInfo SelectMethod(String action, IDictionary actions, IRequest request, params object[] actionArgs)
 		{
 			object methods = actions[action];
 
@@ -133,9 +88,7 @@ namespace Castle.MonoRail.Framework
 			                           request.Params, actionArgs);
 		}
 
-		protected virtual MethodInfo SelectBestCandidate(MethodInfo[] candidates,
-		                                                 NameValueCollection webParams,
-		                                                 IDictionary actionArgs)
+		protected virtual MethodInfo SelectBestCandidate(MethodInfo[] candidates, NameValueCollection webParams, params object[] actionArgs)
 		{
 			if (candidates.Length == 1)
 			{
@@ -175,10 +128,11 @@ namespace Castle.MonoRail.Framework
 		/// <param name="webParams">Parameter source</param>
 		/// <param name="actionArgs">Extra parameters</param>
 		/// <returns></returns>
-		protected int CalculatePoints(MethodInfo candidate, NameValueCollection webParams, IDictionary actionArgs)
+		protected int CalculatePoints(MethodInfo candidate, NameValueCollection webParams, params object[] actionArgs)
 		{
 			int points = 0;
 			int matchCount = 0;
+			int actionArgsIndex = 0;
 
 			ParameterInfo[] parameters = candidate.GetParameters();
 
@@ -226,10 +180,12 @@ namespace Castle.MonoRail.Framework
 				// I'm not sure about the following. Seems to be
 				// be fragile regarding the web parameters and the actionArgs array
 				//
-				else if ((actionArgs != null) && actionArgs.Contains(requestParameterName))
+				else if ((actionArgs != null) && (actionArgsIndex < actionArgs.Length))
 				{
-					object actionArg = actionArgs[requestParameterName];
+					object actionArg = actionArgs[actionArgsIndex];
 					
+					if (actionArg == null) continue;
+
 					bool exactMatch;
 					
 					if (binder.Converter.CanConvert(parameterType, actionArg.GetType(), actionArg, out exactMatch))
@@ -240,6 +196,7 @@ namespace Castle.MonoRail.Framework
 						if (exactMatch) points += 5;
 						
 						matchCount++;
+						actionArgsIndex++;	
 					}
 				}
 			}
@@ -268,11 +225,13 @@ namespace Castle.MonoRail.Framework
 		/// <param name="request">The current request, which is the source to obtain the data</param>
 		/// <param name="actionArgs">Extra arguments to pass to the action.</param>
 		/// <returns>An array with the arguments values</returns>
-		protected virtual object[] BuildMethodArguments(ParameterInfo[] parameters, IRequest request, IDictionary actionArgs)
+		protected virtual object[] BuildMethodArguments(ParameterInfo[] parameters, IRequest request, params object[] actionArgs)
 		{
 			object[] args = new object[parameters.Length];
 			String paramName = String.Empty;
 			String value = String.Empty;
+
+			int actionArgsIndex = 0;
 			
 			try
 			{
@@ -285,7 +244,7 @@ namespace Castle.MonoRail.Framework
 					//
 					
 					ParameterInfo param = parameters[argIndex];
-					paramName = GetRequestParameterName(param);
+					paramName = param.Name;
 
 					bool handled = false;
 
@@ -315,13 +274,15 @@ namespace Castle.MonoRail.Framework
 						
 						convertedVal = binder.BindParameter(param.ParameterType, paramName, ParamsNode);
 						
-						if (convertedVal == null && (actionArgs != null) && actionArgs.Contains(paramName))
+						if (convertedVal == null && (actionArgs != null) && (actionArgsIndex < actionArgs.Length))
 						{
-							object actionArg = actionArgs[paramName];
+							object actionArg = actionArgs[actionArgsIndex];
 							
-							Type actionArgType = (actionArg != null) ? actionArg.GetType() : param.ParameterType;
+							if (actionArg == null) continue;
 							
-							convertedVal = binder.Converter.Convert(param.ParameterType, actionArgType, actionArg, out conversionSucceeded);
+							convertedVal = binder.Converter.Convert(param.ParameterType, actionArg.GetType(), actionArg, out conversionSucceeded);
+
+							if (conversionSucceeded) actionArgsIndex++;						
 						}
 						
 						args[argIndex] = convertedVal;

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 		[Version(UnsavedValue="negative")]
 		public int Version
 		{
-			get { return _version; }
-			set { _version = value; }
+			get{ return _version; }
+			set{ _version = value; }
 		}
 
 		[Property(ColumnType="StringClob")]
@@ -61,8 +61,8 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 		}
 
 		[HasMany(typeof(Agent),
-			Inverse=true,
-			Lazy=true)]
+			 Inverse=true,
+			 Lazy=true)]
 		public IList Agents
 		{
 			get { return _agents; }
@@ -84,27 +84,27 @@ namespace Castle.ActiveRecord.Tests.Model.CompositeModel
 
 		public static void DeleteAll()
 		{
-			DeleteAll(typeof(Org));
+			ActiveRecordBase.DeleteAll( typeof(Org) );
 		}
 
 		public static Org[] FindAll()
 		{
-			return (Org[]) FindAll(typeof(Org));
+			return (Org[]) ActiveRecordBase.FindAll( typeof(Org) );
 		}
 
 		public static Org Find(string id)
 		{
-			return (Org) FindByPrimaryKey(typeof(Org), id);
+			return (Org) ActiveRecordBase.FindByPrimaryKey( typeof(Org), id );
 		}
 
 		public static int FetchCount()
 		{
-			return Count(typeof(Org));
+			return ActiveRecordBase.CountAll(typeof(Org));
 		}
 
 		public static int FetchCount(string filter, params object[] args)
 		{
-			return Count(typeof(Org), filter, args);
+			return ActiveRecordBase.CountAll(typeof(Org), filter, args);
 		}
 
 		public void SaveWithException()

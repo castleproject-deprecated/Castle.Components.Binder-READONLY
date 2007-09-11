@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -191,81 +191,6 @@ namespace Castle.ActiveRecord
 		public static void Refresh(T instance)
 		{
 			ActiveRecordMediator.Refresh(instance);
-		}
-
-		/// <summary>
-		/// Executes the query and return a strongly typed result
-		/// </summary>
-		/// <param name="query">The query.</param>
-		/// <returns></returns>
-		public static R ExecuteQuery2<R>(IActiveRecordQuery<R> query)
-		{
-			return ActiveRecordBase<T>.ExecuteQuery2(query);
-		}
-
-		/// <summary>
-		/// Check if the <paramref name="id"/> exists in the database.
-		/// </summary>
-		/// <typeparam name="PkType">The <c>System.Type</c> of the PrimaryKey</typeparam>
-		/// <param name="id">The id to check on</param>
-		/// <returns><c>true</c> if the ID exists; otherwise <c>false</c>.</returns>
-		public static bool Exists<PkType>(PkType id)
-		{
-			return ActiveRecordBase<T>.Exists(id);
-		}
-
-		/// <summary>
-		/// Returns the number of records of the specified 
-		/// type in the database
-		/// </summary>
-		/// <returns>The count result</returns>
-		public static int Count()
-		{
-			return ActiveRecordBase.Count(typeof(T));
-		}
-
-		/// <summary>
-		/// Returns the number of records of the specified 
-		/// type in the database that match the given critera
-		/// </summary>
-		/// <param name="criteria">The criteria expression</param>
-		/// <returns>The count result</returns>
-		public static int Count(ICriterion[] criteria)
-		{
-			return ActiveRecordBase.Count(typeof(T), criteria);
-		}
-
-		/// <summary>
-		/// Returns the number of records of the specified 
-		/// type in the database
-		/// </summary>
-		/// <param name="filter">A sql where string i.e. Person=? and DOB &gt; ?</param>
-		/// <param name="args">Positional parameters for the filter string</param>
-		/// <returns>The count result</returns>
-		public static int Count(string filter, params object[] args)
-		{
-			return ActiveRecordBase.Count(typeof(T), filter, args);
-		}
-
-		/// <summary>
-		/// Check if there is any records in the db for the target type
-		/// </summary>
-		/// <returns><c>true</c> if there's at least one row</returns>
-		public static bool Exists()
-		{
-			return ActiveRecordBase.Exists(typeof(T));
-		}
-
-
-		/// <summary>
-		/// Check if there is any records in the db for the target type
-		/// </summary>
-		/// <param name="filter">A sql where string i.e. Person=? and DOB &gt; ?</param>
-		/// <param name="args">Positional parameters for the filter string</param>
-		/// <returns><c>true</c> if there's at least one row</returns>
-		public static bool Exists(string filter, params object[] args)
-		{
-			return ActiveRecordBase.Exists(typeof(T), filter, args);
 		}
 	}
 }

@@ -1,4 +1,4 @@
- // Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+ // Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ namespace AspectSharp.Core
 {
 	using System;
 	using Castle.DynamicProxy;
-	using IInterceptor=Castle.Core.Interceptor.IInterceptor;
 
 	/// <summary>
 	/// Generates a dynamic proxy. This overrides the .Net proxy requirements 
@@ -46,8 +45,8 @@ namespace AspectSharp.Core
 		/// <returns>Proxy Instance.</returns>
 		public object CreateProxy(Type inter, object target, object[] mixins, IInterceptor interceptor)
 		{
-			ProxyGenerationOptions options = CreateProxyGenerationOptions(mixins);
-			return CreateInterfaceProxyWithTarget(inter, target, options, interceptor);
+			GeneratorContext context = CreateGeneratorContext(mixins);
+			return base.CreateCustomProxy(inter, interceptor, target, context);
 		}
 
 		/// <summary>
@@ -61,8 +60,8 @@ namespace AspectSharp.Core
 		public object CreateClassProxy(Type baseClass, object[] mixins, IInterceptor interceptor,
 			params object[] constructorArgs)
 		{
-			ProxyGenerationOptions options = CreateProxyGenerationOptions(mixins);
-			return CreateClassProxy(baseClass, null, options, constructorArgs, interceptor);
+			GeneratorContext context = CreateGeneratorContext(mixins);
+			return base.CreateCustomClassProxy(baseClass, interceptor, context, constructorArgs);
 		}
 
 		/// <summary>
@@ -71,14 +70,14 @@ namespace AspectSharp.Core
 		/// </summary>
 		/// <param name="mixins">Array of mixins to be registered</param>
 		/// <returns>A GeneratorContext instance</returns>
-		private static ProxyGenerationOptions CreateProxyGenerationOptions(object[] mixins)
+		protected GeneratorContext CreateGeneratorContext(object[] mixins)
 		{
-			ProxyGenerationOptions options = new ProxyGenerationOptions();
+			GeneratorContext context = new GeneratorContext();
 			foreach (object mixin in mixins)
 			{
-				options.AddMixinInstance(mixin);
+				context.AddMixinInstance(mixin);
 			}
-			return options;
+			return context;
 		}
 	}
 }

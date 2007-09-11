@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Proje\ct - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,29 +18,20 @@ namespace Castle.MonoRail.Framework.Adapters
 	using System.IO;
 	using System.Web;
 	using Castle.MonoRail.Framework;
+	using Castle.MonoRail.Framework.Internal;
 
-	/// <summary>
-	/// Adapts the <see cref="IResponse"/> to
-	/// an <see cref="HttpResponse"/> instance.
-	/// </summary>
 	public class ResponseAdapter : IResponse
 	{
-		private readonly IRailsEngineContext context;
+		private readonly IRailsEngineContext engine;
 		private readonly HttpResponse response;
 		private readonly String appPath;
 		private bool redirected;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ResponseAdapter"/> class.
-		/// </summary>
-		/// <param name="response">The response.</param>
-		/// <param name="context">The parent context.</param>
-		/// <param name="appPath">The app path.</param>
-		public ResponseAdapter(HttpResponse response, IRailsEngineContext context, String appPath)
+		public ResponseAdapter(HttpResponse response, IRailsEngineContext engine, String appPath)
 		{
 			this.response = response;
 			this.appPath = appPath;
-			this.context = context;
+			this.engine = engine;
 		}
 
 		/// <summary>
@@ -164,9 +155,8 @@ namespace Castle.MonoRail.Framework.Adapters
 		{
 			redirected = true;
 
-			IUrlBuilder builder = (IUrlBuilder) context.GetService(typeof(IUrlBuilder));
-
-			response.Redirect(builder.BuildUrl(context.UrlInfo, controller, action), false);
+			response.Redirect(UrlInfo.CreateAbsoluteRailsUrl(
+			                   	appPath, controller, action, engine.UrlInfo.Extension), false);
 		}
 
 		public void Redirect(String area, String controller, String action)
@@ -179,9 +169,8 @@ namespace Castle.MonoRail.Framework.Adapters
 			{
 				redirected = true;
 
-				IUrlBuilder builder = (IUrlBuilder) context.GetService(typeof(IUrlBuilder));
-
-				response.Redirect(builder.BuildUrl(context.UrlInfo, area, controller, action), false);
+				response.Redirect(UrlInfo.CreateAbsoluteRailsUrl(
+				                   	appPath, area, controller, action, engine.UrlInfo.Extension), false);
 			}
 		}
 
@@ -195,53 +184,29 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return redirected; }
 		}
 
-		/// <summary>
-		/// Creates the cookie.
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <param name="cookieValue">The cookie value.</param>
 		public void CreateCookie(String name, String cookieValue)
 		{
 			CreateCookie(new HttpCookie(name, cookieValue));
 		}
 
-		/// <summary>
-		/// Creates the cookie.
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <param name="cookieValue">The cookie value.</param>
-		/// <param name="expiration">The expiration.</param>
 		public void CreateCookie(String name, String cookieValue, DateTime expiration)
 		{
 			HttpCookie cookie = new HttpCookie(name, cookieValue);
 
 			cookie.Expires = expiration;
-			cookie.Path = context.ApplicationPath;
+			cookie.Path = "/";
 
 			CreateCookie(cookie);
 		}
 
-		/// <summary>
-		/// Creates the cookie.
-		/// </summary>
-		/// <param name="cookie">The cookie.</param>
 		public void CreateCookie(HttpCookie cookie)
 		{
 			response.Cookies.Add(cookie);
 		}
 
-		/// <summary>
-		/// Removes the cookie.
-		/// </summary>
-		/// <param name="name">The name.</param>
 		public void RemoveCookie(string name)
 		{
-			HttpCookie cookie = new HttpCookie(name, "");
-			
-			cookie.Expires = DateTime.Now.AddYears(-10);
-			cookie.Path = context.ApplicationPath;
-			
-			CreateCookie(cookie);
+			response.Cookies.Remove(name);
 		}
 	}
 }

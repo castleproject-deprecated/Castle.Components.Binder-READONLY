@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 namespace Castle.MicroKernel.Tests.DependencyResolving
 {
+	using System;
 	using System.Collections;
 
 	using NUnit.Framework;
@@ -21,6 +22,7 @@ namespace Castle.MicroKernel.Tests.DependencyResolving
 	using Castle.Core;
 	using Castle.Core.Configuration;
 	using Castle.MicroKernel.Tests.ClassComponents;
+
 
 	/// <summary>
 	/// This test case ensures that the resolving event

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,44 +52,30 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		}
 
 		internal static void SaveInstance(object instance, Controller controller, 
-		                                  ArrayList errors, ref IDictionary prop2Validation, bool create)
+		                                  ArrayList errors, IDictionary prop2Validation, bool create)
 		{
-			bool isValid = true;
-			
-#if DOTNET2
-			Type genType = typeof(ActiveRecordValidationBase<>).MakeGenericType(instance.GetType());
-			
-			if (genType.IsAssignableFrom(instance.GetType()))
-			{
-				MethodInfo isValidMethod = instance.GetType().GetMethod("IsValid");
-
-				isValid = (bool) isValidMethod.Invoke(instance, null);
-				
-				if (!isValid)
-				{
-					MethodInfo getValidationErrorMessages = instance.GetType().GetMethod("get_ValidationErrorMessages");
-					MethodInfo getPropertiesValidationErrorMessage = instance.GetType().GetMethod("get_PropertiesValidationErrorMessage");
-
-					errors.AddRange((ICollection) getValidationErrorMessages.Invoke(instance, null));
-					prop2Validation = (IDictionary) getPropertiesValidationErrorMessage.Invoke(instance, null);
-				}
-			}
-			else
-#endif
 			if (instance is ActiveRecordValidationBase)
 			{
 				ActiveRecordValidationBase instanceBase = instance as ActiveRecordValidationBase;
 
-				isValid = instanceBase.IsValid();
-				
-				if (!isValid)
+				if (!instanceBase.IsValid())
 				{
 					errors.AddRange(instanceBase.ValidationErrorMessages);
 					prop2Validation = instanceBase.PropertiesValidationErrorMessage;
 				}
+				else
+				{
+					if (create)
+					{
+						instanceBase.Create();
+					}
+					else
+					{
+						instanceBase.Update();
+					}
+				}
 			}
-
-			if (isValid)
+			else
 			{
 				if (create)
 				{

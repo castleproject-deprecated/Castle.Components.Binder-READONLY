@@ -2,4 +2,4 @@
 Alpha Version 1.0.0
 - First release
 
-- Added support for contexts with NLog and log4net via IExtendedLogger interface.
+Future modifications - after the first release - shall be tracked in this file

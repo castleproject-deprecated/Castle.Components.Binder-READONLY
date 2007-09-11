@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
 
 namespace Castle.Windsor
 {
+	using System;
+
 	using Castle.MicroKernel;
 
+
 	/// <summary>
-	/// Installs the components and facilities based on the
-	/// information on the configuration store.
+	/// Bad name. It also install facilities.
+	/// TODO: Better name!
 	/// </summary>
 	public interface IComponentsInstaller
 	{
-		/// <summary>
-		/// Perform installation.
-		/// </summary>
-		/// <param name="container">Target container</param>
-		/// <param name="store">Configuration store</param>
 		void SetUp(IWindsorContainer container, IConfigurationStore store);
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace Castle.ActiveRecord
 	/// {
 	///		...
 	///		
-	/// 	[HasMany(typeof(Post), RelationType.Bag, ColumnKey="Posts", Table="Posts")]
+	/// 	[HasMany(typeof(Post), RelationType.Bag, Key="Posts", Table="Posts", Column="blogid")]
 	///		public IList Posts
 	///		{
 	///			get { return _posts; }
@@ -44,16 +44,6 @@ namespace Castle.ActiveRecord
 		/// Cannot exist with keyColumn != null
 		/// </summary>
 		protected String[] compositeKeyColumns;
-
-		/// <summary>
-		/// Whether the target type is for dependent objects or not
-		/// </summary>
-		protected bool hasDependentObjects;
-
-		/// <summary>
-		/// Whether we do outer join fetching for this collection
-		/// </summary>
-		protected FetchEnum fetchMethod = FetchEnum.Unspecified;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HasManyAttribute"/> class.
@@ -101,28 +91,8 @@ namespace Castle.ActiveRecord
 		/// <value>The composite key column keys.</value>
 		public String[] CompositeKeyColumnKeys
 		{
-			get { return compositeKeyColumns; }
-			set { compositeKeyColumns = value; }
-		}
-
-		/// <summary>
-		/// Whether or not the target type is a dependent object.
-		/// </summary>
-		/// <value>true = the target type is a dependent object</value>
-		public bool DependentObjects
-		{
-			get { return hasDependentObjects; }
-			set { hasDependentObjects = value; }
-		}
-
-		/// <summary>
-		/// Chooses between outer-join fetching
-		/// or sequential select fetching.
-		/// </summary>
-		public FetchEnum Fetch
-		{
-			get { return fetchMethod; }
-			set { fetchMethod = value; }
+			get { return this.compositeKeyColumns; }
+			set { this.compositeKeyColumns = value; }
 		}
 	}
 }

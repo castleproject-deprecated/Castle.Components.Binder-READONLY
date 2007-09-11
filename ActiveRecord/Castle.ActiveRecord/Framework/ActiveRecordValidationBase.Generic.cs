@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ namespace Castle.ActiveRecord
 	///	</code>
 	/// </example>
 	[Serializable]
-	public abstract class ActiveRecordValidationBase<T> : ActiveRecordBase<T>, NHibernate.Classic.IValidatable where T : class
+	public abstract class ActiveRecordValidationBase<T> : ActiveRecordBase<T>, NHibernate.IValidatable where T : class
 	{
 		/// <summary>
 		/// List of validators that should be executed for this class
@@ -155,12 +155,12 @@ namespace Castle.ActiveRecord
 		/// Maps a specific PropertyInfo to a list of
 		/// error messages. Useful for frameworks.
 		/// </summary>
-		public virtual IDictionary PropertiesValidationErrorMessage
+		public IDictionary PropertiesValidationErrorMessage
 		{
 			get { return __failedProperties; }
 		}
 
-		void NHibernate.Classic.IValidatable.Validate()
+		void NHibernate.IValidatable.Validate()
 		{
 			if (!IsValid())
 			{

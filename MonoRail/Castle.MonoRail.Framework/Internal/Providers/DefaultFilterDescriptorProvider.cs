@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace Castle.MonoRail.Framework.Internal
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Collecting filters for {0}", controllerType);
+				logger.Debug("Collecting filters for {0}", controllerType);
 			}
 			
 			object[] attributes = controllerType.GetCustomAttributes(typeof(IFilterDescriptorBuilder), true);
@@ -68,8 +68,8 @@ namespace Castle.MonoRail.Framework.Internal
 				{
 					foreach(FilterDescriptor desc in descs)
 					{
-						logger.DebugFormat("Collected filter {0} to execute {1} order {2}", 
-						                   desc.FilterType, desc.When, desc.ExecutionOrder);
+						logger.Debug("Collected filter {0} to execute {1} order {2}", 
+						             desc.FilterType, desc.When, desc.ExecutionOrder);
 					}
 				}
 

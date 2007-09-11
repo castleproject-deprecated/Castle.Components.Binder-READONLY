@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,12 +62,10 @@ namespace Castle.ActiveRecord.Tests
 
 			nested.Self = new Name();
 			nested.Self.First = "John";
-		    nested.Self.Middle = "Mystery";
 			nested.Self.Last = "Doe";
 			
 			nested.Other = new Name();
 			nested.Other.First = "Edward";
-		    nested.Other.Middle = "G";
 			nested.Other.Last = "Norton";
 			
 			nested.Save();
@@ -77,11 +75,8 @@ namespace Castle.ActiveRecord.Tests
 			Assert.IsNotNull(nested.Other);
 			Assert.AreEqual("John", nested.Self.First);
 			Assert.AreEqual("Doe", nested.Self.Last);
-            Assert.AreEqual("Mystery", nested.Self.Middle);
-
 			Assert.AreEqual("Edward", nested.Other.First);
 			Assert.AreEqual("Norton", nested.Other.Last);
-            Assert.AreEqual("G", nested.Other.Middle);
 		}
 	}
 }

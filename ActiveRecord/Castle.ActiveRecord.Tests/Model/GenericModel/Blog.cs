@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace Castle.ActiveRecord.Tests.Model.GenericModel
 {
 	using System;
 	using System.Collections;
-	using System.Collections.Generic;
 
 	using NHibernate;
 
@@ -32,7 +31,7 @@ namespace Castle.ActiveRecord.Tests.Model.GenericModel
 		private int _id;
 		private String _name;
 		private String _author;
-		private IList<Post> _posts = new List<Post>();
+		private IList _posts;
 		private IList _publishedposts;
 		private IList _unpublishedposts;
 		private IList _recentposts;
@@ -58,8 +57,8 @@ namespace Castle.ActiveRecord.Tests.Model.GenericModel
 			set { _author = value; }
 		}
 
-		[HasMany(Table="Posts", ColumnKey="blogid")]
-		public IList<Post> Posts
+		[HasMany(typeof (Post), Table="Posts", ColumnKey="blogid")]
+		public IList Posts
 		{
 			get { return _posts; }
 			set { _posts = value; }

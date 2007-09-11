@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,19 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// Exposes the effect script from Thomas Fuchs 
 	/// (http://script.aculo.us, http://mir.aculo.us)
 	/// </summary>
-	/// <remarks>
-	/// Before using it, you must install the scripts. See <see cref="ScriptaculousHelper.InstallScripts"/>
-	/// </remarks>
-	[Obsolete("Use ScriptaculousHelper instead")]
-	public class Effects2Helper : ScriptaculousHelper
+	public class Effects2Helper : AbstractHelper
 	{
+		/// <summary>
+		/// Renders a Javascript library inside a single script tag.
+		/// </summary>
+		/// <returns></returns>
+		public String GetJavascriptFunctions()
+		{
+			return String.Format("<script type=\"text/javascript\" src=\"{0}.{1}\"></script>", 
+				Controller.Context.ApplicationPath + "/MonoRail/Files/Effects2", 
+				Controller.Context.UrlInfo.Extension);
+		}
+
 		/// <summary>
 		/// Make an element appear. If the element was previously set to display:none;  
 		/// inside the style attribute of the element, the effect will automatically 
