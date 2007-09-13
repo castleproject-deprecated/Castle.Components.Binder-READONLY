@@ -1,11 +1,6 @@
 RC 3
 ====
 
-- Fixed IOC-34 
-  "Cannot use types having their own base type as constructor argument"
-
-  See revision r2787
-
 - Added setter to ReleasePolicy property
 
 - Applied Curtis Schlak's patch fixing IOC-30

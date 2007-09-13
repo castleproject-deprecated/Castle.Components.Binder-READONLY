@@ -900,7 +900,9 @@ namespace Castle.MicroKernel
 				// to other container
 				if (!NamingSubSystem.Contains(model.Name)) continue;
 				
-				RemoveComponent(model.Name);
+				bool successOnRemoval = RemoveComponent(model.Name);
+
+				System.Diagnostics.Debug.Assert(successOnRemoval);
 			}
 		}
 

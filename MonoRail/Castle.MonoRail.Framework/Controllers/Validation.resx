@@ -218,19 +218,19 @@
 						switch( params.last() )
 						{				
 							case 'bok'	:	//	bok requested
-								params = params.slicex( 1, 1 );
+								params = params.reduce( 1, 1 );
 								elem.bok = true;
 								break;
 							case 'if'	:	//	Conditional validation requested
-								params = params.slicex( 1, 1 );
+								params = params.reduce( 1, 1 );
 								elem._if_ = true;
 								break;
 							case 'then'	:	//	Conditional validation requested
-								params = params.slicex( 1, 1 );
+								params = params.reduce( 1, 1 );
 								elem._then_ = true;
 								break;
 							default		:	//	No modifiers
-								params = params.slicex( 1, 0 );
+								params = params.reduce( 1, 0 );
 							
 						}
 
@@ -881,7 +881,7 @@
 
 			/*	Trims b items from the beginning of the array, e items from the end
 			------------------------------------------- */
-			Array.prototype.slicex = function( b, e )
+			Array.prototype.reduce = function( b, e )
 			{
 				var a = new Array();
 				var count = 0;
