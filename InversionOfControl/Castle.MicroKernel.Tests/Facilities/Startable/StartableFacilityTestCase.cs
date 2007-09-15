@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,41 +14,51 @@
 
 namespace Castle.Facilities.Startable.Tests
 {
-	using System;
+	using System.Collections;
+	using Castle.Core;
 	using Castle.Core.Configuration;
-	using NUnit.Framework;
-
-	using Castle.MicroKernel;
-
 	using Castle.Facilities.Startable.Tests.Components;
-
+	using Castle.MicroKernel;
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class StartableFacilityTestCase
 	{
+		private bool startableCreatedBeforeResolved;
+
+		[SetUp]
+		public void SetUp()
+		{
+			startableCreatedBeforeResolved = false;
+		}
+
 		[Test]
 		public void TestInterfaceBasedStartable()
 		{
 			IKernel kernel = new DefaultKernel();
+			kernel.ComponentCreated += new ComponentInstanceDelegate(OnStartableComponentStarted);
 
-			kernel.AddFacility( "startable", new StartableFacility() );
+			kernel.AddFacility("startable", new StartableFacility());
 
-			kernel.AddComponent( "a", typeof(StartableComponent) );
+			kernel.AddComponent("a", typeof(StartableComponent));
+
+			Assert.IsTrue(startableCreatedBeforeResolved, "Component was not properly started");
 
 			StartableComponent component = kernel["a"] as StartableComponent;
 
 			Assert.IsNotNull(component);
-			Assert.IsTrue( component.Started );
-			Assert.IsFalse( component.Stopped );
+			Assert.IsTrue(component.Started);
+			Assert.IsFalse(component.Stopped);
 
 			kernel.ReleaseComponent(component);
-			Assert.IsTrue( component.Stopped );
+			Assert.IsTrue(component.Stopped);
 		}
 
-        [Test]
-        public void TestComponentWithNoInterface()
-        {
-            IKernel kernel = new DefaultKernel();
+		[Test]
+		public void TestComponentWithNoInterface()
+		{
+			IKernel kernel = new DefaultKernel();
+			kernel.ComponentCreated += new ComponentInstanceDelegate(OnNoInterfaceStartableComponentStarted);
 
 			MutableConfiguration compNode = new MutableConfiguration("component");
 			compNode.Attributes["id"] = "b";
@@ -58,16 +68,66 @@ namespace Castle.Facilities.Startable.Tests
 
 			kernel.ConfigurationStore.AddComponentConfiguration("b", compNode);
 
-            kernel.AddFacility( "startable", new StartableFacility() );
-            kernel.AddComponent( "b", typeof(NoInterfaceStartableComponent) );
-            NoInterfaceStartableComponent component = kernel["b"] as NoInterfaceStartableComponent;
+			kernel.AddFacility("startable", new StartableFacility());
+			kernel.AddComponent("b", typeof(NoInterfaceStartableComponent));
 
-            Assert.IsNotNull(component);
-            Assert.IsTrue( component.Started );
-            Assert.IsFalse( component.Stopped );
+			Assert.IsTrue(startableCreatedBeforeResolved, "Component was not properly started");
 
-            kernel.ReleaseComponent(component);
-            Assert.IsTrue( component.Stopped );
-        }
+			NoInterfaceStartableComponent component = kernel["b"] as NoInterfaceStartableComponent;
+
+			Assert.IsNotNull(component);
+			Assert.IsTrue(component.Started);
+			Assert.IsFalse(component.Stopped);
+
+			kernel.ReleaseComponent(component);
+			Assert.IsTrue(component.Stopped);
+		}
+
+		[Test, Ignore("Pending resolution")]
+		public void TestStartableWithCustomDependencies()
+		{
+			IKernel kernel = new DefaultKernel();
+			kernel.ComponentCreated += new ComponentInstanceDelegate(OnStartableComponentStarted);
+
+			kernel.AddFacility("startable", new StartableFacility());
+
+			Hashtable dependencies = new Hashtable();
+			dependencies.Add("config", 1);
+			kernel.AddComponent("a", typeof(StartableComponentWithCustomDependencies));
+			kernel.RegisterCustomDependencies(typeof(StartableComponentWithCustomDependencies), dependencies);
+
+			Assert.IsTrue(startableCreatedBeforeResolved, "Component was not properly started");
+
+			StartableComponentWithCustomDependencies component = kernel["a"] as StartableComponentWithCustomDependencies;
+
+			Assert.IsNotNull(component);
+			Assert.IsTrue(component.Started);
+			Assert.IsFalse(component.Stopped);
+
+			kernel.ReleaseComponent(component);
+			Assert.IsTrue(component.Stopped);
+		}
+
+		private void OnStartableComponentStarted(ComponentModel mode, object instance)
+		{
+			StartableComponent startable = instance as StartableComponent;
+
+			Assert.IsNotNull(startable);
+			Assert.IsTrue(startable.Started);
+			Assert.IsFalse(startable.Stopped);
+
+			startableCreatedBeforeResolved = true;
+		}
+
+		private void OnNoInterfaceStartableComponentStarted(ComponentModel mode, object instance)
+		{
+			NoInterfaceStartableComponent startable = instance as NoInterfaceStartableComponent;
+
+			Assert.IsNotNull(startable);
+			Assert.IsTrue(startable.Started);
+			Assert.IsFalse(startable.Stopped);
+
+			startableCreatedBeforeResolved = true;
+		}
 	}
 }

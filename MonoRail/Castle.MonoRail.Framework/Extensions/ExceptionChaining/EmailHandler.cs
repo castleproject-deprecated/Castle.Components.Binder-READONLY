@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,8 +34,9 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 
 			if (mailToAtt == null || mailToAtt.Value == String.Empty)
 			{
-				throw new ConfigurationException("'mailTo' is a required attribute " + 
-					"for EmailHandler (part of ExceptionChaining extension)");
+				String message="'mailTo' is a required attribute " + 
+					"for EmailHandler (part of ExceptionChaining extension)";
+				throw new ConfigurationErrorsException(message);
 			}
 
 			mailTo = mailToAtt.Value;

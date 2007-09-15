@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 namespace Castle.ActiveRecord
 {
 	using System;
+	using Castle.ActiveRecord.Framework.Internal;
 
 	/// <summary>
 	/// Define the relation type for a relation.
@@ -47,7 +48,7 @@ namespace Castle.ActiveRecord
 		/// </summary>
 		List
 	}
-
+	
 	/// <summary>
 	/// Base class to define common relation information
 	/// </summary>
@@ -64,11 +65,14 @@ namespace Castle.ActiveRecord
 		internal String indexType;
 		internal String element;
 		internal bool lazy;
+		internal bool lazySpecified = false;
 		internal bool inverse;
 		internal ManyRelationCascadeEnum cascade = ManyRelationCascadeEnum.None;
 		internal RelationType relType = RelationType.Guess;
+		internal NotFoundBehaviour notFoundBehaviour = NotFoundBehaviour.Default;
+	    private int batchSize = 1;
 
-		/// <summary>
+	    /// <summary>
 		/// Gets or sets the type of the relation.
 		/// </summary>
 		/// <value>The type of the relation.</value>
@@ -101,7 +105,7 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Gets or sets the schema for this relation (dbo., etc)
 		/// </summary>
-		/// <value>The schema.</value>
+		/// <value>The schema name.</value>
 		public String Schema
 		{
 			get { return schema; }
@@ -114,8 +118,17 @@ namespace Castle.ActiveRecord
 		/// <value><c>true</c> if lazy; otherwise, <c>false</c>.</value>
 		public bool Lazy
 		{
-			get { return lazy; }
-			set { lazy = value; }
+			get
+			{
+				if(lazySpecified)
+					return lazy;
+				return ActiveRecordModel.isLazyByDefault;
+			}
+			set
+			{
+				lazy = value;
+				lazySpecified = true;
+			}
 		}
 
 		/// <summary>
@@ -139,7 +152,7 @@ namespace Castle.ActiveRecord
 		}
 
 		/// <summary>
-		/// Gets or sets the order by clause for this relation
+		/// Gets or sets the order by clause for this relation. This is a SQL order, not HQL.
 		/// </summary>
 		public String OrderBy
 		{
@@ -157,7 +170,7 @@ namespace Castle.ActiveRecord
 		}
 
 		/// <summary>
-		/// Only used with sets
+		/// Only used with sets. The value can be <c>unsorted</c>, <c>natural</c> and the name of a class implementing <c>System.Collections.IComparer</c>
 		/// </summary>
 		public String Sort
 		{
@@ -166,7 +179,7 @@ namespace Castle.ActiveRecord
 		}
 
 		/// <summary>
-		/// Only used with maps or list
+		/// Only used with maps or lists
 		/// </summary>
 		public string Index
 		{
@@ -191,5 +204,25 @@ namespace Castle.ActiveRecord
 			get { return element; }
 			set { element = value; }
 		}
+
+		/// <summary>
+		/// Gets or sets the way broken relations are handled.
+		/// </summary>
+		/// <value>The behaviour.</value>
+		public NotFoundBehaviour NotFoundBehaviour
+		{
+			get { return notFoundBehaviour; }
+			set { notFoundBehaviour = value; }
+		}
+
+	    /// <summary>
+	    /// From NHibernate documentation:
+	    /// Specify a "batch size" for batch fetching of collections.
+	    /// </summary>
+	    public int BatchSize
+	    {
+	        get { return batchSize; }
+	        set { batchSize = value; }
+	    }
 	}
 }

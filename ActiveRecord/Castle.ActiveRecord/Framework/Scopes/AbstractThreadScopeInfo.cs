@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 namespace Castle.ActiveRecord.Framework.Scopes
 {
-	using System;
 	using System.Collections;
 
 	/// <summary>
@@ -24,13 +23,25 @@ namespace Castle.ActiveRecord.Framework.Scopes
 	/// </summary>
 	public abstract class AbstractThreadScopeInfo : IThreadScopeInfo
 	{
+		/// <summary>
+		/// Gets the current stack.
+		/// </summary>
+		/// <value>The current stack.</value>
 		public abstract Stack CurrentStack { get; }
 
+		/// <summary>
+		/// Registers the scope.
+		/// </summary>
+		/// <param name="scope">The scope.</param>
 		public void RegisterScope(ISessionScope scope)
 		{
 			CurrentStack.Push(scope);
 		}
 
+		/// <summary>
+		/// Gets the registered scope.
+		/// </summary>
+		/// <returns></returns>
 		public ISessionScope GetRegisteredScope()
 		{
 			Stack stack = CurrentStack;
@@ -45,6 +56,10 @@ namespace Castle.ActiveRecord.Framework.Scopes
 			}
 		}
 
+		/// <summary>
+		/// Unregister the scope.
+		/// </summary>
+		/// <param name="scope">The scope.</param>
 		public void UnRegisterScope(ISessionScope scope)
 		{
 			if (GetRegisteredScope() != scope)
@@ -55,6 +70,12 @@ namespace Castle.ActiveRecord.Framework.Scopes
 			CurrentStack.Pop();
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this instance has initialized scope.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance has initialized scope; otherwise, <c>false</c>.
+		/// </value>
 		public bool HasInitializedScope
 		{
 			get { return GetRegisteredScope() != null; }

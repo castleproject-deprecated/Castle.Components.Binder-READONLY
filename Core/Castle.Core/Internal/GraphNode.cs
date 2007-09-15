@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ namespace Castle.Core
 		{
 		}
 
-		/// <summary>
-		/// Kind of copy constructor
-		/// </summary>
-		/// <param name="copy"></param>
+//		/// <summary>
+//		/// Kind of copy constructor
+//		/// </summary>
+//		/// <param name="copy"></param>
 //		public GraphNode(GraphNode copy)
 //		{
 //			incoming = new ArrayList(Incoming);
@@ -78,7 +78,7 @@ namespace Castle.Core
 			get
 			{
 				if (incoming == null) return new GraphNode[0];
-				return (GraphNode[]) incoming.ToArray( typeof(GraphNode) );
+				return (GraphNode[]) incoming.ToArray(typeof(GraphNode));
 			}
 		}
 
@@ -90,7 +90,7 @@ namespace Castle.Core
 			get
 			{
 				if (outgoing == null) return new GraphNode[0];
-				return (GraphNode[]) outgoing.ToArray( typeof(GraphNode) );
+				return (GraphNode[]) outgoing.ToArray(typeof(GraphNode));
 			}
 		}
 
@@ -103,6 +103,6 @@ namespace Castle.Core
 		private void RemoveDependent(GraphNode graphNode)
 		{
 			Outgoing.Remove(graphNode);
-		}		
-	}	
+		}
+	}
 }

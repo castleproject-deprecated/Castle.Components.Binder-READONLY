@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,7 @@
 
 namespace TableHierarchySample
 {
-	using System;
-
 	using Castle.ActiveRecord;
-
 
 	[ActiveRecord(DiscriminatorValue="client")]
 	public class Client : Company
@@ -40,19 +37,9 @@ namespace TableHierarchySample
 			set { _firm = value; }
 		}
 
-		public new static void DeleteAll()
-		{
-			ActiveRecordBase.DeleteAll( typeof(Client) );
-		}
-
 		public new static Client[] FindAll()
 		{
-			return (Client[]) ActiveRecordBase.FindAll( typeof(Client) );
-		}
-
-		public new static Client Find(int id)
-		{
-			return (Client) ActiveRecordBase.FindByPrimaryKey( typeof(Client), id );
+			return (Client[]) FindAll(typeof(Client));
 		}
 	}
 }

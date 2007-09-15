@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,10 @@
 namespace Castle.ActiveRecord
 {
 	using System;
-	using System.Collections;
-	using System.Collections.Specialized;
+	using System.Collections.Generic;
 	using System.ComponentModel;
-
+	using System.Data;
 	using NHibernate;
-	
 	using Castle.ActiveRecord.Framework.Scopes;
 
 	/// <summary>
@@ -38,6 +36,25 @@ namespace Castle.ActiveRecord
 		/// </summary>
 		New
 	}
+	
+	/// <summary>
+	/// Governs the <see cref="TransactionScope"/> behavior 
+	/// on dispose if neither <see cref="TransactionScope.VoteCommit"/>
+	/// nor <see cref="TransactionScope.VoteRollBack"/> was called
+	/// </summary>
+	public enum OnDispose
+	{
+		/// <summary>
+		/// Should commit the transaction, unless <see cref="TransactionScope.VoteRollBack"/>
+		/// was called before the disposing the scope (this is the default behavior)
+		/// </summary>
+		Commit,
+		/// <summary>
+		/// Should rollback the transaction, unless <see cref="TransactionScope.VoteCommit"/>
+		/// was called before the disposing the scope
+		/// </summary>
+		Rollback
+	}
 
 	/// <summary>
 	/// Implementation of <see cref="ISessionScope"/> to 
@@ -48,22 +65,61 @@ namespace Castle.ActiveRecord
 		private static readonly object CompletedEvent = new object();
 
 		private readonly TransactionMode mode;
-		private IDictionary _transactions = new HybridDictionary();
-		private TransactionScope parentTransactionScope;
-		private AbstractScope parentSimpleScope;
-		private EventHandlerList events = new EventHandlerList();
-		private bool rollbackOnly;
+		private readonly IsolationLevel isolationLevel;
+		private readonly OnDispose onDisposeBehavior;
+		private readonly IDictionary<ISession, ITransaction> transactions = new Dictionary<ISession, ITransaction>();
+		private readonly TransactionScope parentTransactionScope;
+		private readonly AbstractScope parentSimpleScope;
+		private readonly EventHandlerList events = new EventHandlerList();
+		private bool rollbackOnly, setForCommit;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TransactionScope"/> class.
+		/// </summary>
 		public TransactionScope() : this(TransactionMode.New)
 		{
 		}
 
-		public TransactionScope(TransactionMode mode) : base(FlushAction.Auto, SessionScopeType.Transactional)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TransactionScope"/> class.
+		/// </summary>
+		/// <param name="onDisposeBehavior">The on dispose behavior.</param>
+		public TransactionScope(OnDispose onDisposeBehavior) : this(TransactionMode.New, onDisposeBehavior)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TransactionScope"/> class.
+		/// </summary>
+		/// <param name="mode">Whatever to create a new transaction or inherits an existing one</param>
+		public TransactionScope(TransactionMode mode) : this(mode, IsolationLevel.Unspecified, OnDispose.Commit)
+		{
+		}
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TransactionScope"/> class.
+		/// </summary>
+		/// <param name="mode">Whatever to create a new transaction or inherits an existing one</param>
+		/// <param name="onDisposeBehavior">The on dispose behavior.</param>
+		public TransactionScope(TransactionMode mode, OnDispose onDisposeBehavior) : this(mode, IsolationLevel.Unspecified, onDisposeBehavior)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TransactionScope"/> class.
+		/// </summary>
+		/// <param name="mode">Whatever to create a new transaction or inherits an existing one</param>
+		/// <param name="isolationLevel">The transaction isolation level.</param>
+		/// <param name="onDisposeBehavior">The on dispose behavior.</param>
+		public TransactionScope(TransactionMode mode, IsolationLevel isolationLevel, OnDispose onDisposeBehavior)
+			: base(FlushAction.Auto, SessionScopeType.Transactional)
 		{
 			this.mode = mode;
+			this.isolationLevel = isolationLevel;
+			this.onDisposeBehavior = onDisposeBehavior;
 
 			bool preferenceForTransactionScope = mode == TransactionMode.Inherits ? true : false;
-			
+
 			ISessionScope previousScope = ScopeUtil.FindPreviousScope(this, preferenceForTransactionScope);
 
 			if (previousScope != null)
@@ -87,10 +143,13 @@ namespace Castle.ActiveRecord
 
 		#region OnTransactionCompleted event
 
+		/// <summary>
+		/// This event is raised when a transaction is completed
+		/// </summary>
 		public event EventHandler OnTransactionCompleted
 		{
-			add 
-			{ 
+			add
+			{
 				if (parentTransactionScope != null)
 				{
 					parentTransactionScope.OnTransactionCompleted += value;
@@ -115,6 +174,9 @@ namespace Castle.ActiveRecord
 
 		#endregion
 
+		/// <summary>
+		/// Votes to roll back the transaction
+		/// </summary>
 		public void VoteRollBack()
 		{
 			if (mode == TransactionMode.Inherits && parentTransactionScope != null)
@@ -124,22 +186,37 @@ namespace Castle.ActiveRecord
 			rollbackOnly = true;
 		}
 
+		/// <summary>
+		/// Votes to commit the transaction
+		/// </summary>
 		public void VoteCommit()
 		{
 			if (rollbackOnly)
 			{
-				throw new TransactionException("The transaction was marked as rollback " + 
-					"only - by itself or one of the nested transactions");
+				throw new TransactionException("The transaction was marked as rollback " + "only - by itself or one of the nested transactions");
 			}
+			setForCommit = true;
 		}
 
+		/// <summary>
+		/// This method is invoked when the
+		/// <see cref="Castle.ActiveRecord.Framework.ISessionFactoryHolder"/>
+		/// instance needs a session instance. Instead of creating one it interrogates
+		/// the active scope for one. The scope implementation must check if it
+		/// has a session registered for the given key.
+		/// <seealso cref="RegisterSession"/>
+		/// </summary>
+		/// <param name="key">an object instance</param>
+		/// <returns>
+		/// 	<c>true</c> if the key exists within this scope instance
+		/// </returns>
 		public override bool IsKeyKnown(object key)
 		{
 			if (mode == TransactionMode.Inherits && parentTransactionScope != null)
 			{
 				return parentTransactionScope.IsKeyKnown(key);
 			}
-			
+
 			bool keyKnown = false;
 
 			if (parentSimpleScope != null)
@@ -150,6 +227,17 @@ namespace Castle.ActiveRecord
 			return keyKnown ? true : base.IsKeyKnown(key);
 		}
 
+		/// <summary>
+		/// This method is invoked when no session was available
+		/// at and the <see cref="Castle.ActiveRecord.Framework.ISessionFactoryHolder"/>
+		/// just created one. So it registers the session created
+		/// within this scope using a key. The scope implementation
+		/// shouldn't make any assumption on what the key
+		/// actually is as we reserve the right to change it
+		/// <seealso cref="IsKeyKnown"/>
+		/// </summary>
+		/// <param name="key">an object instance</param>
+		/// <param name="session">An instance of <c>ISession</c></param>
 		public override void RegisterSession(object key, ISession session)
 		{
 			if (mode == TransactionMode.Inherits && parentTransactionScope != null)
@@ -164,6 +252,13 @@ namespace Castle.ActiveRecord
 			base.RegisterSession(key, session);
 		}
 
+		/// <summary>
+		/// This method should return the session instance associated with the key.
+		/// </summary>
+		/// <param name="key">an object instance</param>
+		/// <returns>
+		/// the session instance or null if none was found
+		/// </returns>
 		public override ISession GetSession(object key)
 		{
 			if (mode == TransactionMode.Inherits && parentTransactionScope != null)
@@ -178,25 +273,42 @@ namespace Castle.ActiveRecord
 				session = parentSimpleScope.GetSession(key);
 			}
 
-			session = session != null ? session : base.GetSession(key);
+			session = session ?? base.GetSession(key);
 
 			EnsureHasTransaction(session);
 
 			return session;
 		}
 
+		/// <summary>
+		/// Ensures that a transaction exist, creating one if neccecary
+		/// </summary>
+		/// <param name="session">The session.</param>
 		protected internal void EnsureHasTransaction(ISession session)
 		{
-			if (!_transactions.Contains(session))
+			if (!transactions.ContainsKey(session))
 			{
 				session.FlushMode = FlushMode.Commit;
 
-				ITransaction transaction = session.BeginTransaction();
+				ITransaction transaction;
 
-				_transactions.Add(session, transaction);
+				if (isolationLevel == IsolationLevel.Unspecified)
+				{
+					transaction = session.BeginTransaction();
+				}
+				else
+				{
+					transaction = session.BeginTransaction(isolationLevel);
+				}
+
+				transactions.Add(session, transaction);
 			}
 		}
 
+		/// <summary>
+		/// Initializes the current transaction scope using the session
+		/// </summary>
+		/// <param name="session">The session.</param>
 		protected override void Initialize(ISession session)
 		{
 			if (mode == TransactionMode.Inherits && parentTransactionScope != null)
@@ -208,23 +320,46 @@ namespace Castle.ActiveRecord
 			EnsureHasTransaction(session);
 		}
 
-		protected override void PerformDisposal(ICollection sessions)
+		/// <summary>
+		/// Dispose of this scope
+		/// </summary>
+		/// <param name="sessions">The sessions.</param>
+		protected override void PerformDisposal(ICollection<ISession> sessions)
 		{
+			if (!setForCommit && !rollbackOnly) // Neither VoteCommit or VoteRollback were called
+			{
+				if (onDisposeBehavior == OnDispose.Rollback)
+				{
+					VoteRollBack();
+				}
+			}
+			
 			if (mode == TransactionMode.Inherits && parentTransactionScope != null)
 			{
 				// In this case it's not up to this instance to perform the clean up
 				return;
 			}
 
-			foreach (ITransaction transaction in _transactions.Values)
+			Exception transactionError = null;
+
+			foreach(ITransaction transaction in transactions.Values)
 			{
-				if (rollbackOnly)
+				try
 				{
-					transaction.Rollback();
+					if (rollbackOnly)
+					{
+						transaction.Rollback();
+					}
+					else
+					{
+						transaction.Commit();
+					}
 				}
-				else
+				catch(Exception ex)
 				{
-					transaction.Commit();
+					transactionError = ex;
+
+					transaction.Dispose();
 				}
 			}
 
@@ -232,7 +367,7 @@ namespace Castle.ActiveRecord
 			{
 				// No flush necessary, but we should close the session
 
-				base.PerformDisposal(sessions, false, true);
+				PerformDisposal(sessions, false, true);
 			}
 			else
 			{
@@ -241,7 +376,7 @@ namespace Castle.ActiveRecord
 					// Cancel all pending changes 
 					// (not sure whether this is a good idea, it should be scoped
 
-					foreach( ISession session in parentSimpleScope.GetSessions() )
+					foreach(ISession session in parentSimpleScope.GetSessions())
 					{
 						session.Clear();
 					}
@@ -249,9 +384,27 @@ namespace Castle.ActiveRecord
 			}
 
 			RaiseOnCompleted();
+
+			if (transactionError != null)
+			{
+				throw transactionError;
+			}
 		}
 
-		protected internal override void DiscardSessions(ICollection sessions)
+		/// <summary>
+		/// This is called when a session has a failure
+		/// </summary>
+		/// <param name="session">the session</param>
+		public override void FailSession(ISession session)
+		{
+			VoteRollBack();
+		}
+
+		/// <summary>
+		/// Discards the sessions.
+		/// </summary>
+		/// <param name="sessions">The sessions.</param>
+		protected internal override void DiscardSessions(ICollection<ISession> sessions)
 		{
 			if (parentSimpleScope != null)
 			{
@@ -259,6 +412,9 @@ namespace Castle.ActiveRecord
 			}
 		}
 
+		/// <summary>
+		/// Raises the on completed event
+		/// </summary>
 		private void RaiseOnCompleted()
 		{
 			EventHandler handler = (EventHandler) events[CompletedEvent];

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@ namespace Castle.DynamicProxy
 	using System;
 	using System.Reflection;
 
+	[Serializable]
 	public class AllMethodsHook : IProxyGenerationHook
 	{
 		public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
 		{
-			return methodInfo.DeclaringType != typeof(Object) && 
-			       methodInfo.DeclaringType != typeof(MarshalByRefObject) && 
+			return methodInfo.DeclaringType != typeof(Object) &&
+			       methodInfo.DeclaringType != typeof(MarshalByRefObject) &&
 			       methodInfo.DeclaringType != typeof(ContextBoundObject);
 		}
 

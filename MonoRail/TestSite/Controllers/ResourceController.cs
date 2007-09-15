@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,36 +16,35 @@ namespace TestSite.Controllers
 {
 	using System.Globalization;
 	using System.Threading;
-
 	using Castle.MonoRail.Framework;
 	using Castle.MonoRail.Framework.Filters;
 
 
-	[LocalizationFilter( RequestStore.QueryString, "locale" )]
-	[Resource( "text", "TestSite.Resources.Language" )]
+	[LocalizationFilter(RequestStore.QueryString, "locale")]
+	[Resource("text", "TestSite.Resources.Language")]
 	public class ResourceController : Controller
 	{
 		public ResourceController()
 		{
-			CultureInfo en = CultureInfo.CreateSpecificCulture( "en" );
+			CultureInfo en = CultureInfo.CreateSpecificCulture("en");
 
-			Thread.CurrentThread.CurrentCulture	= en;
+			Thread.CurrentThread.CurrentCulture = en;
 			Thread.CurrentThread.CurrentUICulture = en;
 		}
 
 		public void GetResource()
 		{
-			IResource res = Resources[ "text" ];
+			IResource res = Resources["text"];
 
-            RenderText( res[ "language" ].ToString() );
+			RenderText(res["language"].ToString());
 		}
 
-		[Resource( "text", "TestSite.Resources.Language", CultureName="de")]
+		[Resource("text", "TestSite.Resources.Language", CultureName="de")]
 		public void GetResourceByCulture()
 		{
-			IResource res = Resources[ "text" ];
-			
-			RenderText( res[ "language" ].ToString() );
+			IResource res = Resources["text"];
+
+			RenderText(res["language"].ToString());
 		}
 	}
 }

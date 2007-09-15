@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +14,9 @@
 
 namespace Castle.Windsor.Tests
 {
-	using System.Collections;
-#if DOTNET2
-    using System.Collections.Generic;
-#endif
-	
-    using Castle.MicroKernel;
-	
-    using NUnit.Framework;
+	using System.Collections.Generic;
+	using Castle.MicroKernel;
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class ContainerProblem
@@ -30,7 +25,7 @@ namespace Castle.Windsor.Tests
 		public void CausesStackOverflow()
 		{
 			IWindsorContainer container = new WindsorContainer();
-			
+
 			container.AddComponent("child", typeof(IChild), typeof(Child));
 			container.AddComponent("parent", typeof(IParent), typeof(Parent));
 
@@ -42,12 +37,8 @@ namespace Castle.Windsor.Tests
 		}
 	}
 
-#if DOTNET2
-    public interface IParent : IList<IChild>
-#else
-    public interface IParent : IList
-#endif
-    {
+	public interface IParent : IList<IChild>
+	{
 	}
 
 	public interface IChild
@@ -61,12 +52,8 @@ namespace Castle.Windsor.Tests
 		}
 	}
 
-#if DOTNET2
-    public class Parent : List<IChild>
-#else
-    public class Parent : ArrayList
-#endif
-    {
+	public class Parent : List<IChild>
+	{
 		public Parent(IKernel kernel)
 		{
 		}

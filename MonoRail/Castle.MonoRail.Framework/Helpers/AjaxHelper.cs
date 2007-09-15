@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@ namespace Castle.MonoRail.Framework.Helpers
 	using System.Text;
 	using System.Collections;
 	using System.Collections.Specialized;
-	using System.Reflection;
-
 	using Castle.Core;
-	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Services.AjaxProxyGenerator;
 
 	public enum CallbackEnum
 	{
@@ -73,27 +71,10 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// </remarks>
 	public class AjaxHelper : AbstractHelper, IServiceEnabledComponent
 	{
-		private static Hashtable ajaxProxyCache = Hashtable.Synchronized(new Hashtable());
-		
-		/// <summary>
-		/// The logger instance
-		/// </summary>
-		private ILogger logger = NullLogger.Instance;
-		
-		/// <summary>
-		/// Used by <c>GenerateJSProxy</c> overloads.
-		/// </summary>
-		private IControllerFactory controllerFactory;
-		
-		/// <summary>
-		/// Used by <c>GenerateJSProxy</c> overloads.
-		/// </summary>
-		private IControllerDescriptorProvider controllerDescriptorBuilder;
-
-		private bool behaviourCommaNeeded;
+		private IAjaxProxyGenerator ajaxProxyGenerator;
 
 		#region IServiceEnabledComponent implementation
-		
+
 		/// <summary>
 		/// Invoked by the framework in order to give a chance to
 		/// obtain other services
@@ -101,116 +82,34 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="provider">The service proviver</param>
 		public void Service(IServiceProvider provider)
 		{
-			ILoggerFactory loggerFactory = (ILoggerFactory) provider.GetService(typeof(ILoggerFactory));
-			
-			if (loggerFactory != null)
-			{
-				logger = loggerFactory.Create(typeof(AjaxHelper));
-			}
-			
-			controllerFactory = (IControllerFactory) 
-				provider.GetService(typeof(IControllerFactory));
-			
-			controllerDescriptorBuilder = (IControllerDescriptorProvider) 
-				provider.GetService(typeof(IControllerDescriptorProvider));
+			this.ajaxProxyGenerator = (IAjaxProxyGenerator) provider.GetService(typeof(IAjaxProxyGenerator));
 		}
 
 		#endregion
 
+		#region Scripts
+
 		/// <summary>
 		/// Renders a Javascript library inside a single script tag.
 		/// </summary>
-		/// <returns></returns>
+		public String InstallScripts()
+		{
+			return RenderScriptBlockToSource("/MonoRail/Files/AjaxScripts");
+		}
+
+		/// <summary>
+		/// Renders a Javascript library inside a single script tag.
+		/// </summary>
+		[Obsolete("Please use the preferred InstallScripts function.")]
 		public String GetJavascriptFunctions()
 		{
-			return String.Format("<script type=\"text/javascript\" src=\"{0}.{1}\"></script>", 
-				Controller.Context.ApplicationPath + "/MonoRail/Files/AjaxScripts", 
-				Controller.Context.UrlInfo.Extension);
-		}
-
-		/// <summary>
-		/// Renders a script tag refering the Behaviour library code.
-		/// </summary>
-		/// <returns></returns>
-		public String GetBehaviourFunctions()
-		{
-			return String.Format("<script type=\"text/javascript\" src=\"{0}.{1}\"></script>", 
-				Controller.Context.ApplicationPath + "/MonoRail/Files/BehaviourScripts", 
-				Controller.Context.UrlInfo.Extension);
-		}
-		
-		#region Behaviour library related
-		
-		/// <summary>
-		/// Renders a script block invoking <c>Behaviour.apply()</c>
-		/// </summary>
-		public String ReApply()
-		{
-			return "<script type=\"text/javascript\">Behaviour.apply();</script>";
-		}
-		
-		/// <summary>
-		/// Renders a script block invoking <c>Behaviour.addLoadEvent(loadFunctionName);</c>
-		/// </summary>
-		/// <param name="loadFunctionName">The name of the js function to be invoked when the body is loaded</param>
-		public String AddLoadEvent(String loadFunctionName)
-		{
-			return "<script type=\"text/javascript\">" + Environment.NewLine + 
-				"Behaviour.addLoadEvent(" + loadFunctionName + ");" + Environment.NewLine + 
-				"</script>";
-		}
-		
-		/// <summary>
-		/// Renders a script block starting the association of events to selector rules
-		/// <seealso cref="Register"/>
-		/// <seealso cref="EndBehaviourRegister"/>
-		/// </summary>
-		public String StartBehaviourRegister()
-		{
-			behaviourCommaNeeded = false;
-			
-			return "<script type=\"text/javascript\">" + Environment.NewLine + 
-				"Behaviour.register({" + Environment.NewLine;
-		}
-
-		/// <summary>
-		/// Adds a entry to a registration array. Invoking it 
-		/// with <c>#form</c>, <c>onsubmit</c> and <c>validate</c> will produce
-		/// <c>'#form' : function(e){ e.onsubmit = validate; },</c>
-		/// <seealso cref="StartBehaviourRegister"/>
-		/// <seealso cref="EndBehaviourRegister"/>
-		/// </summary>
-		/// <param name="selector">The css selector rule</param>
-		/// <param name="eventName">The name of the event on the element</param>
-		/// <param name="jsFunctionName">The function to be invoked in response to the event</param>
-		public String Register(String selector, String eventName, String jsFunctionName)
-		{
-			String val = behaviourCommaNeeded ? "," : String.Empty + 
-					"\t'" + selector + "' : function(e){ e." + eventName + " = " + jsFunctionName + "; }" + 
-			       Environment.NewLine;
-			
-			if (!behaviourCommaNeeded)
-			{
-				behaviourCommaNeeded = true;
-			}
-			
-			return val;
-		}
-
-		/// <summary>
-		/// Renders the end of a script block that associated events to selector rules
-		/// <seealso cref="StartBehaviourRegister"/>
-		/// <seealso cref="Register"/>
-		/// </summary>
-		public String EndBehaviourRegister()
-		{
-			return Environment.NewLine + "});" + Environment.NewLine + "</script>";
+			return InstallScripts();
 		}
 
 		#endregion
 
 		#region GenerateJSProxy overloads
-		
+
 		/// <summary>
 		/// Generates an AJAX JavaScript proxy for the current controller.
 		/// </summary>
@@ -227,7 +126,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="controller">Controller which will be target of the proxy</param>
 		public String GenerateJSProxy(string proxyName, string controller)
 		{
-			return GenerateJSProxy(proxyName, null, controller);
+			return GenerateJSProxy(proxyName, String.Empty, controller);
 		}
 
 		/// <summary>
@@ -238,83 +137,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="area">area which the controller belongs to</param>
 		public String GenerateJSProxy(string proxyName, string area, string controller)
 		{
-			String cacheKey = (area + "|" + controller).ToLower();
-			String result = (String) ajaxProxyCache[cacheKey];
-
-			if (result == null)
-			{
-				Controller controllerInstance = controllerFactory.CreateController(new UrlInfo("/", area, controller, "", ""));
-				
-				if (controllerInstance == null)
-				{
-					throw new RailsException("Controller not found with Area: '{0}', Name: '{1}'", area, controller);
-				}
-				
-				String baseUrl = Controller.Context.ApplicationPath + "/";
-				
-				if (area != null && area != String.Empty)
-				{
-					baseUrl += area + "/";
-				}
-				
-				baseUrl += controller + "/";
-				
-				// TODO: develop a smarter function generation, inspecting the return
-				// value of the action and generating a proxy that does the same.
-				// also, think on a proxy pattern for the Ajax.Updater.
-				
-				StringBuilder functions = new StringBuilder(1024);
-				
-				functions.Append("{ " + Environment.NewLine);
-				
-				ControllerMetaDescriptor metaDescriptor = 
-					controllerDescriptorBuilder.BuildDescriptor(controllerInstance);
-				
-				bool commaNeeded = false;
-				
-				foreach(MethodInfo ajaxActionMethod in metaDescriptor.AjaxActions)
-				{
-					if (!commaNeeded) commaNeeded = true; else functions.Append(',');
-					
-					String methodName = ajaxActionMethod.Name;
-					
-					object[] attributes = ajaxActionMethod.GetCustomAttributes(typeof(AjaxActionAttribute), true);
-					
-					AjaxActionAttribute ajaxActionAtt = (AjaxActionAttribute) attributes[0];
-					
-					StringBuilder parameters = new StringBuilder("_=");
-					String url = baseUrl + methodName + "." + Controller.Context.UrlInfo.Extension;
-					String functionName = ajaxActionAtt.Name != null ? ajaxActionAtt.Name : methodName;
-					
-					functionName = Char.ToLower(functionName[0]) + (functionName.Length > 0 ? functionName.Substring(1) : null);
-
-					functions.AppendFormat(Environment.NewLine + "\t{0}: " + Environment.NewLine + "\tfunction(", functionName);
-					
-					foreach(ParameterInfo pi in ajaxActionMethod.GetParameters())
-					{
-						String paramName = pi.Name;
-						paramName = Char.ToLower(paramName[0]) + (paramName.Length > 0 ? paramName.Substring(1) : null);
-						functions.AppendFormat("{0}, ", paramName);
-						parameters.AppendFormat("\\x26{0}='+{0}+'", paramName);
-					}
-					
-					functions.Append("callback)").Append(Environment.NewLine).Append("\t{");
-					functions.Append(Environment.NewLine).AppendFormat("\t\tvar r=new Ajax.Request('{0}', " + 
-						"{{parameters: '{1}', asynchronous: !!callback, onComplete: callback}}); " + 
-						Environment.NewLine + 
-						"\t\tif(!callback) return r.transport.responseText;", url, parameters.ToString());
-					functions.Append("}").Append(Environment.NewLine);
-				}
-				
-				functions.Length -= 1;
-				functions.Append("}").Append(Environment.NewLine);
-
-				ajaxProxyCache[cacheKey] = result = functions.ToString();
-			}
-			
-			return @"<script type=""text/javascript"">var " + 
-			       proxyName + " = " + Environment.NewLine + 
-			       result + "</script>";
+			return ajaxProxyGenerator.GenerateJSProxy(CurrentContext, proxyName, area, controller);
 		}
 		
 		#endregion
@@ -342,13 +165,45 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <summary>
 		/// Returns a link that will trigger a javascript function using the 
 		/// onclick handler and return false after the fact.
+		/// <code>
+		/// &lt;a href="javascript:void(0);" onclick="confirm('question') { functionCodeOrName}; return false"&gt;innerContent&lt;/a&gt;
+		/// </code>
+		/// </summary>
+		/// <param name="innerContent">Link content</param>
+		/// <param name="functionCodeOrName">Function definition</param>
+		/// <param name="confirm">Confirm question</param>
+		/// <param name="attributes">Attributes to be applied to the html element</param>
+		/// <returns></returns>
+		public String LinkToFunction(String innerContent, String functionCodeOrName, string confirm, IDictionary attributes)
+		{
+			String htmlAtt = GetAttributes(attributes);
+
+			return String.Format("<a href=\"javascript:void(0);\" {2} onclick=\"if(confirm('" + confirm + "')){{{0}}};return false;\" >{1}</a>", functionCodeOrName, innerContent, htmlAtt);
+		}
+
+		/// <summary>
+		/// Returns a link that will trigger a javascript function using the 
+		/// onclick handler and return false after the fact.
 		/// </summary>
 		/// <param name="innerContent">Link content</param>
 		/// <param name="functionCodeOrName">Function definition</param>
 		/// <returns></returns>
 		public String LinkToFunction(String innerContent, String functionCodeOrName)
 		{
-			return LinkToFunction(innerContent, functionCodeOrName, null);
+			return LinkToFunction(innerContent, functionCodeOrName, new Hashtable());
+		}
+
+		/// <summary>
+		/// Returns a link that will trigger a javascript function using the 
+		/// onclick handler and return false after the fact.
+		/// </summary>
+		/// <param name="innerContent">Link content</param>
+		/// <param name="functionCodeOrName">Function definition</param>
+		/// <param name="confirm">Confirm question</param>
+		/// <returns></returns>
+		public String LinkToFunction(String innerContent, String functionCodeOrName, String confirm)
+		{
+			return LinkToFunction(innerContent, functionCodeOrName, confirm, null);
 		}
 		
 		#endregion
@@ -440,6 +295,23 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// Usually, the result would be a partial prepared by the controller
 		/// </summary>
 		/// <param name="innerContent">Link content</param>
+		/// <param name="confirm">the confirm question</param>
+		/// <param name="url">Target url</param>
+		/// <param name="options">the options for the Ajax invocation</param>
+		/// <returns>The handcrafted element</returns>
+		public String LinkToRemote(String innerContent, String confirm, String url, IDictionary options)
+		{
+			return LinkToFunction(innerContent, BuildRemoteFunction(url, options), confirm, null);
+		}
+
+		/// <summary>
+		/// Returns a link to a remote action defined by <c>options["url"]</c> 
+		/// that is called in the background using 
+		/// XMLHttpRequest. The result of that request can then be inserted into a
+		/// DOM object whose id can be specified with <c>options["update"]</c>. 
+		/// Usually, the result would be a partial prepared by the controller
+		/// </summary>
+		/// <param name="innerContent">Link content</param>
 		/// <param name="url">Target url</param>
 		/// <param name="options">the options for the Ajax invocation</param>
 		/// <param name="htmloptions">Attributes to be applied to the html element</param>
@@ -485,9 +357,9 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			String remoteFunc = RemoteFunction(options);
 
-			String formId = options.Contains("formId") ? ("id=\"" + (String)options["formId"] + "\"") : String.Empty;
+			String formId = options.Contains("formId") ? ("id=\"" + (String) options["formId"] + "\"") : String.Empty;
 
-			return String.Format("<form {1} onsubmit=\"{0}; return false;\" enctype=\"multipart/form-data\">", remoteFunc, formId);
+			return String.Format("<form {1} onsubmit=\"{0}; return false;\" enctype=\"multipart/form-data\" action=\"{2}\" method=\"post\" >", remoteFunc, formId, options["url"]);
 		}
 		
 		#endregion
@@ -591,8 +463,12 @@ namespace Castle.MonoRail.Framework.Helpers
 		#region ObserveForm
 
 		/// <summary>
-		/// Works like the <see cref="ObserveField"/>, but operates on an entire form identified by the
-		/// DOM ID <c>formId</c>. Options are the same as <see cref="ObserveField"/>, except 
+		/// Like <see cref="ObserveField(IDictionary)"/>, but operates on an entire form identified by the
+		/// DOM ID <c>formId</c>. options are the same as <see cref="ObserveField(IDictionary)"/>, except 
+		/// the default value of the <tt>:with</tt> option evaluates to the
+		/// serialized (request String) value of the form.
+		/// Works like the <see cref="ObserveField(IDictionary)"/>, but operates on an entire form identified by the
+		/// DOM ID <c>formId</c>. Options are the same as <see cref="ObserveField(IDictionary)"/>, except 
 		/// the default value of the <c>with</c> option evaluates to the
 		/// serialized (request String) value of the entire form.
 		/// </summary>
@@ -609,21 +485,21 @@ namespace Castle.MonoRail.Framework.Helpers
 		///                       to 'value', which in the evaluated context 
 		///                       refers to the new field value.</param>
 		/// <returns>javascript that activates the observer</returns>
-		public String ObserveForm(String formId, int frequency, String url, String idOfElementToBeUpdated, String with)
+		public String ObserveForm(String formId, int frequency, String url, String idOfElementToBeUpdated, object with)
 		{
 			IDictionary options = new HybridDictionary();
 			options["frequency"] = frequency;
 			options["url"] = url;
 
 			if (idOfElementToBeUpdated != null && idOfElementToBeUpdated.Length > 0) options["update"] = idOfElementToBeUpdated;
-			if (with != null && with.Length > 0) options["with"] = with;
+			if (with != null) options["with"] = ProcessWith(with);
 
 			return ObserveForm(formId, options);
 		}
 
 		/// <summary>
-		/// Like <see cref="ObserveField"/>, but operates on an entire form identified by the
-		/// DOM ID <c>formId</c>. options are the same as <see cref="ObserveField"/>, except 
+		/// Like <see cref="ObserveField(IDictionary)"/>, but operates on an entire form identified by the
+		/// DOM ID <c>formId</c>. options are the same as <see cref="ObserveField(IDictionary)"/>, except 
 		/// the default value of the <c>with</c> option evaluates to the
 		/// serialized (request String) value of the entire form.
 		/// </summary>
@@ -864,11 +740,6 @@ namespace Castle.MonoRail.Framework.Helpers
 				}
 			}
 
-			if (options.Contains("with"))
-			{
-				options["callback"] = String.Format( "function(element, value) { return {0} }", options["with"] );
-			}
-
 			if (options.Contains("indicator"))
 			{
 				options["indicator"] = String.Format( "'{0}'", options["indicator"] );
@@ -936,6 +807,7 @@ namespace Castle.MonoRail.Framework.Helpers
 				if (options.Contains("update"))
 				{
 					contents.AppendFormat( "'{0}', ", options["update"] );
+					options.Remove("update");
 				}
 				else
 				{
@@ -947,11 +819,17 @@ namespace Castle.MonoRail.Framework.Helpers
 					{
 						contents.AppendFormat( "success:'{0}'", options["success"] );
 						commaFirst = true;
+						options.Remove("success");
 					}
+
 					if (options.Contains("failure"))
 					{
-						if (commaFirst) contents.Append(",");
+						if (commaFirst)
+						{
+							contents.Append(",");
+						}
 						contents.AppendFormat( "failure:'{0}'", options["failure"] );
+						options.Remove("failure");
 					}
 
 					contents.Append("}, ");
@@ -965,21 +843,26 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (options.Contains("before"))
 			{
-				contents = new StringBuilder( String.Format("{0}; {1}", 
-					options["before"].ToString(), contents.ToString()) );
+				contents = new StringBuilder( String.Format("{0}; {1}", options["before"], contents) );
+
+				options.Remove("before");
 			}
 
 			if (options.Contains("after"))
 			{
-				contents = new StringBuilder( String.Format("{1}; {0}", 
-					options["after"].ToString(), contents.ToString()) );
+				contents = new StringBuilder( String.Format("{1}; {0}", options["after"], contents) );
+
+				options.Remove("after");
 			}
 
 			if (options.Contains("condition"))
 			{
 				String old = contents.ToString();
+
 				contents = new StringBuilder( 
 					String.Format("if ( {0} ) {{ {1}; }}", options["condition"], old) );
+
+				options.Remove("condition");
 			}
 
 			return contents.ToString();
@@ -1001,7 +884,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			BuildCallbacks(jsOptions, options);
 
-			jsOptions["asynchronous"] = (!options.Contains("type")).ToString().ToLower();
+			jsOptions["asynchronous"] = (!options.Contains("type")).ToString().ToLower(System.Globalization.CultureInfo.InvariantCulture);
 
 			if (options.Contains("method"))
 			{
@@ -1028,30 +911,22 @@ namespace Castle.MonoRail.Framework.Helpers
 			}
 			else if (options.Contains("with"))
 			{
-				jsOptions["parameters"] = options["with"];
+				jsOptions["parameters"] = ProcessWith(options["with"]);
 			}
 
 			return JavascriptOptions(jsOptions);
 		}
 
-		private String JavascriptOptions(IDictionary jsOptions)
+		private string ProcessWith(object with)
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append("{");
-			bool comma = false;
-	
-			foreach(DictionaryEntry entry in jsOptions)
-			{
-				if (!comma)
-					comma = true;
-				else
-					sb.Append(", ");
+			if (with == null) return null;
 
-				sb.Append( String.Format("{0}:{1}", entry.Key, entry.Value) );
+			if (with is IDictionary)
+			{
+				return SQuote(CommonUtils.BuildQueryString(ServerUtility, with as IDictionary, false));
 			}
-	
-			sb.Append("}");
-			return sb.ToString();
+
+			return with.ToString();
 		}
 
 		private void BuildCallbacks(IDictionary jsOptions, IDictionary options)
@@ -1060,13 +935,13 @@ namespace Castle.MonoRail.Framework.Helpers
 			
 			foreach(String name in names)
 			{
-				if (!options.Contains(name.ToLower())) continue;
+				if (!options.Contains(name)) continue;
 
 				String callbackFunctionName;
 
 				String function = BuildCallbackFunction( 
-					(CallbackEnum) Enum.Parse( typeof(CallbackEnum), name, true), 
-					options[name.ToLower()] as String, out callbackFunctionName );
+					(CallbackEnum) Enum.Parse( typeof(CallbackEnum), name, true),
+					options[name].ToString(), out callbackFunctionName);
 
 				if (function == String.Empty) return;
 
@@ -1082,7 +957,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (callback != CallbackEnum.OnFailure && callback != CallbackEnum.OnSuccess)
 			{
-				name = "on" + callback.ToString();
+				name = "on" + callback;
 			}
 			else if (callback == CallbackEnum.OnFailure)
 			{
@@ -1129,7 +1004,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		public IDictionary GetOptions(String url, String idOfElementToBeUpdated, 
-		                              String with, String loading, String loaded, String complete, String interactive)
+		                              object with, String loading, String loaded, String complete, String interactive)
 		{
 			IDictionary options = new HybridDictionary();
 	
@@ -1137,7 +1012,7 @@ namespace Castle.MonoRail.Framework.Helpers
 			options["url"] = url;
 			//	options["method"] = method;
 	
-			if (with != null && with.Length > 0) options["with"] = with;
+			if (with != null) options["with"] = with;
 			if (idOfElementToBeUpdated != null && idOfElementToBeUpdated.Length > 0) options["update"] = idOfElementToBeUpdated;
 			if (loading != null && loading.Length > 0) options["Loading"] = loading;
 			if (loaded != null && loaded.Length > 0) options["Loaded"] = loaded;

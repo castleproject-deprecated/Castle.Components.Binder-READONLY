@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ namespace Castle.MonoRail.Framework.Services
 		private ILayoutDescriptorProvider layoutDescriptorProvider;
 		private IRescueDescriptorProvider rescueDescriptorProvider;
 		private IResourceDescriptorProvider resourceDescriptorProvider;
+		private ITransformFilterDescriptorProvider transformFilterDescriptorProvider;
 
 		#region IServiceEnabledComponent implementation
 
@@ -70,6 +71,9 @@ namespace Castle.MonoRail.Framework.Services
 		
 			resourceDescriptorProvider = (IResourceDescriptorProvider)
 				serviceProvider.GetService(typeof(IResourceDescriptorProvider));
+			
+			transformFilterDescriptorProvider = (ITransformFilterDescriptorProvider)
+				serviceProvider.GetService(typeof(ITransformFilterDescriptorProvider));
 		}
 
 		#endregion
@@ -137,7 +141,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Building controller descriptor for {0}", controllerType);
+				logger.DebugFormat("Building controller descriptor for {0}", controllerType);
 			}
 
 			ControllerMetaDescriptor descriptor = new ControllerMetaDescriptor();
@@ -147,7 +151,7 @@ namespace Castle.MonoRail.Framework.Services
 			CollectActions(controllerType, descriptor);
 
 			CollectActionLevelAttributes(descriptor);
-
+			
 			return descriptor;
 		}
 
@@ -156,7 +160,7 @@ namespace Castle.MonoRail.Framework.Services
 		private void CollectActions(Type controllerType, ControllerMetaDescriptor desc)
 		{
 			// HACK: GetRealControllerType is a workaround for DYNPROXY-14 bug
-			// see: http://support.castleproject.org/jira/browse/DYNPROXY-14
+			// see: http://support.castleproject.org/browse/DYNPROXY-14
 			controllerType = GetRealControllerType(controllerType);
 
 			MethodInfo[] methods = controllerType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
@@ -215,7 +219,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Collection attributes for action {0}", method.Name);
+				logger.DebugFormat("Collection attributes for action {0}", method.Name);
 			}
 
 			ActionMetaDescriptor actionDescriptor = descriptor.GetAction(method);
@@ -226,6 +230,8 @@ namespace Castle.MonoRail.Framework.Services
 			CollectAccessibleThrough(actionDescriptor, method);
 			CollectSkipRescue(actionDescriptor, method);
 			CollectLayout(actionDescriptor, method);
+			CollectCacheConfigures(actionDescriptor, method);
+			CollectTransformFilter(actionDescriptor, method);
 			
 			if (method.IsDefined(typeof(AjaxActionAttribute), true))
 			{
@@ -257,7 +263,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			object[] attributes = method.GetCustomAttributes(typeof(SkipFilterAttribute), true);
 			
-			foreach (SkipFilterAttribute attr in attributes)
+			foreach(SkipFilterAttribute attr in attributes)
 			{
 				actionDescriptor.SkipFilters.Add(attr);
 			}
@@ -267,18 +273,31 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			desc.Resources = resourceDescriptorProvider.CollectResources(memberInfo);
 		}
+
+		private void CollectTransformFilter(ActionMetaDescriptor actionDescriptor, MethodInfo method)
+		{
+			actionDescriptor.TransformFilters = transformFilterDescriptorProvider.CollectFilters((method));
+			Array.Sort(actionDescriptor.TransformFilters, TransformFilterDescriptorComparer.Instance);
+		}
 		
+		/// <summary>
+		/// Gets the real controller type, instead of the proxy type.
+		/// </summary>
+		/// <remarks>
+		/// Workaround for DYNPROXY-14 bug. See: http://support.castleproject.org/browse/DYNPROXY-14
+		/// </remarks>
 		private Type GetRealControllerType(Type controllerType)
 		{
 			Type prev = controllerType;
 
-			// try to get the first type which is not a proxy
-			// TODO: skip it in case of mixins
-			while (controllerType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen"))
+			// try to get the first non-proxy type
+			while(controllerType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2") || 
+				  controllerType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen"))
 			{
 				controllerType = controllerType.BaseType;
 
-				if (controllerType == typeof(SmartDispatcherController) || controllerType == typeof(Controller))
+				if (controllerType == typeof(SmartDispatcherController) || 
+				    controllerType == typeof(Controller))
 				{
 					// oops, it's a pure-proxy controller. just let it go.
 					controllerType = prev;
@@ -343,28 +362,42 @@ namespace Castle.MonoRail.Framework.Services
 
 		private void CollectHelpers(ControllerMetaDescriptor descriptor, Type controllerType)
 		{
-			descriptor.Helpers = 
-				helperDescriptorProvider.CollectHelpers(controllerType);
+			descriptor.Helpers = helperDescriptorProvider.CollectHelpers(controllerType);
 		}
 
 		private void CollectFilters(ControllerMetaDescriptor descriptor, Type controllerType)
 		{
-			descriptor.Filters = 
-				filterDescriptorProvider.CollectFilters(controllerType);
+			descriptor.Filters = filterDescriptorProvider.CollectFilters(controllerType);
 
 			Array.Sort(descriptor.Filters, FilterDescriptorComparer.Instance);
 		}
 
 		private void CollectLayout(BaseMetaDescriptor descriptor, MemberInfo memberInfo)
 		{
-			descriptor.Layout = 
-				layoutDescriptorProvider.CollectLayout(memberInfo);
+			descriptor.Layout = layoutDescriptorProvider.CollectLayout(memberInfo);
 		}
 
-		private void CollectRescues(BaseMetaDescriptor descriptor, MemberInfo memberInfo)
+		private void CollectRescues(BaseMetaDescriptor descriptor, MethodInfo memberInfo)
 		{
-			descriptor.Rescues = 
-				rescueDescriptorProvider.CollectRescues(memberInfo);
+			descriptor.Rescues = rescueDescriptorProvider.CollectRescues(memberInfo);
+		}
+
+		private void CollectRescues(BaseMetaDescriptor descriptor, Type type)
+		{
+			descriptor.Rescues = rescueDescriptorProvider.CollectRescues(type);
+		}
+
+		private void CollectCacheConfigures(ActionMetaDescriptor descriptor, MemberInfo memberInfo)
+		{
+			object[] configurers = memberInfo.GetCustomAttributes(typeof(ICachePolicyConfigurer), true);
+
+			if (configurers.Length != 0)
+			{
+				foreach(ICachePolicyConfigurer cacheConfigurer in configurers)
+				{
+					descriptor.CacheConfigurers.Add(cacheConfigurer);
+				}
+			}
 		}
 
 		#endregion
@@ -389,6 +422,29 @@ namespace Castle.MonoRail.Framework.Services
 			public int Compare(object left, object right)
 			{
 				return ((FilterDescriptor) left).ExecutionOrder - ((FilterDescriptor) right).ExecutionOrder;
+			}
+		}
+
+		/// <summary>
+		/// This <see cref="IComparer"/> implementation
+		/// is used to sort the transformfilters based on their Execution Order.
+		/// </summary>
+		class TransformFilterDescriptorComparer : IComparer
+		{
+			private static readonly TransformFilterDescriptorComparer instance = new TransformFilterDescriptorComparer();
+
+			private TransformFilterDescriptorComparer()
+			{
+			}
+
+			public static TransformFilterDescriptorComparer Instance
+			{
+				get { return instance; }
+			}
+
+			public int Compare(object left, object right)
+			{
+				return ((TransformFilterDescriptor)right).ExecutionOrder - ((TransformFilterDescriptor)left).ExecutionOrder;
 			}
 		}
 	}

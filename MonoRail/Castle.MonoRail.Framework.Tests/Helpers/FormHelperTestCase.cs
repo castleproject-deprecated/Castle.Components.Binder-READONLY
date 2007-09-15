@@ -1,4 +1,4 @@
-// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 {
 	using System;
 	using System.Collections;
-#if DOTNET2
 	using System.Collections.Generic;
-#endif
+	using System.Collections.Specialized;
 	using System.Globalization;
 	using System.IO;
 	using System.Threading;
-
+	using Castle.DynamicProxy;
 	using Castle.MonoRail.Framework.Helpers;
 	using Castle.MonoRail.Framework.Tests.Controllers;
 	
@@ -32,10 +31,11 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 	public class FormHelperTestCase
 	{
 		private FormHelper helper;
-		private Product product;
+		private Product product, productProxy;
 		private SimpleUser user;
 		private Subscription subscription;
 		private Month[] months;
+		private ProxyGenerator generator = new ProxyGenerator();
 
 		[SetUp]
 		public void Init()
@@ -50,11 +50,19 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			subscription = new Subscription();
 			months = new Month[] {new Month(1, "January"), new Month(1, "February")};
 			product = new Product("memory card", 10, (decimal) 12.30);
+			
+			productProxy = (Product) generator.CreateClassProxy(typeof(Product), new StandardInterceptor());
+			
+			productProxy.Name = "memory card";
+			productProxy.Quantity = 10;
+			productProxy.Price = (decimal) 12.30;
+
 			user = new SimpleUser();
 
 			HomeController controller = new HomeController();
 
 			controller.PropertyBag.Add("product", product);
+			controller.PropertyBag.Add("productproxy", productProxy);
 			controller.PropertyBag.Add("user", user);
 			controller.PropertyBag.Add("roles", new Role[] { new Role(1, "a"), new Role(2, "b"), new Role(3, "c") });
 			controller.PropertyBag.Add("sendemail", true);
@@ -64,6 +72,13 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			controller.PropertyBag.Add("months", months);
 
 			helper.SetController(controller);
+		}
+
+		[Test]
+		public void FormTagDoesNotMixUrlParametersWithFormElementParameters()
+		{
+			// No solution here. Id is ambiguous
+			// helper.FormTag(DictHelper.Create("noaction=true"));
 		}
 		
 		[Test]
@@ -97,8 +112,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			list.Add("cat1");
 			list.Add("cat2");
 
-			Assert.AreEqual("<select id=\"something\" name=\"product.category.id\" >\r\n" + 
-				"<option value=\"cat1\">cat1</option>\r\n<option value=\"cat2\">cat2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"something\" name=\"product.category.id\" >" + Environment.NewLine +
+				"<option value=\"cat1\">cat1</option>" + Environment.NewLine + "<option value=\"cat2\">cat2</option>" + Environment.NewLine + "</select>",
 				helper.Select("product.category.id", list, DictHelper.Create("id=something")));
 		}
 
@@ -109,6 +124,34 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 				helper.TextField("product.name"));
 			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" />", 
 				helper.TextField("product.quantity"));
+		}
+
+		[Test]
+		public void ProxiedComponent()
+		{
+			Assert.AreEqual("<input type=\"text\" id=\"productproxy_name\" name=\"productproxy.name\" value=\"memory card\" />",
+				helper.TextField("productproxy.name"));
+			Assert.AreEqual("<input type=\"text\" id=\"productproxy_quantity\" name=\"productproxy.quantity\" value=\"10\" />",
+				helper.TextField("productproxy.quantity"));
+		}
+
+		[Test]
+		public void NumberField()
+		{
+			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [], []);\" />",
+				helper.NumberField("product.quantity"));
+			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [1], []);\" />",
+				helper.NumberField("product.quantity", DictHelper.Create("exceptions=1")));
+			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [1,2], []);\" />",
+				helper.NumberField("product.quantity", DictHelper.Create("exceptions=1,2")));
+		}
+
+		[Test]
+		public void MaskedNumberField()
+		{
+			Assert.AreEqual("<input type=\"text\" id=\"product_quantity\" name=\"product.quantity\" value=\"10\" onKeyPress=\"return monorail_formhelper_numberonly(event, [], []);\" " +
+				"onBlur=\"javascript:void(0);return monorail_formhelper_mask(event,this,'2,5','-');\" onKeyUp=\"javascript:void(0);return monorail_formhelper_mask(event,this,'2,5','-');\" />",
+				helper.NumberField("product.quantity", DictHelper.Create("mask=2,5")));
 		}
 
 		[Test]
@@ -133,7 +176,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		public void TextFieldFormat()
 		{
 			Assert.AreEqual("<input type=\"text\" id=\"product_price\" name=\"product.price\" value=\"$12.30\" />", 
-				helper.TextFieldFormat("product.price", "C"));
+				helper.TextField("product.price", DictHelper.Create("textformat=C")));
 		}
 
 		[Test]
@@ -207,6 +250,14 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		}
 
 		[Test]
+		public void LabelForAttributed()
+		{
+			IDictionary attrs = new ListDictionary();
+			attrs.Add("class", "cssclass");
+			Assert.AreEqual("<label for=\"product_name\" class=\"cssclass\" >Name:</label>",
+			                helper.LabelFor("product.name", "Name:",attrs));
+		}
+		[Test]
 		public void TextFieldWithIndex()
 		{
 			Assert.AreEqual("<input type=\"text\" id=\"roles_0_Id\" name=\"roles[0].Id\" value=\"1\" />",
@@ -260,8 +311,6 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 				helper.TextField("user.roles[1].Name"));
 		}
 
-#if DOTNET2
-		
 		[Test]
 		public void IndexedValueTextFieldInDotNet2()
 		{
@@ -274,8 +323,6 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			Assert.AreEqual("<input type=\"text\" id=\"subscription_months4_0_name\" name=\"subscription.months4[0].name\" value=\"Jan\" />",
 				helper.TextField("subscription.months4[0].name"));
 		}
-
-#endif
 
 		[Test, ExpectedException(typeof(RailsException))]
 		public void InvalidIndex1()
@@ -327,9 +374,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		int[] months; 
 		IList months2 = new ArrayList();
 		Month[] months3;
-#if DOTNET2
 		IList<Month> months4 = new CustomList<Month>();
-#endif
 
 		public int[] Months
 		{
@@ -349,24 +394,24 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			set { months3 = value; }
 		}
 
-#if DOTNET2
-
 		public IList<Month> Months4
 		{
-			get { return this.months4; }
-			set { this.months4 = value; }
+			get { return months4; }
+			set { months4 = value; }
 		}
-
-#endif
 	}
 
 	public class Product
 	{
-		private String name;
+		private string name;
 		private int quantity;
-		private Decimal price;
 		private bool isAvailable;
+		private decimal price;
 		private ProductCategory category = new ProductCategory();
+
+		public Product()
+		{
+		}
 
 		public Product(string name, int quantity, decimal price)
 		{
@@ -375,31 +420,31 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			this.price = price;
 		}
 
-		public string Name
+		public virtual string Name
 		{
 			get { return name; }
 			set { name = value; }
 		}
 
-		public int Quantity
+		public virtual int Quantity
 		{
 			get { return quantity; }
 			set { quantity = value; }
 		}
 
-		public decimal Price
+		public virtual decimal Price
 		{
 			get { return price; }
 			set { price = value; }
 		}
 
-		public bool IsAvailable
+		public virtual bool IsAvailable
 		{
 			get { return isAvailable; }
 			set { isAvailable = value; }
 		}
 
-		public ProductCategory Category
+		public virtual ProductCategory Category
 		{
 			get { return category; }
 			set { category = value; }
@@ -506,10 +551,28 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 
 	public class SimpleUser
 	{
+		public enum RegistrationEnum
+		{
+			unregistered = 1,
+			pending = 2,
+			registered = 6
+		}
+
 		private int id;
 		private String name;
 		private ArrayList roles = new ArrayList();
 		private bool isActive;
+		private RegistrationEnum registration = RegistrationEnum.registered;
+
+		public SimpleUser()
+		{
+		}
+
+		public SimpleUser(int id, bool isActive)
+		{
+			this.id = id;
+			this.isActive = isActive;
+		}
 
 		public int Id
 		{
@@ -527,6 +590,12 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		{
 			get { return name; }
 			set { name = value; }
+		}
+
+		public RegistrationEnum Registration
+		{
+			get { return registration; }
+			set { registration = value; }
 		}
 
 		public Role[] RolesAsArray
@@ -552,8 +621,6 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		}
 	}
 	
-#if DOTNET2
-
 	public class CustomList<T> : IList<T>
 	{
 		private List<T> innerList = new List<T>();
@@ -625,7 +692,67 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		}
 	}
 
-#endif
+	public interface IInterfacedList
+	{
+		int Id { get; set;}
+		string Name { get; set;}
+	}
+
+	public class InterfacedClassA : IInterfacedList
+	{
+		private int id;
+		private string name;
+
+		public InterfacedClassA(int id, string name)
+		{
+			this.id = id;
+			this.name = name;
+		}
+
+		#region IInterfacedList Members
+
+		public int Id
+		{
+			get{ return id; }
+			set{ id = value; }
+		}
+
+		public string Name
+		{
+			get{ return name; }
+			set{ name = value; }
+		}
+
+		#endregion
+	}
+
+	public class InterfacedClassB : IInterfacedList
+	{
+		private int id;
+		private string name;
+
+		public InterfacedClassB(int id, string name)
+		{
+			this.id = id;
+			this.name = name;
+		}
+
+		#region IInterfacedList Members
+
+		public int Id
+		{
+			get { return id; }
+			set { id = value; }
+		}
+
+		public string Name
+		{
+			get { return name; }
+			set { name = value; }
+		}
+
+		#endregion
+	}
 
 	#endregion
 }

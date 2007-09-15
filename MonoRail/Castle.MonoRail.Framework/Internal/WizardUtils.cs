@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ namespace Castle.MonoRail.Framework.Internal
 
 			String wizardName = WizardUtils.ConstructWizardNamespace(controller);
 
-			IList stepList = (IList) context.UnderlyingContext.Items["wizard.step.list"];
+			IList stepList = (IList) context.Items["wizard.step.list"];
 
 			int currentIndex = (int) context.Session[wizardName + "currentstepindex"];
 						
@@ -61,7 +61,7 @@ namespace Castle.MonoRail.Framework.Internal
 
 			int curIndex = (int) context.Session[wizardName + "currentstepindex"];
 
-			IList stepList = (IList) context.UnderlyingContext.Items["wizard.step.list"];
+			IList stepList = (IList) context.Items["wizard.step.list"];
 
 			if ((curIndex - 1) >= 0)
 			{
@@ -79,7 +79,7 @@ namespace Castle.MonoRail.Framework.Internal
 
 			int curIndex = (int) context.Session[wizardName + "currentstepindex"];
 
-			IList stepList = (IList) context.UnderlyingContext.Items["wizard.step.list"];
+			IList stepList = (IList) context.Items["wizard.step.list"];
 
 			if ((curIndex + 1) < stepList.Count)
 			{
@@ -93,7 +93,7 @@ namespace Castle.MonoRail.Framework.Internal
 		{
 			IRailsEngineContext context = controller.Context;
 
-			IList stepList = (IList) context.UnderlyingContext.Items["wizard.step.list"];
+			IList stepList = (IList) context.Items["wizard.step.list"];
 
 			for(int i=0; i < stepList.Count; i++)
 			{

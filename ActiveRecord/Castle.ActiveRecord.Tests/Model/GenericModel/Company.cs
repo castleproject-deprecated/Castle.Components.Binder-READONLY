@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if DOTNET2
 namespace Castle.ActiveRecord.Tests.Model.GenericModel
 {
 	using System;
 	using System.Collections;
+	using Iesi.Collections.Generic;
 
 	[ActiveRecord( "Companies", DiscriminatorColumn = "type", DiscriminatorType = "String", DiscriminatorValue = "company" )]
 	public class Company : ActiveRecordBase<Company>
 	{
 		private int id;
 		private String name;
-		private IList _people;
+		private ISet<Person> _people = new HashedSet<Person>();
 		private PostalAddress _address;
 
 		public Company()
@@ -56,9 +56,9 @@ namespace Castle.ActiveRecord.Tests.Model.GenericModel
 			set { _address = value; }
 		}
 
-		[HasAndBelongsToMany( typeof( Person ), RelationType.Bag,
-			 Table = "PeopleCompanies", ColumnRef = "person_id", ColumnKey = "company_id" )]
-		public IList People
+		[HasAndBelongsToMany(Table = "PeopleCompanies", 
+			ColumnRef = "person_id", ColumnKey = "company_id" )]
+		public ISet<Person> People
 		{
 			get { return _people; }
 			set { _people = value; }
@@ -117,4 +117,3 @@ namespace Castle.ActiveRecord.Tests.Model.GenericModel
        
 	}
 } 
-#endif

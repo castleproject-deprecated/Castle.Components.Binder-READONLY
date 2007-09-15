@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,13 +34,15 @@ namespace Castle.MonoRail.Framework.Configuration
 
 				if (patternNode == null || patternNode.ChildNodes.Count == 0 || patternNode.ChildNodes[0] == null)
 				{
-					throw new ConfigurationException("A rule node must have a pattern (child) " + 
-						"node denoting the regular expression to be matched");
+					String message = "A rule node must have a pattern (child) " + 
+						"node denoting the regular expression to be matched";
+					throw new ConfigurationErrorsException(message);
 				}
 				if (replaceNode == null || replaceNode.ChildNodes.Count == 0 || replaceNode.ChildNodes[0] == null)
 				{
-					throw new ConfigurationException("A rule node must have a replace (child) " + 
-						"node denoting the string to be replaced");
+					String message = "A rule node must have a replace (child) " + 
+						"node denoting the string to be replaced";
+					throw new ConfigurationErrorsException(message);
 				}
 
 				String pattern = patternNode.ChildNodes[0].Value;

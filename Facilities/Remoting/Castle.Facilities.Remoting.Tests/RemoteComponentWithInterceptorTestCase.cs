@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 namespace Castle.Facilities.Remoting.Tests
 {
 	using System;
-	using System.Runtime.Remoting;
 
 	using Castle.Windsor;
 	using Castle.Facilities.Remoting.TestComponents;
@@ -27,7 +26,7 @@ namespace Castle.Facilities.Remoting.Tests
 	{
 		protected override String GetServerConfigFile()
 		{
-			return BuildConfigPath("/server_kernelcomponent_inter1.xml");
+			return BuildConfigPath("server_kernelcomponent_inter1.xml");
 		}
 
 		[Test]
@@ -41,9 +40,6 @@ namespace Castle.Facilities.Remoting.Tests
 			IWindsorContainer clientContainer = CreateRemoteContainer(clientDomain, BuildConfigPath("client_kernelcomponent.xml"));
 
 			ICalcService service = (ICalcService) clientContainer[ typeof(ICalcService) ];
-
-			Assert.IsTrue( RemotingServices.IsTransparentProxy(service) );
-			Assert.IsTrue( RemotingServices.IsObjectOutOfAppDomain(service) );
 
 			// The result is being intercepted, that's why we 
 			// assert for 20 instead of 10

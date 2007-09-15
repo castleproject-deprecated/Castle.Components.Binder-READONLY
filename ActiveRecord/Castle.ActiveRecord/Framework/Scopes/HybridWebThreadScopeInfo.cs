@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,17 @@ namespace Castle.ActiveRecord.Framework.Scopes
 	using System.Collections;
 	using System.Runtime.CompilerServices;
 	using System.Web;
+	using Castle.ActiveRecord.Framework;
 
-	public class HybridWebThreadScopeInfo : AbstractThreadScopeInfo
+	/// <summary>
+	/// This <see cref="IThreadScopeInfo"/> implementation will first try to get the current scope from the current 
+	/// request, and if not found, will use a thread lcoal scope.
+	/// </summary>
+	/// <remarks>
+	/// This is used for scenarios where most of the you need per request scope, but you also does some work outside a 
+	/// request (in a thread pool thread, for instnace).
+	/// </remarks>
+	public class HybridWebThreadScopeInfo : AbstractThreadScopeInfo, IWebThreadScopeInfo
 	{
 		const string ActiveRecordCurrentStack = "activerecord.currentstack";
 
@@ -27,6 +36,10 @@ namespace Castle.ActiveRecord.Framework.Scopes
 		
 		[ThreadStatic] static Stack stack;
 
+		/// <summary>
+		/// Gets the current stack.
+		/// </summary>
+		/// <value>The current stack.</value>
 		public override Stack CurrentStack
 		{
 			[MethodImpl(MethodImplOptions.Synchronized)]
@@ -47,7 +60,7 @@ namespace Castle.ActiveRecord.Framework.Scopes
 					}
 				}
 
-				Stack contextstack = (Stack) current.Items[ActiveRecordCurrentStack];
+				Stack contextstack = (Stack)current.Items[ActiveRecordCurrentStack];
 
 				if (contextstack == null)
 				{

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@ namespace Castle.Facilities.NHibernateIntegration
 	/// through the component <see cref="ISessionManager"/>, which is 
 	/// transaction aware and save you the burden of sharing session
 	/// or using a singleton.
-	/// <
 	/// </para>
 	/// </remarks>
 	/// <example>The following sample illustrates how a component 
@@ -74,6 +73,8 @@ namespace Castle.Facilities.NHibernateIntegration
 	/// </example>
 	public class NHibernateFacility : AbstractFacility
 	{
+		private const String nHMappingAttributesAssemblyName = "NHibernate.Mapping.Attributes";
+		
 		protected override void Init()
 		{
 			AssertHasConfig();
@@ -124,8 +125,10 @@ namespace Castle.Facilities.NHibernateIntegration
 
 				if (!typeof(ISessionStore).IsAssignableFrom(sessionStoreType))
 				{
-					throw new ConfigurationException("The specified customStore does " + 
-						"not implement the interface ISessionStore. Type " + customStore);
+					String message = "The specified customStore does " + 
+						"not implement the interface ISessionStore. Type " + customStore;
+
+						throw new ConfigurationErrorsException(message);
 				}
 			}
 
@@ -155,8 +158,8 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		protected void RegisterTransactionManager()
 		{
-			Kernel.AddComponent( "nhibernate.transaction.manager", 
-			   typeof(ITransactionManager), typeof(NHibernateTransactionManager) );
+			Kernel.AddComponent( "nhibernate.transaction.manager",
+			   typeof(ITransactionManager), typeof(DefaultTransactionManager));
 		}
 
 		#endregion
@@ -176,7 +179,9 @@ namespace Castle.Facilities.NHibernateIntegration
 			{
 				if (!"factory".Equals(factoryConfig.Name))
 				{
-					throw new ConfigurationException("Unexpected node " + factoryConfig.Name);
+					String message = "Unexpected node " + factoryConfig.Name;
+
+					throw new ConfigurationErrorsException(message);
 				}
 
 				ConfigureFactories(factoryConfig, sessionFactoryResolver, firstFactory);
@@ -221,18 +226,22 @@ namespace Castle.Facilities.NHibernateIntegration
 
 			if (id == null || String.Empty.Equals(id))
 			{
-				throw new ConfigurationException("You must provide a " + 
+				String message = "You must provide a " + 
 					"valid 'id' attribute for the 'factory' node. This id is used as key for " + 
-					"the ISessionFactory component registered on the container");
+					"the ISessionFactory component registered on the container";
+
+				throw new ConfigurationErrorsException(message);
 			}
 
 			String alias = config.Attributes["alias"];
 
 			if (!firstFactory && (alias == null || alias.Length == 0))
 			{
-				throw new ConfigurationException("You must provide a " + 
+				String message = "You must provide a " + 
 					"valid 'alias' attribute for the 'factory' node. This id is used to obtain " + 
-					"the ISession implementation from the SessionManager");
+					"the ISession implementation from the SessionManager";
+
+				throw new ConfigurationErrorsException(message);
 			}
 			else if (alias == null || alias.Length == 0)
 			{
@@ -300,6 +309,42 @@ namespace Castle.Facilities.NHibernateIntegration
 			}
 		}
 
+		/// <summary>
+		/// If <paramref name="targetAssembly"/> has a reference on
+		/// <c>NHibernate.Mapping.Attributes</c> : use the NHibernate mapping
+		/// attributes contained in that assembly to update NHibernate
+		/// configuration (<paramref name="cfg"/>). Else do nothing
+		/// </summary>
+		/// <remarks>
+		/// To avoid an unnecessary dependency on the library
+		/// <c>NHibernate.Mapping.Attributes.dll</c> when using this
+		/// facility without NHibernate mapping attributes, all calls to that
+		/// library are made using reflexion.
+		/// </remarks>
+		/// <param name="cfg">NHibernate configuration</param>
+		/// <param name="targetAssembly">Target assembly name</param>
+		protected void GenerateMappingFromAttributesIfNeeded(Configuration cfg, String targetAssembly)
+		{
+			//Get an array of all assemblies referenced by targetAssembly
+			AssemblyName[] refAssemblies = Assembly.Load(targetAssembly).GetReferencedAssemblies();
+
+			//If assembly "NHibernate.Mapping.Attributes" is referenced in targetAssembly
+			if (Array.Exists<AssemblyName>(refAssemblies, delegate(AssemblyName an) { return an.Name.Equals(nHMappingAttributesAssemblyName); }))
+			{
+			//Obtains, by reflexion, the necessary tools to generate NH mapping from attributes
+			Type HbmSerializerType = Type.GetType(String.Concat(nHMappingAttributesAssemblyName, ".HbmSerializer, ", nHMappingAttributesAssemblyName));
+			Object hbmSerializer = Activator.CreateInstance(HbmSerializerType);
+			PropertyInfo validate = HbmSerializerType.GetProperty("Validate");
+			MethodInfo serialize = HbmSerializerType.GetMethod("Serialize", new Type[] { typeof(Assembly) });
+
+			//Enable validation of mapping documents generated from the mapping attributes
+			validate.SetValue(hbmSerializer, true, null);
+
+			//Generates a stream of mapping documents from all decorated classes in targetAssembly and add it to NH config
+			cfg.AddInputStream((MemoryStream)serialize.Invoke(hbmSerializer, new object[] { Assembly.Load(targetAssembly) }));
+			}
+		}
+
 		protected void RegisterAssemblies(Configuration cfg, IConfiguration facilityConfig)
 		{
 			if (facilityConfig == null) return;
@@ -309,6 +354,8 @@ namespace Castle.Facilities.NHibernateIntegration
 				String assembly = item.Value;
 
 				cfg.AddAssembly(assembly);
+
+				GenerateMappingFromAttributesIfNeeded(cfg, assembly);
 			}
 		}
 
@@ -325,7 +372,8 @@ namespace Castle.Facilities.NHibernateIntegration
 			catch(Exception ex)
 			{
 				String message = String.Format("The assembly {0} could not be loaded.", assembly);
-				throw new ConfigurationException( message, ex );
+
+				throw new ConfigurationErrorsException(message, ex);
 			}
 		}
 
@@ -335,7 +383,9 @@ namespace Castle.Facilities.NHibernateIntegration
 	
 			if (factoriesConfig == null)
 			{
-				throw new ConfigurationException("You need to configure at least one factory to use the NHibernateFacility");
+				String message = "You need to configure at least one factory to use the NHibernateFacility";
+
+				throw new ConfigurationErrorsException(message);
 			}
 		}
 
@@ -343,7 +393,9 @@ namespace Castle.Facilities.NHibernateIntegration
 		{
 			if (FacilityConfig == null)
 			{
-				throw new ConfigurationException("The NHibernateFacility requires an external configuration");
+				String message = "The NHibernateFacility requires an external configuration";
+
+				throw new ConfigurationErrorsException(message);
 			}
 		}
 

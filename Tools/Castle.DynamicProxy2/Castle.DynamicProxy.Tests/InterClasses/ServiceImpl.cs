@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 namespace Castle.DynamicProxy.Tests.InterClasses
 {
 	using System;
-	
+
 	public class ServiceImpl : IService, IExtendedService
 	{
 		public int Sum(int b1, int b2)
@@ -25,7 +25,7 @@ namespace Castle.DynamicProxy.Tests.InterClasses
 
 		public byte Sum(byte b1, byte b2)
 		{
-			return System.Convert.ToByte(b1 + b2);
+			return Convert.ToByte(b1 + b2);
 		}
 
 		public long Sum(long b1, long b2)
@@ -35,7 +35,7 @@ namespace Castle.DynamicProxy.Tests.InterClasses
 
 		public short Sum(short b1, short b2)
 		{
-			return (short)(b1 + b2);
+			return (short) (b1 + b2);
 		}
 
 		public float Sum(float b1, float b2)
@@ -50,7 +50,7 @@ namespace Castle.DynamicProxy.Tests.InterClasses
 
 		public UInt16 Sum(UInt16 b1, UInt16 b2)
 		{
-			return (UInt16)(b1 + b2);
+			return (UInt16) (b1 + b2);
 		}
 
 		public UInt32 Sum(UInt32 b1, UInt32 b2)
@@ -70,7 +70,6 @@ namespace Castle.DynamicProxy.Tests.InterClasses
 
 		public void DoSomething()
 		{
-			
 		}
 	}
 }

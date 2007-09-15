@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ namespace Castle.ActiveRecord
 	using System;
 
 	using Castle.ActiveRecord.Framework.Validators;
+	using Castle.Components.Validator;
 
 
 	/// <summary>
@@ -25,19 +26,36 @@ namespace Castle.ActiveRecord
 	[Serializable, CLSCompliant(false)]
 	public class ValidateIsUniqueAttribute : AbstractValidationAttribute
 	{
+		private readonly IValidator validator;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ValidateIsUniqueAttribute"/> class.
 		/// </summary>
-		public ValidateIsUniqueAttribute() : base(new IsUniqueValidator())
+		public ValidateIsUniqueAttribute()
 		{
+			validator = new IsUniqueValidator();
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ValidateIsUniqueAttribute"/> class.
 		/// </summary>
 		/// <param name="errorMessage">The error message.</param>
-		public ValidateIsUniqueAttribute(String errorMessage) : base(new IsUniqueValidator(), errorMessage)
+		public ValidateIsUniqueAttribute(String errorMessage)
+			: base(errorMessage)
 		{
+			validator = new IsUniqueValidator();
+		}
+
+		/// <summary>
+		/// Constructs and configures an <see cref="IValidator"/>
+		/// instance based on the properties set on the attribute instance.
+		/// </summary>
+		/// <returns></returns>
+		public override IValidator Build()
+		{
+			ConfigureValidatorMessage(validator);
+
+			return validator;
 		}
 	}
 }

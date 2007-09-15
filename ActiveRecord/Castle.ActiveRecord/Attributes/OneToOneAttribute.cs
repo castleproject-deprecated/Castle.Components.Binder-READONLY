@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,6 @@ namespace Castle.ActiveRecord
 {
 	using System;
 	
-	/// <summary>
-	/// Define the possible fetch option values
-	/// </summary>
-	public enum FetchEnum
-	{
-		/// <summary>
-		/// Let NHibernate decide what to do here
-		/// </summary>
-		Unspecified,
-		/// <summary>
-		/// Use a JOIN to load the data
-		/// </summary>
-		Join, 
-		/// <summary>
-		/// Use a seperate SELECT statement to load the data
-		/// </summary>
-		Select
-	}
-
 	/// <summary>
 	/// Associates a foreign table where the current class
 	/// and the target class share their primary key.
@@ -125,6 +106,7 @@ namespace Castle.ActiveRecord
 		private String propertyRef;
 		private Type mapType;
 		private bool constrained;
+		private string foreignKey;
 
 		/// <summary>
 		/// Allows one to reference a different type
@@ -183,6 +165,17 @@ namespace Castle.ActiveRecord
 		{
 			get { return constrained; }
 			set { constrained = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the name of the foreign key constraint generated for 
+		/// an association. NHibernate will only use the ForeignKey name one 
+		/// the inherited class and Constrained = true.
+		/// </summary>
+		public string ForeignKey
+		{
+			get { return foreignKey; }
+			set { foreignKey = value; }	
 		}
 	}
 }

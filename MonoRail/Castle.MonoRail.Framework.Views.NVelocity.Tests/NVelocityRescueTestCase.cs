@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,7 @@
 
 namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 {
-	using System;
-	using System.IO;
-
 	using NUnit.Framework;
-
 	using Castle.MonoRail.Framework.Tests;
 
 	[TestFixture]
@@ -79,6 +75,23 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 			AssertSuccess();
 
 			AssertReplyEqualTo( "methodDefaultException" );
-		}		
+		}
+
+		[Test, Ignore("Attributes order cannot be guaranted")]
+		public void RescueAndConrollerInheritance1()
+		{
+			DoGet("rescuable2/Save.rails");
+			AssertReplyEqualTo("An error happened during save");
+
+			DoGet("rescuable2/Save2.rails");
+			AssertReplyEqualTo("An error happened during update");
+		}
+
+		[Test]
+		public void AccessibleThroughAndRescues()
+		{
+			DoGet("rescuable/OnlyPost.rails");
+			AssertReplyEqualTo("An error happened");
+		}
 	}
 }

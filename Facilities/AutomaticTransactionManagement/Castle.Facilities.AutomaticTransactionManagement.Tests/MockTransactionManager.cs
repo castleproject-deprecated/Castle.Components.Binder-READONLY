@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,23 +32,49 @@ namespace Castle.Facilities.AutomaticTransactionManagement.Tests
 		{
 		}
 
-		public event TransactionCreationInfoDelegate TransactionCreated;
+		event TransactionCreationInfoDelegate ITransactionManager.TransactionCreated
+		{
+			add { throw new NotImplementedException(); }
+			remove { throw new NotImplementedException(); }
+		}
 
-		public event TransactionCreationInfoDelegate ChildTransactionCreated;
-		
-		public event TransactionDelegate TransactionCommitted;
-		
-		public event TransactionDelegate TransactionRolledback;
-		
-		public event TransactionDelegate TransactionDisposed;
+		event TransactionCreationInfoDelegate ITransactionManager.ChildTransactionCreated
+		{
+			add { throw new NotImplementedException(); }
+			remove { throw new NotImplementedException(); }
+		}
 
-		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode)
+		event TransactionDelegate ITransactionManager.TransactionCommitted
+		{
+			add { throw new NotImplementedException(); }
+			remove { throw new NotImplementedException(); }
+		}
+
+		event TransactionDelegate ITransactionManager.TransactionRolledback
+		{
+			add { throw new NotImplementedException(); }
+			remove { throw new NotImplementedException(); }
+		}
+
+		event TransactionDelegate ITransactionManager.TransactionDisposed
+		{
+			add { throw new NotImplementedException(); }
+			remove { throw new NotImplementedException(); }
+		}
+
+		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode,
+		                                      bool distributedTransaction)
 		{
 			_current = new MockTransaction();
 
 			_transactions++;
 
 			return _current;
+		}
+
+		public ITransaction CreateTransaction(TransactionMode transactionMode, IsolationMode isolationMode)
+		{
+			return CreateTransaction(transactionMode, isolationMode, false);
 		}
 
 		public void Dispose(ITransaction tran)
@@ -90,6 +116,13 @@ namespace Castle.Facilities.AutomaticTransactionManagement.Tests
 
 	public class MockTransaction : AbstractTransaction
 	{
+		private bool rollbackOnly;
+
+		public override void SetRollbackOnly()
+		{
+			rollbackOnly = true;
+		}
+
 		public override bool IsChildTransaction
 		{
 			get { return false; }
@@ -97,7 +130,7 @@ namespace Castle.Facilities.AutomaticTransactionManagement.Tests
 
 		public override bool IsRollbackOnlySet
 		{
-			get { return false; }
+			get { return rollbackOnly; }
 		}
 	}
 }

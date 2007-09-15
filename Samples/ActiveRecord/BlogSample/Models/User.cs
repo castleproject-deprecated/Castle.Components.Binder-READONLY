@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
 
 namespace BlogSample
 {
-	using System;
 	using Castle.ActiveRecord;
 
 	using NHibernate.Expression;
 
-	[ActiveRecord("[User]")]
-	public class User : ActiveRecordBase
+	[ActiveRecord("`User`")]
+	public class User : ActiveRecordBase<User>
 	{
 		private int id;
 		private string username;
@@ -28,7 +27,6 @@ namespace BlogSample
 
 		public User()
 		{
-			
 		}
 
 		public User(string username, string password)
@@ -60,13 +58,13 @@ namespace BlogSample
 		
 		public static int GetUsersCount()
 		{
-			return CountAll(typeof(User));
+			return Count();
 		}
 
 		public static User FindByUserName(string userName)
 		{
 			// Note that we use the property name, _not_ the column name
-			return (User) FindOne(typeof(User), Expression.Eq("Username", userName));
+			return FindOne(Expression.Eq("Username", userName));
 		}
 	}
 }

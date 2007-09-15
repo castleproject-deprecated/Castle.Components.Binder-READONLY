@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 namespace Castle.MicroKernel.Tests.ClassComponents
 {
-	using System;
-
 	/// <summary>
 	/// Summary description for CommonServiceUser.
 	/// </summary>
@@ -33,7 +31,7 @@ namespace Castle.MicroKernel.Tests.ClassComponents
 			get { return _common; }
 		}
 	}
-	
+
 	public class CommonServiceUser3
 	{
 		private ICommon _common;
@@ -52,5 +50,4 @@ namespace Castle.MicroKernel.Tests.ClassComponents
 			get { return _common; }
 		}
 	}
-
 }

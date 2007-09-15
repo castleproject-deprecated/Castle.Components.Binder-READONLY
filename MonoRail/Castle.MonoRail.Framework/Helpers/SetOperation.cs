@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace Castle.MonoRail.Framework.Helpers
 {
 	using System;
 	using System.Collections;
-	using System.Reflection;
+	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
 	/// 
@@ -33,9 +33,13 @@ namespace Castle.MonoRail.Framework.Helpers
 			Type initialSelectionType = ExtractType(initialSelection);
 			Type dataSourceType = ExtractType(dataSource);
 
-			String customSuffix = FormHelper.ObtainEntryAndRemove(attributes, "suffix");
-			String valueProperty = FormHelper.ObtainEntryAndRemove(attributes, "value");
-			String textProperty = FormHelper.ObtainEntryAndRemove(attributes, "text");
+			String customSuffix = CommonUtils.ObtainEntryAndRemove(attributes, "suffix");
+			String valueProperty = CommonUtils.ObtainEntryAndRemove(attributes, "value");
+			String textProperty = CommonUtils.ObtainEntryAndRemove(attributes, "text");
+			String textFormat = CommonUtils.ObtainEntryAndRemove(attributes, "textformat");
+			String valueFormat = CommonUtils.ObtainEntryAndRemove(attributes, "valueformat");
+
+			bool emptyValueCase = CheckForEmpyTextValueCase(dataSourceType);
 
 			if (dataSourceType == null)
 			{
@@ -51,24 +55,33 @@ namespace Castle.MonoRail.Framework.Helpers
 					customSuffix = valueProperty;
 				}
 
-				return new ListDataSourceState(dataSourceType, dataSource, 
-				                               valueProperty, textProperty, customSuffix);
+				return new ListDataSourceState(dataSourceType, dataSource,
+											   valueProperty, textProperty, textFormat, valueFormat, customSuffix);
 			}
 			else if (initialSelectionType == dataSourceType)
 			{
 				return new SameTypeOperationState(dataSourceType, 
-				                                  initialSelection, dataSource, 
-				                                  valueProperty, textProperty, isInitialSelectionASet);
+				                                  initialSelection, dataSource,
+												  emptyValueCase, valueProperty, textProperty, textFormat, valueFormat, isInitialSelectionASet);
 			}
 			else // types are different, most complex scenario
 			{
-				String sourceProperty = FormHelper.ObtainEntryAndRemove(attributes, "sourceProperty");
+				String sourceProperty = CommonUtils.ObtainEntryAndRemove(attributes, "sourceProperty");
 
 				return new DifferentTypeOperationState(initialSelectionType, 
-				                                       dataSourceType, initialSelection, dataSource, 
-				                                       sourceProperty, valueProperty, textProperty, 
+				                                       dataSourceType, initialSelection, dataSource,
+													   sourceProperty, valueProperty, textProperty, textFormat, valueFormat, 
 				                                       isInitialSelectionASet);
 			}
+		}
+
+		private static bool CheckForEmpyTextValueCase(Type datasourceType)
+		{
+			if (typeof(Enum).IsAssignableFrom(datasourceType))
+			{
+				return true;
+			}
+			return false;
 		}
 
 		private static Type ExtractType(object source)
@@ -159,11 +172,13 @@ namespace Castle.MonoRail.Framework.Helpers
 	public abstract class OperationState : IEnumerable, IEnumerator
 	{
 		protected readonly Type type;
-		protected readonly PropertyInfo valuePropInfo;
-		protected readonly PropertyInfo textPropInfo;
+		protected readonly FormHelper.ValueGetter valuePropInfo;
+		protected readonly FormHelper.ValueGetter textPropInfo;
+		protected readonly String textFormat, valueFormat;
 		protected IEnumerator enumerator;
 
-		protected OperationState(Type type, IEnumerable dataSource, String valueProperty, String textProperty)
+		protected OperationState(Type type, IEnumerable dataSource, 
+			bool emptyValueCase,String valueProperty, String textProperty, String textFormat, String valueFormat)
 		{
 			if (dataSource != null)
 			{
@@ -171,19 +186,39 @@ namespace Castle.MonoRail.Framework.Helpers
 			}
 
 			this.type = type;
+			this.textFormat = textFormat;
+			this.valueFormat = valueFormat;
 
-			if (valueProperty != null)
+			if (valueProperty != null || emptyValueCase) 
 			{
-				valuePropInfo = FormHelper.GetMethod(type, valueProperty);
+				valuePropInfo = FormHelper.ValueGetterAbstractFactory.Create(type, valueProperty); // FormHelper.GetMethod(type, valueProperty);
 			}
 
 			if (textProperty != null)
 			{
-				textPropInfo = FormHelper.GetMethod(type, textProperty);
+				textPropInfo = FormHelper.ValueGetterAbstractFactory.Create(type, textProperty); 
 			}
 		}
 
 		public abstract String TargetSuffix { get; }
+
+		/// <summary>
+		/// Formats the text.
+		/// </summary>
+		/// <param name="value">The value to be formatted.</param>
+		/// <param name="format">The format to apply.</param>
+		protected void FormatText(ref object value, string format)
+		{
+			if (format != null && value != null)
+			{
+				IFormattable formattable = value as IFormattable;
+
+				if (formattable != null)
+				{
+					value = formattable.ToString(format, null);
+				}
+			}
+		}
 
 		protected abstract SetItem CreateItemRepresentation(object current);
 
@@ -230,8 +265,9 @@ namespace Castle.MonoRail.Framework.Helpers
 	{
 		public static readonly NoIterationState Instance = new NoIterationState();
 
-		private NoIterationState()
-			: base(null, null, null, null) {}
+		private NoIterationState() : base(null, null, false, null, null, null, null)
+		{
+		}
 
 		public override string TargetSuffix
 		{
@@ -248,8 +284,9 @@ namespace Castle.MonoRail.Framework.Helpers
 	{
 		private readonly string customSuffix;
 
-		public ListDataSourceState(Type type, IEnumerable dataSource, String valueProperty, String textProperty, String customSuffix)
-			: base(type, dataSource, valueProperty, textProperty)
+		public ListDataSourceState(Type type, IEnumerable dataSource, String valueProperty,
+			String textProperty, String textFormat, String valueFormat, String customSuffix)
+			: base(type, dataSource, false, valueProperty, textProperty, textFormat, valueFormat)
 		{
 			this.customSuffix = customSuffix;
 		}
@@ -266,13 +303,16 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (valuePropInfo != null)
 			{
-				value = valuePropInfo.GetValue(current, null);
+				value = valuePropInfo.GetValue(current);
 			}
 
 			if (textPropInfo != null)
 			{
-				text = textPropInfo.GetValue(current, null);
+				text = textPropInfo.GetValue(current);
 			}
+
+			FormatText(ref text, textFormat);
+			FormatText(ref value, valueFormat);
 
 			return new SetItem(current, value != null ? value.ToString() : String.Empty, text != null ? text.ToString() : String.Empty, false);
 		}
@@ -283,8 +323,9 @@ namespace Castle.MonoRail.Framework.Helpers
 		private readonly object initialSelection;
 		private readonly bool isInitialSelectionASet;
 
-		public SameTypeOperationState(Type type, object initialSelection, IEnumerable dataSource, String valueProperty, String textProperty, bool isInitialSelectionASet)
-			: base(type, dataSource, valueProperty, textProperty)
+		public SameTypeOperationState(Type type, object initialSelection, IEnumerable dataSource, 
+			bool emptyValueCase,String valueProperty, String textProperty, String textFormat, String valueFormat, bool isInitialSelectionASet)
+			: base(type, dataSource, emptyValueCase, valueProperty, textProperty, textFormat, valueFormat)
 		{
 			this.initialSelection = initialSelection;
 			this.isInitialSelectionASet = isInitialSelectionASet;
@@ -302,13 +343,16 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (valuePropInfo != null)
 			{
-				value = valuePropInfo.GetValue(current, null);
+				value = valuePropInfo.GetValue(current);
 			}
 
 			if (textPropInfo != null)
 			{
-				text = textPropInfo.GetValue(current, null);
+				text = textPropInfo.GetValue(current);
 			}
+
+			FormatText(ref text, textFormat);
+			FormatText(ref value, valueFormat);
 
 			bool isSelected = FormHelper.IsPresent(value, initialSelection, valuePropInfo, isInitialSelectionASet);
 
@@ -320,21 +364,24 @@ namespace Castle.MonoRail.Framework.Helpers
 	{
 		private readonly object initialSelection;
 		private readonly bool isInitialSelectionASet;
-		private readonly PropertyInfo sourcePropInfo;
+		private readonly FormHelper.ValueGetter sourcePropInfo;
 
-		public DifferentTypeOperationState(Type initialSelectionType, Type dataSourceType, object initialSelection, IEnumerable dataSource, String sourceProperty, String valueProperty, String textProperty, bool isInitialSelectionASet)
-			: base(dataSourceType, dataSource, valueProperty, textProperty)
+		public DifferentTypeOperationState(Type initialSelectionType, Type dataSourceType, 
+			object initialSelection, IEnumerable dataSource, 
+			String sourceProperty, String valueProperty,
+			String textProperty, String textFormat, String valueFormat, bool isInitialSelectionASet)
+			: base(dataSourceType, dataSource, false, valueProperty, textProperty, textFormat, valueFormat)
 		{
 			this.initialSelection = initialSelection;
 			this.isInitialSelectionASet = isInitialSelectionASet;
 
 			if (sourceProperty != null)
 			{
-				sourcePropInfo = FormHelper.GetMethod(initialSelectionType, sourceProperty);
+				sourcePropInfo = FormHelper.ValueGetterAbstractFactory.Create(initialSelectionType, sourceProperty); // FormHelper.GetMethod(initialSelectionType, sourceProperty);
 			}
 			else if (valueProperty != null)
 			{
-				sourcePropInfo = FormHelper.GetMethod(initialSelectionType, valueProperty);
+				sourcePropInfo = FormHelper.ValueGetterAbstractFactory.Create(initialSelectionType, valueProperty); // FormHelper.GetMethod(initialSelectionType, valueProperty);
 			}
 		}
 
@@ -350,13 +397,16 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (valuePropInfo != null)
 			{
-				value = valuePropInfo.GetValue(current, null);
+				value = valuePropInfo.GetValue(current);
 			}
 
 			if (textPropInfo != null)
 			{
-				text = textPropInfo.GetValue(current, null);
+				text = textPropInfo.GetValue(current);
 			}
+
+			FormatText(ref text, textFormat);
+			FormatText(ref value, valueFormat);
 
 			bool isSelected = FormHelper.IsPresent(value, initialSelection, sourcePropInfo, isInitialSelectionASet);
 

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,8 +36,9 @@ namespace Castle.MonoRail.Framework.Configuration
 				
 				if (typeAtt == null || typeAtt.Value == String.Empty)
 				{
-					throw new ConfigurationException("If the node customComponentFactory is " + 
-						"present, you must specify the 'type' attribute");
+					String message = "If the node customComponentFactory is " + 
+						"present, you must specify the 'type' attribute";
+					throw new ConfigurationErrorsException(message);
 				}
 				
 				String typeName = typeAtt.Value;

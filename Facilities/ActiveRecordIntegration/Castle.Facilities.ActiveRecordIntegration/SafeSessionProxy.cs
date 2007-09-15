@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ namespace Castle.Facilities.ActiveRecordIntegration
 
 	/// <summary>
 	/// This class implements <see cref="ISession"/>
-	/// and delegates <see cref="ISession.Close"/> and 
-	/// <see cref="ISession.Dispose"/> to <see cref="ISessionFactoryHolder.ReleaseSession"/>
+	/// and delegates <see cref="Close"/> and 
+	/// <see cref="Dispose"/> to <see cref="ISessionFactoryHolder.ReleaseSession"/>
 	/// as the session is in fact managed by ActiveRecord framework
 	/// </summary>
 	public class SafeSessionProxy : ISession, IDisposable
@@ -144,6 +144,16 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			return innerSession.Load(theType, id);
 		}
 
+		public T Load<T>(object id, LockMode lockMode)
+		{
+			return innerSession.Load<T>(id, lockMode);
+		}
+
+		public T Load<T>(object id)
+		{
+			return innerSession.Load<T>(id);
+		}
+
 		public void Load(object obj, object id)
 		{
 			innerSession.Load(obj, id);
@@ -157,6 +167,36 @@ namespace Castle.Facilities.ActiveRecordIntegration
 		public object Get(Type clazz, object id, LockMode lockMode)
 		{
 			return innerSession.Get(clazz, id, lockMode);
+		}
+
+		public T Get<T>(object id)
+		{
+			return innerSession.Get<T>(id);
+		}
+
+		public T Get<T>(object id, LockMode lockMode)
+		{
+			return innerSession.Get<T>(id, lockMode);
+		}
+
+		public IFilter EnableFilter(string filterName)
+		{
+			return innerSession.EnableFilter(filterName);
+		}
+
+		public IFilter GetEnabledFilter(string filterName)
+		{
+			return innerSession.GetEnabledFilter(filterName);
+		}
+
+		public void DisableFilter(string filterName)
+		{
+			innerSession.DisableFilter(filterName);
+		}
+
+		public IMultiQuery CreateMultiQuery()
+		{
+			return innerSession.CreateMultiQuery();
 		}
 
 		public void Replicate(object obj, ReplicationMode replicationMode)
@@ -206,46 +246,54 @@ namespace Castle.Facilities.ActiveRecordIntegration
 
 		public IList Find(String query)
 		{
-			return innerSession.Find(query);
+			return innerSession.CreateQuery(query).List();
 		}
 
 		public IList Find(String query, object value, IType type)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return innerSession.Find(query, value, type);
 		}
 
 		public IList Find(String query, object[] values, IType[] types)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return innerSession.Find(query, values, types);
 		}
 
 		public IEnumerable Enumerable(String query)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return innerSession.Enumerable(query);
 		}
 
 		public IEnumerable Enumerable(String query, object value, IType type)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return innerSession.Enumerable(query, value, type);
 		}
 
 		public IEnumerable Enumerable(String query, object[] values, IType[] types)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return innerSession.Enumerable(query, values, types);
 		}
 
 		public ICollection Filter(object collection, String filter)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return innerSession.Filter(collection, filter);
 		}
 
 		public ICollection Filter(object collection, String filter, object value, IType type)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return innerSession.Filter(collection, filter, value, type);
 		}
 
 		public ICollection Filter(object collection, String filter, object[] values, IType[] types)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return innerSession.Filter(collection, filter, values, types);
 		}
 
@@ -299,6 +347,11 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			return innerSession.CreateCriteria(persistentClass);
 		}
 
+		public ICriteria CreateCriteria(Type persistentClass, string alias)
+		{
+			return innerSession.CreateCriteria(persistentClass, alias);
+		}
+
 		public IQuery CreateQuery(String queryString)
 		{
 			return innerSession.CreateQuery(queryString);
@@ -312,6 +365,11 @@ namespace Castle.Facilities.ActiveRecordIntegration
 		public IQuery GetNamedQuery(String queryName)
 		{
 			return innerSession.GetNamedQuery(queryName);
+		}
+
+		public ISQLQuery CreateSQLQuery(string queryString)
+		{
+			return innerSession.CreateSQLQuery(queryString);
 		}
 
 		public IQuery CreateSQLQuery(String sql, String returnAlias, Type returnClass)
@@ -339,6 +397,11 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			{
 				throw new InvalidOperationException("Session was closed");
 			}
+		}
+		
+		public NHibernate.Engine.ISessionImplementor GetSessionImplementation()
+		{
+			return innerSession.GetSessionImplementation();
 		}
 	}
 }

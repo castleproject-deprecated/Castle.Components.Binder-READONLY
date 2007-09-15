@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 {
 	using System;
 	using System.Collections;
-
 	using Castle.ActiveRecord.Framework.Internal;
 	using Castle.MonoRail.Framework.Helpers;
-
 	
 	public class PresentationHelper : AbstractHelper
 	{
@@ -38,15 +36,6 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			return "center";
 		}
 		
-		public String Form(String action, String id, String method, String onSubmit)
-		{
-			HtmlHelper hh = new HtmlHelper();
-
-			string fullAction = string.Format("{0}.{1}", action, Controller.Context.UrlInfo.Extension);
-
-			return hh.Form(fullAction, id, method, onSubmit);
-		}
-
 		public String LinkToBack(String text, IDictionary attributes)
 		{
 			return String.Format( "<a href=\"javascript:history.go(-1);\" {1}>{0}</a>", 

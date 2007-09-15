@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@ namespace Castle.MonoRail.Framework.Controllers
 {
 	using System;
 	using System.Web;
+	using Castle.MonoRail.Framework.Attributes;
+	using Castle.MonoRail.Framework.Filters;
 	using Castle.MonoRail.Framework.Helpers;
 
 	/// <summary>
@@ -23,113 +25,118 @@ namespace Castle.MonoRail.Framework.Controllers
 	/// parts of MonoRail.
 	/// </summary>
 	[ControllerDetails(Area="MonoRail")]
-	[Resource("Behaviour","Castle.MonoRail.Framework.Controllers.Behaviour", CultureName="neutral")]
-	[Resource("Ajax","Castle.MonoRail.Framework.Controllers.Ajax", CultureName="neutral")]
+	[LocalizationFilter(Store = RequestStore.QueryString, Key = "locale")]
+	[Resource("Behaviour", "Castle.MonoRail.Framework.Controllers.Behaviour", CultureName="neutral")]
+	[Resource("Ajax", "Castle.MonoRail.Framework.Controllers.Ajax", CultureName="neutral")]
 	[Resource("Effects2", "Castle.MonoRail.Framework.Controllers.Effects2", CultureName="neutral")]
 	[Resource("EffectsFat", "Castle.MonoRail.Framework.Controllers.EffectsFat", CultureName="neutral")]
 	[Resource("Validation", "Castle.MonoRail.Framework.Controllers.Validation", CultureName="neutral")]
+	[Resource("FormHelper", "Castle.MonoRail.Framework.Controllers.FormHelper", CultureName="neutral")]
+	[Resource("ZebdaValidation", "Castle.MonoRail.Framework.Controllers.ZebdaValidation", CultureName="neutral")]
+	[PersistFlash]
 	public sealed class FilesController : Controller
 	{
-		private string _jsContentType = "application/x-javascript";
-		private string _jsCacheControl = "max-age=86400"; // cache valid for 1 day
-
-		public FilesController()
-		{
-		}
-
-		public string JavascriptContentType
-		{
-			get { return _jsContentType; }
-			set { _jsContentType = value; }
-		}
-
-		public string JavascriptCacheControl
-		{
-			get { return _jsCacheControl; }
-			set { _jsCacheControl = value; }
-		}
-
 		/// <summary>
 		/// Script used by <see cref="AjaxHelper"/>.
 		/// </summary>
+		[Cache(HttpCacheability.Public, Duration=86400)] // 1 day
 		public void AjaxScripts()
-		{	
-			RenderJavascriptFile( "Ajax", "jsfunctions" );
+		{
+			RenderJavascriptFile("Ajax", "jsfunctions");
 		}
 
 		/// <summary>
 		/// Script used by <see cref="AjaxHelper"/>.
 		/// </summary>
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
 		public void BehaviourScripts()
 		{
-			RenderJavascriptFile( "Behaviour", "jsfunctions" );
+			RenderJavascriptFile("Behaviour", "jsfunctions");
 		}
-		
+
 		/// <summary>
 		/// Script used by <see cref="EffectsFatHelper"/>.
 		/// </summary>
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
 		public void EffectsFatScripts()
 		{
-			RenderJavascriptFile( "EffectsFat", "fatfunctions" );
+			RenderJavascriptFile("EffectsFat", "fatfunctions");
 		}
 
 		/// <summary>
 		/// Script used by <see cref="Effects2Helper"/>.
 		/// </summary>
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
 		public void Effects2()
 		{
-			RenderJavascriptFile( "Effects2", "functions" );
+			RenderJavascriptFile("Effects2", "functions");
 		}
 
 		/// <summary>
 		/// Script used by <see cref="ValidationHelper"/>.
 		/// </summary>
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
 		public void ValidateConfig()
 		{
-			RenderJavascriptFile( "Validation", "fValidateConfig" );
+			RenderJavascriptFile("Validation", "fValidateConfig");
 		}
 
 		/// <summary>
 		/// Script used by <see cref="ValidationHelper"/>.
 		/// </summary>
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
 		public void ValidateCore()
 		{
-			RenderJavascriptFile( "Validation", "fValidateCore" );
+			RenderJavascriptFile("Validation", "fValidateCore");
 		}
 
 		/// <summary>
 		/// Script used by <see cref="ValidationHelper"/>.
 		/// </summary>
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
 		public void ValidateValidators()
 		{
-			RenderJavascriptFile( "Validation", "fValidateValidators" );
+			RenderJavascriptFile("Validation", "fValidateValidators");
 		}
 
 		/// <summary>
 		/// Script used by <see cref="ValidationHelper"/>.
 		/// </summary>
+		[Resource("ValidationLang", "Castle.MonoRail.Framework.Controllers.ValidationLang")]
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
 		public void ValidateLang()
 		{
-			RenderJavascriptFile( "Validation", "fValidateLang" );
+			RenderJavascriptFile("ValidationLang", "fValidateLang");
 		}
 
-		private String GetResourceValue( String resName, String resKey )
+		/// <summary>
+		/// Install the zebda validation script
+		/// </summary>
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
+		public void ZebdaScripts()
 		{
-			return (String)(Resources[resName])[resKey];
+			RenderJavascriptFile( "ZebdaValidation", "jsfunctions" );
 		}
 
-		private void RenderJavascriptFile( String resourceName, String resourceKey )
+		/// <summary>
+		/// Script used by <see cref="AjaxHelper"/>.
+		/// </summary>
+		[Cache(HttpCacheability.Public, Duration = 86400)] // 1 day
+		public void FormHelperScript()
 		{
-			Response.ContentType = JavascriptContentType;
-			Response.AppendHeader("Cache-Control", JavascriptCacheControl);
-			// Response.CacheControlHeader = JavascriptCacheControl;
-			RenderFile( resourceName, resourceKey );
+			RenderJavascriptFile("FormHelper", "jsfunctions");
 		}
 
-		private void RenderFile( String resourceName, String resourceKey )
+		private void RenderJavascriptFile(String resourceName, String resourceKey)
 		{
-			String fileContent = GetResourceValue( resourceName, resourceKey );
-			RenderText( fileContent );
+			Response.ContentType = "text/javascript";
+			string fileContent = GetResourceValue(resourceName, resourceKey);
+			RenderText(fileContent);
+		}
+
+		private String GetResourceValue(String resName, String resKey)
+		{
+			return (String) (Resources[resName])[resKey];
 		}
 	}
 }

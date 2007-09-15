@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 namespace Castle.Core
 {
 	using System;
-
 	using Castle.Core.Configuration;
 
 	/// <summary>
@@ -34,7 +33,7 @@ namespace Castle.Core
 		/// </summary>
 		/// <param name="name">The name.</param>
 		/// <param name="value">The value.</param>
-		public ParameterModel( String name, String value )
+		public ParameterModel(String name, String value)
 		{
 			this.name = name;
 			this.value = value;
@@ -45,10 +44,10 @@ namespace Castle.Core
 		/// </summary>
 		/// <param name="name">The name.</param>
 		/// <param name="value">The value.</param>
-		public ParameterModel( String name, IConfiguration value )
+		public ParameterModel(String name, IConfiguration value)
 		{
 			this.name = name;
-			this.configValue = value;
+			configValue = value;
 		}
 
 		/// <summary>

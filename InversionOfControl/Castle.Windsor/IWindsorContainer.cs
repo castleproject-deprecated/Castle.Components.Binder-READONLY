@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ namespace Castle.Windsor
 {
 	using System;
 	using System.Collections;
-
 	using Castle.Core;
 	using Castle.MicroKernel;
 
@@ -24,8 +23,17 @@ namespace Castle.Windsor
 	/// The <c>IWindsorContainer</c> interface exposes all the 
 	/// functionality the Windsor implements.
 	/// </summary>
-	public interface IWindsorContainer : IDisposable
+	public interface IWindsorContainer : IServiceProviderEx, IDisposable
 	{
+		/// <summary>
+		/// Gets the container's name
+		/// </summary>
+		/// <remarks>
+		/// Only useful when child containers are being used
+		/// </remarks>
+		/// <value>The container's name.</value>
+		string Name { get; }
+
 		/// <summary>
 		/// Registers a facility within the kernel.
 		/// </summary>
@@ -86,22 +94,131 @@ namespace Castle.Windsor
 		void AddComponentWithProperties(String key, Type serviceType, Type classType, IDictionary extendedProperties);
 
 		/// <summary>
-		/// Returns a component instance by the key
+		/// Adds a component to be managed by the container.
+		/// The key to obtain the component will be the FullName of the type.
 		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
-		object Resolve(String key);
+		/// <typeparam name="T">The <see cref="Type"/> to manage.</typeparam>
+		void AddComponent<T>();
 
-		#if DOTNET2
+		/// <summary>
+		/// Adds a component to be managed by the container
+		/// </summary>
+		/// <typeparam name="T">The <see cref="Type"/> to manage.</typeparam>
+		/// <param name="key">The key by which the component gets indexed.</param>		
+		void AddComponent<T>(String key);
+
+		/// <summary>
+		/// Adds a component to be managed by the container.
+		/// The key to obtain the component will be the FullName of the type.
+		/// </summary>
+		/// <typeparam name="T">The <see cref="Type"/> to manage.</typeparam>
+		/// <param name="lifestyle">The <see cref="LifestyleType"/> with which to manage the component.</param>
+		void AddComponentWithLifestyle<T>(LifestyleType lifestyle);
+
+		/// <summary>
+		/// Adds a component to be managed by the container
+		/// </summary>
+		/// <typeparam name="T">The <see cref="Type"/> to manage.</typeparam>
+		/// <param name="key">The key by which the component gets indexed.</param>		
+		/// <param name="lifestyle">The <see cref="LifestyleType"/> with which to manage the component.</param>
+		void AddComponentWithLifestyle<T>(String key, LifestyleType lifestyle);
+
+		/// <summary>
+		/// Adds a component to be managed by the container
+		/// The key to obtain the component will be the FullName of the type.
+		/// </summary>
+		/// <typeparam name="I">The service <see cref="Type"/> that the component implements.</typeparam>
+		/// <typeparam name="T">The <see cref="Type"/> to manage.</typeparam>
+		void AddComponent<I, T>() where T : class;
+
+		/// <summary>
+		/// Adds a component to be managed by the container
+		/// </summary>
+		/// <typeparam name="I">The service <see cref="Type"/> that the component implements.</typeparam>
+		/// <typeparam name="T">The <see cref="Type"/> to manage.</typeparam>
+		/// <param name="key">The key by which the component gets indexed.</param>
+		void AddComponent<I, T>(String key) where T : class;
+
+		/// <summary>
+		/// Adds a component to be managed by the container
+		/// The key to obtain the component will be the FullName of the type.
+		/// </summary>
+		/// <typeparam name="I">The service <see cref="Type"/> that the component implements.</typeparam>
+		/// <typeparam name="T">The <see cref="Type"/> to manage.</typeparam>
+		/// <param name="lifestyle">The <see cref="LifestyleType"/> with which to manage the component.</param>
+		void AddComponentWithLifestyle<I, T>(LifestyleType lifestyle) where T : class;
+
+		/// <summary>
+		/// Adds a component to be managed by the container
+		/// </summary>
+		/// <typeparam name="I">The service <see cref="Type"/> that the component implements.</typeparam>
+		/// <typeparam name="T">The <see cref="Type"/> to manage.</typeparam>
+		/// <param name="key">The key by which the component gets indexed.</param>
+		/// <param name="lifestyle">The <see cref="LifestyleType"/> with which to manage the component.</param>
+		void AddComponentWithLifestyle<I, T>(String key, LifestyleType lifestyle) where T : class;
+
+		/// <summary>
+		/// Adds a concrete class as a component and specify the extended properties.
+		/// Used by facilities, mostly.
+		/// The key to obtain the component will be the FullName of the type.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="extendedProperties"></param>
+		void AddComponentWithProperties<T>(IDictionary extendedProperties);
+
+		/// <summary>
+		/// Adds a concrete class as a component and specify the extended properties.
+		/// Used by facilities, mostly.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="key"></param>		
+		/// <param name="extendedProperties"></param>
+		void AddComponentWithProperties<T>(String key, IDictionary extendedProperties);
+
+		/// <summary>
+		/// Adds a concrete class and an interface 
+		/// as a component and specify the extended properties.
+		/// Used by facilities, mostly.
+		/// The key to obtain the component will be the FullName of the type.
+		/// </summary>
+		/// <typeparam name="I"></typeparam>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="extendedProperties"></param>
+		void AddComponentWithLifestyle<I, T>(IDictionary extendedProperties) where T : class;
+
+		/// <summary>
+		/// Adds a concrete class and an interface 
+		/// as a component and specify the extended properties.
+		/// Used by facilities, mostly.
+		/// </summary>
+		/// <typeparam name="I"></typeparam>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="key"></param>
+		/// <param name="extendedProperties"></param>
+		void AddComponentWithLifestyle<I, T>(String key, IDictionary extendedProperties) where T : class;
 
 		/// <summary>
 		/// Returns a component instance by the key
 		/// </summary>
 		/// <param name="key"></param>
 		/// <returns></returns>
-		object Resolve(String key, Type service);
+		object Resolve(String key);
 
-		#endif
+		/// <summary>
+		/// Returns a component instance by the key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		object Resolve(String key, IDictionary arguments);
+		
+		/// <summary>
+		/// Returns a component instance by the key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="service"></param>
+		/// <returns></returns>
+		object Resolve(String key, Type service);
 
 		/// <summary>
 		/// Returns a component instance by the service
@@ -110,6 +227,14 @@ namespace Castle.Windsor
 		/// <returns></returns>
 		object Resolve(Type service);
 
+		/// <summary>
+		/// Returns a component instance by the service
+		/// </summary>
+		/// <param name="service"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		object Resolve(Type service, IDictionary arguments);
+		
 		/// <summary>
 		/// Releases a component instance
 		/// </summary>
@@ -130,16 +255,21 @@ namespace Castle.Windsor
 		void RemoveChildContainer(IWindsorContainer childContainer);
 
 		/// <summary>
-		/// Shortcut to the method <see cref="Resolve"/>
+		/// Shortcut to <see cref="Resolve(string)"/>
 		/// </summary>
 		object this [String key] { get; }
 
 		/// <summary>
-		/// Shortcut to the method <see cref="Resolve"/>
+		/// Shortcut to <see cref="Resolve(Type)"/>
 		/// </summary>
 		object this [Type service] { get; }
 
-		#if DOTNET2
+		/// <summary>
+		/// Gets a child container instance by name.
+		/// </summary>
+		/// <param name="name">The container's name.</param>
+		/// <returns>The child container instance or null</returns>
+		IWindsorContainer GetChildContainer(string name);
 
 		/// <summary>
 		/// Returns a component instance by the service
@@ -149,6 +279,14 @@ namespace Castle.Windsor
 		T Resolve<T>();
 
 		/// <summary>
+		/// Returns a component instance by the service
+		/// </summary>
+		/// <typeparam name="T">Service type</typeparam>
+		/// <param name="arguments"></param>
+		/// <returns>The component instance</returns>
+		T Resolve<T>(IDictionary arguments);
+		
+		/// <summary>
 		/// Returns a component instance by the key
 		/// </summary>
 		/// <param name="key">Component's key</param>
@@ -156,8 +294,25 @@ namespace Castle.Windsor
 		/// <returns>The Component instance</returns>
 		T Resolve<T>(String key);
 
-		#endif
+		/// <summary>
+		/// Returns a component instance by the key
+		/// </summary>
+		/// <typeparam name="T">Service type</typeparam>
+		/// <param name="key">Component's key</param>
+		/// <param name="arguments"></param>
+		/// <returns>The Component instance</returns>
+		T Resolve<T>(String key, IDictionary arguments);
 
+		
+		/// <summary>
+		/// Returns a component instance by the key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="service"></param>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
+		object Resolve(String key, Type service, IDictionary arguments);
+		
 		/// <summary>
 		/// Returns the inner instance of the MicroKernel
 		/// </summary>

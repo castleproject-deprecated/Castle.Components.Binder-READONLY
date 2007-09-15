@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 
 
 	[TestFixture]
-	public class HtmlHelperTestCase 
+	public class HtmlHelperTestCase : AbstractTestCase
 	{
 		[Test]
 		public void FormTag()
 		{
 			HtmlHelper helper = new HtmlHelper();
-			Assert.AreEqual( "<form method=\"post\" action=\"something.rails\">\r\n", 
+			Assert.AreEqual( "<form method=\"post\" action=\"something.rails\">" + Environment.NewLine, 
 				helper.Form("something.rails") );
 		}
 
@@ -43,7 +43,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		public void LabelFor()
 		{
 			HtmlHelper helper = new HtmlHelper();
-			Assert.AreEqual( "<label  for=\"x\">name</label>\r\n", helper.LabelFor("x", "name") );
+			Assert.AreEqual( "<label  for=\"x\">name</label>" + Environment.NewLine, helper.LabelFor("x", "name") );
 		}
 		
 		[Test]
@@ -51,7 +51,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		{
 			String[] args = new String[] { "arg1", "arg2" };
 			HtmlHelper helper = new HtmlHelper();
-			Assert.AreEqual( "<ul>\r\n<li>arg1</li>\r\n<li>arg2</li>\r\n</ul>\r\n", 
+			Assert.AreEqual( "<ul>" + Environment.NewLine + "<li>arg1</li>" + Environment.NewLine + "<li>arg2</li>" + Environment.NewLine + "</ul>" + Environment.NewLine, 
 				helper.BuildUnorderedList(args) );
 		}
 
@@ -60,8 +60,22 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		{
 			String[] args = new String[] { "arg1" };
 			HtmlHelper helper = new HtmlHelper();
-			Assert.AreEqual( "<ul class=\"style1\">\r\n<li class=\"style2\">arg1</li>\r\n</ul>\r\n", 
+			Assert.AreEqual( "<ul class=\"style1\">" + Environment.NewLine + "<li class=\"style2\">arg1</li>" + Environment.NewLine + "</ul>" + Environment.NewLine, 
 				helper.BuildUnorderedList(args, "style1", "style2") );
+		}
+
+		[Test]
+		public void LinkTo()
+		{
+			DoGet("helper/linkto.rails", "name=Click", "action=href");
+
+			AssertSuccess();
+			AssertReplyEqualTo("<a href=\"/helper/href.rails\">Click</a>");
+
+			DoGet("test/helper2/linkto.rails", "name=Click", "action=href");
+
+			AssertSuccess();
+			AssertReplyEqualTo("<a href=\"/test/helper2/href.rails\">Click</a>");
 		}
 	}
 }

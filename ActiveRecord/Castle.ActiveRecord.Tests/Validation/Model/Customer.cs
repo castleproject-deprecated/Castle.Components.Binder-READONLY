@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 namespace Castle.ActiveRecord.Tests.Validation.Model
 {
 	using System;
+	using Castle.Components.Validator;
 
 	[ActiveRecord(DiscriminatorValue="y")]
 	public class Customer : Person
@@ -26,14 +27,14 @@ namespace Castle.ActiveRecord.Tests.Validation.Model
 		{
 		}
 
-		[Property, ValidateNotEmpty]
+		[Property, ValidateNonEmpty]
 		public string ContactName
 		{
 			get { return contactName; }
 			set { contactName = value; }
 		}
 
-		[Property, ValidateNotEmpty]
+		[Property, ValidateNonEmpty]
 		public string Phone
 		{
 			get { return phone; }

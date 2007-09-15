@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 		{
 			if (!HasSelected(context)) return;
 
-			XmlDocument facilitiesDom = (XmlDocument) context.Properties[MRConfigConstants.Facilities];
+			XmlDocument facilitiesDom = (XmlDocument) context.Properties[MRConfigConstants.FacilitiesConfig];
 
 			RegisterAndConfigureFacility(facilitiesDom);
 		}
@@ -67,9 +67,9 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		private bool HasSelected(ExtensionContext context)
 		{
-			return ((bool) context.Properties["enableWindsorIntegration"]) == true &&
+			return ((bool) context.Properties["enableWindsorIntegration"]) &&
 				context.Properties.Contains("Automatic Transaction Management") &&
-				((bool) context.Properties["Automatic Transaction Management"]) == true;
+				((bool) context.Properties["Automatic Transaction Management"]);
 		}
 	}
 }

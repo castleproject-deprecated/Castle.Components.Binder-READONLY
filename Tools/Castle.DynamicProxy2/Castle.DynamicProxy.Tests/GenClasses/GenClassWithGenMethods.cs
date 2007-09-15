@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 
 namespace Castle.DynamicProxy.Tests.GenClasses
 {
+	using System;
+
 	public class GenClassWithGenMethods<T> where T : new()
 	{
 		private object savedParam;
@@ -32,10 +34,17 @@ namespace Castle.DynamicProxy.Tests.GenClasses
 		public virtual T DoSomething<Z>(Z z)
 		{
 			invoked = true;
-			
+
 			savedParam = z;
-			
+
 			return new T();
+		}
+
+		public virtual void DoSomethingElse<T2>(Converter<int, T2> converter, int value)
+		{
+			invoked = true;
+
+			savedParam = converter(value);
 		}
 	}
 }

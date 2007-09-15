@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,11 +27,19 @@ namespace Castle.ActiveRecord.Framework.Internal
 		
 		private ActiveRecordModel currentModel;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="GraphConnectorVisitor"/> class.
+		/// </summary>
+		/// <param name="arCollection">The ar collection.</param>
 		public GraphConnectorVisitor(ActiveRecordModelCollection arCollection)
 		{
 			this.arCollection = arCollection;
 		}
 
+		/// <summary>
+		/// Visits the model.
+		/// </summary>
+		/// <param name="model">The model.</param>
 		public override void VisitModel(ActiveRecordModel model)
 		{
 			ActiveRecordModel savedModel = currentModel;
@@ -88,6 +96,10 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 		}
 
+		/// <summary>
+		/// Visits the nested.
+		/// </summary>
+		/// <param name="model">The model.</param>
 		public override void VisitNested(NestedModel model)
 		{
 			Type type = model.Property.DeclaringType;
@@ -99,6 +111,10 @@ namespace Castle.ActiveRecord.Framework.Internal
 			base.VisitNested(model);
 		}
 
+		/// <summary>
+		/// Visits the collection ID.
+		/// </summary>
+		/// <param name="model">The model.</param>
 		public override void VisitCollectionID(CollectionIDModel model)
 		{
 			// Attempt to find HasAndBelongsToMany for the property
@@ -115,6 +131,10 @@ namespace Castle.ActiveRecord.Framework.Internal
 			hasAndBelModel.CollectionID = model;
 		}
 
+		/// <summary>
+		/// Visits the hilo model
+		/// </summary>
+		/// <param name="model">The model.</param>
 		public override void VisitHilo(HiloModel model)
 		{
 			// Attempt to find CollectionID for the property
@@ -124,7 +144,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			if (collModel == null)
 			{
 				throw new ActiveRecordException( String.Format(
-					"A HileAttribute should be used with CollectionIDAttribute, but we couldn't find it for the property " + 
+					"A HiloAttribute should be used with CollectionIDAttribute, but we couldn't find it for the property " + 
 					currentModel.Type.FullName + "." + model.Property.Name) );
 			}
 
@@ -159,13 +179,12 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 		private static bool IsChildClass(ActiveRecordModel model, ActiveRecordModel child)
 		{
-#if DOTNET2
 			// generic check
 			if (child.Type.BaseType.IsGenericType)
 			{
 				if (child.Type.BaseType.GetGenericTypeDefinition() == model.Type) return true;
 			}
-#endif
+
 			// Direct decendant
 			if (child.Type.BaseType == model.Type) return true;
 

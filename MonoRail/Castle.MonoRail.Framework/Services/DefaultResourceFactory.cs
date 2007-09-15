@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,18 +63,17 @@ namespace Castle.MonoRail.Framework.Services
 		/// <returns></returns>
 		public IResource Create(ResourceDescriptor descriptor, Assembly appAssembly)
 		{
-			Assembly resAssembly = ResolveAssembly(descriptor.AssemblyName, appAssembly);
-			CultureInfo culture = ResolveCulture(descriptor.CultureName);
+			Assembly assembly = this.ResolveAssembly(descriptor.AssemblyName, appAssembly);
+			CultureInfo cultureInfo = this.ResolveCulture(descriptor.CultureName);
 
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Creating resource name {0}, assembly {1}, resource {2}", 
-				             descriptor.Name, descriptor.AssemblyName, descriptor.ResourceName);
+				logger.DebugFormat("Creating resource name {0}, assembly {1}, resource {2}", 
+				                   descriptor.Name, descriptor.AssemblyName, descriptor.ResourceName);
 			}
-			
-			ResourceManager rm = new ResourceManager(descriptor.ResourceName, resAssembly, descriptor.ResourceType);
 
-			return new ResourceFacade(rm.GetResourceSet(culture, true, true));
+			ResourceManager manager = new ResourceManager(descriptor.ResourceName, assembly, descriptor.ResourceType);
+			return new ResourceFacade(manager, cultureInfo);
 		}
 
 		/// <summary>
@@ -90,7 +89,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Resolving culture {0}", name);
+				logger.DebugFormat("Resolving culture {0}", name);
 			}
 
 			if ("neutral".Equals(name))
@@ -111,7 +110,7 @@ namespace Castle.MonoRail.Framework.Services
 			
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Resolving assembly {0}", name);
+				logger.DebugFormat("Resolving assembly {0}", name);
 			}
 
 			try

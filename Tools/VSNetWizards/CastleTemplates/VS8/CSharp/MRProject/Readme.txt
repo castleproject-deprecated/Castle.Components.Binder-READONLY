@@ -1,6 +1,6 @@
 
 The MonoRail project is set up and ready to run 
-with Cassini (which allows debugging).
+using VS.Net web project support
 
 Some considerations if you are using 
 Windsor integration:
@@ -18,7 +18,7 @@ can be optionally registered on the container.
 Connection strings
 ------------------
 
-See the properties.config
+See the Config/properties.config
 
 ActiveRecord Integration Facility
 ---------------------------------
@@ -28,7 +28,7 @@ to add a reference to the assembly that contains
 the ActiveRecord types (your domain model).
 
 If something needs to be included, check the
-facilities.config
+Config/facilities.config
 
 NHibernate Integration Facility
 -------------------------------
@@ -38,5 +38,5 @@ to bring the hbm files or referencing the
 assemblies that contains the NHibernate xml mappings.
 
 If something needs to be included, check the
-facilities.config
+Config/facilities.config
 

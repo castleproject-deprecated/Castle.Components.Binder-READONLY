@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,14 @@ namespace Castle.DynamicProxy.Generators
 		private readonly Type targetType;
 		private readonly Type[] interfaces;
 		private readonly ProxyGenerationOptions options;
+		private readonly Type proxyForType;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CacheKey"/> class.
+		/// </summary>
+		/// <param name="targetType">Type of the target.</param>
+		/// <param name="interfaces">The interfaces.</param>
+		/// <param name="options">The options.</param>
 		public CacheKey(Type targetType, Type[] interfaces, ProxyGenerationOptions options)
 		{
 			this.targetType = targetType;
@@ -29,16 +36,25 @@ namespace Castle.DynamicProxy.Generators
 			this.options = options;
 		}
 
+		public CacheKey(Type proxyForType, Type targetType, Type[] interfaces, ProxyGenerationOptions options)
+			: this(targetType, interfaces, options)
+		{
+			this.proxyForType = proxyForType;
+		}
+
 		public override int GetHashCode()
 		{
 			int result = targetType.GetHashCode();
-			// result = 29 * result + (interfaces != null ? interfaces.GetHashCode() : 0);
 			if (interfaces != null)
 			{
-				foreach (Type inter in interfaces)
+				foreach(Type inter in interfaces)
+				{
 					result += 29 + inter.GetHashCode();
+				}
 			}
 			result = 29 * result + options.GetHashCode();
+			if (proxyForType != null)
+				result = 29*result + proxyForType.GetHashCode();
 			return result;
 		}
 
@@ -47,14 +63,14 @@ namespace Castle.DynamicProxy.Generators
 			if (this == obj) return true;
 			CacheKey cacheKey = obj as CacheKey;
 			if (cacheKey == null) return false;
+			if (proxyForType != null && !Equals(proxyForType, cacheKey.proxyForType)) return false;
 			if (!Equals(targetType, cacheKey.targetType)) return false;
-			// if (!Equals(interfaces, cacheKey.interfaces)) return false;
 			if (interfaces != null && cacheKey.interfaces == null) return false;
 			if (interfaces == null && cacheKey.interfaces != null) return false;
 			if (interfaces != null && interfaces.Length != cacheKey.interfaces.Length) return false;
 			if (interfaces != null)
 			{
-				for(int i=0;i<interfaces.Length;i++)
+				for(int i = 0; i < interfaces.Length; i++)
 				{
 					if (!Equals(interfaces[i], cacheKey.interfaces[i])) return false;
 				}

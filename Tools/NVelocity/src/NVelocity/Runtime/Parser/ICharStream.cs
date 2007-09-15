@@ -18,45 +18,12 @@ namespace NVelocity.Runtime.Parser
 	/// </summary>
 	public interface ICharStream
 	{
-		int Column { get; }
-		int Line { get; }
-		int EndColumn { get; }
-		int EndLine { get; }
-		int BeginColumn { get; }
-		int BeginLine { get; }
-
 		/// <summary> Returns the next character from the selected input.  The method
 		/// of selecting the input is the responsibility of the class
 		/// implementing this interface.  Can throw any java.io.IOException.
 		/// </summary>
 		char ReadChar();
 
-		/// <summary> Returns the column position of the character last read.
-		/// </summary>
-		/// <deprecated>
-		/// </deprecated>
-		/// <seealso cref=" #getEndColumn
-		///
-		/// "/>
-		/// <summary> Returns the line number of the character last read.
-		/// </summary>
-		/// <deprecated>
-		/// </deprecated>
-		/// <seealso cref=" #getEndLine
-		///
-		/// "/>
-		/// <summary> Returns the column number of the last character for current token (being
-		/// matched after the last call to BeginTOken).
-		/// </summary>
-		/// <summary> Returns the line number of the last character for current token (being
-		/// matched after the last call to BeginTOken).
-		/// </summary>
-		/// <summary> Returns the column number of the first character for current token (being
-		/// matched after the last call to BeginTOken).
-		/// </summary>
-		/// <summary> Returns the line number of the first character for current token (being
-		/// matched after the last call to BeginTOken).
-		/// </summary>
 		/// <summary> Backs up the input stream by amount steps. Lexer calls this method if it
 		/// had already read some characters, but could not use them to match a
 		/// (longer) token. So, they will be used again as the prefix of the next
@@ -77,7 +44,8 @@ namespace NVelocity.Runtime.Parser
 		/// </summary>
 		String GetImage();
 
-		/// <summary> Returns an array of characters that make up the suffix of length 'len' for
+		/// <summary> 
+		/// Returns an array of characters that make up the suffix of length 'len' for
 		/// the currently matched token. This is used to build up the matched string
 		/// for use in actions in the case of MORE. A simple and inefficient
 		/// implementation of this is as follows :
@@ -95,5 +63,41 @@ namespace NVelocity.Runtime.Parser
 		/// affect the lexer's operation.
 		/// </summary>
 		void Done();
+
+		/// <summary>
+		/// Gets the column.
+		/// </summary>
+		/// <value>The column.</value>
+		int Column { get; }
+
+		/// <summary>
+		/// Gets the line.
+		/// </summary>
+		/// <value>The line.</value>
+		int Line { get; }
+
+		/// <summary>
+		/// Gets the end column.
+		/// </summary>
+		/// <value>The end column.</value>
+		int EndColumn { get; }
+
+		/// <summary>
+		/// Gets the end line.
+		/// </summary>
+		/// <value>The end line.</value>
+		int EndLine { get; }
+
+		/// <summary>
+		/// Gets the begin column.
+		/// </summary>
+		/// <value>The begin column.</value>
+		int BeginColumn { get; }
+
+		/// <summary>
+		/// Gets the begin line.
+		/// </summary>
+		/// <value>The begin line.</value>
+		int BeginLine { get; }
 	}
 }

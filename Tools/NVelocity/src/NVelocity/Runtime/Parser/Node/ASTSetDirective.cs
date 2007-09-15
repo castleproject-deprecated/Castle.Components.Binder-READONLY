@@ -2,19 +2,12 @@ namespace NVelocity.Runtime.Parser.Node
 {
 	using System;
 	using System.IO;
+	using Context;
 	using NVelocity.App.Events;
-	using NVelocity.Context;
 
-	/// <summary> Node for the #set directive
-	/// *
+	/// <summary> 
+	/// Node for the #set directive
 	/// </summary>
-	/// <author> <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
-	/// </author>
-	/// <author> <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
-	/// </author>
-	/// <version> $Id: ASTSetDirective.cs,v 1.4 2003/10/27 13:54:10 corts Exp $
-	///
-	/// </version>
 	public class ASTSetDirective : SimpleNode
 	{
 		private String leftReference = "";
@@ -105,7 +98,8 @@ namespace NVelocity.Runtime.Parser.Node
 
 					if (doit)
 					{
-						rsvc.Error("RHS of #set statement is null. Context will not be modified. " + context.CurrentTemplateName + " [line " + Line + ", column " + Column + "]");
+						rsvc.Error("RHS of #set statement is null. Context will not be modified. " + context.CurrentTemplateName +
+						           " [line " + Line + ", column " + Column + "]");
 					}
 				}
 
@@ -129,11 +123,5 @@ namespace NVelocity.Runtime.Parser.Node
 
 			return true;
 		}
-
-		/// <summary>  returns the ASTReference that is the LHS of the set statememt
-		/// </summary>
-
-		/// <summary>  returns the RHS Node of the set statement
-		/// </summary>
 	}
 }

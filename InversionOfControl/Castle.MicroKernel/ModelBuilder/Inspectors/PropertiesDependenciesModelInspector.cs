@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 		[NonSerialized]
 		private IConversionManager converter;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PropertiesDependenciesModelInspector"/> class.
+		/// </summary>
 		public PropertiesDependenciesModelInspector()
 		{
 		}
@@ -92,6 +95,11 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 				ParameterInfo[] indexerParams = property.GetIndexParameters();
 
 				if (indexerParams != null && indexerParams.Length != 0)
+				{
+					continue;
+				}
+				
+				if (property.IsDefined(typeof(DoNotWireAttribute), true))
 				{
 					continue;
 				}

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ namespace Castle.Facilities.Remoting.Tests
 {
 	using System;
 	using System.Globalization;
+	using System.IO;
 	using System.Reflection;
 	using System.Runtime.Remoting;
 
@@ -38,8 +39,7 @@ namespace Castle.Facilities.Remoting.Tests
 			serverDomain = AppDomainFactory.Create("server");
 			clientDomain = AppDomainFactory.Create("client");
 
-			serverContainer = CreateRemoteContainer(serverDomain, 
-				GetServerConfigFile() );
+			serverContainer = CreateRemoteContainer(serverDomain, GetServerConfigFile());
 		}
 
 		[TearDown]
@@ -79,7 +79,9 @@ namespace Castle.Facilities.Remoting.Tests
 		
 		protected string BuildConfigPath(string configFile)
 		{
-			return "../Castle.Facilities.Remoting.Tests/Configs/" + configFile;
+			string baseDir = System.Configuration.ConfigurationManager.AppSettings["configPath"];
+
+			return ConfigHelper.ResolveConfigPath(Path.Combine(baseDir, configFile));
 		}
 	}
 

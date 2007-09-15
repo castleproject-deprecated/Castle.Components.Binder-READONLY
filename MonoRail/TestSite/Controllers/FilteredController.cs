@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace TestSite.Controllers
 {
 	using Castle.MonoRail.Framework;
 
-	[Filter( ExecuteEnum.Always, typeof(MyFilter) )]
+	[Filter(ExecuteEnum.Always, typeof(MyFilter))]
 	public class FilteredController : Controller
 	{
 		public FilteredController()
@@ -37,10 +37,10 @@ namespace TestSite.Controllers
 		{
 		}
 
-        [SkipFilter( typeof(MyFilter))]
-        public void SelectiveSkip()
-        {
-        }
+		[SkipFilter(typeof(MyFilter))]
+		public void SelectiveSkip()
+		{
+		}
 	}
 
 	public class MyFilter : IFilter

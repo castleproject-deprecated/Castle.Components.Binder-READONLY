@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,14 +22,48 @@ namespace Castle.Core.Configuration
 	[Serializable]
 	public class MutableConfiguration : AbstractConfiguration
 	{
-		public MutableConfiguration( String name ) : this(name, null)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MutableConfiguration"/> class.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		public MutableConfiguration(String name) : this(name, null)
 		{
 		}
 
-		public MutableConfiguration( String name, String value )
+		public MutableConfiguration(String name, String value)
 		{
-			base.internalName = name;
-			base.internalValue = value;
+			internalName = name;
+			internalValue = value;
+		}
+
+		public static MutableConfiguration Create(string name)
+		{
+			return new MutableConfiguration(name);
+		}
+
+		public new string Value
+		{
+			set { internalValue = value; }
+		}
+
+		public MutableConfiguration Attribute(string name, string value)
+		{
+			Attributes[name] = value;
+			return this;
+		}
+
+		public MutableConfiguration CreateChild(string name)
+		{
+			MutableConfiguration child = new MutableConfiguration(name);
+			Children.Add(child);
+			return child;
+		}
+
+		public MutableConfiguration CreateChild(string name, string value)
+		{
+			MutableConfiguration child = new MutableConfiguration(name, value);
+			Children.Add(child);
+			return child;
 		}
 	}
 }

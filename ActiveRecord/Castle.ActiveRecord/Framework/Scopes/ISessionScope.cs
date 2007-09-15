@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,27 @@ namespace Castle.ActiveRecord
 
 	using NHibernate;
 
+	/// <summary>
+	/// Define session scope types
+	/// </summary>
 	public enum SessionScopeType
 	{
+		/// <summary>
+		/// Undefined type of session scope.
+		/// This value probably should never exist
+		/// </summary>
 		Undefined,
+		/// <summary>
+		/// Simple - non transactional session scope
+		/// </summary>
 		Simple,
+		/// <summary>
+		/// Transactional session scope
+		/// </summary>
 		Transactional,
+		/// <summary>
+		/// Custom implementation of session scope.
+		/// </summary>
 		Custom
 	}
 
@@ -108,5 +124,12 @@ namespace Castle.ActiveRecord
 		/// <param name="interceptor">the NHibernate interceptor</param>
 		/// <returns>the newly created session</returns>
 		ISession OpenSession(ISessionFactory sessionFactory, IInterceptor interceptor);
+
+		/// <summary>
+		/// This method will be called if a session action fails. 
+		/// The scope may then decide to use an different approach to flush/dispose it.
+		/// </summary>
+		/// <param name="session">The session that failed</param>
+		void FailSession(ISession session);
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 namespace Castle.ActiveRecord.Framework.Config
 {
 	using System;
-	using System.IO;
-	using System.Xml;
 	using System.Collections;
 	using System.Collections.Specialized;
 	using System.Configuration;
+	using System.IO;
+	using System.Xml;
 
 	/// <summary>
 	/// Source of configuration based on Xml 
@@ -27,10 +27,17 @@ namespace Castle.ActiveRecord.Framework.Config
 	/// </summary>
 	public class XmlConfigurationSource : InPlaceConfigurationSource
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="XmlConfigurationSource"/> class.
+		/// </summary>
 		protected XmlConfigurationSource()
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="XmlConfigurationSource"/> class.
+		/// </summary>
+		/// <param name="xmlFileName">Name of the XML file.</param>
 		public XmlConfigurationSource(String xmlFileName)
 		{
 			XmlDocument doc = new XmlDocument();
@@ -38,6 +45,10 @@ namespace Castle.ActiveRecord.Framework.Config
 			PopulateSource(doc.DocumentElement);
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="XmlConfigurationSource"/> class.
+		/// </summary>
+		/// <param name="stream">The stream.</param>
 		public XmlConfigurationSource(Stream stream)
 		{
 			XmlDocument doc = new XmlDocument();
@@ -45,6 +56,10 @@ namespace Castle.ActiveRecord.Framework.Config
 			PopulateSource(doc.DocumentElement);
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="XmlConfigurationSource"/> class.
+		/// </summary>
+		/// <param name="reader">The reader.</param>
 		public XmlConfigurationSource(TextReader reader)
 		{
 			XmlDocument doc = new XmlDocument();
@@ -52,11 +67,17 @@ namespace Castle.ActiveRecord.Framework.Config
 			PopulateSource(doc.DocumentElement);
 		}
 
+		/// <summary>
+		/// Populate this instance with values from the given XML node
+		/// </summary>
 		protected void PopulateSource(XmlNode section)
 		{
 			XmlAttribute isWebAtt = section.Attributes["isWeb"];
 			XmlAttribute threadInfoAtt = section.Attributes["threadinfotype"];
 			XmlAttribute isDebug = section.Attributes["isDebug"];
+			XmlAttribute lazyByDefault = section.Attributes["default-lazy"];
+			XmlAttribute pluralize = section.Attributes["pluralizeTableNames"];
+			XmlAttribute verifyModelsAgainstDBSchemaAtt = section.Attributes["verifyModelsAgainstDBSchema"];
 
 			SetUpThreadInfoType(isWebAtt != null && "true" == isWebAtt.Value,
 			                    threadInfoAtt != null ? threadInfoAtt.Value : String.Empty);
@@ -75,6 +96,12 @@ namespace Castle.ActiveRecord.Framework.Config
 
 			SetDebugFlag(isDebug != null && "true" == isDebug.Value);
 
+			SetIsLazyByDefault(lazyByDefault != null && lazyByDefault.Value == "true");
+
+			SetPluralizeTableNames(pluralize != null && pluralize.Value == "true");
+
+			SetVerifyModelsAgainstDBSchema(verifyModelsAgainstDBSchemaAtt != null && verifyModelsAgainstDBSchemaAtt.Value == "true");
+
 			PopulateConfigNodes(section);
 		}
 
@@ -91,11 +118,7 @@ namespace Castle.ActiveRecord.Framework.Config
 					String message = String.Format("Unexpected node. Expect '{0}' found '{1}'",
 					                               Config_Node_Name, node.Name);
 
-#if DOTNET2
-					throw new System.Configuration.ConfigurationErrorsException(message);
-#else
-					throw new ConfigurationException(message);
-#endif
+					throw new ConfigurationErrorsException(message);
 				}
 
 				Type targetType = typeof(ActiveRecordBase);
@@ -109,11 +132,7 @@ namespace Castle.ActiveRecord.Framework.Config
 						String message = String.Format("Invalid attribute at node '{0}'. " +
 						                               "The only supported attribute is 'type'", Config_Node_Name);
 
-#if DOTNET2
-						throw new System.Configuration.ConfigurationErrorsException(message);
-#else
-						throw new ConfigurationException(message);
-#endif
+						throw new ConfigurationErrorsException(message);
 					}
 
 					String typeName = typeNameAtt.Value;
@@ -124,11 +143,7 @@ namespace Castle.ActiveRecord.Framework.Config
 					{
 						String message = String.Format("Could not obtain type from name '{0}'", typeName);
 
-#if DOTNET2
-						throw new System.Configuration.ConfigurationErrorsException(message);
-#else
-						throw new ConfigurationException(message);
-#endif
+						throw new ConfigurationErrorsException(message);
 					}
 				}
 
@@ -136,14 +151,15 @@ namespace Castle.ActiveRecord.Framework.Config
 			}
 		}
 
+		/// <summary>
+		/// Builds the configuration properties.
+		/// </summary>
+		/// <param name="node">The node.</param>
+		/// <returns></returns>
 		protected IDictionary BuildProperties(XmlNode node)
 		{
 			HybridDictionary dict = new HybridDictionary();
-#if DOTNET2
-			System.Text.RegularExpressions.Regex connectionStringRegex = new System.Text.RegularExpressions.
-				Regex(@"ConnectionString\s*=\s*\$\{(?<ConnectionStringName>[\d\w_-]+)\}");
-			string ConnectionStringKey = "hibernate.connection.connection_string";
-#endif
+
 			foreach(XmlNode addNode in node.SelectNodes("add"))
 			{
 				XmlAttribute keyAtt = addNode.Attributes["key"];
@@ -153,23 +169,10 @@ namespace Castle.ActiveRecord.Framework.Config
 				{
 					String message = String.Format("For each 'add' element you must specify 'key' and 'value' attributes");
 
-#if DOTNET2
-					throw new System.Configuration.ConfigurationErrorsException(message);
-#else
-					throw new ConfigurationException(message);
-#endif
+					throw new ConfigurationErrorsException(message);
 				}
 				string value = valueAtt.Value;
-#if DOTNET2
 
-				if (keyAtt.Value == ConnectionStringKey
-				    && connectionStringRegex.IsMatch(value))
-				{
-					string connectionStringName = connectionStringRegex.Match(value).
-						Groups["ConnectionStringName"].Value;
-					value = System.Configuration.ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
-				}
-#endif
 				dict.Add(keyAtt.Value, value);
 			}
 

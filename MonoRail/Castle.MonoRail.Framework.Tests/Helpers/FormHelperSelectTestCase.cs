@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 namespace Castle.MonoRail.Framework.Tests.Helpers
 {
+	using System;
 	using System.Collections;
-#if DOTNET2
 	using System.Collections.Generic;
-#endif
+	using System.Data;
 	using System.Globalization;
 	using System.IO;
 	using System.Threading;
@@ -36,6 +36,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		private Subscription subscription;
 		private Month[] months;
 		private Contact contact;
+		private DataTable workTable;
 
 		[SetUp]
 		public void Init()
@@ -65,6 +66,21 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			controller.PropertyBag.Add("months", months);
 			controller.PropertyBag.Add("contact", contact);
 
+			workTable = new DataTable("Customers");
+			DataColumn workCol = workTable.Columns.Add("CustID", typeof(Int32));
+			workCol.AllowDBNull = false;
+			workCol.Unique = true;
+			workTable.Columns.Add("Name", typeof(String));
+
+			DataRow row = workTable.NewRow();
+			row[0] = 1;
+			row[1] = "chris rocks";
+			workTable.Rows.Add(row);
+			row = workTable.NewRow();
+			row[0] = 2;
+			row[1] = "will ferrell";
+			workTable.Rows.Add(row);
+
 			helper.SetController(controller);
 		}
 
@@ -76,8 +92,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			list.Add("cat1");
 			list.Add("cat2");
 
-			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >\r\n" + 
-				"<option value=\"cat1\">cat1</option>\r\n<option value=\"cat2\">cat2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >" + Environment.NewLine + 
+				"<option value=\"cat1\">cat1</option>" + Environment.NewLine + "<option value=\"cat2\">cat2</option>" + Environment.NewLine + "</select>",
 				helper.Select("product.category.id", list));
 		}
 
@@ -88,9 +104,9 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			list.Add("cat1");
 			list.Add("cat2");
 
-			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >\r\n" + 
-				"<option value=\"0\">Please select</option>\r\n" + 
-				"<option value=\"cat1\">cat1</option>\r\n<option value=\"cat2\">cat2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >" + Environment.NewLine + 
+				"<option value=\"0\">Please select</option>" + Environment.NewLine + 
+				"<option value=\"cat1\">cat1</option>" + Environment.NewLine + "<option value=\"cat2\">cat2</option>" + Environment.NewLine + "</select>",
 				helper.Select("product.category.id", list, DictHelper.Create("firstoption=Please select") ));
 		}
 
@@ -101,16 +117,16 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			list.Add(new ProductCategory(1, "cat1"));
 			list.Add(new ProductCategory(2, "cat2"));
 
-			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >\r\n" + 
-				"<option value=\"1\">cat1</option>\r\n<option value=\"2\">cat2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >" + Environment.NewLine + 
+				"<option value=\"1\">cat1</option>" + Environment.NewLine + "<option value=\"2\">cat2</option>" + Environment.NewLine + "</select>",
 				helper.Select("product.category.id", list, DictHelper.Create("value=id", "text=name") ));
 		}
 
 		[Test]
 		public void SelectOnPrimitiveArrayWithoutValueAndText()
 		{
-			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >\r\n" + 
-				"<option value=\"1\">1</option>\r\n<option value=\"2\">2</option>\r\n<option value=\"3\">3</option>\r\n<option value=\"4\">4</option>\r\n<option selected=\"selected\" value=\"5\">5</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >" + Environment.NewLine +
+				"<option value=\"1\">1</option>" + Environment.NewLine + "<option value=\"2\">2</option>" + Environment.NewLine + "<option value=\"3\">3</option>" + Environment.NewLine + "<option value=\"4\">4</option>" + Environment.NewLine + "<option selected=\"selected\" value=\"5\">5</option>" + Environment.NewLine + "</select>",
 				helper.Select("product.category.id", 5, new int[] { 1, 2, 3, 4, 5}, DictHelper.Create() ));
 		}
 
@@ -123,8 +139,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 
 			product.Category.Id = 2;
 
-			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >\r\n" + 
-				"<option value=\"1\">cat1</option>\r\n<option selected=\"selected\" value=\"2\">cat2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"product_category_id\" name=\"product.category.id\" >" + Environment.NewLine +
+				"<option value=\"1\">cat1</option>" + Environment.NewLine + "<option selected=\"selected\" value=\"2\">cat2</option>" + Environment.NewLine + "</select>",
 				helper.Select("product.category.id", list, DictHelper.Create("value=id", "text=name") ));
 		}
 
@@ -135,8 +151,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			list.Add(new Role(1, "role1"));
 			list.Add(new Role(2, "role2"));
 
-			Assert.AreEqual("<select id=\"user_roles\" name=\"user.roles\" >\r\n" + 
-				"<option value=\"1\">role1</option>\r\n<option value=\"2\">role2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"user_roles\" name=\"user.roles\" >" + Environment.NewLine + 
+				"<option value=\"1\">role1</option>" + Environment.NewLine + "<option value=\"2\">role2</option>" + Environment.NewLine + "</select>",
 				helper.Select("user.roles", list, DictHelper.Create("value=id", "text=name") ));
 		}
 
@@ -150,8 +166,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			user.Roles.Add(new Role(1, "role1"));
 			user.Roles.Add(new Role(2, "role2"));
 
-			Assert.AreEqual("<select id=\"user_roles\" name=\"user.roles\" >\r\n" + 
-				"<option selected=\"selected\" value=\"1\">role1</option>\r\n<option selected=\"selected\" value=\"2\">role2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"user_roles\" name=\"user.roles\" >" + Environment.NewLine + 
+				"<option selected=\"selected\" value=\"1\">role1</option>" + Environment.NewLine + "<option selected=\"selected\" value=\"2\">role2</option>" + Environment.NewLine + "</select>",
 				helper.Select("user.roles", list, DictHelper.Create("value=id", "text=name") ));
 		}
 
@@ -164,8 +180,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 
 			user.Roles.Add(new Role(1, "role1"));
 
-			Assert.AreEqual("<select id=\"user_roles\" name=\"user.roles\" >\r\n" + 
-				"<option selected=\"selected\" value=\"1\">role1</option>\r\n<option value=\"2\">role2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"user_roles\" name=\"user.roles\" >" + Environment.NewLine + 
+				"<option selected=\"selected\" value=\"1\">role1</option>" + Environment.NewLine + "<option value=\"2\">role2</option>" + Environment.NewLine + "</select>",
 				helper.Select("user.roles", list, DictHelper.Create("value=id", "text=name") ));
 		}
 
@@ -179,8 +195,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			user.Roles.Add(new Role(1, "role1"));
 			user.Roles.Add(new Role(2, "role2"));
 
-			Assert.AreEqual("<select id=\"user_RolesAsArray\" name=\"user.RolesAsArray\" >\r\n" + 
-				"<option selected=\"selected\" value=\"1\">role1</option>\r\n<option selected=\"selected\" value=\"2\">role2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"user_RolesAsArray\" name=\"user.RolesAsArray\" >" + Environment.NewLine + 
+				"<option selected=\"selected\" value=\"1\">role1</option>" + Environment.NewLine + "<option selected=\"selected\" value=\"2\">role2</option>" + Environment.NewLine + "</select>",
 				helper.Select("user.RolesAsArray", list, DictHelper.Create("value=id", "text=name") ));
 		}
 
@@ -193,8 +209,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 
 			user.Roles.Add(new Role(1, "role1"));
 
-			Assert.AreEqual("<select id=\"user_RolesAsArray\" name=\"user.RolesAsArray\" >\r\n" + 
-				"<option selected=\"selected\" value=\"1\">role1</option>\r\n<option value=\"2\">role2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"user_RolesAsArray\" name=\"user.RolesAsArray\" >" + Environment.NewLine + 
+				"<option selected=\"selected\" value=\"1\">role1</option>" + Environment.NewLine + "<option value=\"2\">role2</option>" + Environment.NewLine + "</select>",
 				helper.Select("user.RolesAsArray", list, DictHelper.Create("value=id", "text=name") ));
 		}
 
@@ -208,12 +224,57 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			user.Roles.Add(new Role(1, "role1"));
 			user.Roles.Add(new Role(2, "role2"));
 
-			Assert.AreEqual("<select id=\"user_RolesAsArray\" name=\"user.RolesAsArray\" >\r\n" + 
-				"<option selected=\"selected\" value=\"role1\">role1</option>\r\n<option selected=\"selected\" value=\"role2\">role2</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"user_RolesAsArray\" name=\"user.RolesAsArray\" >" + Environment.NewLine + 
+				"<option selected=\"selected\" value=\"role1\">role1</option>" + Environment.NewLine + "<option selected=\"selected\" value=\"role2\">role2</option>" + Environment.NewLine + "</select>",
 				helper.Select("user.RolesAsArray", list));
 		}
 
-#if DOTNET2
+		[Test]
+		public void UsingDataTable()
+		{
+			Assert.AreEqual(
+				"<select id=\"user_id\" name=\"user.id\" >" + Environment.NewLine + 
+				"<option value=\"1\">chris rocks</option>" + Environment.NewLine + "<option value=\"2\">will ferrell</option>" + Environment.NewLine + "</select>",
+				helper.Select("user.id", workTable.Rows, DictHelper.Create("value=custid", "text=name", "sourceProperty=id")));
+		}
+
+		[Test]
+		public void UsingEnums()
+		{
+			Assert.AreEqual(
+				"<select id=\"user_registration\" name=\"user.registration\" >" + Environment.NewLine + 
+				"<option value=\"1\">unregistered</option>" + Environment.NewLine + 
+				"<option value=\"2\">pending</option>" + Environment.NewLine + 
+				"<option selected=\"selected\" value=\"6\">registered</option>" + Environment.NewLine + 
+				"</select>",
+				helper.Select("user.registration", Enum.GetValues(typeof(SimpleUser.RegistrationEnum))));
+		}
+
+		[Test]
+		public void UsingEnumsAsText()
+		{
+			Assert.AreEqual(
+				"<select id=\"user_registration\" name=\"user.registration\" >" + Environment.NewLine +
+				"<option value=\"unregistered\">unregistered</option>" + Environment.NewLine +
+				"<option value=\"pending\">pending</option>" + Environment.NewLine +
+				"<option selected=\"selected\" value=\"registered\">registered</option>" + Environment.NewLine + 
+				"</select>",
+				helper.Select("user.registration", Enum.GetNames(typeof(SimpleUser.RegistrationEnum))));
+		}	
+
+
+		[Test]
+		public void UsingInterface()
+		{
+			List<IInterfacedList> list = new List<IInterfacedList>();
+
+			list.Add(new InterfacedClassA(1, "ernst"));
+			list.Add(new InterfacedClassB(2, "enix"));
+
+			Assert.AreEqual("<select id=\"user_name\" name=\"user.name\" >" + Environment.NewLine +
+				"<option value=\"1\">ernst</option>" + Environment.NewLine + "<option value=\"2\">enix</option>" + Environment.NewLine + "</select>",
+				helper.Select("user.name", list, DictHelper.Create("value=id", "text=name")));
+		}
 
 		[Test]
 		public void BasicFunctionalityInDotNet2()
@@ -222,11 +283,9 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			list.Add(new Month(1, "Jan"));
 			list.Add(new Month(2, "Feb"));
 
-			Assert.AreEqual("<select id=\"contact_dobmonth_id\" name=\"contact.dobmonth.id\" >\r\n" +
-				"<option value=\"1\">Jan</option>\r\n<option value=\"2\">Feb</option>\r\n</select>",
+			Assert.AreEqual("<select id=\"contact_dobmonth_id\" name=\"contact.dobmonth.id\" >" + Environment.NewLine + 
+				"<option value=\"1\">Jan</option>" + Environment.NewLine + "<option value=\"2\">Feb</option>" + Environment.NewLine + "</select>",
 				helper.Select("contact.dobmonth.id", list, DictHelper.Create("value=id", "text=name")));
 		}
-
-#endif
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ namespace Castle.MonoRail.Framework
 
 	/// <summary>
 	/// Decorates a controller with a different name
-	/// and optionaly an area which the controller belongs.
+	/// and optionally an area which the controller belongs to.
 	/// This is used to override the convention for controller
 	/// names and to optionally associate a controller with an 
 	/// area name.

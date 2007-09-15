@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,74 +17,63 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	using System;
 	using System.Collections;
 	using System.Reflection;
-	using System.Xml.Serialization;
-	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+	using System.Reflection.Emit;
 
 	public class ClassEmitter : AbstractTypeEmitter
 	{
-		private static IDictionary signedAssemblyCache = new Hashtable();
-
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, Type[] interfaces, bool serializable)
+		public ClassEmitter (ModuleScope modulescope, String name, Type baseType, Type[] interfaces)
+			: this (modulescope, name, baseType, interfaces, TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Serializable)
 		{
-			TypeAttributes flags = 
-				TypeAttributes.Public|TypeAttributes.Class|TypeAttributes.Serializable;
+		}
 
-			if (serializable)
-			{
-				flags |= TypeAttributes.Serializable;
-			}
+		public ClassEmitter (ModuleScope modulescope, String name, Type baseType, Type[] interfaces, TypeAttributes flags)
+			: this (modulescope, name, baseType, interfaces, flags, false)
+		{
+		}
 
-			bool isAssemblySigned = IsAssemblySigned(baseType);
-            
-			typebuilder = modulescope.ObtainDynamicModule(isAssemblySigned).DefineType(name, flags);
-			
-//#if DOTNET2
-			if (baseType.IsGenericType)
-			{
-			 	CreateGenericParameters(baseType.GetGenericArguments());
-			 
-				baseType = baseType.MakeGenericType(genericTypeParams);
-			}
-//#endif
-			
+		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, Type[] interfaces, TypeAttributes flags, bool forceUnsigned)
+			: base (CreateTypeBuilder (modulescope, name, baseType, interfaces, flags, forceUnsigned))
+		{
+			InitializeGenericArgumentsFromBases(ref baseType, ref interfaces);
+
 			if (interfaces != null)
 			{
 				foreach(Type inter in interfaces)
 				{
-					if (inter.IsGenericType)
-					{
-						CreateGenericParameters(inter.GetGenericArguments());
-
-						typebuilder.AddInterfaceImplementation(inter.MakeGenericType(GenericTypeParams));
-					}
-					else
-					{
-						typebuilder.AddInterfaceImplementation(inter);
-					}
+					TypeBuilder.AddInterfaceImplementation(inter);
 				}
 			}
-			
-			typebuilder.SetParent(baseType);
+
+			TypeBuilder.SetParent(baseType);
 		}
 
-		private bool IsAssemblySigned(Type baseType)
+		private static TypeBuilder CreateTypeBuilder (ModuleScope modulescope, string name, Type baseType, Type[] interfaces,
+				TypeAttributes flags, bool forceUnsigned)
 		{
-			if (baseType == typeof(object) || 
-			    baseType == typeof(MarshalByRefObject) || 
-			    baseType == typeof(ContextBoundObject))
+			bool isAssemblySigned = !forceUnsigned && !StrongNameUtil.IsAnyTypeFromUnsignedAssembly (baseType, interfaces);
+			return modulescope.ObtainDynamicModule (isAssemblySigned).DefineType (name, flags);
+		}
+
+		public ClassEmitter (TypeBuilder typeBuilder)
+			: base (typeBuilder)
+		{
+		}
+
+		// The ambivalent generic parameter handling of base type and interfaces has been removed from the ClassEmitter, it isn't used by the proxy
+		// generators anyway. If a concrete user needs to support generic bases, a subclass can override this method (and not call this base
+		// implementation), call CreateGenericParameters and replace baseType and interfaces by versions bound to the newly created GenericTypeParams.
+		protected virtual void InitializeGenericArgumentsFromBases(ref Type baseType, ref Type[] interfaces)
+		{
+			if (baseType.IsGenericTypeDefinition)
 			{
-				return false;
+				throw new NotSupportedException("ClassEmitter does not support open generic base types. Type: " + baseType.FullName);
 			}
-			
-			lock(signedAssemblyCache)
+			foreach(Type inter in interfaces)
 			{
-				if (signedAssemblyCache.Contains(baseType.Assembly) == false)
+				if (inter.IsGenericTypeDefinition)
 				{
-					byte[] key = baseType.Assembly.GetName().GetPublicKey();
-					bool isSigned = key != null  && key.Length != 0;
-					signedAssemblyCache.Add(baseType.Assembly, isSigned);
+					throw new NotSupportedException("ClassEmitter does not support open generic interfaces. Type: " + inter.FullName);
 				}
-				return (bool) signedAssemblyCache[baseType.Assembly];
 			}
 		}
 	}

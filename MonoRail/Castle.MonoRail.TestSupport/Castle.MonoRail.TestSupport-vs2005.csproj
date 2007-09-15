@@ -11,8 +11,7 @@
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>Castle.MonoRail.TestSupport</AssemblyName>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\CastleKey.snk</AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -26,6 +25,7 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -34,18 +34,16 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DocumentationFile>bin\Debug\Castle.MonoRail.TestSupport.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>1591</NoWarn>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -58,22 +56,28 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Release\Castle.MonoRail.TestSupport.XML</DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>1591</NoWarn>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cassini, Version=1.0.40305.0, Culture=neutral, PublicKeyToken=132a282791bfaeb7">
+      <HintPath>..\..\SharedLibs\net\Cassini.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Components.Common.EmailSender, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
+    <Reference Include="Castle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\net-2.0\debug\Castle.Core.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <Name>nunit.framework</Name>
       <HintPath>..\..\build\net-2.0\debug\nunit.framework.dll</HintPath>
@@ -81,6 +85,7 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
@@ -89,6 +94,10 @@
     </Reference>
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
+    </Reference>
+    <Reference Include="WatiN.Core, Version=1.0.0.1001, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\net\2.0\WatiN.Core.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\Castle.MonoRail.Framework\Castle.MonoRail.Framework-vs2005.csproj">
       <Name>Castle.MonoRail.Framework-vs2005</Name>
@@ -103,7 +112,14 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BaseControllerTest.cs" />
+    <Compile Include="BaseViewComponentTest.cs" />
+    <Compile Include="GenericBaseControllerTest.cs" />
+    <Compile Include="GenericBaseWizardStepTest.cs" />
     <Compile Include="MonoRailTestWorkerRequest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ReflectionHelper.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TestRequest.cs">
@@ -115,12 +131,21 @@
     <Compile Include="WebAppHost.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="WebServer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\CastleKey.snk">
+      <Link>CastleKey.snk</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>"$(DevEnvDir)\..\..\SDK\v2.0\Bin\gacutil.exe" /u $(TargetPath)
-"$(DevEnvDir)\..\..\SDK\v2.0\Bin\gacutil.exe" /i $(TargetPath)</PostBuildEvent>
+    <PostBuildEvent>"$(DevEnvDir)..\..\SDK\v2.0\Bin\gacutil.exe" /u "$(TargetName)" 
+"$(DevEnvDir)..\..\SDK\v2.0\Bin\gacutil.exe" /i "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

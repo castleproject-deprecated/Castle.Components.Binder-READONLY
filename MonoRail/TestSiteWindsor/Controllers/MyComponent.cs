@@ -1,4 +1,4 @@
-// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,19 @@ namespace TestSiteWindsor.Controllers
 
 	public class MyComponent : ViewComponent
 	{
+		public MyComponent()
+		{
+		}
+		
+		/// <summary>
+		/// Called by the framework once the component instance
+		/// is initialized
+		/// </summary>
+		public override void Initialize()
+		{
+			base.Initialize();
+		}
+
 		/// <summary>
 		/// Called by the framework so the component can 
 		/// render its content

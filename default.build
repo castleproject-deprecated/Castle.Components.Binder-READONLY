@@ -2,58 +2,40 @@
 <project
 	name="Castle"
 	default="build"
-	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
+	xmlns="http://nant.sf.net/release/0.85/nant.xsd"
 >
 
 	<property name="root.dir" value="." />
 	<include buildfile="${root.dir}/common.xml" />
 	
+	<fileset id="buildfiles.all">
+		<!-- Files have to be in dependency order -->
+		<include name="Core/core.build" />
+		<include name="Services/services.build" />
+		<include name="Tools/Tools.build" />
+		<include name="InversionOfControl/InversionOfControl.build" />
+		<include name="Components/components.build" />
+		<include name="ActiveRecord/activerecord.build" />
+		<include name="MonoRail/monorail.build" />
+		<!--
+		<include name="AspectSharp/aspectsharp.build" />
+		-->
+		<include name="Facilities/facilities.build" />
+	</fileset>
+
 	<target name="build"
-		depends="init copy-referenced-assemblies core services tools container components activerecord monorail aspectsharp facilities samples"
-		description="Builds Castle in the current configuration" />
+		depends="init copy-referenced-assemblies"
+		description="Builds Castle in the current configuration">
+
+		<nant target="build">
+			<buildfiles refid="buildfiles.all" />
+		</nant>
+
+	</target>
 
 	<target name="rebuild"
 		depends="init recreate-build-directory build"
 		description="Rebuilds Castle in the current configuration" />
-
-	<target name="activerecord" depends="init">
-		<nant buildfile="ActiveRecord/activerecord.build" target="build" inheritall="true" />
-	</target>
-	
-	<target name="tools" depends="init">
-		<nant buildfile="Tools/Tools.build" target="build" inheritall="true" />
-	</target>
-
-	<target name="container" depends="init">
-		<nant buildfile="InversionOfControl/InversionOfControl.build" target="build" inheritall="true" />
-	</target>
-
-	<target name="services" depends="init">
-		<nant buildfile="Services/services.build" target="build" inheritall="true" />
-	</target>
-
-	<target name="core" depends="init">
-		<nant buildfile="Core/core.build" target="build" inheritall="true" />
-	</target>
-
-	<target name="facilities" depends="init">
-		<nant buildfile="Facilities/facilities.build" target="build" inheritall="true" />
-	</target>
-
-	<target name="components" depends="init">
-		<nant buildfile="Components/components.build" target="build" inheritall="true" />
-	</target>
-
-	<target name="monorail" depends="init">
-		<nant buildfile="MonoRail/monorail.build" target="build" inheritall="true" />
-	</target>
-
-	<target name="aspectsharp" depends="init">
-		<nant buildfile="AspectSharp/aspectsharp.build" target="build" inheritall="true" />
-	</target>
-
-	<target name="samples" depends="init">
-	</target>
 
 	<target name="installer" depends="init createreleasenotes zip-source zip-samples">
 		<nant buildfile="Setup/Setup.build" />
@@ -69,35 +51,40 @@
 	
 	<target name="clean" description="Deletes current build artifacts" depends="common.init">
 		<delete dir="${build.dir}" failonerror="false" />
+		<delete>
+			<fileset basedir="${build.base.dir}">
+				<include name="*.*" />
+			</fileset>
+		</delete>
 	</target>
 		
-    <target name="clean-vs" description="Delete Visual Studio artifacts" depends="common.init">
-        <!-- NB - this target will fail if you have a solution open in Visual Studio -->
+	<target name="clean-vs" description="Delete Visual Studio artifacts" depends="common.init">
+		<!-- NB - this target will fail if you have a solution open in Visual Studio -->
 		<echo message="Gathering files for removal..." />
-        <foreach item="File" property="filename">
-            <in>
-                <items basedir=".">
-                    <include name="**/*.suo" />
-                    <include name="*/*.csproj.user" />
-                </items>
-            </in>
-            <do>
-                <delete file="${filename}" />
-            </do>
-        </foreach>
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir=".">
+					<include name="**/*.suo" />
+					<include name="*/*.csproj.user" />
+				</items>
+			</in>
+			<do>
+				<delete file="${filename}" />
+			</do>
+		</foreach>
 		<echo message="Gathering folders for removal..." />
-        <foreach item="Folder" property="foldername">
-            <in>
-                <items basedir=".">
-                    <include name="**/obj" />
-                    <include name="**/_ReSharper*" />
-                </items>
-            </in>
-            <do>
-                <delete dir="${foldername}" failonerror="false" />
-            </do>
-        </foreach>
-    </target>
+		<foreach item="Folder" property="foldername">
+			<in>
+				<items basedir=".">
+					<include name="**/obj" />
+					<include name="**/_ReSharper*" />
+				</items>
+			</in>
+			<do>
+				<delete dir="${foldername}" failonerror="false" />
+			</do>
+		</foreach>
+	</target>
 
 	<target name="cleanall" description="Deletes all build artifacts" depends="common.init">
 		<echo message="Deleting all builds from all configurations" />
@@ -127,6 +114,9 @@
 			</fileset>
 		</copy>
 		
+		<!-- Copy family-specific libraries installed on the system-->
+		<copy file="${path::combine(nant::get-base-directory(), 'NAnt.Core.dll')}" todir="${lib.family.dir}" />
+
 		<!-- Copy family-specific libraries -->
 		<!-- 
 			The build of log4net works just fine for all versions of .NET.
@@ -151,6 +141,17 @@
 		</copy>
 	</target>
 
+	<target name="generate-assemblyinfo"
+		depends="init"
+		description="Generate AssemblyInfo files">
+
+		<property name="visual-studio" value="true" />
+		<nant target="generate-assemblyinfo">
+			<buildfiles refid="buildfiles.all" />
+		</nant>
+
+	</target>
+
 	<target name="build-all-frameworks" depends="init">
 		<!-- Save the current framework -->
 		<property name="current.framework.saved" value="${nant.settings.currentframework}" />
@@ -172,6 +173,10 @@
 
 		<echo message="Created a '${project.config}' package in file://${build.zip.fullpath}" />
 
+		<delete file="${build.base.dir}/castle-sourcecode.zip" failonerror="false" />
+		<delete file="${build.dir}/test-results.zip" failonerror="false" />
+		<delete file="${build.dir}/external-dependencies.zip" failonerror="false" />
+		
 	</target>
 
 	<target name="createreleasenotes" depends="init">
@@ -262,10 +267,11 @@
 		<!-- Create the master zip file with all files included -->
 		<zip zipfile="${build.zip.fullpath}">
 			<fileset basedir="${build.dir}" prefix="bin" >
-				<include name="Castle*.*" />
+				<include name="**/Castle*.*" />
 				<include name="AspectSharp*.*" />
 				<include name="external-dependencies.zip" />
 				<exclude name="*Tests.*" />
+				<exclude name="test-results/**" />
 			</fileset>
 			<fileset basedir="${root.dir}">
 				<include name="ASL - Apache Software Foundation License.txt" />
@@ -279,11 +285,6 @@
 				<include name="**/*.txt" />
 			</fileset>
 		</zip>
-		
-		<delete file="${build.base.dir}/castle-sourcecode.zip" failonerror="false" />
-		<delete file="${build.dir}/test-results.zip" failonerror="false" />
-		<delete file="${build.dir}/external-dependencies.zip" failonerror="false" />
-		
 	</target>
 	
 	<target name="zip-dependencies"  >
@@ -308,7 +309,10 @@
 	</target>
 
 	<target name="zip-samples-for-website" depends="init">
-		<zip zipfile="${root.dir}/InitializingAndConfiguring.zip">
+		<delete dir="${root.dir}/samplesforwebsite/" failonerror="false" />
+		<mkdir dir="${root.dir}/samplesforwebsite/" />
+		
+		<zip zipfile="${root.dir}/samplesforwebsite/InitializingAndConfiguring.zip">
 			<fileset basedir="${root.dir}/Samples/ActiveRecord/BlogSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -330,7 +334,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/TableHierarchy.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/TableHierarchy.zip">
 			<fileset basedir="${root.dir}/Samples/ActiveRecord/TableHierarchySample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -352,7 +356,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.WizardSample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.WizardSample.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/WizardSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -377,7 +381,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.SimpleBindingSample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.SimpleBindingSample.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/SimpleBindingSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -402,7 +406,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.DataBindSample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.DataBindSample.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/DataBindSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -427,7 +431,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.SendingEmailSample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.SendingEmailSample.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/SendingEmailSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -452,7 +456,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.ViewComponentSample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.ViewComponentSample.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/ViewComponentSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -477,7 +481,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.AuthenticationUsingFilters.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.AuthenticationUsingFilters.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/AuthenticationUsingFilters">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -502,7 +506,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.AuthenticationUsingForms.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.AuthenticationUsingForms.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/AuthenticationUsingForms">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -527,7 +531,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.LocalizationSample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.LocalizationSample.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/LocalizationSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -552,7 +556,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/MonoRail.FormHelperSample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.FormHelperSample.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/FormHelperSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -578,7 +582,7 @@
 			</fileset>
 		</zip>
 
-		<zip zipfile="${root.dir}/MonoRail.GettingStartedSampleVS2003.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.GettingStartedSampleVS2003.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/GettingStartedSampleVS2003">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -604,7 +608,7 @@
 			</fileset>
 		</zip>
 
-		<zip zipfile="${root.dir}/MonoRail.GettingStartedSampleVS2005.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.GettingStartedSampleVS2005.zip">
 			<fileset basedir="${root.dir}/Samples/MonoRail/GettingStartedSampleVS2005">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -630,7 +634,56 @@
 			</fileset>
 		</zip>
 
-		<zip zipfile="${root.dir}/Windsor.TimeTracking.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.DynActProvSample.zip">
+			<fileset basedir="${root.dir}/Samples/MonoRail/DynActProvSample">
+				<include name="**/*.build" />
+				<include name="**/*.sln" />
+				<include name="**/*.cs" />
+				<include name="**/*.ico" />
+				<include name="**/*.csproj" />
+				<include name="**/*.xml" />
+				<include name="**/*.config" />
+				<include name="**/*.lang" />
+				<include name="**/*.txt" />
+				<include name="**/*.inc" />
+				<include name="**/*.vm" />
+				<include name="**/*.resx" />
+				<include name="**/*.aspx" />
+				<include name="**/*.asax" />
+				<include name="*.snk" />
+				<exclude name="**/bin/*" />
+				<exclude name="**/bin/Debug/*" />
+				<exclude name="**/bin/Release/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**.user" />
+				<exclude name="**/_Resharper.*/*" />
+			</fileset>
+		</zip>
+		<zip zipfile="${root.dir}/samplesforwebsite/MonoRail.DiggStylePagination.zip">
+			<fileset basedir="${root.dir}/Samples/MonoRail/DiggPaginationSample">
+				<include name="**/*.build" />
+				<include name="**/*.sln" />
+				<include name="**/*.cs" />
+				<include name="**/*.ico" />
+				<include name="**/*.csproj" />
+				<include name="**/*.xml" />
+				<include name="**/*.config" />
+				<include name="**/*.lang" />
+				<include name="**/*.txt" />
+				<include name="**/*.inc" />
+				<include name="**/*.vm" />
+				<include name="*.snk" />
+				<exclude name="**/bin/*" />
+				<exclude name="**/bin/Debug/*" />
+				<exclude name="**/bin/Release/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**.user" />
+				<exclude name="**/_Resharper.*/*" />
+			</fileset>
+		</zip>
+
+
+		<zip zipfile="${root.dir}/samplesforwebsite/Windsor.TimeTracking.zip">
 			<fileset basedir="${root.dir}/Samples/InversionOfControl/TimeTracking">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -655,7 +708,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/CustomTypeConverterSample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/CustomTypeConverterSample.zip">
 			<fileset basedir="${root.dir}/Samples/InversionOfControl/CustomTypeConverterSample">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -680,7 +733,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/FacilitySample2.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/FacilitySample2.zip">
 			<fileset basedir="${root.dir}/Samples/InversionOfControl/ExtendingSample2">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -705,7 +758,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/GettingStartedPart1.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/GettingStartedPart1.zip">
 			<fileset basedir="${root.dir}/Samples/InversionOfControl/GettingStarted/GettingStartedPart1">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -728,7 +781,7 @@
 			</fileset>
 		</zip>
 		
-		<zip zipfile="${root.dir}/KernelInOneEndPoint.Sample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/KernelInOneEndPoint.Sample.zip">
 			<fileset basedir="${root.dir}/Samples/Facilities/Remoting/KernelInOneEndPoint">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -749,7 +802,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/KernelOnBothEndPoints.Sample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/KernelOnBothEndPoints.Sample.zip">
 			<fileset basedir="${root.dir}/Samples/Facilities/Remoting/KernelOnBothEndPoints">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -770,7 +823,7 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
-		<zip zipfile="${root.dir}/ContainersConnected.Sample.zip">
+		<zip zipfile="${root.dir}/samplesforwebsite/ContainersConnected.Sample.zip">
 			<fileset basedir="${root.dir}/Samples/Facilities/Remoting/ContainersConnected">
 				<include name="**/*.build" />
 				<include name="**/*.sln" />
@@ -818,7 +871,7 @@
 				<exclude name="**/obj/*" />
 				<exclude name="**.user" />
 				<exclude name="**/_Resharper.*/*" />
-			</fileset>
+		</fileset>
 		</zip>
 		<zip zipfile="${build.base.dir}/Facilities-Samples.zip">
 			<fileset basedir="${root.dir}/Samples/Facilities">
@@ -931,7 +984,10 @@
 				<include name="**/*.vm" />
 				<include name="**/*.gif" />
 				<include name="**/*.resx" />
-				
+				<include name="**/*.boo" />
+				<include name="**/*.booproj" />
+				<include name="**/*.prjx" />
+				<include name="**/*.cmbx" />
 				<exclude name="**/obj/" />
 				<exclude name="**/obj/**/*.*" />
 				<exclude name="**/bin*/**/*.*" />
@@ -1005,7 +1061,7 @@
 				<include name="SharedLibs/Nlog"/>
 				<include name="SharedLibs/log4net"/>
 				<include name="SharedLibs/Nvelocity"/>
-			    <include name="SharedLibs/stringtemplate/net-1.1"/> 
+				<include name="SharedLibs/stringtemplate/net-1.1"/> 
 			</referencepaths>
 			<documenters>
 				<documenter name="MSDN">
@@ -1038,7 +1094,7 @@
 					<property name="DocumentPrivates" value="${ShowPrivate}" />
 					
 					<property name="IncludeAssemblyVersion" value="True" />
-					<property name="CopyrightText" value="Copyright 2004,2006 - Castle Project (original author or authors)" />
+					<property name="CopyrightText" value="Copyright 2004-2007 - Castle Project (original author or authors)" />
 					<property name="CopyrightHref" value="http://www.castleproject.org" />
 				</documenter>
 			</documenters>

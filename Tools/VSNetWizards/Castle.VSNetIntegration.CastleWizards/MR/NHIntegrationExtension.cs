@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,11 +74,11 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 			RegisterSessionHttpModule(webConfigDom);
 
-			XmlDocument facilitiesDom = (XmlDocument) context.Properties[MRConfigConstants.Facilities];
+			XmlDocument facilitiesDom = (XmlDocument) context.Properties[MRConfigConstants.FacilitiesConfig];
 
 			RegisterAndConfigureFacility(facilitiesDom);
 
-			XmlDocument propDom = (XmlDocument) context.Properties[MRConfigConstants.Properties];
+			XmlDocument propDom = (XmlDocument) context.Properties[MRConfigConstants.PropertiesConfig];
 
 			RegisterConnectionStringAsProperty(propDom);
 		}
@@ -99,7 +99,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			XmlElement modulesElem = (XmlElement) dom.SelectSingleNode("configuration/system.web/httpModules");
 
 			modulesElem.AppendChild(dom.CreateComment(" For more information on what this does "));
-			modulesElem.AppendChild(dom.CreateComment(" visit http://www.castleproject.org/index.php/Facility:NHibernate_in_Web_apps "));
+			modulesElem.AppendChild(dom.CreateComment(" visit http://www.castleproject.org/container/facilities/trunk/nhibernate/webapp.html "));
 
 			XmlElement sessionModElem = dom.CreateElement("add");
 			
@@ -114,7 +114,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			XmlElement facilitiesElem = (XmlElement) dom.SelectSingleNode("configuration/facilities");
 
 			facilitiesElem.AppendChild(dom.CreateComment(" For more information on the configuration schema "));
-			facilitiesElem.AppendChild(dom.CreateComment(" visit http://www.castleproject.org/index.php/Facility:NHibernate "));
+			facilitiesElem.AppendChild(dom.CreateComment(" visit http://www.castleproject.org/container/facilities/trunk/nhibernate/index.html "));
 
 			XmlElement nhElem = dom.CreateElement("facility");
 			

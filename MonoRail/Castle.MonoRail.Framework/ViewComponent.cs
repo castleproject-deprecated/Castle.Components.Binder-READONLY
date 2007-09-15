@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,45 @@ namespace Castle.MonoRail.Framework
 	using System.Collections.Specialized;
 	using System.IO;
 	using System.Collections;
+	using System.Reflection;
 	using System.Web;
+	using Castle.Components.Binder;
 
 	/// <summary>
-	/// Base class for UI Components
+	/// Base class for reusable UI Components. 
+	/// <para>
+	/// Implementors should override <see cref="ViewComponent.Initialize"/>
+	/// for implement proper initialization (if necessary). 
+	/// Also implement <see cref="ViewComponent.Render"/> as by default it 
+	/// will render a <c>default</c> view on <c>[ViewFolderRoot]/components/[componentname]</c>.
+	/// </para>
+	/// <para>
+	/// You can also override <see cref="ViewComponent.SupportsSection"/> if your component supports 
+	/// neste sections (ie templates provided on the view that uses the view component.
+	/// </para>
 	/// </summary>
+	/// <example>
+	/// A very simplist view component that renders the time.
+	/// <code>
+	/// public class ShowTime : ViewComponent
+	/// {
+	///		public override void Initialize()
+	///		{
+	///		}
+	/// 
+	///		public override void Render()
+	///		{
+	///			RenderText("Time: " + DateTime.Now.ToString());
+	///		}
+	/// }
+	/// </code>
+	/// <para>
+	/// This can be used from the view using the following syntax (NVelocity view engine)
+	/// </para>
+	/// <code>
+	/// #component(ShowTime)
+	/// </code>
+	/// </example>
 	public abstract class ViewComponent
 	{
 		/// <summary>
@@ -36,19 +70,85 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		private IRailsEngineContext railsContext;
 
+		private string[] sectionsFromAttribute;
+
 		#region "Internal" core methods
 
 		/// <summary>
 		/// Invoked by the framework.
 		/// </summary>
-		/// <param name="railsContext"></param>
-		/// <param name="context"></param>
-		public void Init(IRailsEngineContext railsContext, IViewComponentContext context)
+		/// <param name="engineContext">Request context</param>
+		/// <param name="componentContext">ViewComponent context</param>
+		public void Init(IRailsEngineContext engineContext, IViewComponentContext componentContext)
 		{
-			this.railsContext = railsContext;
-			this.context = context;
+			railsContext = engineContext;
+			context = componentContext;
+
+			BindComponentParameters();
 
 			Initialize();
+		}
+
+		/// <summary>
+		/// Binds the component parameters.
+		/// </summary>
+		private void BindComponentParameters()
+		{
+			IConverter converter = new DefaultConverter();
+
+			PropertyInfo[] properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+		
+			foreach(PropertyInfo property in properties)
+			{
+				if (!property.CanWrite) continue;
+
+				object[] attributes = property.GetCustomAttributes(typeof(ViewComponentParamAttribute), true);
+			
+				if (attributes.Length == 1)
+				{
+					BindParameter((ViewComponentParamAttribute) attributes[0], property, converter);
+				}
+			}
+		}
+
+		private void BindParameter(ViewComponentParamAttribute paramAtt, PropertyInfo property, IConverter converter)
+		{
+			string compParamKey = string.IsNullOrEmpty(paramAtt.ParamName) ? property.Name : paramAtt.ParamName;
+
+			object value = ComponentParams[compParamKey];
+
+			if (value == null)
+			{
+				if (paramAtt.Required && 
+					(property.PropertyType.IsValueType || property.GetValue(this, null) == null))
+				{
+					throw new ViewComponentException(string.Format("The parameter '{0}' is required by " +
+						"the ViewComponent {1} but was not passed or had a null value", compParamKey, GetType().Name));
+				}
+			}
+			else
+			{
+				try
+				{
+					bool succeeded;
+
+					object converted = converter.Convert(property.PropertyType, value.GetType(), value, out succeeded);
+
+					if (succeeded)
+					{
+						property.SetValue(this, converted, null);
+					}
+					else
+					{
+						throw new Exception("Could not convert '" + value + "' to type " + property.PropertyType);
+					}
+				}
+				catch(Exception ex)
+				{
+					throw new ViewComponentException(string.Format("Error trying to set value for parameter '{0}' " +
+						"on ViewComponent {1}: {2}", compParamKey, GetType().Name, ex.Message), ex);
+				}
+			}
 		}
 
 		#endregion
@@ -61,7 +161,6 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		public virtual void Initialize()
 		{
-			
 		}
 
 		/// <summary>
@@ -71,6 +170,42 @@ namespace Castle.MonoRail.Framework
 		public virtual void Render()
 		{
 			RenderView("default");
+		}
+
+		/// <summary>
+		/// Implementor should return true only if the 
+		/// <c>name</c> is a known section the view component
+		/// supports.
+		/// </summary>
+		/// <param name="name">section being added</param>
+		/// <returns><see langword="true"/> if section is supported</returns>
+		public virtual bool SupportsSection(string name)
+		{
+			// TODO: We need to cache this
+
+			if (sectionsFromAttribute == null)
+			{
+				object[] attributes = GetType().GetCustomAttributes(typeof(ViewComponentDetailsAttribute), true);
+
+				if (attributes.Length != 0)
+				{
+					ViewComponentDetailsAttribute detailsAtt = (ViewComponentDetailsAttribute) attributes[0];
+
+					if (!string.IsNullOrEmpty(detailsAtt.Sections))
+					{
+						sectionsFromAttribute = detailsAtt.Sections.Split(',');
+					}
+				}
+
+				if (sectionsFromAttribute == null)
+				{
+					sectionsFromAttribute = new string[0];
+				}
+			}
+			
+			return Array.Find(sectionsFromAttribute, 
+				delegate(string item)
+					{ return string.Equals(item, name, StringComparison.InvariantCultureIgnoreCase); }) != null;
 		}
 
 		#endregion
@@ -204,6 +339,55 @@ namespace Castle.MonoRail.Framework
 			context.Writer.Write(content);
 		}
 
+		/// <summary>
+		/// Determines whether the current component declaration on the view
+		/// has the specified section.
+		/// </summary>
+		/// <param name="sectionName">Name of the section.</param>
+		/// <returns>
+		/// <c>true</c> if the specified section exists; otherwise, <c>false</c>.
+		/// </returns>
+		protected bool HasSection(String sectionName)
+		{
+			return context.HasSection(sectionName);
+		}
+
+		/// <summary>
+		/// Renders the component body.
+		/// </summary>
+		protected void RenderBody()
+		{
+			context.RenderBody();
+		}
+
+		/// <summary>
+		/// Renders the body into the specified <see cref="TextWriter"/>
+		/// </summary>
+		/// <param name="writer">The writer.</param>
+		protected void RenderBody(TextWriter writer)
+		{
+			context.RenderBody(writer);
+		}
+
+		/// <summary>
+		/// Renders the the specified section
+		/// </summary>
+		/// <param name="sectionName">Name of the section.</param>
+		protected void RenderSection(String sectionName)
+		{
+			context.RenderSection(sectionName);
+		}
+
+		/// <summary>
+		/// Renders the the specified section
+		/// </summary>
+		/// <param name="sectionName">Name of the section.</param>
+		/// <param name="writer">The writer.</param>
+		protected void RenderSection(String sectionName, TextWriter writer)
+		{
+			context.RenderSection(sectionName, writer);
+		}
+
 		#endregion
 
 		#region private helper methods
@@ -219,17 +403,5 @@ namespace Castle.MonoRail.Framework
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Implementor should return true only if the 
-		/// <c>name</c> is a known section the view component
-		/// supports.
-		/// </summary>
-		/// <param name="name">section being added</param>
-		/// <returns><see langword="true"/> if section is supported</returns>
-		public virtual bool SupportsSection(string name)
-		{
-			return false;
-		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if DOTNET2
-
 namespace Castle.ActiveRecord
 {
+	using Framework;
 	using NHibernate.Expression;
 
 	/// <summary>
@@ -46,7 +45,7 @@ namespace Castle.ActiveRecord
 		/// <c>true</c> and the row is not found</exception>
 		public static T FindByPrimaryKey(object id, bool throwOnNotFound)
 		{
-			return (T) ActiveRecordMediator.FindByPrimaryKey(typeof(T), id, throwOnNotFound);
+			return (T) FindByPrimaryKey(typeof(T), id, throwOnNotFound);
 		}
 
 		/// <summary>
@@ -55,7 +54,7 @@ namespace Castle.ActiveRecord
 		/// <param name="id">ID value</param>
 		public static T FindByPrimaryKey(object id)
 		{
-			return (T) ActiveRecordMediator.FindByPrimaryKey(typeof(T), id, true);
+			return (T) FindByPrimaryKey(typeof(T), id, true);
 		}
 
 		/// <summary>
@@ -66,7 +65,7 @@ namespace Castle.ActiveRecord
 		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
 		public static T FindFirst(Order[] orders, params ICriterion[] criterias)
 		{
-			return (T) ActiveRecordMediator.FindFirst(typeof(T), orders, criterias);
+			return (T) FindFirst(typeof(T), orders, criterias);
 		}
 
 		/// <summary>
@@ -76,7 +75,28 @@ namespace Castle.ActiveRecord
 		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
 		public static T FindFirst(params ICriterion[] criterias)
 		{
-			return (T) ActiveRecordMediator.FindFirst(typeof(T), criterias);
+			return (T) FindFirst(typeof(T), criterias);
+		}
+
+		/// <summary>
+		/// Searches and returns the first row.
+		/// </summary>
+		/// <param name="detachedCriteria">The criteria.</param>
+		/// <param name="orders">The sort order - used to determine which record is the first one.</param>
+		/// <returns>A <c>targetType</c> instance or <c>null.</c></returns>
+		public static T FindFirst(DetachedCriteria detachedCriteria, params Order[] orders)
+		{
+			return (T) FindFirst(typeof(T), detachedCriteria, orders);
+		}
+
+		/// <summary>
+		/// Searches and returns the first row.
+		/// </summary>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
+		public static T FindFirst(DetachedCriteria criteria)
+		{
+			return (T)FindFirst(typeof(T),criteria);
 		}
 
 		/// <summary>
@@ -86,7 +106,18 @@ namespace Castle.ActiveRecord
 		/// <returns>A instance the targetType or <c>null</c></returns>
 		public static T FindOne(params ICriterion[] criterias)
 		{
-			return (T) ActiveRecordMediator.FindOne(typeof(T), criterias);
+			return (T) FindOne(typeof(T), criterias);
+		}
+
+		/// <summary>
+		/// Searches and returns a row. If more than one is found, 
+		/// throws <see cref="ActiveRecordException"/>
+		/// </summary>
+		/// <param name="criteria">The criteria</param>
+		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
+		public static T FindOne(DetachedCriteria criteria)
+		{
+			return (T)FindOne(typeof(T), criteria);
 		}
 
 		/// <summary>
@@ -95,23 +126,7 @@ namespace Castle.ActiveRecord
 		/// <returns></returns>
 		public static T[] FindAll()
 		{
-			return (T[]) ActiveRecordMediator.FindAll(typeof(T));
-		}
-
-		/// <summary>
-		/// Returns a portion of the query results (sliced)
-		/// </summary>
-		public static T[] SlicedFindAll(int firstResult, int maxResults, Order[] orders, params ICriterion[] criterias)
-		{
-			return (T[]) ActiveRecordMediator.SlicedFindAll(typeof(T), firstResult, maxResults, orders, criterias);
-		}
-
-		/// <summary>
-		/// Returns a portion of the query results (sliced)
-		/// </summary>
-		public static T[] SlicedFindAll(int firstResult, int maxResults, params ICriterion[] criterias)
-		{
-			return (T[]) ActiveRecordMediator.SlicedFindAll(typeof(T), firstResult, maxResults, null, criterias);
+			return (T[]) FindAll(typeof(T));
 		}
 
 		/// <summary>
@@ -123,7 +138,7 @@ namespace Castle.ActiveRecord
 		/// <returns></returns>
 		public static T[] FindAll(Order[] orders, params ICriterion[] criterias)
 		{
-			return (T[]) ActiveRecordMediator.FindAll(typeof(T), orders, criterias);
+			return (T[])FindAll(typeof(T), orders, criterias);
 		}
 
 		/// <summary>
@@ -134,17 +149,56 @@ namespace Castle.ActiveRecord
 		/// <returns></returns>
 		public static T[] FindAll(params ICriterion[] criterias)
 		{
-			return (T[]) ActiveRecordMediator.FindAll(typeof(T), criterias);
+			return (T[])FindAll(typeof(T), criterias);
 		}
 
+		/// <summary>
+		/// Returns all instances found for the specified type according to the criteria
+		/// </summary>
+		public static T[] FindAll(DetachedCriteria detachedCriteria, params Order[] orders)
+		{
+			return (T[])FindAll(typeof(T), detachedCriteria, orders);
+		}
+
+		/// <summary>
+		/// Returns a portion of the query results (sliced)
+		/// </summary>
+		public static T[] SlicedFindAll(int firstResult, int maxResults, Order[] orders, params ICriterion[] criterias)
+		{
+			return (T[]) SlicedFindAll(typeof(T), firstResult, maxResults, orders, criterias);
+		}
+
+		/// <summary>
+		/// Returns a portion of the query results (sliced)
+		/// </summary>
+		public static T[] SlicedFindAll(int firstResult, int maxResults, params ICriterion[] criterias)
+		{
+			return (T[]) SlicedFindAll(typeof(T), firstResult, maxResults, null, criterias);
+		}
+
+		/// <summary>
+		/// Returns a portion of the query results (sliced)
+		/// </summary>
+		public static T[] SlicedFindAll(int firstResult, int maxResults,
+													  DetachedCriteria criteria)
+		{
+			return (T[])SlicedFindAll(typeof(T), firstResult, maxResults, criteria);
+		}
+
+		/// <summary>
+		/// Deletes all entities of <typeparamref name="T"/>.
+		/// </summary>
 		public static void DeleteAll()
 		{
-			ActiveRecordMediator.DeleteAll(typeof(T));
+			DeleteAll(typeof(T));
 		}
 
+		/// <summary>
+		/// Deletes all entities of <typeparamref name="T"/> that match the HQL where clause.
+		/// </summary>
 		public static void DeleteAll(string where)
 		{
-			ActiveRecordMediator.DeleteAll(typeof(T), where);
+			DeleteAll(typeof(T), where);
 		}
 
 		/// <summary>
@@ -155,6 +209,16 @@ namespace Castle.ActiveRecord
 		{
 			ActiveRecordMediator.Save(instance);
 		}
+
+        /// <summary>
+        /// Saves a copy of the instance to the database
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns>The saved instance</returns>
+        public static T SaveCopy(T instance)
+        {
+            return (T) ActiveRecordMediator.SaveCopy(instance);
+        }
 
 		/// <summary>
 		/// Creates (Saves) a new instance to the database.
@@ -192,7 +256,120 @@ namespace Castle.ActiveRecord
 		{
 			ActiveRecordMediator.Refresh(instance);
 		}
+
+		/// <summary>
+		/// Executes the query and return a strongly typed result
+		/// </summary>
+		/// <param name="query">The query.</param>
+		/// <returns></returns>
+		public static R ExecuteQuery2<R>(IActiveRecordQuery<R> query)
+		{
+			return ActiveRecordBase<T>.ExecuteQuery2(query);
+		}
+
+		/// <summary>
+		/// Check if the <paramref name="id"/> exists in the database.
+		/// </summary>
+		/// <typeparam name="PkType">The <c>System.Type</c> of the PrimaryKey</typeparam>
+		/// <param name="id">The id to check on</param>
+		/// <returns><c>true</c> if the ID exists; otherwise <c>false</c>.</returns>
+		public static bool Exists<PkType>(PkType id)
+		{
+			return ActiveRecordBase<T>.Exists(id);
+		}
+
+		/// <summary>
+		/// Returns the number of records of the specified 
+		/// type in the database
+		/// </summary>
+		/// <returns>The count result</returns>
+		public static int Count()
+		{
+			return ActiveRecordBase.Count(typeof(T));
+		}
+
+		/// <summary>
+		/// Returns the number of records of the specified 
+		/// type in the database that match the given critera
+		/// </summary>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>The count result</returns>
+		public static int Count(params ICriterion[] criteria)
+		{
+			return ActiveRecordBase.Count(typeof(T), criteria);
+		}
+
+		/// <summary>
+		/// Returns the number of records of the specified 
+		/// type in the database
+		/// </summary>
+		/// <param name="filter">A sql where string i.e. Person=? and DOB &gt; ?</param>
+		/// <param name="args">Positional parameters for the filter string</param>
+		/// <returns>The count result</returns>
+		public static int Count(string filter, params object[] args)
+		{
+			return ActiveRecordBase.Count(typeof(T), filter, args);
+		}
+
+		/// <summary>
+		/// Returns the number of records of the specified 
+		/// type in the database
+		/// </summary>
+		/// <param name="detachedCriteria">The criteria expression</param>
+		/// <returns>The count result</returns>
+		public static int Count(DetachedCriteria detachedCriteria)
+		{
+			return ActiveRecordBase.Count(typeof(T), detachedCriteria);
+		}
+
+		/// <summary>
+		/// Check if there is any records in the db for the target type
+		/// </summary>
+		/// <returns><c>true</c> if there's at least one row</returns>
+		public static bool Exists()
+		{
+			return ActiveRecordBase.Exists(typeof(T));
+		}
+
+
+		/// <summary>
+		/// Check if there is any records in the db for the target type
+		/// </summary>
+		/// <param name="filter">A sql where string i.e. Person=? and DOB &gt; ?</param>
+		/// <param name="args">Positional parameters for the filter string</param>
+		/// <returns><c>true</c> if there's at least one row</returns>
+		public static bool Exists(string filter, params object[] args)
+		{
+			return ActiveRecordBase.Exists(typeof(T), filter, args);
+		}
+
+		/// <summary>
+		/// Check if the <paramref name="id"/> exists in the database.
+		/// </summary>
+		/// <param name="id">The id to check on</param>
+		/// <returns><c>true</c> if the ID exists; otherwise <c>false</c>.</returns>
+		public static bool Exists(object id)
+		{
+			return ActiveRecordBase.Exists(typeof(T), id);
+		}
+
+		/// <summary>
+		/// Check if any instance matches the criteria.
+		/// </summary>
+		/// <returns><c>true</c> if an instance is found; otherwise <c>false</c>.</returns>
+		public static bool Exists(params ICriterion[] criterias)
+		{
+			return ActiveRecordBase.Exists(typeof(T), criterias);
+		}
+
+		/// <summary>
+		/// Check if any instance matching the criteria exists in the database.
+		/// </summary>
+		/// <param name="detachedCriteria">The criteria expression</param>		
+		/// <returns><c>true</c> if an instance is found; otherwise <c>false</c>.</returns>
+		public static bool Exists(DetachedCriteria detachedCriteria)
+		{
+			return ActiveRecordBase.Exists(typeof(T), detachedCriteria);
+		}
 	}
 }
-
-#endif

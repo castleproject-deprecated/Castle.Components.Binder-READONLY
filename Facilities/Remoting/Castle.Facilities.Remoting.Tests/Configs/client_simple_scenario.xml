@@ -6,7 +6,7 @@
     <facility 
 		id="remote.facility" 
 		type="Castle.Facilities.Remoting.RemotingFacility, Castle.MicroKernel"
-		remotingConfigurationFile="../Castle.Facilities.Remoting.Tests/Configs/RemotingTcpConfigClient.config"
+		remotingConfigurationFile="../../../Facilities/Remoting/Castle.Facilities.Remoting.Tests/Configs/RemotingTcpConfigClient.config"
 		baseUri="tcp://localhost:2133">
     
     </facility>
@@ -19,8 +19,7 @@
     <component 
 		id="calcservice"
 		service="Castle.Facilities.Remoting.TestComponents.ICalcService, Castle.Facilities.Remoting.TestComponents"
-		atype="Castle.Facilities.Remoting.TestComponents.CalcServiceImpl, Castle.Facilities.Remoting.TestComponents"
-		type="System.Object, mscorlib"
+		type="Castle.Facilities.Remoting.TestComponents.CalcServiceImpl, Castle.Facilities.Remoting.TestComponents"
 		remoteclient="singleton" />
   
   </components>

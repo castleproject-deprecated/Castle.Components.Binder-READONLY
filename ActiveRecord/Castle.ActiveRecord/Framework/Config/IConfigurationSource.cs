@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 namespace Castle.ActiveRecord.Framework
 {
 	using System;
-	
 	using Castle.Core.Configuration;
 
 	/// <summary>
@@ -49,6 +48,35 @@ namespace Castle.ActiveRecord.Framework
 		/// <returns></returns>
 		IConfiguration GetConfiguration(Type type);
 
+		/// <summary>
+		/// Gets a value indicating whether this <see cref="IConfigurationSource"/> produce debug information
+		/// </summary>
+		/// <value><c>true</c> if debug; otherwise, <c>false</c>.</value>
 		bool Debug { get; }
+
+		/// <summary>
+		/// Gets a value indicating whether the entities should be lazy by default.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if entities should be lazy by default; otherwise, <c>false</c>.
+		/// </value>
+		bool IsLazyByDefault { get; }
+
+		/// <summary>
+		/// Gets a value indicating whether table names are assumed plural by default. 
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if table names should be pluralized by default; otherwise, <c>false</c>.
+		/// </value>
+		bool PluralizeTableNames { get; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the models should be verified against the db schema on Initialisation.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if models should be verified; otherwise, <c>false</c>.
+		/// </value>
+		bool VerifyModelsAgainstDBSchema { get; }
+
 	}
 }

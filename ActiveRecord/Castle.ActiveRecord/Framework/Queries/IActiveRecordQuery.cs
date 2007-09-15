@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,10 +24,22 @@ namespace Castle.ActiveRecord
 	/// </summary>
 	public interface IActiveRecordQuery
 	{
-		Type Target { get; }
+		/// <summary>
+		/// Gets the target type of this query
+		/// </summary>
+		Type RootType { get; }
 
+		/// <summary>
+		/// Executes the specified query and return the results
+		/// </summary>
+		/// <param name="session">The session to execute the query in.</param>
+		/// <returns></returns>
 		object Execute(ISession session);
-		
+
+		/// <summary>
+		/// Enumerates over the result of the query.
+		/// Note: Only use if you expect most of your values to already exist in the second level cache!
+		/// </summary>
 		IEnumerable Enumerate(ISession session);
 	}
 }

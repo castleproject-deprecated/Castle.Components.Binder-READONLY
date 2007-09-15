@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace NVelocity.Exception
 	/// <summary>  
 	/// Application-level exception thrown when a resource of any type
 	/// isn't found by the Velocity engine.
-	/// <br>
+	/// <br/>
 	/// When this exception is thrown, a best effort will be made to have
 	/// useful information in the exception's message.  For complete
 	/// information, consult the runtime log.

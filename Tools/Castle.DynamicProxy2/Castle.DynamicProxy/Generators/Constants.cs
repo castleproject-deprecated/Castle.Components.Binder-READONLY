@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,34 +16,39 @@ namespace Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Reflection;
+	using Castle.Core.Interceptor;
 
 	public abstract class Constants
 	{
-		public static ConstructorInfo AbstractInvocationConstructorWithTargetMethod = 
-			typeof(AbstractInvocation).GetConstructor(BindingFlags.Instance|BindingFlags.NonPublic,
-				null, new Type[] { typeof(object), typeof(object), typeof(IInterceptor[]), 
-				                   typeof(Type), typeof(MethodInfo), 
-				                   typeof(MethodInfo), typeof(object[]) }, null);
+		public static ConstructorInfo AbstractInvocationConstructorWithTargetMethod =
+			typeof(AbstractInvocation).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic,
+			                                          null, new Type[]
+			                                                	{
+			                                                		typeof(object), typeof(object), typeof(IInterceptor[]),
+			                                                		typeof(Type), typeof(MethodInfo),
+			                                                		typeof(MethodInfo), typeof(object[])
+			                                                	}, null);
 
 		public static ConstructorInfo AbstractInvocationConstructorWithoutTargetMethod =
 			typeof(AbstractInvocation).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic,
-				null, new Type[] { typeof(object), typeof(object), typeof(IInterceptor[]), 
-				                   typeof(Type), typeof(MethodInfo), 
-				                   typeof(object[]) }, null);
+			                                          null, new Type[]
+			                                                	{
+			                                                		typeof(object), typeof(object), typeof(IInterceptor[]),
+			                                                		typeof(Type), typeof(MethodInfo),
+			                                                		typeof(object[])
+			                                                	}, null);
 
 		public static MethodInfo AbstractInvocationProceed =
-			typeof(AbstractInvocation).GetMethod("Proceed", BindingFlags.Instance|BindingFlags.Public);
+			typeof(AbstractInvocation).GetMethod("Proceed", BindingFlags.Instance | BindingFlags.Public);
 
 		public static MethodInfo GetMethodFromHandle1 =
 			typeof(MethodBase).GetMethod(
 				"GetMethodFromHandle", BindingFlags.Static | BindingFlags.Public, null,
-				new Type[] { typeof(RuntimeMethodHandle) }, null);
+				new Type[] {typeof(RuntimeMethodHandle)}, null);
 
-#if DOTNET2
 		public static MethodInfo GetMethodFromHandle2 =
 			typeof(MethodBase).GetMethod(
 				"GetMethodFromHandle", BindingFlags.Static | BindingFlags.Public, null,
-				new Type[] { typeof(RuntimeMethodHandle), typeof(RuntimeTypeHandle) }, null);
-#endif
+				new Type[] {typeof(RuntimeMethodHandle), typeof(RuntimeTypeHandle)}, null);
 	}
 }

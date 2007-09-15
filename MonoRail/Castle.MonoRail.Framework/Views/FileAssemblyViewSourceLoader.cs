@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.IO;
-	
+
 	using Castle.Core;
 	using Castle.MonoRail.Framework.Configuration;
-	using Castle.MonoRail.Framework.Internal;
 	using Castle.MonoRail.Framework.Views;
 
 	/// <summary>
@@ -28,20 +27,25 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	public class FileAssemblyViewSourceLoader : IViewSourceLoader, IServiceEnabledComponent
 	{
-		private readonly IList additionalSources = new ArrayList();
+		private IList additionalSources = ArrayList.Synchronized(new ArrayList());
 		private String viewRootDir;
 		private bool enableCache = true;
 		private FileSystemWatcher viewFolderWatcher;
-		
+
 		#region IServiceEnabledComponent implementation
 
 		public void Service(IServiceProvider provider)
 		{
-			MonoRailConfiguration config = (MonoRailConfiguration) provider.GetService(typeof(MonoRailConfiguration));
-			
+			MonoRailConfiguration config = (MonoRailConfiguration)provider.GetService(typeof(MonoRailConfiguration));
+
 			if (config != null)
 			{
 				viewRootDir = config.ViewEngineConfig.ViewPathRoot;
+				
+				foreach(AssemblySourceInfo sourceInfo in config.ViewEngineConfig.Sources)
+				{
+					AddAssemblySource(sourceInfo);
+				}
 			}
 		}
 
@@ -87,7 +91,7 @@ namespace Castle.MonoRail.Framework
 			CollectViewsOnFileSystem(dirName, views);
 			CollectViewsOnAssemblies(dirName, views);
 
-			return (String[]) views.ToArray(typeof(String));
+			return (String[])views.ToArray(typeof(String));
 		}
 
 		/// <summary>
@@ -109,9 +113,18 @@ namespace Castle.MonoRail.Framework
 			set { enableCache = value; }
 		}
 
-		public IList AdditionalSources
+		public IList AssemblySources
 		{
 			get { return additionalSources; }
+		}
+
+		/// <summary>
+		/// Adds the assembly source.
+		/// </summary>
+		/// <param name="assemblySourceInfo">The assembly source info.</param>
+		public void AddAssemblySource(AssemblySourceInfo assemblySourceInfo)
+		{
+			additionalSources.Add(assemblySourceInfo);
 		}
 
 		#region Handle File System Changes To Views
@@ -125,7 +138,7 @@ namespace Castle.MonoRail.Framework
 			{
 				//avoid concurrency problems with creating/removing the watcher
 				//in two threads in parallel. Unlikely, but better to be safe.
-				lock(this)
+				lock (this)
 				{
 					//create the watcher if it doesn't exists
 					if (viewFolderWatcher == null)
@@ -139,7 +152,7 @@ namespace Castle.MonoRail.Framework
 			{
 				//avoid concurrency problems with creating/removing the watcher
 				//in two threads in parallel. Unlikely, but better to be safe.
-				lock(this)
+				lock (this)
 				{
 					ViewChangedImpl -= value;
 					if (ViewChangedImpl == null)//no more subscribers.
@@ -151,40 +164,42 @@ namespace Castle.MonoRail.Framework
 		}
 
 		private event FileSystemEventHandler ViewChangedImpl;
-		
+
 		private void DisposeViewFolderWatch()
 		{
 			ViewChangedImpl -= new FileSystemEventHandler(viewFolderWatcher_Changed);
-			viewFolderWatcher.Dispose();
+			if (viewFolderWatcher != null)
+			{
+				viewFolderWatcher.Dispose();
+			}
 		}
 
 		private void InitViewFolderWatch()
 		{
-			
-			viewFolderWatcher = new FileSystemWatcher(ViewRootDir);
-			//need all of those because VS likes to play games
-			//with the way it is saving files.
-			viewFolderWatcher.NotifyFilter = NotifyFilters.CreationTime |
-			                                 NotifyFilters.DirectoryName |
-			                                 NotifyFilters.FileName |
-			                                 NotifyFilters.LastWrite |
-			                                 NotifyFilters.Size;
-			viewFolderWatcher.IncludeSubdirectories = true;
-			viewFolderWatcher.Changed += new FileSystemEventHandler(viewFolderWatcher_Changed);
-			viewFolderWatcher.EnableRaisingEvents = true;
+			if (Directory.Exists(ViewRootDir))
+			{
+				viewFolderWatcher = new FileSystemWatcher(ViewRootDir);
+				viewFolderWatcher.IncludeSubdirectories = true;
+				viewFolderWatcher.Changed += new FileSystemEventHandler(viewFolderWatcher_Changed);
+				viewFolderWatcher.Created += new FileSystemEventHandler(viewFolderWatcher_Changed);
+				viewFolderWatcher.Deleted += new FileSystemEventHandler(viewFolderWatcher_Changed);
+				viewFolderWatcher.EnableRaisingEvents = true;
+			}
 		}
 
 		private void viewFolderWatcher_Changed(object sender, FileSystemEventArgs e)
 		{
 			//shouldn't ever happen, because we make sure that the watcher is only 
 			//active when there are subscribers, but checking will prevent possible concrureny issues with it.
-			FileSystemEventHandler temp = ViewChangedImpl;
-			if (temp != null)
-				temp(this, e);
+
+			if (ViewChangedImpl != null)
+			{
+				ViewChangedImpl(this, e);
+			}
 		}
 
 		#endregion
-		
+
 		private bool HasTemplateOnFileSystem(string templateName)
 		{
 			return CreateFileInfo(templateName).Exists;
@@ -229,7 +244,7 @@ namespace Castle.MonoRail.Framework
 		private void CollectViewsOnFileSystem(string dirName, ArrayList views)
 		{
 			DirectoryInfo dir = new DirectoryInfo(Path.Combine(ViewRootDir, dirName));
-	
+
 			if (dir.Exists)
 			{
 				foreach(FileInfo file in dir.GetFiles("*.*"))

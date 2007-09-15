@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ namespace ViewComponentSample.ViewComponents
 		private static Random rnd = new Random();
 		private string pageName;
 
-		public override void Initialize()
+		[ViewComponentParam]
+		public string PageName
 		{
-			pageName =  (String) ComponentParams["pagename"];
-			
-			base.Initialize();
+			get { return pageName; }
+			set { pageName = value; }
 		}
 
 		public override void Render()

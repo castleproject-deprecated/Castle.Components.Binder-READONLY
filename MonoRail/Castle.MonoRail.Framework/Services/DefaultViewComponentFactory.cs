@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ namespace Castle.MonoRail.Framework.Services
 {
 	using System;
 	using System.Reflection;
-	
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Configuration;
 
@@ -43,10 +42,16 @@ namespace Castle.MonoRail.Framework.Services
 		private String[] assemblies;
 
 		/// <summary>
+		/// A dictionary of name to ViewComponent
+		/// </summary>
+		private IViewComponentRegistry registry;
+
+		/// <summary>
 		/// Constructs a <c>DefaultViewComponentFactory</c>
 		/// </summary>
-		public DefaultViewComponentFactory() : base()
+		public DefaultViewComponentFactory()
 		{
+			registry = new DefaultViewComponentRegistry();
 		}
 		
 		#region IInitializable implementation
@@ -70,6 +75,11 @@ namespace Castle.MonoRail.Framework.Services
 		}
 		
 		#endregion
+
+		protected override IViewComponentRegistry GetViewComponentRegistry()
+		{
+			return registry;
+		}
 
 		public override void Service(IServiceProvider provider)
 		{
@@ -105,7 +115,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.Debug("Inspecting assembly {0}", assemblyFileName);
+				logger.DebugFormat("Inspecting assembly {0}", assemblyFileName);
 			}
 			
 			Assembly assembly = Assembly.Load(assemblyFileName);

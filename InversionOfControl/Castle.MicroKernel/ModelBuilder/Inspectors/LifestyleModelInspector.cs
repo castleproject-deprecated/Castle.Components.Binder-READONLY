@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,8 +36,6 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 		/// Seaches for the lifestyle in the configuration and, if unsuccessful
 		/// look for the lifestyle attribute in the implementation type.
 		/// </summary>
-		/// <param name="kernel"></param>
-		/// <param name="model"></param>
 		public virtual void ProcessModel(IKernel kernel, ComponentModel model)
 		{
 			if (!ReadLifestyleFromConfiguration(model))
@@ -48,14 +46,9 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 
 		/// <summary>
 		/// Reads the attribute "lifestyle" associated with the 
-		/// component configuration and tries to convert to <see cref="LifestyleType"/> 
+		/// component configuration and tries to convert to <see cref="LifestyleType"/>  
 		/// enum type. 
 		/// </summary>
-		/// <exception cref="System.Configuration.ConfigurationException">
-		/// If the conversion fails
-		/// </exception>
-		/// <param name="model"></param>
-		/// <returns></returns>
 		protected virtual bool ReadLifestyleFromConfiguration(ComponentModel model)
 		{
 			if (model.Configuration != null)
@@ -72,13 +65,13 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 						model.LifestyleType = type;
 
 					}
-					catch(Exception ex)
+					catch(Exception)
 					{
 						String message = String.Format(
 							"Could not convert the specified attribute value " + 
 							"{0} to a valid LifestyleType enum type", lifestyle);
-						
-						throw new ConfigurationException(message, ex);
+
+						throw new ConfigurationErrorsException(message);
 					}
 
 					if (model.LifestyleType == LifestyleType.Pooled)
@@ -123,17 +116,19 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 				{
 					model.CustomLifestyle = Type.GetType(customLifestyleType, true, false);
 				}
-				catch(Exception ex)
+				catch(Exception)
 				{
 					String message = String.Format(
 						"The Type {0} specified  in the customLifestyleType attribute could not be loaded.", customLifestyleType);
 
-					throw new ConfigurationException(message, ex);
+					throw new ConfigurationErrorsException(message);
 				}
 			}
 			else
 			{
-				throw new ConfigurationException(@"The attribute 'customLifestyleType' must be specified in conjunction with the 'lifestyle' attribute set to ""custom"".");
+				string message = @"The attribute 'customLifestyleType' must be specified in conjunction with the 'lifestyle' attribute set to ""custom"".";
+
+				throw new ConfigurationErrorsException(message);
 			}
 		}
 
@@ -141,7 +136,6 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 		/// Check if the type expose one of the lifestyle attributes
 		/// defined in Castle.Model namespace.
 		/// </summary>
-		/// <param name="model"></param>
 		protected virtual void ReadLifestyleFromType(ComponentModel model)
 		{
 			object[] attributes = model.Implementation.GetCustomAttributes( 

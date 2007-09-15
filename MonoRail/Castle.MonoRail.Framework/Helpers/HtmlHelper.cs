@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Castle.MonoRail.Framework.Helpers
 	using System.Collections;
 	using System.Reflection;
 	using System.Web.UI;
+	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
 	/// Provides usefull common methods to generate HTML tags.
@@ -81,7 +82,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		#endregion
 
-		#region Form
+		#region Form and FormTo
 
 		///<overloads>This method has three overloads.</overloads>
 		/// <summary>
@@ -96,7 +97,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <remarks>Calling <c>Form( "actionArg" )</c> results in:
 		/// <code>&lt;form method=&quot;post&quot; action=&quot;actionArg&quot;&gt;</code>
 		/// </remarks>
-		/// <example>This example shows how to use <see cref="Form"/> together with <see cref="EndForm"/>:
+		/// <example>This example shows how to use <see cref="Form(String)"/> together with <see cref="EndForm"/>:
 		/// <code>
 		/// $HtmlHelper.Form( "actionArg" )
 		/// ...
@@ -120,8 +121,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		/// <summary>
-		/// Creates a <b>form</b> tag with specified <paramref name="method"/>, <paramref name="action"/> and
-		/// <paramref name="id"/>.
+		/// Creates a <b>form</b> tag with the specified <paramref name="method"/>, <paramref name="action"/> and
+		/// <paramref name="id"/> attributes.
 		/// <code>
 		/// &lt;form method=&quot;methodArg&quot; action=&quot;actionArg&quot; id=&quot;idArg&quot;&gt;
 		/// </code>
@@ -147,7 +148,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		/// <summary>
-		/// Creates a <b>form</b> tag with specified <paramref name="method"/>, <paramref name="action"/>,
+		/// Creates a <b>form</b> tag with the specified <paramref name="method"/> and <paramref name="action"/> attributes,
 		/// <paramref name="id"/> and <paramref name="onSubmit"/> event handler. 
 		/// <code>
 		/// &lt;form method=&quot;methodArg&quot; action=&quot;actionArg&quot; id=&quot;idArg&quot; onsubmit=&quot;onSubmitArg&quot;&gt;
@@ -189,7 +190,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		/// <summary>
-		/// Creates a <b>form</b> tag the specified <paramref name="action"/>.
+		/// Creates a <b>form</b> tag with the specified <paramref name="action"/> attribute.
 		/// <code>
 		/// &lt;form action=&quot;actionArg&quot;&gt;
 		/// </code>
@@ -202,20 +203,113 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			return String.Format("<form action=\"{0}\" {1}>", action, GetAttributes(attributes));
 		}
+		
+		/// <summary>
+		/// Creates a <b>form</b> tag targeting a URL in the style of the <see cref="LinkTo(String, String)"/> methods.
+		/// </summary>
+		/// <param name="action">An action on the current controller.</param>
+		/// <returns>HTML string with form opening tag.</returns>
+		public String FormTo(String action)
+		{
+			return FormTo(Controller.Name, action, null);
+		}
+
+		/// <summary>
+		/// Creates a <b>form</b> tag targeting a URL in the style of the <see cref="LinkTo(String, String)"/> methods.
+		/// </summary>
+		/// <param name="controller">A controller name.</param>
+		/// <param name="action">An action on <paramref name="controller"/>.</param>
+		/// <returns>HTML string with form opening tag.</returns>
+		public String FormTo(String controller, String action)
+		{
+			return FormTo(controller, action, null);
+		}
+
+		/// <summary>
+		/// Creates a <b>form</b> tag targeting a URL in the style of the <see cref="LinkTo(String, String)"/> methods.
+		/// </summary>
+		/// <param name="controller">A controller name.</param>
+		/// <param name="action">An action on <paramref name="controller"/>.</param>
+		/// <param name="id">Object to use for the action ID argument.</param>
+		/// <returns>HTML string with form opening tag.</returns>
+		public String FormTo(String controller, String action, object id)
+		{
+			return FormToAttributed(controller, action, id, null);
+		}
+
+		/// <summary>
+		/// Creates a <b>form</b> tag targeting a URL in the style of the <see cref="LinkToAttributed(String, String, String, IDictionary)"/> methods.
+		/// </summary>
+		/// <param name="controller">A controller name.</param>
+		/// <param name="action">An action on <paramref name="controller"/>.</param>
+		/// <param name="attributes">Additional attributes for the <b>form</b> tag.</param>
+		/// <returns>HTML string with form opening tag.</returns>
+		public String FormToAttributed(String controller, String action, IDictionary attributes)
+		{
+			return FormToAttributed(controller, action, null, attributes);
+		}
+
+		/// <summary>
+		/// Creates a <b>form</b> tag targeting a URL in the style of the <see cref="LinkToAttributed(String, String, String, IDictionary)"/> methods.
+		/// </summary>
+		/// <param name="controller">A controller name.</param>
+		/// <param name="action">An action on <paramref name="controller"/>.</param>
+		/// <param name="id">Object to use for the action ID argument.</param>
+		/// <param name="attributes">Additional attributes for the <b>form</b> tag.</param>
+		/// <returns>HTML string with form opening tag.</returns>
+		public String FormToAttributed(String controller, String action, object id, IDictionary attributes)
+		{
+			return FormToAttributed(controller, action, id, null, attributes);
+		}
+
+		/// <summary>
+		/// Creates a <b>form</b> tag targeting a URL in the style of the <see cref="LinkToAttributed(String, String, String, IDictionary)"/> methods.
+		/// </summary>
+		/// <param name="controller">A controller name.</param>
+		/// <param name="action">An action on <paramref name="controller"/>.</param>
+		/// <param name="id">Object to use for the action ID argument.</param>
+		/// <param name="method">Form method (get, post, etc).</param>
+		/// <param name="attributes">Additional attributes for the <b>form</b> tag.</param>
+		/// <returns>HTML string with form opening tag.</returns>
+		public String FormToAttributed(String controller, String action, object id, string method, IDictionary attributes)
+		{
+			string formAction = UrlHelper.For(DictHelper.Create("controller=" + controller, "action=" + action));
+
+			if (id != null)
+			{
+				formAction += "?id=" + id;
+			}
+
+			if (method == null)
+			{
+				method = "post";
+			}
+
+			if (attributes == null)
+			{
+				attributes = DictHelper.Create("method=" + method);
+			}
+			else
+			{
+				attributes["method"] = method;
+			}
+
+			return Form(formAction, attributes);
+		}
 
 		/// <summary>
 		/// Creates a closing <b>form</b> tag.
 		/// <code>
 		/// &lt;/form&gt;
 		/// </code>
-		/// <seealso cref="HtmlHelper.Form"/>
+		/// <seealso cref="Form(String)"/>
 		/// </summary>
 		/// <returns>HTML string with form closing tag.</returns>
 		/// <remarks>
 		/// Calling <c>EndForm()</c> results in:
 		/// <code>&lt;/form&gt;</code>
 		/// </remarks>
-		/// <example>This example shows how to use <see cref="Form"/> together with <see cref="EndForm"/>:
+		/// <example>This example shows how to use <see cref="Form(String,String,String,String)"/> together with <see cref="EndForm"/>:
 		/// <code>
 		/// $HtmlHelper.Form( "actionArg", "idArg", "methodArg", "submitHandler()" )
 		/// ...
@@ -229,7 +323,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		#endregion
 
-		#region Link and LinkTo
+		#region Link and LinkTo and LinkToWithPost
 
 		///<overloads>This method has two overloads.</overloads>
 		/// <summary>
@@ -298,7 +392,39 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </example>
 		public String LinkTo(String name, String action)
 		{
-			return LinkTo(name, Controller.Name, action);
+			string url = UrlHelper.For(DictHelper.Create("action=" + action));
+
+			return String.Format("<a href=\"{0}\">{1}</a>", url, name);
+		}
+
+		///<overloads>This method has three overloads.</overloads>
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the current controller.
+		/// <code>
+		/// &lt;a href=&quot;/website/currentController/actionArg.rails&quot;&gt;nameArg&lt;/a&gt;
+		/// </code>
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="options">link options</param>
+		/// <returns>HTML string with anchor to the specified <paramref name="options"/>.</returns>
+		/// <remarks>Calling <c>LinkTo( "nameArg", DictHelper.CreateDict("controller=home","action=index") )</c> results in:
+		/// <code>&lt;a href=&quot;/websiter/home/index.rails&quot;&gt;nameArg&lt;/a&gt;</code>
+		/// </remarks>
+		/// <example>This example shows how to use <b>LinkTo</b>:
+		/// <code>
+		/// $HtmlHelper.LinkTo( "linkName", DictHelper.CreateDict("controller=home","action=index") )
+		/// </code>
+		/// </example>
+		public String LinkTo(String name, IDictionary options)
+		{
+			string url = UrlHelper.For(options);
+			// remove the common action attribute 
+			CommonUtils.ObtainEntryAndRemove(options, "area");
+			CommonUtils.ObtainEntryAndRemove(options, "controller");
+			CommonUtils.ObtainEntryAndRemove(options, "action");
+
+			// and consider the other options to be link attributes
+			return String.Format("<a href=\"{0}\" {2}>{1}</a>", url, name, GetAttributes(options));
 		}
 
 		/// <summary>
@@ -312,21 +438,19 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="action">Action to link to.</param>
 		/// <returns>HTML string with anchor to the specified <paramref name="controller"/>
 		/// and <paramref name="action"/>.</returns>
-		/// <remarks>Calling <c>LinkTo( "nameArg", "controllerArg", "actionArg" )</c> results in:
+		/// <remarks>Calling <c>LinkTo( "nameArg", options )</c> results in:
 		/// <code>&lt;a href=&quot;/website/controllerArg/actionArg.rails&quot;&gt;nameArg&lt;/a&gt;</code>
 		/// </remarks>
 		/// <example>This example shows how to use <b>LinkTo</b>:
 		/// <code>
-		/// $HtmlHelper.LinkTo( "linkName", "someController", "requiredAction" )
+		/// $HtmlHelper.LinkTo( "linkName", {@action:} )
 		/// </code>
 		/// </example>
 		public String LinkTo(String name, String controller, String action)
 		{
-			String url = Controller.Context.ApplicationPath;
-			String extension = Controller.Context.UrlInfo.Extension;
+			string url = UrlHelper.For(DictHelper.Create("controller=" + controller, "action=" + action));
 
-			return String.Format("<a href=\"{0}/{1}/{2}.{3}\">{4}</a>",
-			                     url, controller, action, extension, name);
+			return String.Format("<a href=\"{0}\">{1}</a>", url, name);
 		}
 
 		/// <summary>
@@ -345,7 +469,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <remarks>Calling <c>LinkTo( "nameArg", "controllerArg", "actionArg", object )</c> results in:
 		/// <code>&lt;a href=&quot;/website/controllerArg/actionArg.rails?id=object&quot;&gt;nameArg&lt;/a&gt;</code>
 		/// <para>
-		/// <see cref="String.Format"/> is used to convert <paramref name="id"/> to the actual <see cref="String"/>.</para>
+		/// <see cref="String.Format(String, object)"/> is used to convert <paramref name="id"/> to the actual <see cref="String"/>.</para>
 		/// </remarks>
 		/// <example>This example shows how to use <b>LinkTo</b>:
 		/// <code>
@@ -354,11 +478,9 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </example>
 		public String LinkTo(String name, String controller, String action, object id)
 		{
-			String url = Controller.Context.ApplicationPath;
-			String extension = Controller.Context.UrlInfo.Extension;
+			string url = UrlHelper.For(DictHelper.Create("controller=" + controller, "action=" + action));
 
-			return String.Format("<a href=\"{0}/{1}/{2}.{3}?id={4}\">{5}</a>",
-			                     url, controller, action, extension, id, name);
+			return String.Format("<a href=\"{0}?id={1}\">{2}</a>", url, id, name);
 		}
 
 		/// <summary>
@@ -382,11 +504,9 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </example>
 		public String LinkToAttributed(String name, String controller, String action, IDictionary attributes)
 		{
-			String url = Controller.Context.ApplicationPath;
-			String extension = Controller.Context.UrlInfo.Extension;
+			string url = UrlHelper.For(DictHelper.Create("controller=" + controller, "action=" + action));
 
-			return String.Format("<a href=\"{0}/{1}/{2}.{3}\" {5}>{4}</a>",
-			                     url, controller, action, extension, name, GetAttributes(attributes));
+			return String.Format("<a href=\"{0}\" {2}>{1}</a>", url, name, GetAttributes(attributes));
 		}
 
 		/// <summary>
@@ -411,14 +531,172 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </example>
 		public String LinkToAttributed(String name, String controller, String action, object id, IDictionary attributes)
 		{
-			String url = Controller.Context.ApplicationPath;
-			String extension = Controller.Context.UrlInfo.Extension;
+			string url = UrlHelper.For(DictHelper.Create("controller=" + controller, "action=" + action));
 
-			return String.Format("<a href=\"{0}/{1}/{2}.{3}?id={6}\" {5}>{4}</a>",
-			                     url, controller, action, extension, name, GetAttributes(attributes), id);
+			return String.Format("<a href=\"{0}?id={1}\" {3}>{2}</a>", url, id, name, GetAttributes(attributes));
 		}
 
-		#endregion
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the current controller that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="action">Action to link to on the current controller.</param>
+		/// <returns>HTML string with anchor that posts to the current controller</returns>
+		public String LinkToWithPost(String name, String action)
+		{
+			return LinkToWithPost(name, action, null);
+		}
+
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the current controller that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="action">Action to link to on the current controller.</param>
+		/// <param name="id">The ID to be passed as a parameter for the action.</param>
+		/// <returns>HTML string with anchor that posts to the current controller</returns>
+		public String LinkToWithPost(String name, String action, object id)
+		{
+			return LinkToWithPost(name, Controller.Name, action, id);
+		}
+
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the current controller that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="action">Action to link to on the current controller.</param>
+		/// <param name="confirm">Guards the form submission with a javascript confirm popup.</param>
+		/// <returns>HTML string with anchor that posts to the current controller</returns>
+		public String LinkToWithPost(String name, String action, String confirm)
+		{
+			return LinkToWithPost(name, Controller.Name, action, confirm);
+		}
+
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the current controller that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="action">Action to link to on the current controller.</param>
+		/// <param name="id">The ID to be passed as a parameter for the action.</param>
+		/// <param name="confirm">Guards the form submission with a javascript confirm popup.</param>
+		/// <returns>HTML string with anchor that posts to the current controller</returns>
+		public String LinkToWithPost(String name, String action, object id, string confirm)
+		{
+			return LinkToWithPost(name, Controller.Name, action, id, confirm);
+		}
+
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the specified <paramref name="controller"/> that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="controller">Controller to link to.</param>
+		/// <param name="action">Action to link to.</param>
+		/// <param name="id">The ID to be passed as a parameter for the action.</param>
+		/// <returns>HTML string with anchor that posts to the specified <paramref name="controller"/></returns>
+		public String LinkToWithPost(String name, String controller, String action, object id)
+		{
+			return LinkToWithPost(name, controller, action, id, null);
+		}
+
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the specified <paramref name="controller"/> that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="controller">Controller to link to.</param>
+		/// <param name="action">Action to link to.</param>
+		/// <param name="confirm">Guards the form submission with a javascript confirm popup.</param>
+		/// <returns>HTML string with anchor that posts to the specified <paramref name="controller"/></returns>
+		public String LinkToWithPost(String name, String controller, String action, String confirm)
+		{
+			return LinkToWithPost(name, controller, action, null, confirm);
+		}
+
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the specified <paramref name="controller"/> that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="controller">Controller to link to.</param>
+		/// <param name="action">Action to link to.</param>
+		/// <param name="id">The ID to be passed as a parameter for the action.</param>
+		/// <param name="confirm">Guards the form submission with a javascript confirm popup.</param>
+		/// <returns>HTML string with anchor that posts to the specified <paramref name="controller"/></returns>
+		public String LinkToWithPost(String name, String controller, String action, object id, String confirm)
+		{
+			return LinkToWithPostAttributed(name, controller, action, id, confirm, null);
+		}
+
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> on the specified <paramref name="controller"/> that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="controller">Controller to link to.</param>
+		/// <param name="action">Action to link to.</param>
+		/// <param name="confirm">Guards the form submission with a javascript confirm popup.</param>
+		/// <param name="attributes">Additional attributes for the <b>a</b> tag.</param>
+		/// <returns>HTML string with anchor that posts to the specified <paramref name="controller"/></returns>
+		public String LinkToWithPostAttributed(String name, String controller, String action, String confirm, IDictionary attributes)
+		{
+			return LinkToWithPostAttributed(name, controller, action, null, confirm, attributes);
+		}
+
+		/// <summary>
+		/// Creates an anchor (link) to the <paramref name="action"/> 
+		/// on the specified <paramref name="controller"/> that posts
+		/// using a hidden form element.
+		/// </summary>
+		/// <param name="name">Name for the link.</param>
+		/// <param name="controller">Controller to link to.</param>
+		/// <param name="action">Action to link to.</param>
+		/// <param name="id">The ID to be passed as a parameter for the action.</param>
+		/// <param name="confirm">Guards the form submission with a javascript confirm popup.</param>
+		/// <param name="attributes">Additional attributes for the <b>a</b> tag.</param>
+		/// <returns>HTML string with anchor that posts to the specified <paramref name="controller"/></returns>
+		public String LinkToWithPostAttributed(String name, String controller, String action, object id, String confirm, IDictionary attributes)
+		{
+			IDictionary formAttributes = DictHelper.Create("style=display:inline;margin:0;");
+
+			string onclickAttribute = "this.parentNode.submit();return false;";
+
+			if (confirm != null && confirm != "")
+			{
+				onclickAttribute = "if(confirm('" + confirm + "')){{this.parentNode.submit();}};return false;";
+			}
+
+			if (attributes == null)
+			{
+				attributes = DictHelper.Create("onclick=" + onclickAttribute);
+			}
+			else
+			{
+				attributes["onclick"] = onclickAttribute;
+			}
+
+			StringBuilder stringBuilder = new StringBuilder();
+
+			if (id != null)
+			{
+				stringBuilder.Append(FormToAttributed(controller, action, id, formAttributes));
+				stringBuilder.Append(LinkToAttributed(name, controller, action, id, attributes));
+			}
+			else
+			{
+				stringBuilder.Append(FormToAttributed(controller, action, formAttributes));
+				stringBuilder.Append(LinkToAttributed(name, controller, action, attributes));
+			}
+
+			stringBuilder.Append(EndForm());
+
+			return stringBuilder.ToString();
+		}
+
+		#endregion 
 
 		#region MapToVirtual
 
@@ -467,7 +745,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <remarks>Calling <c>LabelFor( "forIdArg", "labelArg" )</c> results in:
 		/// <code>&lt;label  for=&quot;forIdArg&quot;&gt;labelArg&lt;/label&gt;</code>
 		/// </remarks>
-		/// <example>This example shows how to use <see cref="LabelFor"/>:
+		/// <example>This example shows how to use <see cref="LabelFor(String,String)"/>:
 		/// <code>
 		/// $HtmlHelper.LabelFor( "forIdArg", "labelArg" )
 		/// </code>
@@ -496,7 +774,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <see cref="IDictionary.Keys"/> are used to name attributes.
 		/// <see cref="IDictionary.Values"/> are used to assign those attributes values.
 		/// </para>
-		/// <example>This example shows how to use <see cref="LabelFor"/>:
+		/// <example>This example shows how to use <see cref="LabelFor(String,String,IDictionary)"/>:
 		/// <code>
 		/// $HtmlHelper.LabelFor( "forIdArg", "labelArg", IDictionary )
 		/// </code>
@@ -1185,7 +1463,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <remarks>Calling <c>EndSelect()</c> results in:
 		/// <code>&lt;/select&gt;</code>
 		/// </remarks>
-		/// <example>This example shows how to use <see cref="Select"/> together with <b>EndSelect</b>:
+		/// <example>This example shows how to use <see cref="Select(String)"/> together with <b>EndSelect</b>:
 		/// <code>
 		/// $HtmlHelper.Select( "nameArg" )
 		/// ...
@@ -1202,15 +1480,19 @@ namespace Castle.MonoRail.Framework.Helpers
 		#region Create options
 
 		/// <summary>
-		/// TODO: Document this!
+		/// Creates an opening <b>optgroup</b> element.
 		/// </summary>
-		/// <param name="label"></param>
-		/// <returns></returns>
+		/// <param name="label">The label attribute.</param>
+		/// <returns>An opening <b>optgroup</b> element.</returns>
 		public String OptionGroup(String label)
 		{
 			return String.Format("<optgroup label=\"{0}\">", label);
 		}
 
+		/// <summary>
+		/// Creates a closing <b>optgroup</b> element.
+		/// </summary>
+		/// <returns>A closing <b>optgroup</b> element.</returns>
 		public String EndOptionGroup()
 		{
 			return String.Format("</optgroup>");
@@ -1269,7 +1551,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// &lt;option&gt;object&lt;/option&gt;
 		/// </code>
 		/// <para>
-		/// Elements in the array are converted to <see cref="String"/> using <see cref="StringBuilder.AppendFormat"/>.
+		/// Elements in the array are converted to <see cref="String"/> using <see cref="StringBuilder.AppendFormat(String,object)"/>.
 		/// </para>
 		/// </remarks>
 		/// <example>This example shows how to use <b>CreateOptionsFromPrimitiveArray</b>:
@@ -1300,7 +1582,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// &lt;option value=&quot;0&quot;&gt;textProp2&lt;/option&gt;
 		/// &lt;option value=&quot;5&quot;&gt;textProp3&lt;/option&gt;
 		/// </code>
-		/// <seealso cref="CreateOptions"/>
+		/// <seealso cref="CreateOptions(ICollection,String,String)"/>
 		/// </summary>
 		/// <param name="elems">Collection of objects each of which describes an <b>option</b> tag.</param>
 		/// <param name="textProperty">Name of the <paramref name="elems"/>
@@ -1368,7 +1650,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// thrown or options will have unexpected strings.
 		/// </note>
 		/// </para>
-		/// <para><b>CreateOptionsFromArray</b> relies on <see cref="CreateOptions"/> to generate
+		/// <para><b>CreateOptionsFromArray</b> relies on <see cref="CreateOptions(ICollection,String,String)"/> to generate
 		/// all <b>option</b> tags.</para>
 		/// </remarks>
 		/// <example>This example shows how to use <b>CreateOptions</b>:
@@ -1388,7 +1670,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// &lt;option value=&quot;0&quot;&gt;textProp2&lt;/option&gt;
 		/// &lt;option value=&quot;5&quot;&gt;textProp3&lt;/option&gt;
 		/// </code>
-		/// <seealso cref="CreateOptions"/>
+		/// <seealso cref="CreateOptions(ICollection,String,String,object)"/>
 		/// </summary>
 		/// <param name="elems">Collection of objects each of which describes an <b>option</b> tag.</param>
 		/// <param name="textProperty">Name of the <paramref name="elems"/>
@@ -1459,7 +1741,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// thrown or options will have unexpected strings.
 		/// </note>
 		/// </para>
-		/// <para><b>CreateOptionsFromArray</b> relies on <see cref="CreateOptions"/> to generate
+		/// <para><b>CreateOptionsFromArray</b> relies on <see cref="CreateOptions(ICollection,String,String,object)"/> to generate
 		/// all <b>option</b> tags.</para>
 		/// </remarks>
 		/// <example>This example shows how to use <b>CreateOptions</b>:
@@ -1716,11 +1998,11 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>
 		/// 	<see langword="true"/> if the specified <paramref name="value"/> is selected; otherwise, <see langword="false"/>.
 		/// </returns>
-		/// <remarks>Specified <paramref name="value"/> is selected if it <see cref="Object.Equals"/>
+		/// <remarks>Specified <paramref name="value"/> is selected if it <see cref="Object.Equals(object)"/>
 		/// to the <paramref name="selectedValue"/>. Or if <paramref name="selectedValue"/> is an
-		/// array <paramref name="value"/> is selected if <see cref="Array.IndexOf"/> can find it
+		/// array <paramref name="value"/> is selected if <see cref="Array.IndexOf(Array, object)"/> can find it
 		/// in <paramref name="selectedValue"/>.</remarks>
-		private bool IsSelected(object value, object selectedValue, bool isMultiple)
+		private static bool IsSelected(object value, object selectedValue, bool isMultiple)
 		{
 			if (!isMultiple)
 			{
@@ -1742,7 +2024,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <remarks>This method is used to get the <see cref="MethodInfo"/> to retrieve
 		/// specified property from the specified type.</remarks>
 		/// <exception cref="ArgumentNullException">Thrown is <paramref name="elem"/> is <c>null</c>.</exception>
-		private MethodInfo GetMethod(object elem, String property)
+		private static MethodInfo GetMethod(object elem, String property)
 		{
 			if (elem == null) throw new ArgumentNullException("elem");
 			if (property == null) return null;
@@ -1954,7 +2236,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// BuildList("ol", elements, styleClass, itemClass);
 		/// </code>
 		/// </example>
-		private String BuildList(String tag, ICollection elements, String styleClass, String itemClass)
+		private static String BuildList(String tag, ICollection elements, String styleClass, String itemClass)
 		{
 			StringBuilder sb = new StringBuilder();
 			StringWriter sbWriter = new StringWriter(sb);

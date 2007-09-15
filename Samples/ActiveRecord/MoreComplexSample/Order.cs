@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@ namespace MoreComplexSample
 {
 	using System;
 	using Castle.ActiveRecord;
-	using Iesi.Collections;
-	using Nullables;
+	using Iesi.Collections.Generic;
 
 	public enum OrderStatus : short
 	{
@@ -32,11 +31,11 @@ namespace MoreComplexSample
 	{
 		private int id;
 		private DateTime createdAt;
-		private NullableDateTime dispatchedAt;
+		private DateTime? dispatchedAt;
 		private Customer customer;
-		private float total;
 		private OrderStatus status;
-		private ISet products = new HashedSet();
+		private float total;
+		private ISet<Product> products = new HashedSet<Product>();
 
 		public Order()
 		{
@@ -58,7 +57,7 @@ namespace MoreComplexSample
 		}
 
 		[Property(Insert=false)]
-		public NullableDateTime DispatchedAt
+		public DateTime? DispatchedAt
 		{
 			get { return dispatchedAt; }
 			set { dispatchedAt = value; }
@@ -85,9 +84,10 @@ namespace MoreComplexSample
 			set { status = value; }
 		}
 
-		[HasAndBelongsToMany(typeof(Product), Table="LineItem",
-			ColumnKey="OrderId", ColumnRef="ProductId", Lazy=true)]
-		public ISet Products
+		[HasAndBelongsToMany(
+			Table="LineItem",
+			ColumnKey="OrderId", ColumnRef="ProductId", Inverse = true, Lazy = true)]
+		public ISet<Product> Products
 		{
 			get { return products; }
 			set { products = value; }

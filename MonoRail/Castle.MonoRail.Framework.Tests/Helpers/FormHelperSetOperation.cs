@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,6 +64,37 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		}
 
 		[Test]
+		public void ApplyingFormat()
+		{
+			OperationState state = SetOperation.IterateOnDataSource(
+				null, new int[] { 1, 2, 3, 4 }, DictHelper.Create("textformat=C"));
+
+			Assert.IsNotNull(state);
+			Assert.IsTrue(state is ListDataSourceState);
+			Assert.IsNull(state.TargetSuffix);
+
+			bool iterated = false;
+			int index = 1;
+
+			foreach(SetItem item in state)
+			{
+				iterated = true;
+
+				Assert.IsFalse(item.IsSelected);
+				Assert.IsNotNull(item.Text);
+				Assert.IsNotNull(item.Value);
+
+				Assert.AreEqual(index.ToString("C"), item.Text);
+				Assert.AreEqual(index.ToString(), item.Value);
+
+				index++;
+			}
+
+			Assert.IsTrue(iterated);
+		}
+
+
+		[Test]
 		public void NullDataSource()
 		{
 			OperationState state = SetOperation.IterateOnDataSource(
@@ -73,14 +104,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			Assert.IsTrue(state is NoIterationState);
 			Assert.IsNull(state.TargetSuffix);
 			
-			bool iterated = false;
-			
-			foreach(SetItem item in state)
-			{
-				iterated = true;
-			}
-			
-			Assert.IsFalse(iterated);
+			Assert.IsFalse(state.MoveNext());
 		}
 		
 		[Test]
@@ -93,14 +117,7 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			Assert.IsTrue(state is NoIterationState);
 			Assert.IsNull(state.TargetSuffix);
 			
-			bool iterated = false;
-			
-			foreach(SetItem item in state)
-			{
-				iterated = true;
-			}
-			
-			Assert.IsFalse(iterated);
+			Assert.IsFalse(state.MoveNext());
 		}
 
 		[Test]
@@ -375,6 +392,50 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 				index++;
 			}
 			
+			Assert.IsTrue(iterated);
+		}
+
+		/// <summary>
+		/// The target is a decimal while the data source is an array of strings
+		/// </summary>
+		[Test]
+		public void SingleSelectionDifferentTypes()
+		{
+			CultureInfo en = CultureInfo.CreateSpecificCulture("pt-br");
+
+			Thread.CurrentThread.CurrentCulture = en;
+			Thread.CurrentThread.CurrentUICulture = en;
+
+			OperationState state = SetOperation.IterateOnDataSource(
+				(decimal?) 1.5,
+				new string[] { "1", "1,5", "2" }, null);
+			Assert.IsNotNull(state);
+			Assert.IsTrue(state is DifferentTypeOperationState);
+
+			bool iterated = false;
+			int index = 0;
+
+			foreach(SetItem item in state)
+			{
+				iterated = true;
+
+				Assert.IsNotNull(item.Text);
+				Assert.IsNotNull(item.Value);
+
+				if (index == 1)
+				{
+					Assert.IsTrue(item.IsSelected);
+					Assert.AreEqual("1,5", item.Text);
+					Assert.AreEqual("1,5", item.Value);
+				}
+				else
+				{
+					Assert.IsFalse(item.IsSelected);
+				}
+
+				index++;
+			}
+
 			Assert.IsTrue(iterated);
 		}
 

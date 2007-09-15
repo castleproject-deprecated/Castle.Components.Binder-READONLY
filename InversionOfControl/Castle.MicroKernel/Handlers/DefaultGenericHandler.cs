@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if DOTNET2
-
 namespace Castle.MicroKernel.Handlers
 {
 	using System;
 	using System.Collections.Generic;
-
 	using Castle.Core;
 
 	/// <summary>
@@ -33,7 +30,12 @@ namespace Castle.MicroKernel.Handlers
 	{
 		private readonly IDictionary<Type, IHandler> type2SubHandler;
 
-		public DefaultGenericHandler(ComponentModel model) : base(model)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultGenericHandler"/> class.
+		/// </summary>
+		/// <param name="model"></param>
+		public DefaultGenericHandler(ComponentModel model)
+			: base(model)
 		{
 			type2SubHandler = new Dictionary<Type, IHandler>();
 		}
@@ -44,7 +46,11 @@ namespace Castle.MicroKernel.Handlers
 
 			IHandler handler = GetSubHandler(context, implType);
 
-			return handler.Resolve(context);
+			//so the generic version wouldn't be considered as well
+			using(context.ResolvingHandler(this))
+			{
+				return handler.Resolve(context);
+			}
 		}
 
 		public override void Release(object instance)
@@ -56,9 +62,9 @@ namespace Castle.MicroKernel.Handlers
 
 		protected IHandler GetSubHandler(CreationContext context, Type genericType)
 		{
-			lock (type2SubHandler)
+			lock(type2SubHandler)
 			{
-				IHandler handler = null;
+				IHandler handler;
 
 				if (type2SubHandler.ContainsKey(genericType))
 				{
@@ -71,6 +77,10 @@ namespace Castle.MicroKernel.Handlers
 					ComponentModel newModel = Kernel.ComponentModelBuilder.BuildModel(
 						ComponentModel.Name, service, genericType, null);
 
+					newModel.ExtendedProperties[ComponentModel.SkipRegistration] = true;
+
+					Kernel.AddCustomComponent(newModel);
+
 					handler = Kernel.HandlerFactory.Create(newModel);
 
 					type2SubHandler[genericType] = handler;
@@ -81,5 +91,3 @@ namespace Castle.MicroKernel.Handlers
 		}
 	}
 }
-
-#endif

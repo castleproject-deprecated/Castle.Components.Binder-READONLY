@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,6 +33,10 @@ namespace Castle.Facilities.Remoting
 		RecoverableComponent
 	}
 
+	/// <summary>
+	/// Inspects the model looking for remote component configuration. If found, 
+	/// do the component Remoting configuration.
+	/// </summary>
 	public class RemotingInspector : IContributeComponentModelConstruction
 	{
 		private readonly RemotingRegistry remoteRegistry;
@@ -41,6 +45,17 @@ namespace Castle.Facilities.Remoting
 		private readonly String baseUri;
 		private readonly bool isServer, isClient;
 
+	    private const string UriExtension = ".rem";
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RemotingInspector"/> class.
+		/// </summary>
+		/// <param name="converter">The converter.</param>
+		/// <param name="isServer">if set to <c>true</c> is a server.</param>
+		/// <param name="isClient">if set to <c>true</c> is a client.</param>
+		/// <param name="baseUri">The base URI.</param>
+		/// <param name="remoteRegistry">The remote registry.</param>
+		/// <param name="localRegistry">The local registry.</param>
 		public RemotingInspector(ITypeConverter converter, bool isServer, bool isClient, 
 			String baseUri, RemotingRegistry remoteRegistry, RemotingRegistry localRegistry)
 		{
@@ -58,7 +73,6 @@ namespace Castle.Facilities.Remoting
 
 			String remoteserverAttValue = model.Configuration.Attributes["remoteserver"];
 			String remoteclientAttValue = model.Configuration.Attributes["remoteclient"];
-			// String sponsorIdAttValue = model.Configuration.Attributes["sponsorId"];
 
 			RemotingStrategy server = RemotingStrategy.None;
 			RemotingStrategy client = RemotingStrategy.None;
@@ -158,13 +172,18 @@ namespace Castle.Facilities.Remoting
 			ResetDependencies(model);
 
 			String uri = ConstructClientURI(client, model.Name, model);
+
+			bool skipRemotingRegistration = Convert.ToBoolean(model.Configuration.Attributes["skipRemotingRegistration"]);
 			
 			switch (client)
 			{
 				case RemotingStrategy.Singleton:
 				case RemotingStrategy.SingleCall:
 				{
-					RemotingConfiguration.RegisterWellKnownClientType(type, uri);
+					if (!skipRemotingRegistration)
+					{
+						RemotingConfiguration.RegisterWellKnownClientType(type, uri);
+					}
 
 					model.ExtendedProperties.Add("remoting.uri", uri);
 					model.CustomComponentActivator = typeof(RemoteActivator);
@@ -175,7 +194,10 @@ namespace Castle.Facilities.Remoting
 				{
 					CheckHasBaseURI();
 
-					RemotingConfiguration.RegisterActivatedClientType(type, baseUri);
+					if (!skipRemotingRegistration)
+					{
+						RemotingConfiguration.RegisterActivatedClientType(type, baseUri);
+					}
 
 					model.ExtendedProperties.Add("remoting.appuri", baseUri);
 					model.CustomComponentActivator = typeof(RemoteClientActivatedActivator);
@@ -257,14 +279,24 @@ namespace Castle.Facilities.Remoting
 			
 			if (baseUri.EndsWith("/"))
 			{
-				uriText = String.Format("{0}{1}", baseUri, cpntUri);
+				uriText = SetUriExtensionIfNeeded(String.Format("{0}{1}", baseUri, cpntUri));
 			}
 			else
 			{
-				uriText = String.Format("{0}/{1}", baseUri, cpntUri);
+				uriText = SetUriExtensionIfNeeded(String.Format("{0}/{1}", baseUri, cpntUri));
 			}
 			
 			return uriText;
+		}
+
+		private static string SetUriExtensionIfNeeded(string uri)
+		{
+			if (!uri.EndsWith(".rem"))
+			{
+				return uri + UriExtension;
+			}
+
+			return uri;
 		}
 
 		private String ConstructServerURI(RemotingStrategy server, String componentId, ComponentModel model)
@@ -277,11 +309,11 @@ namespace Castle.Facilities.Remoting
 
 			if (value == null)
 			{
-				uriText = componentId;
+				uriText = SetUriExtensionIfNeeded(componentId);
 			}
 			else
 			{
-				uriText = value;
+				uriText = SetUriExtensionIfNeeded(value);
 			}
 
 			return uriText;

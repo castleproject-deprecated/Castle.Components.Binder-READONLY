@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace Castle.MonoRail.Framework
 		public const String Bcc = "bcc";
 
 		public static readonly String EmailTemplatePath  = "mail";
-		public static readonly String ToAddressPattern   = @"[ \t]*(?<header>(to|cc|bcc)):[ \t]*(?<value>([\w-\.]+@([\w\.]){1,}\w+[ \t]*;?[ \t]*)+)[ \t]*(\r*\n*)?";
+		public static readonly String ToAddressPattern   = @"[ \t]*(?<header>(to|cc|bcc)):[ \t]*(?<value>([\w-\.]+@([\w\.]){1,}\w+[ \t]*[,;]?[ \t]*)+)[ \t]*(\r*\n*)?";
 		public static readonly String FromAddressPattern = @"[ \t]*from:[ \t]*(?<value>(\w+[ \t]*)*<*[ \t]*[\w-\.]+@([\w\.]){1,}[\w][ \t]*>*)[ \t]*(\r*\n*)?";
 		public static readonly String HeaderPattern      = @"[ \t]*(?<header>(subject|X-\w+)):[ \t]*(?<value>(\w+[ \t]*)+)(\r*\n*)?";
 		public static readonly String HeaderKey          = "header";

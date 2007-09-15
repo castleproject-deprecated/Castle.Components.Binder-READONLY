@@ -31,7 +31,7 @@ namespace NVelocity.Test
 		/// Path for templates. This property will override the
 		/// value in the default velocity properties file.
 		/// </summary>
-		public static readonly String FILE_RESOURCE_LOADER_PATH = Path.Combine(System.Configuration.ConfigurationSettings.AppSettings["tests.src"], "../../test/templates");
+		public static readonly String FILE_RESOURCE_LOADER_PATH = Path.Combine(System.Configuration.ConfigurationManager.AppSettings["tests.src"], "../../test/templates");
 
 		/// <summary>
 		/// Properties file that lists which template tests to run.
@@ -99,7 +99,7 @@ namespace NVelocity.Test
 				{
 					Directory.CreateDirectory(dir.FullName);
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					ok = false;
 				}
@@ -141,9 +141,6 @@ namespace NVelocity.Test
 		/// Whether the output matches the contents
 		/// of the comparison file.
 		/// </returns>
-		/// <exception cref="">
-		/// Exception Test failure condition.
-		/// </exception>
 		protected internal virtual bool IsMatch(String resultsDir, String compareDir, String baseFileName, String resultExt, String compareExt)
 		{
 			Boolean SHOW_RESULTS = true;

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,14 +30,9 @@ namespace Castle.VSNetIntegration.CastleWizards
 	using Constants=Castle.VSNetIntegration.CastleWizards.Shared.Constants;
 	using EnvConstants = EnvDTE.Constants;
 
-#if DOTNET2
 	[Guid("9FF77D9F-E4FC-47EE-8E8B-0079FC2F2478")]
 	[ProgId("Castle.MonoRailProjectWizardVS8")]
 	[ComDefaultInterface(typeof(IDTWizard))]
-#else
-	[Guid("43C9796F-E6C8-460D-B722-204A7121A510")]
-	[ProgId("Castle.MonoRailProjectWizardVS7")]
-#endif
 	[ComVisibleAttribute(true)]
 	public class MonoRailProjectWizard : BaseProjectWizard
 	{
@@ -73,15 +68,22 @@ namespace Castle.VSNetIntegration.CastleWizards
 			Project project = 
 				context.DteInstance.Solution.AddFromTemplate(projectFile, LocalProjectPath, ProjectName + ".csproj", Exclusive);
 
-			project.Properties.Item("DefaultNamespace").Value = ProjectName;
+			project.Properties.Item("DefaultNamespace").Value = NameSpace;
 
-			Utils.PerformReplacesOn(project, ProjectName, LocalProjectPath, "Controllers\\HomeController.cs");
-			Utils.PerformReplacesOn(project, ProjectName, LocalProjectPath, "global.asax");
+			Utils.PerformReplacesOn(project, NameSpace, LocalProjectPath, "Controllers\\BaseController.cs");
+			Utils.PerformReplacesOn(project, NameSpace, LocalProjectPath, "Controllers\\HomeController.cs");
+			Utils.PerformReplacesOn(project, NameSpace, LocalProjectPath, "Controllers\\LoginController.cs");
+			Utils.PerformReplacesOn(project, NameSpace, LocalProjectPath, "Controllers\\ContactController.cs");
+			Utils.PerformReplacesOn(project, NameSpace, LocalProjectPath, "Models\\ContactInfo.cs");
+			Utils.PerformReplacesOn(project, NameSpace, LocalProjectPath, "Models\\Country.cs");
+			Utils.PerformReplacesOn(project, NameSpace, LocalProjectPath, "global.asax");
 
 			context.Projects.Add(Constants.ProjectMain, project);
 
 			AddGlobalApplication(project);
-			AddView(project);
+			AddHomeViews(project);
+			AddLoginViews(project);
+			AddContactViews(project);
 			AddLayout(project);
 			AddRescue(project);
 			
@@ -92,7 +94,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			
 			base.AddProjects(context);
 		}
-
+		
 		protected override void PostProcess(ExtensionContext context)
 		{
 			ProcessWebConfig();
@@ -137,52 +139,72 @@ namespace Castle.VSNetIntegration.CastleWizards
 				XmlElement includeControllersElem = webConfigDoc.CreateElement("include");
 				XmlElement includeComponentsElem = webConfigDoc.CreateElement("include");
 
-				includePropElem.SetAttribute("uri", "file://properties.config");
-				includeFacElem.SetAttribute("uri", "file://facilities.config");
-				includeControllersElem.SetAttribute("uri", "file://controllers.config");
-				includeComponentsElem.SetAttribute("uri", "file://components.config");
+				includePropElem.SetAttribute("uri", "file://Config/properties.config");
+				includeFacElem.SetAttribute("uri", "file://Config/facilities.config");
+				includeControllersElem.SetAttribute("uri", "file://Config/controllers.config");
+				includeComponentsElem.SetAttribute("uri", "file://Config/components.config");
 
 				castleElem.AppendChild(includePropElem);
 				castleElem.AppendChild(includeFacElem);
 				castleElem.AppendChild(includeControllersElem);
 				castleElem.AppendChild(includeComponentsElem);
-				
-				webConfigDoc.DocumentElement.AppendChild(webConfigDoc.CreateComment("Container configuration. For more information see http://www.castleproject.org/index.php/IoC:Configuration"));
-				webConfigDoc.DocumentElement.AppendChild(webConfigDoc.CreateComment("and http://www.castleproject.org/index.php/IoC:Component_parameters%2C_configuration_and_type_converters"));
+
+				webConfigDoc.DocumentElement.AppendChild(webConfigDoc.CreateComment("Container configuration. For more information see http://www.castleproject.org/container/documentation/trunk/manual/windsorconfigref.html"));
+				webConfigDoc.DocumentElement.AppendChild(webConfigDoc.CreateComment("and http://www.castleproject.org/container/documentation/trunk/usersguide/compparams.html"));
 				webConfigDoc.DocumentElement.AppendChild(castleElem);
 
-				String projectFile = Context.GetTemplateFileName(@"CSharp\MRProject\controllers.config");
-				project.ProjectItems.AddFromTemplate(projectFile, "controllers.config");
-				
-				projectFile = Context.GetTemplateFileName(@"CSharp\MRProject\facilities.config");
-				project.ProjectItems.AddFromTemplate(projectFile, "facilities.config");
-				
-				projectFile = Context.GetTemplateFileName(@"CSharp\MRProject\properties.config");
-				project.ProjectItems.AddFromTemplate(projectFile, "properties.config");
-				
-				projectFile = Context.GetTemplateFileName(@"CSharp\MRProject\components.config");
-				project.ProjectItems.AddFromTemplate(projectFile, "components.config");
+				ProjectItem configItem = project.ProjectItems.AddFolder("config", EnvConstants.vsProjectItemKindPhysicalFolder);
 
-				CreateXmlDomForConfig(project, MRConfigConstants.Properties);
-				CreateXmlDomForConfig(project, MRConfigConstants.Facilities);
-				CreateXmlDomForConfig(project, MRConfigConstants.Components);
-				XmlDocument controllersDom = CreateXmlDomForConfig(project, MRConfigConstants.Controllers);
+				// Controllers.config
+				String projectFile = Context.GetTemplateFileName(@"CSharp\MRProject\Config\controllers.config");
+				configItem.ProjectItems.AddFromTemplate(projectFile, MRConfigConstants.Controllers);
+
+				// Facilities.config
+				projectFile = Context.GetTemplateFileName(@"CSharp\MRProject\Config\facilities.config");
+				configItem.ProjectItems.AddFromTemplate(projectFile, MRConfigConstants.Facilities);
+
+				// Properties.config
+				projectFile = Context.GetTemplateFileName(@"CSharp\MRProject\Config\properties.config");
+				configItem.ProjectItems.AddFromTemplate(projectFile, MRConfigConstants.Properties);
+
+				// Components.config
+				projectFile = Context.GetTemplateFileName(@"CSharp\MRProject\Config\components.config");
+				configItem.ProjectItems.AddFromTemplate(projectFile, MRConfigConstants.Components);
+
+				Utils.CreateXmlDomForConfig(Context, project, configItem.ProjectItems.Item(MRConfigConstants.Properties), 
+					MRConfigConstants.PropertiesConfig);
+
+				Utils.CreateXmlDomForConfig(Context, project, configItem.ProjectItems.Item(MRConfigConstants.Facilities),
+					MRConfigConstants.FacilitiesConfig);
+
+				Utils.CreateXmlDomForConfig(Context, project, configItem.ProjectItems.Item(MRConfigConstants.Components),
+					MRConfigConstants.ComponentsConfig);
+
+				XmlDocument controllersDom =
+					Utils.CreateXmlDomForConfig(Context, project, configItem.ProjectItems.Item(MRConfigConstants.Controllers),
+						MRConfigConstants.ControllersConfig);
 				
-				RegisterController(controllersDom);
+				RegisterControllers(controllersDom);
 			}
 
 			AddViewEngineConfiguration(webConfigDoc, mrNode);
-
 			AddRoutingConfiguration(webConfigDoc, mrNode);
 		}
 
-		private void RegisterController(XmlDocument dom)
+		private void RegisterControllers(XmlDocument dom)
+		{
+			RegisterController(dom, "home.controller", "HomeController");
+			RegisterController(dom, "login.controller", "LoginController");
+			RegisterController(dom, "contact.controller", "ContactController");
+		}
+
+		private void RegisterController(XmlDocument dom, string name, string ns)
 		{
 			XmlElement compElem = dom.CreateElement("component");
-			
-			compElem.SetAttribute("id", "home.controller");
-			compElem.SetAttribute("type", String.Format("{0}.Controllers.HomeController, {0}", Context.ProjectName));
-			
+
+			compElem.SetAttribute("id", name);
+			compElem.SetAttribute("type", String.Format("{0}.Controllers.{1}, {0}", Context.ProjectName, ns));
+
 			dom.DocumentElement.SelectSingleNode("components").AppendChild(compElem);
 		}
 
@@ -201,7 +223,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			rule1.AppendChild(rule1replace);
 
 			rule1pattern.AppendChild( webConfigDoc.CreateTextNode(@"(/blog/posts/)(\d+)/(\d+)/(.)*$") );
-			rule1replace.AppendChild( webConfigDoc.CreateCDataSection(" /blog/view.rails?year=$2&month=$3 ") );
+			rule1replace.AppendChild( webConfigDoc.CreateCDataSection(" /blog/view.castle?year=$2&month=$3 ") );
 
 			mrNode.AppendChild(webConfigDoc.CreateComment("For more information on routing see http://www.castleproject.org/monorail/documentation/trunk/advanced/routing.html"));
 			mrNode.AppendChild(routingElem);
@@ -215,29 +237,38 @@ namespace Castle.VSNetIntegration.CastleWizards
 			addRoutingElem.SetAttribute("name", "routing");
 			addRoutingElem.SetAttribute("type", "Castle.MonoRail.Framework.RoutingModule, Castle.MonoRail.Framework");
 			
-			httpModules.AppendChild(addRoutingElem);
+			httpModules.InsertBefore(httpModules.FirstChild, addRoutingElem);
 		}
 
 		private void AddViewEngineConfiguration(XmlDocument webConfigDoc, XmlElement mrNode)
 		{
 			if (!optionsPanel.VeWebForms)
 			{
-				XmlElement viewEngineElem = webConfigDoc.CreateElement("viewEngine");
+				XmlElement viewEngineElem = webConfigDoc.CreateElement("viewEngines");
 				viewEngineElem.SetAttribute("viewPathRoot", "Views");
+
+				XmlElement addElem = webConfigDoc.CreateElement("add");
+				addElem.SetAttribute("xhtml", "false");
 				
 				if (optionsPanel.VeNVelocity)
 				{
-					viewEngineElem.SetAttribute("customEngine",
-					                            "Castle.MonoRail.Framework.Views.NVelocity.NVelocityViewEngine, Castle.MonoRail.Framework.Views.NVelocity");
+					addElem.SetAttribute("type",
+						"Castle.MonoRail.Framework.Views.NVelocity.NVelocityViewEngine, Castle.MonoRail.Framework.Views.NVelocity");
 				}
 				else if (optionsPanel.VeBrail)
 				{
-					viewEngineElem.SetAttribute("customEngine",
-					                            "Castle.MonoRail.Views.Brail.BooViewEngine, Castle.MonoRail.Views.Brail");
+					addElem.SetAttribute("type",
+						"Castle.MonoRail.Views.Brail.BooViewEngine, Castle.MonoRail.Views.Brail");
 
 					AddBrailCommonConfiguration(webConfigDoc);
 				}
+				else if (optionsPanel.VeWebForms)
+				{
+					addElem.SetAttribute("type",
+						"Castle.MonoRail.Framework.Views.Aspx.WebFormsViewEngine, Castle.MonoRail.Framework");
+				}
 
+				viewEngineElem.AppendChild(addElem);
 				mrNode.AppendChild(viewEngineElem);
 			}
 		}
@@ -247,14 +278,14 @@ namespace Castle.VSNetIntegration.CastleWizards
 			XmlNode configSectionsNode = webConfigDoc.SelectSingleNode("configuration/configSections");
 			XmlElement castleSectionElem = webConfigDoc.CreateElement("section");
 
-			castleSectionElem.SetAttribute("name", "Brail");
+			castleSectionElem.SetAttribute("name", "brail");
 			castleSectionElem.SetAttribute("type", "Castle.MonoRail.Views.Brail.BrailConfigurationSection, Castle.MonoRail.Views.Brail");
 
 			configSectionsNode.AppendChild(castleSectionElem);
 
-			XmlComment comment = webConfigDoc.CreateComment("For more on Brail " + 
-				"configuration see http://www.castleproject.org/index.php/MonoRail:Brail#Configuring_Brail:");
-			XmlElement brailElem = webConfigDoc.CreateElement("Brail");
+			XmlComment comment = webConfigDoc.CreateComment("For more on Brail " +
+				"configuration see http://www.castleproject.org/monorail/documentation/trunk/viewengines/brail/index.html");
+			XmlElement brailElem = webConfigDoc.CreateElement("brail");
 
 			brailElem.SetAttribute("debug", "false");
 			brailElem.SetAttribute("saveToDisk", "false");
@@ -273,7 +304,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		private void AddGlobalApplication(Project project)
 		{
-			String globalAppFile = null;
+			String globalAppFile;
 
 			if (HasEnabledWindsorIntegration)
 			{
@@ -286,7 +317,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 			project.ProjectItems.AddFromTemplate(globalAppFile, "GlobalApplication.cs");
 			
-			Utils.PerformReplacesOn(project, ProjectName, LocalProjectPath, "GlobalApplication.cs");
+			Utils.PerformReplacesOn(project, NameSpace, LocalProjectPath, "GlobalApplication.cs");
 		}
 
 		private void UpdateProjectToUseCassini(Project project)
@@ -309,30 +340,48 @@ namespace Castle.VSNetIntegration.CastleWizards
 			}
 		}
 
-		private void AddView(Project project)
+		private void AddHomeViews(Project project)
 		{
-			String viewTemplateFile;
-			String viewFile;
+			AddView(project, "Home", "Index");
+		}
 
+		private void AddLoginViews(Project project)
+		{
+			AddView(project, "Login", "Index");
+			AddView(project, "Login", "authenticate");
+		}
+
+		private void AddContactViews(Project project)
+		{
+			AddView(project, "Contact", "index");
+			AddView(project, "Contact", "confirmation");
+		}
+
+		private void AddView(Project project, string controller, string action)
+		{
+			String fileExtension = ViewFileExtension();
+
+			String viewFile = String.Format("{0}.{1}", action, fileExtension);
+			String viewTemplateFile = Context.GetTemplateFileName(String.Format(@"CSharp\MRProject\ViewsPlaceHolder\{0}\{1}", 
+				controller, viewFile));
+
+			project.ProjectItems.Item("Views").ProjectItems.Item(controller).ProjectItems.AddFromTemplate(viewTemplateFile, viewFile);
+		}
+		
+		private string ViewFileExtension()
+		{
 			if (optionsPanel.VeNVelocity)
 			{
-				viewFile = "index.vm";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\index.vm");
+				return "vm";
 			}
 			else if (optionsPanel.VeBrail)
 			{
-				viewFile = "index.boo";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\index.boo");
+				return "brail";
 			}
 			else
 			{
-				viewFile = "index.aspx";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\index.aspx");
+				return "aspx";
 			}
-
-			project.ProjectItems.Item("Views").
-				ProjectItems.Item("Home").
-				ProjectItems.AddFromTemplate(viewTemplateFile, viewFile);
 		}
 
 		private void AddRescue(Project project)
@@ -347,8 +396,8 @@ namespace Castle.VSNetIntegration.CastleWizards
 			}
 			else if (optionsPanel.VeBrail)
 			{
-				viewFile = "generalerror.boo";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\rescue_default.boo");
+				viewFile = "generalerror.brail";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\rescue_default.brail");
 			}
 			else
 			{
@@ -369,17 +418,17 @@ namespace Castle.VSNetIntegration.CastleWizards
 			if (optionsPanel.VeNVelocity)
 			{
 				viewFile = "default.vm";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\layout_default.vm");
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\ViewsPlaceHolder\layout_default.vm");
 			}
 			else if (optionsPanel.VeBrail)
 			{
-				viewFile = "default.boo";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\layout_default.boo");
+				viewFile = "default.brail";
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\ViewsPlaceHolder\layout_default.brail");
 			}
 			else
 			{
 				viewFile = "default.aspx";
-				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\layout_default.aspx");
+				viewTemplateFile = Context.GetTemplateFileName(@"CSharp\MRProject\ViewsPlaceHolder\layout_default.aspx");
 			}
 
 			project.ProjectItems.Item("Views").
@@ -399,7 +448,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 				// Utils.AddReference(project, "anrControls.Markdown.NET.dll");
 				// Utils.AddReference(project, "Boo.Lang.Compiler.dll");
 				// Utils.AddReference(project, "Boo.Lang.dll");
-				// Utils.AddReference(project, "Boo.Lang.Parser.dll");
+				// Utils.AddReference(project, "Boo.Lang.Parser.dll");	
 				Utils.AddReference(project, "Castle.MonoRail.Views.Brail");
 			}
 
@@ -426,7 +475,22 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 			foreach(String file in configFiles)
 			{
-				ProjectItem item = project.ProjectItems.Item(file);
+				ProjectItem item;
+
+				if (file.IndexOf("\\") > -1)
+				{
+					string[] p = file.Split('\\');
+					item = project.ProjectItems.Item(p[0]);
+
+					for (int i = 1; i < p.Length; i++)
+					{
+						item = item.ProjectItems.Item(p[i]);
+					}
+				}
+				else
+				{
+					item = project.ProjectItems.Item(file);
+				}
 
 				Window codeWindow = item.Open(EnvConstants.vsViewKindCode);
 	

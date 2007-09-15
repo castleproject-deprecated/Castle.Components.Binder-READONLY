@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.railsproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,17 +34,14 @@ namespace ActiveRecordIntegrationSample.Components
 
 		public override void Render()
 		{
- 			IPaginatedPage page = PaginationHelper.CreatePagination(elements, 5);
+			int currentPage = 1;
+			Int32.TryParse(RailsContext.Request.Params[PaginationHelper.PageParameterName] as string, out currentPage);
+			IPaginatedPage page = PaginationHelper.CreatePagination(elements, 5, currentPage);
 			
 			PropertyBag["page"] = page;
 			PropertyBag["name"] = name;
 			
 			base.Render();
-		}
-
-		public override bool SupportsSection(string name)
-		{
-			return base.SupportsSection(name);
 		}
 	}
 }

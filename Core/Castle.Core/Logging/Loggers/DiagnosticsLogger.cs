@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,12 +61,14 @@ namespace Castle.Core.Logging
 			// Create the source, if it does not already exist.
 			if (!EventLog.SourceExists(source, machineName))
 			{
-				EventLog.CreateEventSource(source, logName, machineName);
+				EventSourceCreationData eventSourceCreationData = new EventSourceCreationData(source, logName);
+				eventSourceCreationData.MachineName = machineName;
+				EventLog.CreateEventSource(eventSourceCreationData);
 			}
 
 			eventLog = new EventLog(logName, machineName, source);
 		}
-		
+
 		~DiagnosticsLogger()
 		{
 			Close(false);
@@ -108,19 +110,20 @@ namespace Castle.Core.Logging
 		protected override void Log(LoggerLevel level, string name, string message, Exception exception)
 		{
 			if (eventLog == null) return; // just in case it was disposed
-			
+
 			EventLogEntryType type = TranslateLevel(level);
-			
+
 			String contentToLog;
-			
+
 			if (exception == null)
 			{
 				contentToLog = string.Format("[{0}] '{1}' message: {2}", level.ToString(), name, message);
 			}
 			else
 			{
-				contentToLog = string.Format("[{0}] '{1}' message: {2} exception: {3} {4} {5}", 
-					level.ToString(), name, message, exception.GetType(), exception.Message, exception.StackTrace);
+				contentToLog = string.Format("[{0}] '{1}' message: {2} exception: {3} {4} {5}",
+				                             level.ToString(), name, message, exception.GetType(), exception.Message,
+				                             exception.StackTrace);
 			}
 
 			eventLog.WriteEntry(contentToLog, type);

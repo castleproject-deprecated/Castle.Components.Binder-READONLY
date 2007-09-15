@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,7 @@
 
 namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 {
-	
-#if DOTNET2
-
-
-	[ActiveRecord("disctable"), JoinedBase]
+	[ActiveRecord("disctable", Lazy = false), JoinedBase]
 	public class GenClassJoinedSubClassParent : ActiveRecordValidationBase<GenClassJoinedSubClassParent>
 	{
 		private int id;
@@ -39,7 +35,7 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 		}
 	}
 
-	[ActiveRecord("disctablea")]
+	[ActiveRecord("disctablea", Lazy = false)]
 	public class GenClassJoinedSubClassA : GenClassJoinedSubClassParent
 	{
 		private int aid;
@@ -59,6 +55,4 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 			set { age = value; }
 		}
 	}
-	
-#endif
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,9 +60,10 @@ namespace Castle.MonoRail.Framework.Filters
 		{
 			set
 			{
-				if ( !(value is LocalizationFilterAttribute) )
+				if (!(value is LocalizationFilterAttribute))
 				{
-					throw new ConfigurationException( "LocalizationFilter can only be defined by a LocalizationFilterAttribute." );
+					String message = "LocalizationFilter can only be defined by a LocalizationFilterAttribute.";
+					throw new ConfigurationErrorsException(message);
 				}
 
 				setup = value as LocalizationFilterAttribute;
@@ -73,20 +74,18 @@ namespace Castle.MonoRail.Framework.Filters
 
 		#region IFilter Members
 
-		public bool Perform( ExecuteEnum exec, IRailsEngineContext context, Controller controller )
+		public bool Perform(ExecuteEnum exec, IRailsEngineContext context, Controller controller)
 		{
 			try
 			{
-				String localeId	= GetLocaleId( context );
+				String localeId = GetLocaleId(context);
 
-				if ( localeId == null && setup.UseBrowser )
+				if (localeId == null && setup.UseBrowser)
+					localeId = GetUserLanguage(context.Request);
+
+				if (localeId != null)
 				{
-					localeId = GetUserLanguage( context.Request );
-				}
-				
-				if ( localeId != null )
-				{
-					CultureInfo culture = CultureInfo.CreateSpecificCulture( localeId );
+					CultureInfo culture = CultureInfo.CreateSpecificCulture(localeId);
 
 					Thread.CurrentThread.CurrentCulture = culture;
 					Thread.CurrentThread.CurrentUICulture = culture;
@@ -94,40 +93,38 @@ namespace Castle.MonoRail.Framework.Filters
 			}
 			catch
 			{
-				if ( setup.FailOnError ) throw;
+				if (setup.FailOnError) throw;
 			}
-			
+
 			return true;
 		}
 
-        #endregion
+		#endregion
 
 		#region Get locale id from the store
 
-		private String GetUserLanguage( IRequest request )
+		private String GetUserLanguage(IRequest request)
 		{
-			if ( request.UserLanguages != null && request.UserLanguages.Length > 0 )
-			{
+			if (request.UserLanguages != null && request.UserLanguages.Length > 0)
 				return request.UserLanguages[0];
-			}
 
-			return null;	
+			return null;
 		}
 
-		private String GetLocaleId( IRailsEngineContext context )
+		private String GetLocaleId(IRailsEngineContext context)
 		{
-			switch ( setup.Store )
+			switch(setup.Store)
 			{
 				case RequestStore.Session:
-					return context.Session[ setup.Key ] as String;
+					return context.Session[setup.Key] as String;
 				case RequestStore.Cookie:
-					return context.Request.ReadCookie( setup.Key );
+					return context.Request.ReadCookie(setup.Key);
 				case RequestStore.QueryString:
-					return context.Request.QueryString[ setup.Key ];
+					return context.Request.QueryString[setup.Key];
 				case RequestStore.Form:
-					return context.Request.Form[ setup.Key ];
+					return context.Request.Form[setup.Key];
 				case RequestStore.Params:
-					return context.Request.Params[ setup.Key ];
+					return context.Request.Params[setup.Key];
 			}
 
 			return null;

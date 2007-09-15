@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,19 +23,19 @@ namespace Castle.Facilities.NHibernateIntegration.Tests
 		private string name;
 		private IList items;
 
-		public int Id
+		public virtual int Id
 		{
 			get { return id; }
 			set { id = value; }
 		}
 
-		public string Name
+		public virtual string Name
 		{
 			get { return name; }
 			set { name = value; }
 		}
 
-		public IList Items
+		public virtual IList Items
 		{
 			get { return items; }
 			set { items = value; }

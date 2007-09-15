@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@ namespace Castle.MonoRail.Framework.Helpers
 {
 	using System;
 	using System.Collections;
-#if DOTNET2
 	using System.Collections.Generic;
-#endif
+	using System.Collections.Specialized;
 
 	/// <summary>
 	/// Used as callback handler to obtain the items 
@@ -32,6 +31,10 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// </summary>
 	public class PaginationHelper : AbstractHelper
 	{
+		public const string PageParameterName = "page";
+
+		#region CreatePageLink
+
 		/// <summary>
 		/// Creates a link to navigate to a specific page
 		/// </summary>
@@ -76,31 +79,52 @@ namespace Castle.MonoRail.Framework.Helpers
 				queryStringParams = new Hashtable(queryStringParams);
 			}
 
-			queryStringParams["page"] = page.ToString();
+			queryStringParams[PageParameterName] = page.ToString();
 
-			return String.Format("<a href=\"{0}?{1}\" {2}>{3}</a>", 
-				filePath, BuildQueryString(queryStringParams), GetAttributes(htmlAttributes), text);
+			return String.Format("<a href=\"{0}?{1}\" {2}>{3}</a>",
+			                     filePath, BuildQueryString(queryStringParams), GetAttributes(htmlAttributes), text);
 		}
+
+		/// <summary>
+		/// Creates a link to navigate to a specific page
+		/// </summary>
+		/// <param name="page">Page index</param>
+		/// <param name="text">Link text</param>
+		/// <param name="htmlAttributes">Attributes for the anchor tag</param>
+		/// <returns>An anchor tag</returns>
+		public String CreatePageLinkWithCurrentQueryString(int page, String text, IDictionary htmlAttributes)
+		{
+			NameValueCollection queryStringParams = Controller.Request.QueryString;
+			IDictionary dictionary = null;
+			if (queryStringParams != null && queryStringParams.Count > 0)
+			{
+				dictionary = new Hashtable(queryStringParams.Count);
+				foreach(string key in queryStringParams.Keys)
+				{
+					if (key != null)
+					{
+						dictionary[key] = queryStringParams.GetValues(key);
+					}
+				}
+			}
+			return CreatePageLink(page, text, htmlAttributes, dictionary);
+		}
+
+		#endregion
+
+		#region CreatePagination
 
 		/// <summary>
 		/// Creates a <see cref="Page"/> which is a sliced view of
 		/// the data source
 		/// </summary>
+		/// <param name="controller">the current controller</param>
 		/// <param name="datasource">Data source to be used as target of the pagination</param>
 		/// <param name="pageSize">Page size</param>
 		/// <returns>A <see cref="Page"/> instance</returns>
-		public static IPaginatedPage CreatePagination(IList datasource, int pageSize)
+		public static IPaginatedPage CreatePagination(Controller controller, IList datasource, int pageSize)
 		{
-			String currentPage = CurrentContext.Request.Params["page"];
-
-			int curPage = 1;
-
-			if (currentPage != null)
-			{
-				curPage = Int32.Parse(currentPage);
-			}
-
-			return CreatePagination(datasource, pageSize, curPage);
+			return CreatePagination(datasource, pageSize, GetCurrentPageFromRequest(controller));
 		}
 
 		/// <summary>
@@ -118,27 +142,21 @@ namespace Castle.MonoRail.Framework.Helpers
 			return new Page(datasource, currentPage, pageSize);
 		}
 
-#if DOTNET2
+		#endregion
+
+		#region CreatePagination<T>
 
 		/// <summary>
 		/// Creates a <see cref="Page"/> which is a sliced view of
 		/// the data source
 		/// </summary>
+		/// <param name="controller">the current controller</param>
 		/// <param name="datasource">Data source to be used as target of the pagination</param>
 		/// <param name="pageSize">Page size</param>
 		/// <returns>A <see cref="Page"/> instance</returns>
-		public static IPaginatedPage CreatePagination<T>(IList<T> datasource, int pageSize)
+		public static IPaginatedPage CreatePagination<T>(Controller controller, ICollection<T> datasource, int pageSize)
 		{
-			String currentPage = CurrentContext.Request.Params["page"];
-
-			int curPage = 1;
-
-			if (currentPage != null)
-			{
-				curPage = Int32.Parse(currentPage);
-			}
-
-			return CreatePagination(datasource, pageSize, curPage);
+			return CreatePagination<T>(datasource, pageSize, GetCurrentPageFromRequest(controller));
 		}
 
 		/// <summary>
@@ -149,15 +167,17 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="pageSize">Page size</param>
 		/// <param name="currentPage">current page index (1 based)</param>
 		/// <returns>A <see cref="Page"/> instance</returns>
-		public static IPaginatedPage CreatePagination<T>(IList<T> datasource, int pageSize, int currentPage)
+		public static IPaginatedPage CreatePagination<T>(ICollection<T> datasource, int pageSize, int currentPage)
 		{
 			if (currentPage <= 0) currentPage = 1;
 
 			return new GenericPage<T>(datasource, currentPage, pageSize);
 		}
 
-#endif
-		
+		#endregion
+
+		#region CreateCachedPagination
+
 		/// <summary>
 		/// Creates a <see cref="Page"/> which is a sliced view of
 		/// the data source. This method first looks for the datasource 
@@ -165,24 +185,109 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// it invokes the <c>dataObtentionCallback</c> and caches the result
 		/// using the specifed <c>cacheKey</c>
 		/// </summary>
+		/// <param name="controller">the current controller</param>
 		/// <param name="cacheKey">Cache key used to query/store the datasource</param>
 		/// <param name="pageSize">Page size</param>
 		/// <param name="dataObtentionCallback">Callback to be used to populate the cache</param>
 		/// <returns>A <see cref="Page"/> instance</returns>
-		public static IPaginatedPage CreateCachedPagination(String cacheKey, int pageSize, DataObtentionDelegate dataObtentionCallback)
+		public static IPaginatedPage CreateCachedPagination(Controller controller, String cacheKey, int pageSize,
+		                                                    DataObtentionDelegate dataObtentionCallback)
 		{
-			IList datasource = (IList) CurrentContext.Cache[cacheKey];
+			IList datasource = (IList) GetCache(controller).Get(cacheKey);
 
 			if (datasource == null)
 			{
 				datasource = dataObtentionCallback();
 
-				CurrentContext.Cache.Insert(
-					cacheKey, datasource, null, 
-					DateTime.MaxValue, TimeSpan.FromSeconds(10));
+				GetCache(controller).Store(cacheKey, datasource);
 			}
 
-			return CreatePagination(datasource, pageSize);
+			return CreatePagination(controller, datasource, pageSize);
+		}
+
+		#endregion
+
+		#region CreateCustomPage
+
+		/// <summary>
+		/// Creates a <see cref="Page"/> which is a sliced view of
+		/// the data source
+		/// <para>
+		/// Assumes that the slicing is managed by the caller.
+		/// </para>
+		/// </summary>
+		/// <param name="controller">the current controller</param>
+		/// <param name="datasource">Data source to be used as target of the pagination</param>
+		/// <param name="pageSize">Page size</param>
+		/// <param name="total">The total of items in the datasource</param>
+		/// <returns>A <see cref="Page"/> instance</returns>
+		public static IPaginatedPage CreateCustomPage(Controller controller, IList datasource, int pageSize, int total)
+		{
+			return CreateCustomPage(datasource, pageSize, GetCurrentPageFromRequest(controller), total);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Page"/> which is a sliced view of
+		/// the data source
+		/// <para>
+		/// Assumes that the slicing is managed by the caller.
+		/// </para>
+		/// </summary>
+		/// <param name="datasource">Data source to be used as target of the pagination</param>
+		/// <param name="pageSize">Page size</param>
+		/// <param name="total">The total of items in the datasource</param>
+		/// <param name="currentPage">The current page index (1 based).</param>
+		/// <returns></returns>
+		public static IPaginatedPage CreateCustomPage(IList datasource, int pageSize, int currentPage, int total)
+		{
+			if (currentPage <= 0) currentPage = 1;
+
+			return new Page(datasource, currentPage, pageSize, total);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Page"/> which is a sliced view of
+		/// the data source
+		/// <para>
+		/// Assumes that the slicing is managed by the caller.
+		/// </para>
+		/// </summary>
+		/// <param name="datasource">Data source to be used as target of the pagination</param>
+		/// <param name="pageSize">Page size</param>
+		/// <param name="total">The total of items in the datasource</param>
+		/// <param name="currentPage">The current page index (1 based).</param>
+		/// <returns></returns>
+		public static IPaginatedPage CreateCustomPage<T>(IList<T> datasource, int pageSize, int currentPage, int total)
+		{
+			if (currentPage <= 0) currentPage = 1;
+
+			return new GenericCustomPage<T>(datasource, currentPage, pageSize, total);
+		}
+
+		#endregion
+
+		private static ICacheProvider GetCache(Controller controller)
+		{
+			return controller.Context.Cache;
+		}
+
+		private static int GetCurrentPageFromRequest(Controller controller)
+		{
+			String currentPage = GetParameter(controller, PageParameterName);
+
+			int curPage = 1;
+
+			if (currentPage != null && currentPage != String.Empty)
+			{
+				curPage = Int32.Parse(currentPage);
+			}
+
+			return curPage <= 0 ? 1 : curPage;
+		}
+
+		private static string GetParameter(Controller controller, string parameterName)
+		{
+			return controller.Context.Request.Params[parameterName];
 		}
 	}
 
@@ -190,9 +295,26 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// Represents the sliced data and offers
 	/// a few read only properties to create a pagination bar.
 	/// </summary>
+	[Serializable]
 	public class Page : AbstractPage
 	{
 		private readonly IList slice = new ArrayList();
+		private int startIndex;
+		private int endIndex;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Page"/> class.
+		/// </summary>
+		/// <param name="curPage">The desired page index</param>
+		/// <param name="pageSize">The desired page size</param>
+		/// <param name="total">The total of items in the data source.</param>
+		protected Page(int curPage, int pageSize, int total)
+		{
+			startIndex = (pageSize * curPage) - pageSize;
+			endIndex = Math.Min(startIndex + pageSize, total);
+
+			CalculatePaginationInfo(startIndex, endIndex, total, pageSize, curPage);
+		}
 
 		/// <summary>
 		/// Constructs a Page using the specified parameters
@@ -200,15 +322,21 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="list">The whole set</param>
 		/// <param name="curPage">The desired page index</param>
 		/// <param name="pageSize">The desired page size</param>
-		public Page(IList list, int curPage, int pageSize)
+		public Page(IList list, int curPage, int pageSize) : this(curPage, pageSize, list.Count)
 		{
-			// Calculate slice indexes
-			int startIndex = (pageSize * curPage) - pageSize;
-			int endIndex =  Math.Min(startIndex + pageSize, list.Count);
-
 			CreateSlicedCollection(startIndex, endIndex, list);
+		}
 
-			CalculatePaginationInfo(startIndex, endIndex, list.Count, pageSize, curPage);
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Page"/> class.
+		/// </summary>
+		/// <param name="slice">The sliced list.</param>
+		/// <param name="curPage">The desired page index</param>
+		/// <param name="pageSize">The desired page size</param>
+		/// <param name="total">The total of items (not in the list, but on the original source).</param>
+		public Page(IList slice, int curPage, int pageSize, int total) : this(curPage, pageSize, total)
+		{
+			this.slice = slice;
 		}
 
 		/// <summary>
@@ -221,7 +349,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			for(int index = startIndex; index < endIndex; index++)
 			{
-				slice.Add( list[index] );
+				slice.Add(list[index]);
 			}
 		}
 
@@ -236,47 +364,107 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 	}
 
-#if DOTNET2
-
 	/// <summary>
 	/// Represents the sliced data and offers
 	/// a few read only properties to create a pagination bar.
 	/// </summary>
+	[Serializable]
 	public class GenericPage<T> : AbstractPage
 	{
 		private readonly int sliceStart, sliceEnd;
-		private readonly IList<T> sourceList;
+		private readonly ICollection<T> sourceList;
 
-		public GenericPage(IList<T> list, int curPage, int pageSize)
+		public GenericPage(ICollection<T> list, int curPage, int pageSize)
 		{
 			// Calculate slice indexes
-			int startIndex = this.sliceStart = (pageSize * curPage) - pageSize;
-			int endIndex = this.sliceEnd = Math.Min(startIndex + pageSize, list.Count);
+			int startIndex = sliceStart = (pageSize * curPage) - pageSize;
+			int endIndex = sliceEnd = Math.Min(startIndex + pageSize, list.Count);
 
-			this.sourceList = list;
+			sourceList = list;
 
 			CalculatePaginationInfo(startIndex, endIndex, list.Count, pageSize, curPage);
 		}
 
 		public override IEnumerator GetEnumerator()
 		{
-			for (int i = sliceStart; i < sliceEnd; i++)
+			if (sourceList is IList<T>)
 			{
-				yield return this.sourceList[i];
+				IList<T> list = (IList<T>) sourceList;
+				for(int i = sliceStart; i < sliceEnd; i++)
+				{
+					yield return list[i];
+				}
+			}
+			else if (sourceList is IList)
+			{
+				IList list = (IList) sourceList;
+				for(int i = sliceStart; i < sliceEnd; i++)
+				{
+					yield return list[i];
+				}
+			}
+			else
+			{
+				IEnumerator en = sourceList.GetEnumerator();
+				for(int i = 0; i < sliceEnd; i++)
+				{
+					if (!en.MoveNext())
+						yield break;
+
+					if (i < sliceStart)
+						continue;
+
+					yield return en.Current;
+				}
 			}
 		}
 	}
 
-#endif
-	
+	/// <summary>
+	/// Represents the sliced data and offers
+	/// a few read only properties to create a pagination bar.
+	/// </summary>
+	[Serializable]
+	public class GenericCustomPage<T> : AbstractPage, IEnumerable<T>
+	{
+		private readonly IList<T> sourceList;
+
+		public GenericCustomPage(IList<T> list, int curPage, int pageSize, int total)
+		{
+			int startIndex = 0;
+			int endIndex = Math.Min(startIndex + pageSize, list.Count);
+
+			sourceList = list;
+
+			CalculatePaginationInfo(startIndex, endIndex, total, pageSize, curPage);
+		}
+
+		public override IEnumerator GetEnumerator()
+		{
+			for(int i = 0; i < sourceList.Count; i++)
+			{
+				yield return sourceList[i];
+			}
+		}
+
+		IEnumerator<T> IEnumerable<T>.GetEnumerator()
+		{
+			for(int i = 0; i < sourceList.Count; i++)
+			{
+				yield return sourceList[i];
+			}
+		}
+	}
+
 	/// <summary>
 	/// Abstract implementation of <see cref="IPaginatedPage"/>
 	/// which performs the standard calculations on 
 	/// <see cref="CalculatePaginationInfo"/>
 	/// </summary>
+	[Serializable]
 	public abstract class AbstractPage : IPaginatedPage
 	{
-		private int firstItem, lastItem, totalItems;
+		private int firstItem, lastItem, totalItems, pageSize;
 		private int previousIndex, nextIndex, lastIndex, curIndex;
 		private bool hasPrev, hasNext, hasFirst, hasLast;
 
@@ -294,17 +482,19 @@ namespace Castle.MonoRail.Framework.Helpers
 			firstItem = count != 0 ? startIndex + 1 : 0;
 			lastItem = endIndex;
 			totalItems = count;
-	
+
 			hasPrev = startIndex != 0;
 			hasNext = count == -1 || (startIndex + pageSize) < count;
 			hasFirst = curPage != 1;
 			hasLast = count > curPage * pageSize;
-	
+
 			curIndex = curPage;
 			previousIndex = curPage - 1;
 			nextIndex = curPage + 1;
 			lastIndex = count == -1 ? -1 : count / pageSize;
-	
+
+			this.pageSize = pageSize;
+
 			if (count != -1 && count / (float) pageSize > lastIndex)
 			{
 				lastIndex++;
@@ -350,7 +540,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			get { return nextIndex; }
 		}
-		
+
 		/// <summary>
 		/// The first element (index + 1)
 		/// </summary>
@@ -373,6 +563,15 @@ namespace Castle.MonoRail.Framework.Helpers
 		public int TotalItems
 		{
 			get { return totalItems; }
+		}
+
+		/// <summary>
+		/// Gets the size of the page.
+		/// </summary>
+		/// <value>The size of the page.</value>
+		public int PageSize
+		{
+			get { return pageSize; }
 		}
 
 		/// <summary>
@@ -409,6 +608,16 @@ namespace Castle.MonoRail.Framework.Helpers
 		public bool HasLast
 		{
 			get { return hasLast; }
+		}
+
+		/// <summary>
+		/// Checks whether the specified page exists.
+		/// Useful for Google-like pagination.
+		/// </summary>
+		/// <param name="pageNumber">The page number</param>
+		public bool HasPage(int pageNumber)
+		{
+			return pageNumber <= LastIndex;
 		}
 
 		/// <summary>

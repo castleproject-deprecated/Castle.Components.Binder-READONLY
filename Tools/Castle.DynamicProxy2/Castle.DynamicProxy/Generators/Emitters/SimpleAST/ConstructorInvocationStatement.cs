@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,15 +27,15 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 		{
 			if (method == null) throw new ArgumentNullException("method");
 			if (args == null) throw new ArgumentNullException("args");
-			
-			this.cmethod = method;
+
+			cmethod = method;
 			this.args = args;
 		}
 
 		public override void Emit(IMemberEmitter member, ILGenerator gen)
 		{
 			gen.Emit(OpCodes.Ldarg_0);
-			
+
 			foreach(Expression exp in args)
 			{
 				exp.Emit(member, gen);

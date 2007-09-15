@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 namespace Castle.DynamicProxy.Generators
 {
+	using System;
 	using System.Reflection;
-
 	using Castle.DynamicProxy.Generators.Emitters;
 
 	public class PropertyToGenerate
@@ -24,7 +24,8 @@ namespace Castle.DynamicProxy.Generators
 		private readonly PropertyEmitter emitter;
 		private readonly MethodInfo getMethod, setMethod;
 
-		public PropertyToGenerate(bool canRead, bool canWrite, PropertyEmitter emitter, MethodInfo getMethod, MethodInfo setMethod)
+		public PropertyToGenerate(bool canRead, bool canWrite, PropertyEmitter emitter, MethodInfo getMethod,
+		                          MethodInfo setMethod)
 		{
 			this.canRead = canRead;
 			this.canWrite = canWrite;

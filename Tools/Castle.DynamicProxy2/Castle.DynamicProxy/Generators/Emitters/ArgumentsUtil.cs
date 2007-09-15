@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	using System;
 	using System.Reflection;
 	using System.Reflection.Emit;
-
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
 	public abstract class ArgumentsUtil
@@ -30,12 +29,13 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 			reference.LoadReference(il);
 		}
-		
-		public static void InitializeArgumentsByPosition(ArgumentReference[] args)
+
+		public static void InitializeArgumentsByPosition(ArgumentReference[] args, bool isStatic)
 		{
-			for(int i=0; i < args.Length; ++i)
+			int offset = isStatic ? 0 : 1;
+			for(int i = 0; i < args.Length; ++i)
 			{
-				args[i].Position = i+1;
+				args[i].Position = i + offset;
 			}
 		}
 
@@ -43,9 +43,9 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		{
 			Type[] types = new Type[args.Length];
 
-			for(int i=0; i < args.Length; ++i)
+			for(int i = 0; i < args.Length; ++i)
 			{
-				args[i].Position = i+1;
+				args[i].Position = i + 1;
 				types[i] = args[i].Type;
 			}
 
@@ -55,10 +55,10 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		public static ArgumentReference[] ConvertToArgumentReference(Type[] args)
 		{
 			ArgumentReference[] arguments = new ArgumentReference[args.Length];
-			
-			for(int i=0; i < args.Length; ++i)
+
+			for(int i = 0; i < args.Length; ++i)
 			{
-				arguments[i] = new ArgumentReference( args[i] );
+				arguments[i] = new ArgumentReference(args[i]);
 			}
 
 			return arguments;
@@ -67,10 +67,10 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		public static ArgumentReference[] ConvertToArgumentReference(ParameterInfo[] args)
 		{
 			ArgumentReference[] arguments = new ArgumentReference[args.Length];
-			
-			for(int i=0; i < args.Length; ++i)
+
+			for(int i = 0; i < args.Length; ++i)
 			{
-				arguments[i] = new ArgumentReference( args[i].ParameterType );
+				arguments[i] = new ArgumentReference(args[i].ParameterType);
 			}
 
 			return arguments;
@@ -79,8 +79,8 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		public static Expression[] ConvertArgumentReferenceToExpression(ArgumentReference[] args)
 		{
 			Expression[] expressions = new Expression[args.Length];
-			
-			for(int i=0; i < args.Length; ++i)
+
+			for(int i = 0; i < args.Length; ++i)
 			{
 				expressions[i] = args[i].ToExpression();
 			}

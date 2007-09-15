@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 	public class TestProjectExtension : IWizardExtension
 	{
 		private string localTestProjectPath;
+		private string testProjectName;
 		private MRTestPanel panel;
 
 		#region IWizardExtension implementation
@@ -55,15 +56,24 @@ namespace Castle.VSNetIntegration.CastleWizards
 			if (!panel.WantsTestProject) return;
 			
 			String testProjectFile = context.GetTemplateFileName(@"CSharp\MRProjectTest\MRProjectTest.csproj");
+			testProjectName = context.ProjectName + ".Tests";
+			string nameSpace = Utils.CreateValidIdentifierFromName(context.ProjectName);
 
-			localTestProjectPath = new DirectoryInfo(Path.Combine(context.LocalProjectPath, @"..\" + context.ProjectName + ".Tests")).FullName;
+			localTestProjectPath = new DirectoryInfo(Path.Combine(context.LocalProjectPath, 
+				@"..\" + testProjectName)).FullName;
 
 			Utils.EnsureDirExists(localTestProjectPath);
 
-			Project testProject = 
-				context.DteInstance.Solution.AddFromTemplate(testProjectFile, 
-				                                             localTestProjectPath, 
-				                                             context.ProjectName + ".Tests.csproj", false);
+			Project testProject = context.DteInstance.Solution
+				.AddFromTemplate(testProjectFile, 
+					localTestProjectPath, 
+					context.ProjectName + ".Tests.csproj", false);
+
+			Utils.AddReference(testProject, context.Projects[Constants.ProjectMain]);
+
+			Utils.PerformReplacesOn(testProject, nameSpace, localTestProjectPath, "Controllers\\ContactControllerTestCase.cs");
+			Utils.PerformReplacesOn(testProject, nameSpace, localTestProjectPath, "Controllers\\HomeControllerTestCase.cs");
+			Utils.PerformReplacesOn(testProject, nameSpace, localTestProjectPath, "Controllers\\LoginControllerTestCase.cs");
 
 			context.Projects.Add(Constants.ProjectTest, testProject);
 		}
@@ -74,15 +84,6 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 		private void OnPostProcess(object sender, ExtensionContext context)
 		{
-			if (!panel.WantsTestProject) return;
-
-			Project project = context.Projects[Constants.ProjectMain];
-			Project testProject = context.Projects[Constants.ProjectTest];
-
-			String name = project.Name;
-			
-			Utils.PerformReplacesOn(testProject, name, localTestProjectPath, "HomeControllerTestCase.cs");
-			Utils.PerformReplacesOn(testProject, name, context.LocalProjectPath, "App.config");
 		}
 		
 		private void AddPanels(object sender, WizardDialog dlg, ExtensionContext context)
@@ -94,11 +95,6 @@ namespace Castle.VSNetIntegration.CastleWizards
 		
 		private void OnSetupBuildEvent(object sender, ExtensionContext context)
 		{
-			if (!panel.WantsTestProject) return;
-			
-			Project testProject = context.Projects[Constants.ProjectTest];
-
-			Utils.AddCommonPostBuildEvent(testProject);
 		}
 	}
 }

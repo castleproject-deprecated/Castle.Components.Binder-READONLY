@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ namespace Castle.DynamicProxy.Tests.Classes
 
 	public class DiffAccessLevelOnProperties
 	{
-		int age, age2;
-		int maxval, maxval2;
-		String name;
-		
+		private int age, age2;
+		private int maxval, maxval2;
+		private String name;
+
 		public void SetProperties()
 		{
 			Age = 10;

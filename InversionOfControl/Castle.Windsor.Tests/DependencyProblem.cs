@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,7 @@
 
 namespace Castle.Windsor.Tests
 {
-	using System;
-
 	using NUnit.Framework;
-
 
 	/// <summary>
 	/// Reported at http://forum.castleproject.org/posts/list/17.page
@@ -40,7 +37,7 @@ namespace Castle.Windsor.Tests
 			container.AddComponent("B", typeof(B));
 			container.AddComponent("A", typeof(A));
 
-			Assert.IsNotNull(container["A"]);			
+			Assert.IsNotNull(container["A"]);
 			Assert.IsNotNull(container["B"]);
 			Assert.IsNotNull(container["C"]);
 		}
@@ -52,11 +49,11 @@ namespace Castle.Windsor.Tests
 			container.AddComponent("C", typeof(C));
 			container.AddComponent("A", typeof(A));
 
-			Assert.IsNotNull(container["A"]);			
+			Assert.IsNotNull(container["A"]);
 			Assert.IsNotNull(container["B"]);
 			Assert.IsNotNull(container["C"]);
 		}
-	
+
 		[Test]
 		public void LoadingOutOfSequence()
 		{
@@ -64,7 +61,7 @@ namespace Castle.Windsor.Tests
 			container.AddComponent("B", typeof(B));
 			container.AddComponent("C", typeof(C));
 
-			Assert.IsNotNull(container["A"]);			
+			Assert.IsNotNull(container["A"]);
 			Assert.IsNotNull(container["B"]);
 			Assert.IsNotNull(container["C"]);
 		}
@@ -77,9 +74,16 @@ namespace Castle.Windsor.Tests
 			container.AddComponent("C", typeof(C));
 			container.AddComponent("NotUsed", typeof(int));
 
-			Assert.IsNotNull(container["A"]);			
+			Assert.IsNotNull(container["A"]);
 			Assert.IsNotNull(container["B"]);
 			Assert.IsNotNull(container["C"]);
+		}
+
+		[Test]
+		public void CtorSourceOrderDoesNotMatter()
+		{
+			container.AddComponent("D", typeof(D));
+			Assert.IsNotNull(container["D"]);
 		}
 
 		public class A
@@ -99,6 +103,17 @@ namespace Castle.Windsor.Tests
 		public class C
 		{
 			public C()
+			{
+			}
+		}
+
+		public class D
+		{
+			public D(B b)
+			{
+			}
+
+			public D()
 			{
 			}
 		}

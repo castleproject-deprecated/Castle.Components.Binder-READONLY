@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace Castle.Facilities.Remoting.Tests
 		public void CommonAppConsumingRemoteComponentsCallback()
 		{
 			ICalcService service = (ICalcService) 
-				Activator.GetObject( typeof(ICalcService), "tcp://localhost:2133/calcservice" );
+				Activator.GetObject( typeof(ICalcService), "tcp://localhost:2133/calcservice.rem" );
 
 			Assert.IsTrue( RemotingServices.IsTransparentProxy( service ) );
 			Assert.IsTrue( RemotingServices.IsObjectOutOfAppDomain(service) );

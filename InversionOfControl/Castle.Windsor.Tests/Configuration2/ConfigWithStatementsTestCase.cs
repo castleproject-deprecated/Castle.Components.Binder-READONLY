@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,22 @@ namespace Castle.Windsor.Tests.Configuration2
 {
 	using System;
 	using System.IO;
-	using Castle.Windsor.Tests;
-	using NUnit.Framework;
-
 	using Castle.Core.Configuration;
-
-	using Castle.MicroKernel;		
+	using Castle.MicroKernel;
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class ConfigWithStatementsTestCase
 	{
-		String dir = ConfigHelper.ResolveConfigPath("Configuration2/");
+		private String dir = ConfigHelper.ResolveConfigPath("Configuration2/");
 
 		private IWindsorContainer container;
 
 		[Test]
 		public void SimpleIf()
 		{
-			String file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir + 
-				"config_with_if_stmt.xml");
+			String file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir +
+			                                                                  "config_with_if_stmt.xml");
 
 			container = new WindsorContainer(file);
 
@@ -66,10 +63,10 @@ namespace Castle.Windsor.Tests.Configuration2
 		[Test]
 		public void SimpleChoose()
 		{
-			foreach(string flag in new string[]{ "debug", "prod", "qa", "default" } )
+			foreach(string flag in new string[] {"debug", "prod", "qa", "default"})
 			{
-				String file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir + 
-					"config_with_define_" + flag + ".xml");
+				String file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir +
+				                                                                  "config_with_define_" + flag + ".xml");
 
 				container = new WindsorContainer(file);
 
@@ -79,7 +76,7 @@ namespace Castle.Windsor.Tests.Configuration2
 
 				IConfiguration config = store.GetComponentConfiguration(flag);
 
-				Assert.IsNotNull(config);				
+				Assert.IsNotNull(config);
 			}
 		}
 	}

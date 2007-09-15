@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,10 +70,11 @@ namespace Castle.Core.Logging
 		protected override void Log(LoggerLevel level, String name, String message, Exception exception)
 		{
 			Console.Out.WriteLine(string.Format("[{0}] '{1}' {2}", level.ToString(), name, message));
-				
-			if(exception != null)
+
+			if (exception != null)
 			{
-				Console.Out.WriteLine("[{0}] '{1}' {2}: {3} {4}", level.ToString(), name, exception.GetType().FullName, exception.Message, exception.StackTrace);
+				Console.Out.WriteLine("[{0}] '{1}' {2}: {3} {4}", level.ToString(), name, exception.GetType().FullName,
+				                      exception.Message, exception.StackTrace);
 			}
 		}
 

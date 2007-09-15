@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ namespace Castle.MonoRail.Framework.Internal
 		private SkipRescueAttribute skipRescue;
 		private AccessibleThroughAttribute accessibleThrough;
 		private IList skipFilters = new ArrayList();
-
+		private IList cacheConfigurers = new ArrayList();
+		private TransformFilterDescriptor[] transformFilters = new TransformFilterDescriptor[] {};
+		
 		public SkipRescueAttribute SkipRescue
 		{
 			get { return skipRescue; }
@@ -42,6 +44,17 @@ namespace Castle.MonoRail.Framework.Internal
 		public IList SkipFilters
 		{
 			get { return skipFilters; }
+		}
+
+		public IList CacheConfigurers
+		{
+			get { return cacheConfigurers; }
+		}
+
+		public TransformFilterDescriptor[] TransformFilters
+		{
+			get { return transformFilters; }
+			set { transformFilters = value; }
 		}
 	}
 }

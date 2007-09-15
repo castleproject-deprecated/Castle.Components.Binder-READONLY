@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,12 +31,25 @@ namespace Castle.MicroKernel
 	[Serializable]
 	public sealed class CreationContext : MarshalByRefObject, ISubDependencyResolver
 	{
-		public readonly static CreationContext Empty = new CreationContext(new DependencyModel[0]);
+		/// <summary>Creates a new, empty <see cref="CreationContext" /> instance.</summary>
+		/// <remarks>A new CreationContext should be created every time, as the contexts keeps some state related to dependency resolution.</remarks>
+		public static CreationContext Empty
+		{
+			get { return new CreationContext(new DependencyModel[0]); }
+		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		private readonly IHandler handler;
+
+		/// <summary>
+		/// The list of handlers that are used to resolve
+		/// the component.
+		/// We track that in order to try to avoid attempts to resolve a service
+		/// with itself.
+		/// </summary>
+        private readonly ArrayList handlersChain = new ArrayList();
 
 		private readonly IDictionary additionalArguments;
 
@@ -46,11 +59,7 @@ namespace Castle.MicroKernel
 		/// </summary>
 		private readonly DependencyModelCollection dependencies;
 
-		#if DOTNET2
-		
 		private readonly Type[] genericArguments;
-		
-		#endif
 
 		public CreationContext(IHandler handler, IDictionary additionalArguments)
 		{
@@ -59,26 +68,18 @@ namespace Castle.MicroKernel
 			dependencies = new DependencyModelCollection();
 		}
 
-		public CreationContext(IHandler handler, CreationContext parentContext)
-		{
-			this.handler = handler;
-			additionalArguments = parentContext.additionalArguments;
-			dependencies = new DependencyModelCollection(parentContext.Dependencies);
-		}
-
 		public CreationContext(DependencyModel[] dependencies)
 		{
-			this.handler = null;
+			handler = null;
 			this.dependencies = new DependencyModelCollection(dependencies);
 		}
 
-		public CreationContext(IHandler handler, DependencyModelCollection dependencies)
+		public CreationContext(IHandler handler, DependencyModelCollection dependencies, IList handlersChain)
 			: this(handler, (IDictionary)null)
 		{
 			this.dependencies = new DependencyModelCollection(dependencies);
+            this.handlersChain.AddRange(handlersChain);
 		}
-
-		#if DOTNET2
 
 		public CreationContext(IHandler handler, Type typeToExtractGenericArguments, IDictionary additionalArguments)
 			: this(handler, additionalArguments)
@@ -86,43 +87,42 @@ namespace Castle.MicroKernel
 			genericArguments = ExtractGenericArguments(typeToExtractGenericArguments);
 		}
 
-		public CreationContext(IHandler handler, Type typeToExtractGenericArguments, 
-		                       CreationContext parentContext) : this(handler, parentContext.Dependencies)
+		public CreationContext(IHandler handler, Type typeToExtractGenericArguments,
+							   CreationContext parentContext)
+			: this(handler, parentContext.Dependencies, parentContext.handlersChain)
 		{
 			additionalArguments = parentContext.additionalArguments;
 			genericArguments = ExtractGenericArguments(typeToExtractGenericArguments);
 		}
 
-		#endif
+		#region ISubDependencyResolver
 
-		#region ISubDependencyResolver 
-
-		public object Resolve(CreationContext context, ISubDependencyResolver parentResolver, 
-		                      ComponentModel model, DependencyModel dependency)
+		public object Resolve(CreationContext context, ISubDependencyResolver parentResolver,
+							  ComponentModel model, DependencyModel dependency)
 		{
 			if (additionalArguments != null)
 			{
 				return additionalArguments[dependency.DependencyKey];
 			}
-			
+
 			return null;
 		}
 
-		public bool CanResolve(CreationContext context, ISubDependencyResolver parentResolver, 
-		                       ComponentModel model, DependencyModel dependency)
+		public bool CanResolve(CreationContext context, ISubDependencyResolver parentResolver,
+							   ComponentModel model, DependencyModel dependency)
 		{
 			if (dependency.DependencyKey == null) return false;
-			
+
 			if (additionalArguments != null)
 			{
 				return additionalArguments.Contains(dependency.DependencyKey);
 			}
-			
+
 			return false;
 		}
 
 		#endregion
-		
+
 		public bool HasAdditionalParameters
 		{
 			get { return additionalArguments != null && additionalArguments.Count != 0; }
@@ -138,83 +138,12 @@ namespace Castle.MicroKernel
 
 		#region Cycle detection related members
 
-		/// <summary>
-		/// Track dependencies and guards against circular dependencies.
-		/// </summary>
-		/// <returns>A dependency key that can be used to remove the dependency if it was resolved correctly.</returns>
-		public DependencyModel TrackDependency(MemberInfo info, DependencyModel dependencyModel)
-		{
-			if (dependencies.Contains(dependencyModel))
-			{
-				StringBuilder sb = new StringBuilder("A cycle was detected when trying to resolve a dependency. ");
-				
-				sb.Append("The dependency graph that resulted in a cycle is:");
-
-				foreach(DependencyModel key in dependencies)
-				{
-					DependencyModelExtended extendedInfo = key as DependencyModelExtended;
-					
-					if (extendedInfo != null)
-					{
-						sb.AppendFormat("\r\n - {0} for {1} in type {2}",
-							key.ToString(), extendedInfo.Info, extendedInfo.Info.DeclaringType);
-					}
-					else
-					{
-						sb.AppendFormat("\r\n - {0}", key.ToString());
-					}
-				}
-
-				sb.AppendFormat("\r\n + {0} for {1} in {2}\r\n",
-				                dependencyModel, info, info.DeclaringType);
-
-				throw new CircularDependecyException(sb.ToString());
-			}
-
-			DependencyModelExtended trackingKey = new DependencyModelExtended(dependencyModel, info);
-			dependencies.Add(trackingKey);
-			return trackingKey;
-		}
-
-		/// <summary>
-		/// Removes a dependency that was resolved successfully.
-		/// </summary>
-		public void UntrackDependency(DependencyModel model)
-		{
-			dependencies.Remove(model);
-		}
-
 		public DependencyModelCollection Dependencies
 		{
 			get { return dependencies; }
 		}
 
-		/// <summary>
-		/// Extends <see cref="DependencyModel"/> adding <see cref="MemberInfo"/>
-		/// information. This is only useful to provide detailed information 
-		/// on exceptions.
-		/// </summary>
-		[Serializable]
-		internal class DependencyModelExtended : DependencyModel
-		{
-			private readonly MemberInfo info;
-
-			public DependencyModelExtended(DependencyModel inner, MemberInfo info)
-				:
-				base(inner.DependencyType, inner.DependencyKey, inner.TargetType, inner.IsOptional)
-			{
-				this.info = info;
-			}
-
-			public MemberInfo Info
-			{
-				get { return info; }
-			}
-		}
-
 		#endregion
-
-		#if DOTNET2
 
 		public Type[] GenericArguments
 		{
@@ -226,6 +155,36 @@ namespace Castle.MicroKernel
 			return typeToExtractGenericArguments.GetGenericArguments();
 		}
 
-		#endif
+		/// <summary>
+		/// Check if we are now in the middle of resolving this handler, 
+		/// and as such, we shouldn't try to resolve that.
+		/// </summary>
+		public bool HandlerIsCurrentlyBeingResolved(IHandler handlerToTest)
+		{
+			return handlersChain.Contains(handlerToTest);
+		}
+
+		public IDisposable ResolvingHandler(IHandler handlerBeingResolved)
+		{
+			handlersChain.Add(handlerBeingResolved);
+			return new RemoveHandlerFromCurrentlyResolving(this, handlerBeingResolved);
+		}
+
+		private class RemoveHandlerFromCurrentlyResolving : IDisposable
+		{
+			private readonly CreationContext parent;
+			private readonly IHandler handler;
+
+			public RemoveHandlerFromCurrentlyResolving(CreationContext parent, IHandler handler)
+			{
+				this.parent = parent;
+				this.handler = handler;
+			}
+
+			public void Dispose()
+			{
+				parent.handlersChain.Remove(handler);
+			}
+		}
 	}
 }

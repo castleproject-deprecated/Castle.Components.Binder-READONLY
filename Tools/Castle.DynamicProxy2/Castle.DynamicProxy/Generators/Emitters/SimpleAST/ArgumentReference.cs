@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,13 +17,19 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 	using System;
 	using System.Reflection.Emit;
 
-	[CLSCompliant(false)]
 	public class ArgumentReference : TypeReference
 	{
 		private int position = -1;
 
-		public ArgumentReference(Type argumentType) : base(argumentType)
+		public ArgumentReference(Type argumentType)
+			: base(argumentType)
 		{
+		}
+
+		public ArgumentReference (Type argumentType, int position)
+			: base (argumentType)
+		{
+			Position = position;
 		}
 
 		internal int Position
@@ -60,9 +66,11 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 
 		public override void StoreReference(ILGenerator gen)
 		{
-			// Invalid operation
-			// We'd like to keep arguments read-only
-			throw new NotImplementedException();
+			if (Position == -1)
+			{
+				throw new ApplicationException("ArgumentReference unitialized");
+			}
+			gen.Emit(OpCodes.Starg, Position);
 		}
 
 		public override void LoadAddressOfReference(ILGenerator gen)

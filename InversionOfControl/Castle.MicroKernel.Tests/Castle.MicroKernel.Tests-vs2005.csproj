@@ -34,7 +34,7 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
@@ -45,7 +45,7 @@
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -69,10 +69,11 @@
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
@@ -110,6 +111,7 @@
     <Compile Include="ClassComponents\ClassWithListConstructor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ClassComponents\ClassWithTwoParametersWithSameType.cs" />
     <Compile Include="ClassComponents\CommonImpl1.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -125,6 +127,7 @@
     <Compile Include="ClassComponents\ComponentFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ClassComponents\CommonImplWithDependancy.cs" />
     <Compile Include="ClassComponents\CustomerImpl.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -158,12 +161,18 @@
     <Compile Include="ClassComponents\ICustomer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ClassComponents\Repository.cs" />
+    <Compile Include="Configuration\Components\ClassWithComplexParameter.cs" />
     <Compile Include="Configuration\Components\ClassWithConstructors.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Configuration\ConfigurationTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Facilities\FactorySupport\FactorySupportProgrammaticTestCase.cs" />
+    <Compile Include="Facilities\FactorySupport\FactorySupportTestCase.cs" />
+    <Compile Include="Facilities\Startable\Components\StartableComponentWithCustomDependencies.cs" />
+    <Compile Include="KeySearchNamingSubSystemTestCase.cs" />
     <Compile Include="DefaultConversionManagerTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -194,9 +203,11 @@
     <Compile Include="Lifecycle\Components\HttpFakeServer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Lifestyle\DecomissioningResponsibilitiesTestCase.cs" />
     <Compile Include="Lifecycle\LifecycleTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Lifestyle\Components\PerWebRequestComponent.cs" />
     <Compile Include="Lifestyle\Components\CustomComponent.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -244,9 +255,13 @@
     <Compile Include="SubContainers\SubContainersTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TransientMultiConstructorTestCase.cs" />
     <Compile Include="UnsatisfiedDependenciesTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

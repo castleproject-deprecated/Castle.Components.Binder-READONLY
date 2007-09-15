@@ -29,17 +29,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Components.Binder, Version=0.0.1.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="Castle.Components.Binder, Version=0.0.1.1, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Castle.Components.Binder.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Components.Validator, Version=0.0.1.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Castle.Components.Validator.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Components.Common.EmailSender, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Castle.Components.Common.EmailSender.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Components.Common.EmailSender.SmtpEmailSender, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Castle.Components.Common.EmailSender.SmtpEmailSender.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -56,20 +56,34 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\css\style.css" />
+    <Content Include="Content\images\ar.jpg" />
+    <Content Include="Content\images\mr.png" />
+    <Content Include="Content\images\top_bar.jpg" />
+    <Content Include="Content\images\windsor.jpg" />
+    <Content Include="Content\js\behaviour.js" />
+    <Content Include="Content\js\formhelper.js" />
+    <Content Include="Content\js\prototype.js" />
+    <Content Include="Content\js\scriptaculous.js" />
     <Content Include="Default.aspx" />
     <Content Include="global.asax" />
     <Content Include="Readme.txt" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Models\ContactInfo.cs" />
+    <Compile Include="Models\Country.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Content\css\" />
-    <Folder Include="Content\images\" />
+    <Folder Include="Views\Contact\" />
     <Folder Include="Views\Home\" />
     <Folder Include="Views\layouts\" />
+    <Folder Include="Views\Login\" />
     <Folder Include="Views\rescues\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

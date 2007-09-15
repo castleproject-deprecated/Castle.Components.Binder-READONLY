@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ namespace Castle.Core.Logging.Tests
 {
 	using System;
 	using System.Diagnostics;
+	using System.Security.Principal;
 	using NUnit.Framework;
 
 	[TestFixture]
@@ -24,9 +25,19 @@ namespace Castle.Core.Logging.Tests
 		[SetUp]
 		public void Clear()
 		{
+			AssertAdmin();
 			if (EventLog.Exists("castle_testlog"))
 			{
 				EventLog.Delete("castle_testlog");
+			}
+		}
+
+		private void AssertAdmin()
+		{
+			WindowsPrincipal windowsPrincipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+			if(windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator)==false)
+			{
+				Assert.Ignore("This test case only valid when running as admin");
 			}
 		}
 

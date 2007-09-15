@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,7 +57,8 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 			String expected = "<form  onsubmit=\"new Ajax.Request('something.rails', " 
 				+ "{onSuccess:function(request) { javascriptcode } , onFailure:function("
 				+ "request) { javascriptcode } , asynchronous:true, evalScripts:true, "
-				+ "parameters:Form.serialize(this)}); return false;\" enctype=\"multipart/form-data\">";
+				+ "parameters:Form.serialize(this)}); return false;\" enctype=\"multipart/form-data\" "
+				+ "action=\"something.rails\" method=\"post\" >";
 
 			String actual = helper.BuildFormRemoteTag( new DictHelper().CreateDict("url=something.rails", "onfailure=javascriptcode", "onsuccess=javascriptcode") );
 			

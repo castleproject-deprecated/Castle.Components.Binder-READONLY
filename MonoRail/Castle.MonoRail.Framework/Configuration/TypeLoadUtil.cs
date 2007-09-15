@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@ namespace Castle.MonoRail.Framework.Configuration
 
 			if (loadedType == null && !ignoreError)
 			{
-				throw new ConfigurationException(String.Format("The type {0} could not be found", typeName));
+				String message = String.Format("The type {0} could not be found", typeName);
+				throw new ConfigurationErrorsException(message);
 			}
 			
 			return loadedType;
@@ -50,7 +51,7 @@ namespace Castle.MonoRail.Framework.Configuration
 			String assemblyName = thisAssembly.GetName().Name;
 			String assemblyFullName = thisAssembly.GetName().FullName;
 			
-			return String.Format("{0}{1}", typeName, assemblyFullName.Substring(assemblyName.Length));
+			return typeName + assemblyFullName.Substring(assemblyName.Length);
 		}
 	}
 }

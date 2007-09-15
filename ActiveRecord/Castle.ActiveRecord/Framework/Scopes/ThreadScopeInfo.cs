@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,19 @@ namespace Castle.ActiveRecord.Framework.Scopes
 	using System;
 	using System.Collections;
 
+	/// <summary>
+	/// This <see cref="IThreadScopeInfo"/> implementation will first get the current scope from the current 
+	/// thread. Do NOT use on web scenario (web applications or web services).
+	/// </summary>
 	public sealed class ThreadScopeInfo : AbstractThreadScopeInfo
 	{
 		static readonly Object syncObject = new Object();
 		[ThreadStatic] static Stack stack;
-		
+
+		/// <summary>
+		/// Gets the current stack.
+		/// </summary>
+		/// <value>The current stack.</value>
 		public override Stack CurrentStack
 		{
 			get

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ namespace Castle.MonoRail.WindsorExtension
 
 	/// <summary>
 	/// Facility responsible for registering the controllers in
-	/// the tree.
+	/// the controllerTree.
 	/// </summary>
 	public class RailsFacility : AbstractFacility
 	{
-		private IControllerTree tree;
+		private IControllerTree controllerTree;
+		private IViewComponentRegistry componentRegistry;
 
 		public RailsFacility()
 		{
@@ -37,14 +38,23 @@ namespace Castle.MonoRail.WindsorExtension
 
 		protected override void Init()
 		{
+			RegisterWindsorLocationWithinMonoRail();
+
 			Kernel.AddComponent("rails.controllertree", typeof(IControllerTree), typeof(DefaultControllerTree));
 			Kernel.AddComponent("rails.wizardpagefactory", typeof(IWizardPageFactory), typeof(DefaultWizardPageFactory));
+			Kernel.AddComponent("rails.viewcomponentregistry", typeof(IViewComponentRegistry), typeof(DefaultViewComponentRegistry));
 
-			tree = (IControllerTree) Kernel["rails.controllertree"];
+			controllerTree = (IControllerTree) Kernel["rails.controllertree"];
+			componentRegistry = (IViewComponentRegistry) Kernel["rails.viewcomponentregistry"];
 
-			Kernel.ComponentModelCreated += new ComponentModelDelegate(OnComponentModelCreated);
+			Kernel.ComponentModelCreated += OnComponentModelCreated;
 
 			AddBuiltInControllers();
+		}
+
+		private void RegisterWindsorLocationWithinMonoRail()
+		{
+			ServiceProviderLocator.Instance.AddLocatorStrategy(new WindsorAccessorStrategy());
 		}
 
 		protected virtual void AddBuiltInControllers()
@@ -55,20 +65,35 @@ namespace Castle.MonoRail.WindsorExtension
 		private void OnComponentModelCreated(ComponentModel model)
 		{
 			bool isController = typeof(Controller).IsAssignableFrom(model.Implementation);
+			bool isViewComponent = typeof(ViewComponent).IsAssignableFrom(model.Implementation);
 
-			if (!isController && !typeof(ViewComponent).IsAssignableFrom(model.Implementation))
+			if (!isController && !isViewComponent)
 			{
 				return;
 			}
 
 			// Ensure it's transient
 			model.LifestyleType = LifestyleType.Transient;
+			model.InspectionBehavior = PropertiesInspectionBehavior.DeclaredOnly;
 
 			if (isController)
 			{
 				ControllerDescriptor descriptor = ControllerInspectionUtil.Inspect(model.Implementation);
-			
-				tree.AddController( descriptor.Area, descriptor.Name, model.Name );
+
+				controllerTree.AddController(descriptor.Area, descriptor.Name, model.Implementation);
+			}
+
+			if (isViewComponent)
+			{
+				componentRegistry.AddViewComponent(model.Name, model.Implementation);
+			}
+		}
+
+		public class WindsorAccessorStrategy : ServiceProviderLocator.IAccessorStrategy
+		{
+			public IServiceProviderEx LocateProvider()
+			{
+				return WindsorContainerAccessorUtil.ObtainContainer();
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,43 +19,23 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 {
 	using System;
 	using System.Collections;
-
-	using Castle.MonoRail.Framework.Internal;
 	using Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives;
 
+	/// <summary>
+	/// Pendent
+	/// </summary>
 	public class CustomDirectiveManager : DirectiveManager
 	{
 		private static readonly String DirectiveSuffix = "directive";
 
 		private Hashtable directives = new Hashtable();
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CustomDirectiveManager"/> class.
+		/// </summary>
 		public CustomDirectiveManager()
 		{
 			RegisterCustomDirectives();
-		}
-
-		protected virtual void RegisterCustomDirectives()
-		{
-			RegisterCustomDirective(typeof(BlockComponentDirective));
-			RegisterCustomDirective(typeof(ComponentDirective));
-			RegisterCustomDirective(typeof(CaptureForDirective));
-		}
-
-		private void RegisterCustomDirective(Type type)
-		{
-			if (!typeof(Directive).IsAssignableFrom(type))
-			{
-				throw new RailsException("{0} is not a subclass of directive", type.FullName);
-			}
-
-			String name = type.Name.ToLower();
-
-			if (name.EndsWith(DirectiveSuffix))
-			{
-				name = name.Substring(0, name.Length - DirectiveSuffix.Length);
-			}
-
-			directives.Add(name, type);
 		}
 
 		public override bool Contains(string name)
@@ -73,7 +53,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 				if (typeof(AbstractComponentDirective).IsAssignableFrom(customDirective))
 				{
-					args = new object[] { GetViewComponentFactory() };
+					args = new object[] { GetViewComponentFactory(), GetViewEngine() };
 				}
 
 				return Activator.CreateInstance(customDirective, args) as Directive;
@@ -82,6 +62,30 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			{
 				return base.Create(name, directiveStack);
 			}
+		}
+
+		protected void RegisterCustomDirectives()
+		{
+			RegisterCustomDirective(typeof(BlockComponentDirective));
+			RegisterCustomDirective(typeof(ComponentDirective));
+			RegisterCustomDirective(typeof(CaptureForDirective));
+		}
+
+		private void RegisterCustomDirective(Type type)
+		{
+			if (!typeof(Directive).IsAssignableFrom(type))
+			{
+				throw new RailsException("{0} is not a subclass of directive", type.FullName);
+			}
+
+			String name = type.Name.ToLower(System.Globalization.CultureInfo.InvariantCulture);
+
+			if (name.EndsWith(DirectiveSuffix))
+			{
+				name = name.Substring(0, name.Length - DirectiveSuffix.Length);
+			}
+
+			directives.Add(name, type);
 		}
 
 		private IViewComponentFactory GetViewComponentFactory()
@@ -95,6 +99,19 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 
 			return compFactory;
+		}
+
+		private IViewEngine GetViewEngine()
+		{
+			IViewEngine viewEngine = (IViewEngine)
+				MonoRailHttpHandler.CurrentContext.GetService(typeof(IViewEngine));
+
+			if (viewEngine == null)
+			{
+				throw new RailsException("NVelocityViewEngine: could not obtain ViewEngine instance");
+			}
+
+			return viewEngine;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,17 @@
 
 namespace Castle.MicroKernel.Tests.DependencyResolving
 {
-	using System;
 	using System.Collections;
-
-	using NUnit.Framework;
-
 	using Castle.Core;
 	using Castle.Core.Configuration;
 	using Castle.MicroKernel.Tests.ClassComponents;
-
+	using NUnit.Framework;
 
 	/// <summary>
 	/// This test case ensures that the resolving event
 	/// is fired properly.
 	/// </summary>
-	[TestFixture] 
+	[TestFixture]
 	public class EventTests
 	{
 		private IKernel kernel;
@@ -38,38 +34,40 @@ namespace Castle.MicroKernel.Tests.DependencyResolving
 
 		#region Setup / Teardown
 
-		[SetUp] public void SetUp()
+		[SetUp]
+		public void SetUp()
 		{
 			kernel = new DefaultKernel();
 			kernel.DependencyResolving += new DependencyDelegate(AssertEvent);
 		}
 
-		[TearDown] public void TearDown()
+		[TearDown]
+		public void TearDown()
 		{
 			kernel.Dispose();
 		}
 
 		#endregion
 
-		[Test] 
+		[Test]
 		public void ResolvingPrimitivesThroughProperties()
 		{
 			MutableConfiguration config = new MutableConfiguration("component");
-			
-			MutableConfiguration parameters = (MutableConfiguration ) 
-				config.Children.Add( new MutableConfiguration("parameters") );
 
-			parameters.Children.Add( new MutableConfiguration("name", "hammett") );
-			parameters.Children.Add( new MutableConfiguration("address", "something") );
-			parameters.Children.Add( new MutableConfiguration("age", "25") );
+			MutableConfiguration parameters = (MutableConfiguration)
+			                                  config.Children.Add(new MutableConfiguration("parameters"));
+
+			parameters.Children.Add(new MutableConfiguration("name", "hammett"));
+			parameters.Children.Add(new MutableConfiguration("address", "something"));
+			parameters.Children.Add(new MutableConfiguration("age", "25"));
 
 			kernel.ConfigurationStore.AddComponentConfiguration("customer", config);
 
-			kernel.AddComponent( "customer", typeof(ICustomer), typeof(CustomerImpl) );
+			kernel.AddComponent("customer", typeof(ICustomer), typeof(CustomerImpl));
 
 			expectedClient = kernel.GetHandler("customer").ComponentModel;
 			expectedModels = new ArrayList();
-			foreach (PropertySet prop in kernel.GetHandler("customer").ComponentModel.Properties)
+			foreach(PropertySet prop in kernel.GetHandler("customer").ComponentModel.Properties)
 			{
 				expectedModels.Add(prop.Dependency);
 			}
@@ -79,12 +77,12 @@ namespace Castle.MicroKernel.Tests.DependencyResolving
 			Assert.IsNotNull(customer);
 		}
 
-		[Test] 
+		[Test]
 		public void ResolvingConcreteClassThroughProperties()
 		{
-			kernel.AddComponent( "spamservice", typeof(DefaultSpamService) );
-			kernel.AddComponent( "mailsender", typeof(DefaultMailSenderService) );
-			kernel.AddComponent( "templateengine", typeof(DefaultTemplateEngine) );
+			kernel.AddComponent("spamservice", typeof(DefaultSpamService));
+			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService));
+			kernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
 
 			DefaultMailSenderService mailservice = (DefaultMailSenderService) kernel["mailsender"];
 			DefaultTemplateEngine templateengine = (DefaultTemplateEngine) kernel["templateengine"];
@@ -94,7 +92,7 @@ namespace Castle.MicroKernel.Tests.DependencyResolving
 
 			expectedClient = kernel.GetHandler("spamservice").ComponentModel;
 			expectedModels = new ArrayList();
-			foreach (PropertySet prop in kernel.GetHandler("spamservice").ComponentModel.Properties)
+			foreach(PropertySet prop in kernel.GetHandler("spamservice").ComponentModel.Properties)
 			{
 				expectedModels.Add(prop.Dependency);
 			}
@@ -104,12 +102,12 @@ namespace Castle.MicroKernel.Tests.DependencyResolving
 			Assert.IsNotNull(spamservice);
 		}
 
-		[Test] 
+		[Test]
 		public void ResolvingConcreteClassThroughConstructor()
 		{
-			kernel.AddComponent( "spamservice", typeof(DefaultSpamServiceWithConstructor) );
-			kernel.AddComponent( "mailsender", typeof(DefaultMailSenderService) );
-			kernel.AddComponent( "templateengine", typeof(DefaultTemplateEngine) );
+			kernel.AddComponent("spamservice", typeof(DefaultSpamServiceWithConstructor));
+			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService));
+			kernel.AddComponent("templateengine", typeof(DefaultTemplateEngine));
 
 			DefaultMailSenderService mailservice = (DefaultMailSenderService) kernel["mailsender"];
 			DefaultTemplateEngine templateengine = (DefaultTemplateEngine) kernel["templateengine"];
@@ -118,9 +116,10 @@ namespace Castle.MicroKernel.Tests.DependencyResolving
 			Assert.IsNotNull(templateengine);
 
 			expectedClient = kernel.GetHandler("spamservice").ComponentModel;
-			expectedModels = new ArrayList(kernel.GetHandler("spamservice").ComponentModel.Constructors.FewerArgumentsCandidate.Dependencies);
+			expectedModels =
+				new ArrayList(kernel.GetHandler("spamservice").ComponentModel.Constructors.FewerArgumentsCandidate.Dependencies);
 
-			DefaultSpamServiceWithConstructor spamservice = 
+			DefaultSpamServiceWithConstructor spamservice =
 				(DefaultSpamServiceWithConstructor) kernel["spamservice"];
 
 			Assert.IsNotNull(spamservice);
@@ -130,7 +129,7 @@ namespace Castle.MicroKernel.Tests.DependencyResolving
 		{
 			bool ok = false;
 			Assert.AreEqual(expectedClient, client);
-			foreach (DependencyModel expectedModel in expectedModels)
+			foreach(DependencyModel expectedModel in expectedModels)
 			{
 				if (expectedModel.Equals(model))
 				{
@@ -139,7 +138,7 @@ namespace Castle.MicroKernel.Tests.DependencyResolving
 				}
 			}
 			Assert.IsTrue(ok);
-			Assert.IsNotNull(dependency);			
+			Assert.IsNotNull(dependency);
 		}
 	}
 }

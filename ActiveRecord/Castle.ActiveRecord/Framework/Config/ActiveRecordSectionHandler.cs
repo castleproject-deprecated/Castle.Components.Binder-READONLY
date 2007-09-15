@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 namespace Castle.ActiveRecord.Framework.Config
 {
 	using System;
-	using System.Xml;
 	using System.Configuration;
+	using System.Xml;
 
 	/// <summary>
 	/// Reads the configuration from a entry 'activerecord'
@@ -24,42 +24,42 @@ namespace Castle.ActiveRecord.Framework.Config
 	/// </summary>
 	public class ActiveRecordSectionHandler : XmlConfigurationSource, IConfigurationSectionHandler
 	{
-		public ActiveRecordSectionHandler()
-		{
-		}
-
+		/// <summary>
+		/// Creates a configuration section handler.
+		/// </summary>
+		/// <param name="parent"></param>
+		/// <param name="configContext">Configuration context object.</param>
+		/// <param name="section"></param>
+		/// <returns>The created section handler object.</returns>
 		public object Create(object parent, object configContext, XmlNode section)
 		{
 			PopulateSource(section);
-			
+
 			return this;
 		}
-		
+
+		/// <summary>
+		/// Gets the sole instance.
+		/// </summary>
+		/// <value>The instance.</value>
 		public static IConfigurationSource Instance
 		{
 			get
 			{
 				IConfigurationSource source;
-#if DOTNET2
+
 				source =
-					System.Configuration.ConfigurationManager.GetSection("activerecord") as IConfigurationSource;
-#else
-				source =
-					System.Configuration.ConfigurationSettings.GetConfig("activerecord") as IConfigurationSource;
-#endif
-				
+					ConfigurationManager.GetSection("activerecord") as IConfigurationSource;
+
 				if (source == null)
 				{
 					String message = "Could not obtain configuration from the AppDomain config file." +
-									 " Sorry, but you have to fill the configuration or provide a " +
-									 "IConfigurationSource instance yourself.";
-#if DOTNET2
-					throw new System.Configuration.ConfigurationErrorsException(message);
-#else
-					throw new System.Configuration.ConfigurationException(message);
-#endif
+					                 " Sorry, but you have to fill the configuration or provide a " +
+					                 "IConfigurationSource instance yourself.";
+
+					throw new ConfigurationErrorsException(message);
 				}
-				
+
 				return source;
 			}
 		}

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,10 +36,7 @@ namespace Castle.Core
 		/// <param name="dependencies">The dependencies.</param>
 		public DependencyModelCollection(DependencyModelCollection dependencies)
 		{
-			foreach(DependencyModel model in dependencies)
-			{
-				Add(model);
-			}
+			InnerList.AddRange(dependencies);
 		}
 
 		/// <summary>
@@ -48,10 +45,7 @@ namespace Castle.Core
 		/// <param name="dependencies">The dependencies.</param>
 		public DependencyModelCollection(DependencyModel[] dependencies)
 		{
-			foreach(DependencyModel model in dependencies)
-			{
-				Add(model);
-			}
+			InnerList.AddRange(dependencies);
 		}
 
 		/// <summary>
@@ -62,7 +56,7 @@ namespace Castle.Core
 		{
 			InnerList.Add(model);
 		}
-		
+
 		/// <summary>
 		/// Removes the specified model.
 		/// </summary>

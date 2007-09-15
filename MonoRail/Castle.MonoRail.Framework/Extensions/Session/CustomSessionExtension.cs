@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -89,17 +89,19 @@ namespace Castle.MonoRail.Framework.Extensions.Session
 
 			if (customSessionAtt == null || customSessionAtt.Value.Length == 0)
 			{
-				throw new ConfigurationException("The CustomSessionExtension requires that " + 
+				String message = "The CustomSessionExtension requires that " + 
 					"the type that implements ICustomSessionFactory be specified through the " + 
-					"'customSession' attribute on 'monoRail' configuration node");
+					"'customSession' attribute on 'monorail' configuration node";
+				throw new ConfigurationErrorsException(message);
 			}
 
 			Type customSessType = TypeLoadUtil.GetType(customSessionAtt.Value);
 
 			if (customSessType == null)
 			{
-				throw new ConfigurationException("The Type for the custom session could not be loaded. " + 
-					customSessionAtt.Value);
+				String message = "The Type for the custom session could not be loaded. " + 
+					customSessionAtt.Value;
+				throw new ConfigurationErrorsException(message);
 			}
 
 			try
@@ -108,8 +110,9 @@ namespace Castle.MonoRail.Framework.Extensions.Session
 			}
 			catch(InvalidCastException)
 			{
-				throw new ConfigurationException("The Type for the custom session must " + 
-					"implement ICustomSessionFactory. " + customSessionAtt.Value);
+				String message = "The Type for the custom session must " + 
+					"implement ICustomSessionFactory. " + customSessionAtt.Value;
+				throw new ConfigurationErrorsException(message);
 			}
 		}
 

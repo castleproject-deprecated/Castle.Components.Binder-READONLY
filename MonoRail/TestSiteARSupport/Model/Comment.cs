@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 namespace TestSiteARSupport.Model
 {
-	using System;
 	using Castle.ActiveRecord;
 
 	[ActiveRecord]
@@ -23,7 +22,6 @@ namespace TestSiteARSupport.Model
 		private int id;
 		private string from;
 		private string text;
-		private Condition condition;
 
 		public Comment()
 		{
@@ -54,13 +52,6 @@ namespace TestSiteARSupport.Model
 		{
 			get { return text; }
 			set { text = value; }
-		}
-
-		[BelongsTo]
-		public Condition Condition
-		{
-			get { return condition; }
-			set { condition = value; }
 		}
 
 		public static Comment[] FindAll()

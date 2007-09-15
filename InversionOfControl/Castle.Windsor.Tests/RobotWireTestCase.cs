@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,8 @@
 
 namespace Castle.Windsor.Tests
 {
-	using System;
-
-	using NUnit.Framework;
-
 	using Castle.Windsor.Tests.Components;
+	using NUnit.Framework;
 
 	/// <summary>
 	/// Check for existence of any problem, as 
@@ -34,8 +31,8 @@ namespace Castle.Windsor.Tests
 		{
 			container = new WindsorContainer(ConfigHelper.ResolveConfigPath("robotwireconfig.xml"));
 
-			Robot robot = (Robot) container[ typeof(Robot) ];
-			
+			Robot robot = (Robot) container[typeof(Robot)];
+
 			Assert.IsNotNull(robot);
 			Assert.IsNotNull(robot.Left);
 			Assert.IsNotNull(robot.Right);

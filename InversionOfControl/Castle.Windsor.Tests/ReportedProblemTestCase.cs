@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,8 @@
 
 namespace Castle.Windsor.Tests
 {
-	using System;
-
-	using NUnit.Framework;
-
 	using Castle.Windsor.Tests.Components;
-
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class ReportedProblemTestCase
@@ -39,7 +35,7 @@ namespace Castle.Windsor.Tests
 			container.AddComponent("B", typeof(Reviewer));
 			container.AddComponent("A", typeof(ReviewableEmployee));
 
-			Assert.IsNotNull(container["A"]);			
+			Assert.IsNotNull(container["A"]);
 			Assert.IsNotNull(container["B"]);
 			Assert.IsNotNull(container["C"]);
 		}

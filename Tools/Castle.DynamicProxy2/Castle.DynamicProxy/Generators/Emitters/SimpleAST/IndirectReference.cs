@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,10 +21,9 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 	/// Wraps a reference that is passed 
 	/// ByRef and provides indirect load/store support.
 	/// </summary>
-	[CLSCompliant(false)]
 	public class IndirectReference : TypeReference
 	{
-		public IndirectReference(TypeReference byRefReference) : 
+		public IndirectReference(TypeReference byRefReference) :
 			base(byRefReference, byRefReference.Type.GetElementType())
 		{
 			if (!byRefReference.Type.IsByRef)
@@ -44,7 +43,7 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 		{
 			TypeReference[] result = new TypeReference[references.Length];
 
-			for (int i = 0; i < references.Length; i++)
+			for(int i = 0; i < references.Length; i++)
 			{
 				result[i] = WrapIfByRef(references[i]);
 			}

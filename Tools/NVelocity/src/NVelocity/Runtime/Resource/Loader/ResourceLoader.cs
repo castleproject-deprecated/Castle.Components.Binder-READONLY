@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,12 +53,12 @@ namespace NVelocity.Runtime.Resource.Loader
 		/// </summary>
 		public void CommonInit(IRuntimeServices rs, ExtendedProperties configuration)
 		{
-			this.rsvc = rs;
+			rsvc = rs;
 
 			// these two properties are not required for all loaders.
 			// For example, for ClasspathLoader, what would cache mean? 
 			// so adding default values which I think are the safest
-			
+
 			// don't cache, and modCheckInterval irrelevant...
 
 			isCachingOn = configuration.GetBoolean("cache", false);
@@ -117,7 +117,7 @@ namespace NVelocity.Runtime.Resource.Loader
 		public long ModificationCheckInterval
 		{
 			get { return modificationCheckInterval; }
-			set { this.modificationCheckInterval = value; }
+			set { modificationCheckInterval = value; }
 		}
 	}
 }

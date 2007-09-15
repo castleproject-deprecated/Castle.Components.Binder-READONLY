@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace Castle.ActiveRecord.Framework.Internal
 	using System.Collections;
 	using System.Collections.Specialized;
 	using System.Data;
-	using System.Diagnostics;
 	using System.IO;
 
 	using NHibernate.Cfg;
@@ -34,12 +33,20 @@ namespace Castle.ActiveRecord.Framework.Internal
 		private readonly IDictionary connectionProperties;
 		private readonly Dialect dialect;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ARSchemaCreator"/> class.
+		/// </summary>
+		/// <param name="config">The config.</param>
 		public ARSchemaCreator(Configuration config)
 		{
-			this.connectionProperties = config.Properties;
-			this.dialect = Dialect.GetDialect(connectionProperties);
+			connectionProperties = config.Properties;
+			dialect = Dialect.GetDialect(connectionProperties);
 		}
 
+		/// <summary>
+		/// Executes the specified script file.
+		/// </summary>
+		/// <param name="scriptFileName">Name of the script file.</param>
 		public void Execute(String scriptFileName)
 		{
 			String[] parts = OpenFileAndStripContents(scriptFileName);
@@ -65,6 +72,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 		}
 
+		/// <summary>
+		/// Executes the script parts.
+		/// </summary>
+		/// <param name="connection">The connection.</param>
+		/// <param name="parts">The parts.</param>
 		public static void ExecuteScriptParts(IDbConnection connection, String[] parts)
 		{
 			using(IDbCommand statement = connection.CreateCommand())
@@ -87,6 +99,11 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 		}
 
+		/// <summary>
+		/// Opens the file and return an array of seperate commands that it contains
+		/// </summary>
+		/// <param name="scriptFileName">Name of the script file.</param>
+		/// <returns></returns>
 		public static String[] OpenFileAndStripContents(String scriptFileName)
 		{
 			if (scriptFileName == null)

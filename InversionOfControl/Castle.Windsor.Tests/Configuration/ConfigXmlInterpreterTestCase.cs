@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,11 @@
 
 namespace Castle.Windsor.Tests
 {
-	using Castle.Core.Resource;
 	using Castle.Core.Configuration;
+	using Castle.Core.Resource;
 	using Castle.MicroKernel;
 	using Castle.MicroKernel.SubSystems.Configuration;
 	using Castle.Windsor.Configuration.Interpreters;
-
 	using NUnit.Framework;
 
 	[TestFixture]
@@ -35,6 +34,7 @@ namespace Castle.Windsor.Tests
 
 			Assert.AreEqual(2, store.GetFacilities().Length);
 			Assert.AreEqual(2, store.GetComponents().Length);
+			Assert.AreEqual(2, store.GetConfigurationForChildContainers().Length);
 
 			IConfiguration config = store.GetFacilityConfiguration("testidengine");
 			IConfiguration childItem = config.Children["item"];
@@ -54,6 +54,16 @@ namespace Castle.Windsor.Tests
 			childItem = config.Children["item"];
 			Assert.IsNotNull(childItem);
 			Assert.AreEqual("value2", childItem.Value);
+
+			config = store.GetChildContainerConfiguration("child1");
+			Assert.IsNotNull(config);
+			Assert.AreEqual(config.Attributes["name"], "child1");
+			Assert.AreEqual("<configuration />", config.Value);
+
+			config = store.GetChildContainerConfiguration("child2");
+			Assert.IsNotNull(config);
+			Assert.AreEqual(config.Attributes["name"], "child2");
+			Assert.AreEqual("<configuration />", config.Value);
 		}
 
 		[Test]
@@ -63,7 +73,7 @@ namespace Castle.Windsor.Tests
 			XmlInterpreter interpreter = new XmlInterpreter(ConfigHelper.ResolveConfigPath("sample_config.xml"));
 			interpreter.ProcessResource(interpreter.Source, store);
 
-			WindsorContainer container = new WindsorContainer(store);			
+			WindsorContainer container = new WindsorContainer(store);
 
 			container.AddFacility("testidengine", new DummyFacility());
 		}
@@ -78,6 +88,7 @@ namespace Castle.Windsor.Tests
 
 			Assert.AreEqual(2, store.GetFacilities().Length);
 			Assert.AreEqual(2, store.GetComponents().Length);
+			Assert.AreEqual(2, store.GetConfigurationForChildContainers().Length);
 
 			IConfiguration config = store.GetFacilityConfiguration("testidengine");
 			IConfiguration childItem = config.Children["item"];
@@ -96,7 +107,17 @@ namespace Castle.Windsor.Tests
 			config = store.GetComponentConfiguration("testidcomponent2");
 			childItem = config.Children["item"];
 			Assert.IsNotNull(childItem);
-			Assert.AreEqual("value2", childItem.Value);;
+			Assert.AreEqual("value2", childItem.Value);
+
+			config = store.GetChildContainerConfiguration("child1");
+			Assert.IsNotNull(config);
+			Assert.AreEqual(config.Attributes["name"], "child1");
+			Assert.AreEqual("<configuration />", config.Value);
+
+			config = store.GetChildContainerConfiguration("child2");
+			Assert.IsNotNull(config);
+			Assert.AreEqual(config.Attributes["name"], "child2");
+			Assert.AreEqual("<configuration />", config.Value);
 		}
 
 		[Test]

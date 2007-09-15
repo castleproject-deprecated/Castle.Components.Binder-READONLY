@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,16 @@
 
 namespace Castle.ActiveRecord.Framework.Internal
 {
-	using System;
-
-
+	/// <summary>
+	/// For implementing the Visitor pattern.
+	/// All the nodes in the model implements this interface
+	/// </summary>
 	public interface IVisitable
 	{
+		/// <summary>
+		/// Accepts the specified visitor and call the relevant IVisitor.Visit***() method
+		/// </summary>
+		/// <param name="visitor">The visitor.</param>
 		void Accept(IVisitor visitor);
 	}
 }

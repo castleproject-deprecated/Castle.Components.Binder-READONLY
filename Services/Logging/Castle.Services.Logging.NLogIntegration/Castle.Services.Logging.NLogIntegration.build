@@ -2,7 +2,7 @@
 <project
 	name="Castle.Services.Logging.NLogIntegration"
 	default="build"
-	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
+	xmlns="http://nant.sf.net/release/0.85/nant.xsd"
 >
 
 	<property name="root.dir" value="../../.." />
@@ -13,7 +13,7 @@
 		<property name="assembly.description" value="Castle.Services.Logging implementation for NLog" />
 
 		<assemblyfileset id="project.references" basedir="${build.dir}">
-			<include name="nlog.dll" />
+			<include name="NLog.dll" />
 			<include name="Castle.Core.dll" />
 		</assemblyfileset>
 	</target>

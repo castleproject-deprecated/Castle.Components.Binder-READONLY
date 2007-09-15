@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 namespace NVelocity.Runtime.Parser.Node
 {
 	using System;
-	using NVelocity.Context;
+	using Context;
 
 	/// <summary>
 	/// Handles the equivalence operator
 	/// 
-	/// <arg1>  == <arg2>
+	/// &lt;arg1&gt;  == &lt;arg2&gt;
 	/// 
 	/// This operator requires that the LHS and RHS are both of the
 	/// same Class.
@@ -67,7 +67,7 @@ namespace NVelocity.Runtime.Parser.Node
 			// for equality, they are allowed to be null references 
 			try
 			{
-				if ( ObjectComparer.CompareObjects( left, right ) == 0 )
+				if (ObjectComparer.CompareObjects(left, right) == 0)
 					return true;
 			}
 			catch

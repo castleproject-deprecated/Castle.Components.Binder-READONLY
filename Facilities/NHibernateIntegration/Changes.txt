@@ -1,5 +1,17 @@
 Version beta 3
 
+- Applied David Bachmann's patch fixing FACILITIES-88
+  "Remove NH Facility dependency on NHibernate.Mapping.Attribute.dll"
+
+- Applied patch from Brian Chan 
+  "NHibernate.Mapping.Attribute Support"
+
+- Fixed FACILITIES-80
+  "Isolation Mode not applied when integrated with Transaction Services"
+
+- Fixed FACILITIES-54
+  "Integrate NHibernate facility with NHibernate 1.2"
+
 - Applied Curtis Schlak's patch fixing FACILITIES-52
   "Factory-Specific IInterceptors"
 

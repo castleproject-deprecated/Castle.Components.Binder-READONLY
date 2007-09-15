@@ -1,0 +1,50 @@
+Beta 1
+======
+
+- Fixed COMP-36
+  "Misleading validation error messages in english language"
+
+- Applied Ken Egozi's patch fixing COMP-40
+  "A possible typo in SameAsValidator causing possible invalid cast exception"
+
+- Applied Ken Egozi's patch adding NotSameAsValidator (COMP-41)
+
+- Added a decimal range validator
+
+- Made the range validator web enabled
+
+- Applied Brian DeMarzo's patch fixing COMP-30
+  "Improved handling of empty strings, client valiator script tweaks"
+
+- Applied Gokhan Altinoren's patch fixing COMP-28
+  "There isn't a ctor to set error message in 
+   ValidateGroupNotEmptyAttribute and ValidateCollectionNotEmptyAttribute"
+
+- Applied Yuri's patch fixing COMP-21
+  "NullableType Validators, Correct web-validation for primitive types"
+
+- Applied patch by Tim Haines fixing COMP-26
+  "Date Validator doesn't validate nulls. Problem occurs server side and client side."
+
+- Applied patch by David N. Godfrey that converted most of ActiveRecord's validators
+  to the Castle Validator component.
+
+- Added a way to use external resources to override the default messages.
+
+- Applied Brian DeMarzo's patch fixing COMP-20
+  "Added SetValidator"
+
+- Applied Yuri's patch fixing COMP-19
+  "Fixed some validation issues"
+
+- Applied Yuri's patch fixing COMP-18
+  "Clientside validation for date and regular expressions"
+
+- Applied Brian DeMarzo's patch fixing COMP-17
+  "Added overloaded constructors supporting RangeValidationType and object type conversion"
+
+- Applied Brian DeMarzo's patch fixing COMP-16
+  "RangeValidator cleanup, added RangeValidationType.String"
+
+- Applied Brian DeMarzo's patch adding a new validator: RangeValidator
+  Fixes COMP-15

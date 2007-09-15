@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#if DOTNET2
-
 namespace Castle.ActiveRecord.Queries
 {
 	using System;
@@ -26,6 +23,10 @@ namespace Castle.ActiveRecord.Queries
 	/// of the type <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">The resulting object type</typeparam>
+	/// <remarks>
+	/// If the query result is null, and <typeparamref name="T"/> is a value type,
+	/// the default value for that type will be returned.
+	/// </remarks>
 	public class ScalarQuery<T> : ScalarQuery, IActiveRecordQuery<T>
 	{
 		#region Constructors
@@ -59,6 +60,7 @@ namespace Castle.ActiveRecord.Queries
 		/// the target ActiveRecord type specified in <paramref name="targetType"/>.
 		/// </summary>
 		/// <param name="targetType">The target ActiveRecord type</param>
+		/// <param name="queryLanguage">The language of the query</param>
 		/// <param name="query">The query</param>
 		/// <param name="positionalParameters">The positional positionalParameters</param>
 		public ScalarQuery(Type targetType, QueryLanguage queryLanguage, String query, params Object[] positionalParameters)
@@ -71,6 +73,7 @@ namespace Castle.ActiveRecord.Queries
 		/// the target ActiveRecord type specified in <paramref name="targetType"/>.
 		/// </summary>
 		/// <param name="targetType">The target ActiveRecord type</param>
+		/// <param name="queryLanguage">The language of the query</param>
 		/// <param name="query">The query</param>
 		public ScalarQuery(Type targetType, QueryLanguage queryLanguage, String query)
 			: base(targetType, queryLanguage, query)
@@ -81,7 +84,8 @@ namespace Castle.ActiveRecord.Queries
 		#region IActiveRecordQuery<T> implementation
 		T IActiveRecordQuery<T>.Execute(ISession session)
 		{
-			return (T) InternalExecute(session);
+			object result = InternalExecute(session);
+			return result == null ? default(T) : (T)result;
 		}
 		#endregion
 
@@ -90,9 +94,8 @@ namespace Castle.ActiveRecord.Queries
 		/// </summary>
 		public T Execute()
 		{
-			return (T) ActiveRecordMediator.ExecuteQuery(this);
+			object result = ActiveRecordMediator.ExecuteQuery(this);
+			return result == null ? default(T) : (T) result;
 		}
 	}
 }
-
-#endif

@@ -1,4 +1,4 @@
- // Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+ // Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -95,6 +95,7 @@ namespace AspectSharp
 		/// your interceptors must be capable of respoding to them. 
 		/// </summary>
 		/// <param name="classType">Concrete class with a available constructor (public or protected) to be wrapped</param>
+		/// <param name="constructorArgs"></param>
 		/// <returns>A proxy</returns>
 		public virtual object WrapClass(Type classType, params object[] constructorArgs)
 		{

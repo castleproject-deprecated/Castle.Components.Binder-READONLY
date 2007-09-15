@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,32 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 	using Castle.ActiveRecord;
 
 	[ActiveRecord]
+	public class BadClassWithAnyAttribute : ActiveRecordBase
+	{
+		private int _id = 0;
+
+		[PrimaryKey(Access = PropertyAccess.NosetterCamelcaseUnderscore)]
+		public int Id
+		{
+			get { return _id; }
+		}
+
+		[Any(typeof(long), NotNull = true,
+			TypeColumn = "BILLING_DETAILS_TYPE",
+			IdColumn = "BILLING_DETAILS_ID",
+			Cascade = CascadeEnum.SaveUpdate)]
+		// [Any.MetaValue("CREDIT_CARD", typeof (CreditCard))]
+		[Any.MetaValue("BANK_ACCOUNT", typeof(BankAccount))]
+		public IPayment PaymentMethod
+		{
+			get { return null; }
+			set
+			{
+			}
+		}
+	}
+
+	[ActiveRecord]
 	public class ClassWithAnyAttribute : ActiveRecordBase
 	{
 		private int _id = 0;
@@ -29,18 +55,38 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 			get { return _id; }
 		}
 
-		[Any(typeof (long), MetaType=typeof (string),
+		[Any(typeof(long), MetaType=typeof(string), NotNull=true,
 			TypeColumn="BILLING_DETAILS_TYPE",
 			IdColumn="BILLING_DETAILS_ID",
 			Cascade=CascadeEnum.SaveUpdate)]
-		// [Any.MetaValue("CREDIT_CARD", typeof (CreditCard))]
-		[Any.MetaValue("BANK_ACCOUNT", typeof (BankAccount))]
+		[Any.MetaValue("BANK_ACCOUNT", typeof(BankAccount))]
 		public IPayment PaymentMethod
 		{
 			get { return null; }
-			set
-			{
-			}
+			set {}
+		}
+	}
+
+	[ActiveRecord]
+	public class ClassWithAnyAttributeUsingGenericId : ActiveRecordBase
+	{
+		private int _id = 0;
+
+		[PrimaryKey(Access = PropertyAccess.NosetterCamelcaseUnderscore)]
+		public int Id
+		{
+			get { return _id; }
+		}
+
+		[Any(typeof(long?), MetaType = typeof(string), NotNull = true,
+			TypeColumn = "BILLING_DETAILS_TYPE",
+			IdColumn = "BILLING_DETAILS_ID",
+			Cascade = CascadeEnum.SaveUpdate)]
+		[Any.MetaValue("BANK_ACCOUNT", typeof(BankAccount))]
+		public IPayment PaymentMethod
+		{
+			get { return null; }
+			set { }
 		}
 	}
 

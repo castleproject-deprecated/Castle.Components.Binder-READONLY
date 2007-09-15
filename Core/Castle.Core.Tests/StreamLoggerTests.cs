@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -144,7 +144,7 @@ namespace Castle.Core.Logging.Tests
 			LoggerLevel level = LoggerLevel.Fatal;
 			Exception exception = null;
 			
-			logger.FatalError(message);
+			logger.Fatal(message);
 
 			ValidateCall(level, message, exception);
 		}
@@ -156,7 +156,7 @@ namespace Castle.Core.Logging.Tests
 			LoggerLevel level = LoggerLevel.Fatal;
 			Exception exception = new Exception();
 			
-			logger.FatalError(message, exception);
+			logger.Fatal(message, exception);
 
 			ValidateCall(level, message, exception);
 		}

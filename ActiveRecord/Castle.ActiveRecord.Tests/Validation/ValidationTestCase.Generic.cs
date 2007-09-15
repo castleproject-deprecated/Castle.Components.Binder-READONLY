@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,16 @@
 
 namespace Castle.ActiveRecord.Tests.Validation
 {
-#if DOTNET2
 	using System;
-
+	using System.Collections;
+	using System.Globalization;
+	using System.Reflection;
+	using System.Threading;
+	using Castle.ActiveRecord.Tests.Validation.Model.GenericModel;
 	using NUnit.Framework;
 
 	using Castle.ActiveRecord.Tests.Validation.GenericModel;
+	using Castle.Components.Validator;
 
 	[TestFixture]
 	public class ValidationTestCaseGeneric : AbstractActiveRecordTest
@@ -45,31 +49,75 @@ namespace Castle.ActiveRecord.Tests.Validation
 		[Test]
 		public void ErrorMessages()
 		{
-			ActiveRecordStarter.Initialize( GetConfigSource(), typeof(User) );
+			Thread.CurrentThread.CurrentCulture =
+				Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+
+			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(User));
 
 			User user = new User();
+			Type type = user.GetType();
+			PropertyInfo info;
+			ArrayList propertyMessages;
 
-			Assert.IsFalse(user.IsValid()); 
+			Assert.IsFalse(user.IsValid());
 			Assert.AreEqual(5, user.ValidationErrorMessages.Length);
-			Assert.AreEqual("Login is not optional.", user.ValidationErrorMessages[0]);
-			Assert.AreEqual("Name is not optional.", user.ValidationErrorMessages[1]);
-			Assert.AreEqual("Email is not optional.", user.ValidationErrorMessages[2]);
-			Assert.AreEqual("Password is not optional.", user.ValidationErrorMessages[3]);
-			Assert.AreEqual("ConfirmationPassword is not optional.", user.ValidationErrorMessages[4]);
+			Assert.AreEqual("This is a required field", user.ValidationErrorMessages[0]);
+			Assert.AreEqual("This is a required field", user.ValidationErrorMessages[1]);
+			Assert.AreEqual("This is a required field", user.ValidationErrorMessages[2]);
+			Assert.AreEqual("This is a required field", user.ValidationErrorMessages[3]);
+			Assert.AreEqual("This is a required field", user.ValidationErrorMessages[4]);
+
+			Assert.AreEqual(5, user.PropertiesValidationErrorMessage.Count);
+
+			info = type.GetProperty("Login");
+			Assert.IsTrue(user.PropertiesValidationErrorMessage.Contains(info));
+			propertyMessages = (ArrayList)user.PropertiesValidationErrorMessage[info];
+			Assert.AreEqual(1, propertyMessages.Count);
+			Assert.AreEqual("This is a required field", propertyMessages[0]);
+
+			info = type.GetProperty("Name");
+			Assert.IsTrue(user.PropertiesValidationErrorMessage.Contains(info));
+			propertyMessages = (ArrayList)user.PropertiesValidationErrorMessage[info];
+			Assert.AreEqual(1, propertyMessages.Count);
+			Assert.AreEqual("This is a required field", propertyMessages[0]);
+
+			info = type.GetProperty("Email");
+			Assert.IsTrue(user.PropertiesValidationErrorMessage.Contains(info));
+			propertyMessages = (ArrayList)user.PropertiesValidationErrorMessage[info];
+			Assert.AreEqual(1, propertyMessages.Count);
+			Assert.AreEqual("This is a required field", propertyMessages[0]);
+
+			info = type.GetProperty("Password");
+			Assert.IsTrue(user.PropertiesValidationErrorMessage.Contains(info));
+			propertyMessages = (ArrayList)user.PropertiesValidationErrorMessage[info];
+			Assert.AreEqual(1, propertyMessages.Count);
+			Assert.AreEqual("This is a required field", propertyMessages[0]);
+
+			info = type.GetProperty("ConfirmationPassword");
+			Assert.IsTrue(user.PropertiesValidationErrorMessage.Contains(info));
+			propertyMessages = (ArrayList)user.PropertiesValidationErrorMessage[info];
+			Assert.AreEqual(1, propertyMessages.Count);
+			Assert.AreEqual("This is a required field", propertyMessages[0]);
 
 			user.Name = "hammett";
 			user.Login = "hammett";
 			user.Email = "hammett@gmail.com";
 			user.Password = "123x";
 			user.ConfirmationPassword = "123";
-			
-			Assert.IsFalse(user.IsValid()); 
+
+			Assert.IsFalse(user.IsValid());
 			Assert.AreEqual(1, user.ValidationErrorMessages.Length);
-			Assert.AreEqual("Field Password doesn't match with confirmation.", user.ValidationErrorMessages[0]);
+			Assert.AreEqual("Fields do not match", user.ValidationErrorMessages[0]);
+
+			info = type.GetProperty("Password");
+			Assert.IsTrue(user.PropertiesValidationErrorMessage.Contains(info));
+			propertyMessages = (ArrayList)user.PropertiesValidationErrorMessage[info];
+			Assert.AreEqual(1, propertyMessages.Count);
+			Assert.AreEqual("Fields do not match", propertyMessages[0]);
 
 			user.Password = "123";
 
-			Assert.IsTrue(user.IsValid()); 
+			Assert.IsTrue(user.IsValid());
 			Assert.AreEqual(0, user.ValidationErrorMessages.Length);
 		}
 
@@ -167,6 +215,18 @@ namespace Castle.ActiveRecord.Tests.Validation
 
 			Assert.IsTrue( c1.IsValid() );
 		}
+
+		[Test]
+		public void ValidateIsUnique()
+		{
+			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(TimeSlotFixedDate));
+			Recreate();
+
+			TimeSlotFixedDate timeDate = new TimeSlotFixedDate();
+			timeDate.Hour = 1;
+			timeDate.Name = null;
+
+			Assert.IsFalse(timeDate.IsValid());
+		} 
 	}
-#endif
 }

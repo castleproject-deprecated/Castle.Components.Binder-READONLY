@@ -1,5 +1,3 @@
-$ValidationHelper.InstallScripts()
-
 <h2>New ${model.Type.Name}</h2>
 
 #if($flash.errors)
@@ -10,65 +8,63 @@ $ValidationHelper.InstallScripts()
 </ul>
 #end
 
-#set ($validatorForm = "return validateForm( this, false, false, false, false, 5 )" )
-
 #if($useModelName)
-$PresentationHelper.Form("create${model.Type.Name}", "scaffoldingform", "post", $validatorForm)
+$Form.FormTag("%{action='create${model.Type.Name}', id='scaffoldingform'}")
 #else
-$PresentationHelper.Form("create", "scaffoldingform", "post", $validatorForm)
+$Form.FormTag("%{action='create', id='scaffoldingform'}")
 #end
 
 <div id="scaffoldmain">
 
-#foreach($curmodel in $HtmlHelper.GetModelHierarchy($model, $instance))
+#foreach($curmodel in $Form.GetModelHierarchy($model, $instance))
 
 #if($curmodel.IsNestedType)
-  $HtmlHelper.FieldSet("${curmodel.Type.Name}:")
+  $Form.FieldSet("${curmodel.Type.Name}:")
 #end
 
 #foreach($field in $curmodel.Fields)
-#if($HtmlHelper.CanHandle($field))
-<p>$HtmlHelper.CreateControl($curmodel, $prefix, $field, $instance)</p>
+#if($Form.CanHandle($field))
+<div>$Form.CreateControl($curmodel, $prefix, $field, $instance)</div>
 #end
 #end
 
 #foreach($prop in $curmodel.Properties)
-#if($HtmlHelper.CanHandle($prop))
-<p>$HtmlHelper.CreateControl($curmodel, $prefix, $prop, $instance)</p>
+#if($Form.CanHandle($prop))
+<div>$Form.CreateControl($curmodel, $prefix, $prop, $instance)</div>
 #end
 #end
 
 #foreach($prop in $curmodel.NotMappedProperties)
-#if($HtmlHelper.CanHandle($prop))
-<p>$HtmlHelper.CreateControl($curmodel, $prefix, $prop, $instance)</p>
+#if($Form.CanHandle($prop))
+<div>$Form.CreateControl($curmodel, $prefix, $prop, $instance)</div>
 #end
 #end
 
 #foreach($prop in $curmodel.BelongsTo)
-#if($HtmlHelper.CanHandle($prop))
-<p>$HtmlHelper.CreateControl($curmodel, $prefix, $prop, $instance)</p>
+#if($Form.CanHandle($prop))
+<div>$Form.CreateControl($curmodel, $prefix, $prop, $instance)</div>
 #end
 #end
 
 #foreach($prop in $curmodel.HasMany)
-#if($HtmlHelper.CanHandle($prop))
-<p>$HtmlHelper.CreateControl($curmodel, $prefix, $prop, $instance)</p>
+#if($Form.CanHandle($prop))
+<div>$Form.CreateControl($curmodel, $prefix, $prop, $instance)</div>
 #end
 #end
 
 #foreach($prop in $curmodel.HasAndBelongsToMany)
-#if($HtmlHelper.CanHandle($prop))
-<p valign="top">$HtmlHelper.CreateControl($curmodel, $prefix, $prop, $instance)</p>
+#if($Form.CanHandle($prop))
+<div valign="top">$Form.CreateControl($curmodel, $prefix, $prop, $instance)</div>
 #end
 #end
 
 #if($curmodel.IsNestedType)
-  $HtmlHelper.EndFieldSet()
+  $Form.EndFieldSet()
 #end
 
 #end
 
-$HtmlHelper.SubmitButton("Create")
+<input type="submit" value="Create" />
 
 </div>
 
@@ -76,4 +72,4 @@ $HtmlHelper.SubmitButton("Create")
 $PresentationHelper.LinkToBack("Back", null) | $PresentationHelper.LinkToList($model, $useModelName, "List", null)
 </p>
 
-$HtmlHelper.EndForm()
+$Form.EndFormTag()

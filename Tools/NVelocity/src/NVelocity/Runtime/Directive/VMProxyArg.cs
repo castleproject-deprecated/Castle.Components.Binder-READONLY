@@ -2,11 +2,10 @@ namespace NVelocity.Runtime.Directive
 {
 	using System;
 	using System.IO;
-	using NVelocity.Context;
+	using Context;
 	using NVelocity.Exception;
-	using NVelocity.Runtime.Parser;
 	using NVelocity.Runtime.Parser.Node;
-	using NVelocity.Util;
+	using Parser;
 
 	/// <summary>  
 	/// The function of this class is to proxy for the calling parameter to the VM.
@@ -28,15 +27,15 @@ namespace NVelocity.Runtime.Directive
 	/// These arguments can be, in the lingo of
 	/// the parser, one of :
 	/// <ul>
-	/// <li> Reference() : anything that starts with '$'
-	/// <li> StringLiteral() : something like "$foo" or "hello geir"
-	/// <li> NumberLiteral() : 1, 2 etc
-	/// <li> IntegerRange() : [ 1..2] or [$foo .. $bar]
-	/// <li> ObjectArray() : [ "a", "b", "c"]
-	/// <li> True() : true
-	/// <li> False() : false
+	/// <li> Reference() : anything that starts with '$'</li>
+	/// <li> StringLiteral() : something like "$foo" or "hello geir"</li>
+	/// <li> NumberLiteral() : 1, 2 etc</li>
+	/// <li> IntegerRange() : [ 1..2] or [$foo .. $bar]</li>
+	/// <li> ObjectArray() : [ "a", "b", "c"]</li>
+	/// <li> True() : true</li>
+	/// <li> False() : false</li>
 	/// <li>Word() : not likely - this is simply allowed by the parser so we can have
-	/// syntactical sugar like #foreach($a in $b)  where 'in' is the Word
+	/// syntactical sugar like #foreach($a in $b)  where 'in' is the Word</li>
 	/// </ul>
 	/// Now, Reference(), StringLit, NumberLit, IntRange, ObjArr are all dynamic things, so
 	/// their value is gotten with the use of a context.  The others are constants.  The trick
@@ -105,6 +104,8 @@ namespace NVelocity.Runtime.Directive
 		/// the VM we are for is called with...
 		/// *
 		/// </summary>
+		/// <param name="rs">
+		/// </param>
 		/// <param name="contextRef">reference arg in the definition of the VM, used in the VM
 		/// </param>
 		/// <param name="callerRef"> reference used by the caller as an arg to the VM
@@ -419,7 +420,7 @@ namespace NVelocity.Runtime.Directive
 						}
 						catch(Exception e)
 						{
-							rsvc.Error("VMProxyArg.setup() : exception " + callerReference + " : " + StringUtils.StackTrace(e));
+							rsvc.Error("VMProxyArg.setup() : exception " + callerReference + " : " + e);
 						}
 
 						break;
@@ -449,8 +450,8 @@ namespace NVelocity.Runtime.Directive
 				case ParserTreeConstants.WORD:
 					{
 						/*
-			*  this is technically an error...
-			*/
+						*  this is technically an error...
+						*/
 
 						rsvc.Error("Unsupported arg type : " + callerReference +
 						           "  You most likely intended to call a VM with a string literal, so enclose with ' or \" characters. (VMProxyArg.setup())");

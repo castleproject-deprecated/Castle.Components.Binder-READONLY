@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@ namespace Castle.Core.Logging
 
 		public override ILogger Create(string name, LoggerLevel level)
 		{
-			StreamLogger logger = new StreamLogger(name, new FileStream(name + ".log", FileMode.Append, FileAccess.Write), Encoding.Default);
+			StreamLogger logger =
+				new StreamLogger(name, new FileStream(name + ".log", FileMode.Append, FileAccess.Write), Encoding.Default);
 			logger.Level = level;
 			return logger;
 		}

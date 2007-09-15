@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 
 	using Castle.Core;
 	using Castle.Core.Interceptor;
-
+	using Castle.Core.Logging;
 	using Castle.MicroKernel;
 
 	using Castle.Services.Transaction;
@@ -30,11 +30,12 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 	/// method execution. Rollback is invoked if an exception is threw.
 	/// </summary>
 	[Transient]
-	public class TransactionInterceptor : MarshalByRefObject, IMethodInterceptor, IOnBehalfAware
+	public class TransactionInterceptor : IInterceptor, IOnBehalfAware
 	{
 		private readonly IKernel kernel;
 		private readonly TransactionMetaInfoStore infoStore;
 		private TransactionMetaInfo metaInfo;
+		private ILogger logger = NullLogger.Instance;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TransactionInterceptor"/> class.
@@ -47,24 +48,15 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 			this.infoStore = infoStore;
 		}
 
-		#region MarshalByRefObject
-
 		/// <summary>
-		/// Obtains a lifetime service object to control the lifetime policy for this instance.
+		/// Gets or sets the logger.
 		/// </summary>
-		/// <returns>
-		/// An object of type <see cref="T:System.Runtime.Remoting.Lifetime.ILease"/> used to control the
-		/// lifetime policy for this instance. This is the current lifetime service object for
-		/// this instance if one exists; otherwise, a new lifetime service object initialized to the value
-		/// of the <see cref="P:System.Runtime.Remoting.Lifetime.LifetimeServices.LeaseManagerPollTime" qualify="true"/> property.
-		/// </returns>
-		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
-		public override object InitializeLifetimeService()
+		/// <value>The logger.</value>
+		public ILogger Logger
 		{
-			return null;
+			get { return logger; }
+			set { logger = value; }
 		}
-
-		#endregion
 
 		#region IOnBehalfAware
 
@@ -84,15 +76,15 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 		/// if necessary.
 		/// </summary>
 		/// <param name="invocation">The invocation.</param>
-		/// <param name="args">The args.</param>
 		/// <returns></returns>
-		public object Intercept(IMethodInvocation invocation, params object[] args)
+		public void Intercept(IInvocation invocation)
 		{
 			MethodInfo methodInfo = invocation.MethodInvocationTarget;
 
 			if (metaInfo == null || !metaInfo.Contains(methodInfo))
 			{
-				return invocation.Proceed(args);
+				invocation.Proceed();
+				return;
 			}
 			else
 			{
@@ -100,16 +92,14 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 
 				ITransactionManager manager = (ITransactionManager) kernel[ typeof(ITransactionManager) ];
 
-				ITransaction transaction = 
-					manager.CreateTransaction( 
-						transactionAtt.TransactionMode, transactionAtt.IsolationMode );
+				ITransaction transaction = manager.CreateTransaction(
+					transactionAtt.TransactionMode, transactionAtt.IsolationMode, transactionAtt.Distributed);
 
 				if (transaction == null)
 				{
-					return invocation.Proceed(args);
+					invocation.Proceed();
+					return;
 				}
-
-				object value = null;
 
 				transaction.Begin();
 
@@ -117,22 +107,31 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 
 				try
 				{
-					value = invocation.Proceed(args);
+					invocation.Proceed();
 
 					if (transaction.IsRollbackOnlySet)
 					{
+						logger.DebugFormat("Rolling back transaction {0}", transaction.GetHashCode());
+
 						rolledback = true;
 						transaction.Rollback();
 					}
 					else
 					{
+						logger.DebugFormat("Committing back transaction {0}", transaction.GetHashCode());
+
 						transaction.Commit();
 					}
 				}
-				catch(TransactionException)
+				catch(TransactionException ex)
 				{
 					// Whoops. Special case, let's throw without 
 					// attempt to rollback anything
+
+					if (logger.IsFatalEnabled)
+					{
+						logger.Fatal("Fatal error during transaction processing", ex);
+					}
 
 					throw;
 				}
@@ -140,6 +139,8 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 				{
 					if (!rolledback)
 					{
+						logger.DebugFormat("Rolling back transaction {0} due to exception on method {2}.{1}", transaction.GetHashCode(), methodInfo.Name, methodInfo.DeclaringType.Name);
+
 						transaction.Rollback();
 					}
 
@@ -149,8 +150,6 @@ namespace Castle.Facilities.AutomaticTransactionManagement
 				{
 					manager.Dispose(transaction); 
 				}
-
-				return value;
 			}
 		}
 	}

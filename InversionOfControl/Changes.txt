@@ -1,5 +1,193 @@
+RC 4
+====
+
+- Fixed IOC-91
+  "ContextBoundObject's context is not bound when object is created by MicroKernel"
+
+- Fixed build from IContainerAccessor change
+
+- Applied Ron Grabowski's patch fixing IOC-89
+  "Make DefaultKernel implement IServiceProvider"
+
+- Check for required Properties before determining the Handlers initial state
+
+- Fixed IoC-87
+  "DefaultComplextConverter does not properly handle nested components"
+
+- Applied Lee Henson's patch fixing IOC-86
+  "Additional generic AddComponent overloads"
+
+- Applied Ido Samuelson patch fixing IOC-85
+  "IKernel to support generics to add/resolve components."
+
+- Refactored proxy options support. Now you can use the attribute 'marshalByRefProxy' 
+  on the external configuration, or the ComponentProxyBehaviorAttribute
+
+- Fixed IOC-79
+  "Kernel.GetHandlers(Type) does not consider generic handlers when satisfying the type"
+
+- Updated StartableFacilityTestCase to correctly demonstrate the facility and
+  added a unit test to demonstrate IOC-80
+ 
+- Applied Alex Henderson's patch that makes the ComponentModel available
+  to the ILifestyleManager
+
+- Applied Adam Mills's patch fixing IOC-74
+  "BinaryComponentName VisitNode null check"
+
+- Fixed IOC-67
+  "RemoveComponent needs to unwire handlers and remove them"
+
+- Fixed IOC-59
+  "Child component unable to correctly resolve parent service added after the component"
+
+- Fixed IOC-47
+  "Components created by FactoryActivator have their dependencies checked"
+
+- Applied Marcus Widerberg's patch fixing FACILITIES-84
+  "FactorySupport - Allow parameters to factory method to be set at resolvetime"
+
+- Applied Marcus Widerberg's patch fixing FACILITIES-82
+  "Programmatic configuration for FactorySupport"
+
+- Reverted by Henry -> Apply patch from Sam Camp that fixes problems with Remoting Facility Sample and RecoverableComponent. 
+
+- Updated TypedFactoryFacility to not require a target instance
+  when proxying.
+
+- Added Windsor proxy support to create proxies without targets.
+
+- Removed relationship between ProxyOptions and ProxyGeneration options
+  and moved ProxyOptions into the MicroKernel.  ProxyGeneration options
+  are created from the ProxyOptions and will probably need to be updated
+  as facilities demand more proxy generation customizations.
+
+- Added ProxyOptions to allow facilities to easily add proxy interfaces
+  without having to create custom proxy factories.  The ProxyOptions
+  are obtained via the ProxyUtil.
+
+- Fixed IOC-65
+  "DictionaryConverter should use the alternate overload of the 
+   PerformConversion method in order to support dictionaries that contain 
+   custom types"
+
+- Moved ProxyComponentInspector from Castle.MicroKernel to here and added
+  support to supply ProxyGenerationOptions on a ComponentModel basis.  This
+  provides the needed ability to provide proxy options in facilities.
+
+- Fixed IOC-69 - DefaultDependencyResolver issue with Service Overrides.
+
+- Added ComponentProxyBehaviorAttribute and ComponentProxyInspector 
+  to control the creation of component proxies.
+
+- Added eval support to configuration. Currently it only supports 
+  BaseDirectory as a content to evaluate
+
+  <?eval $BaseDirectory ?>
+
+- Added IEnvironmentInfo in an attempt to solve complex 
+  configuration/environment issues.
+
+- Fixing IOC-63 - source order of constructors should not matter
+
+- Fixed IOC-62
+  "Interceptors don't work properly on generic components"
+
+- Applied Norbert Wagner's patch fixing IOC-55
+  "Generic Type Converters: Set default entry types to generic arguments of property type"
+
+- Applied Jeff Brown's patch fixing IOC-54
+  "Empty component parameter values cause runtime exception during component resolution."
+
+- Applied patch by Bill Pierce that
+
+-- Introduces the WebUserControlComponentActivator
+
+-- Introduces the KeySearchNamingSubSystem
+
+-- Allows you to associate a custom component activator using
+    1. componentActivatorType on component node
+    2. ComponentActivatorAttribute
+
+-- Allows you to create and configure child containers 
+   through the configuration, using
+
+  <configuration>
+    <containers>
+        <container name="child1">
+          <configuration>
+                <facilities>
+					...
+                </facilities>
+          
+                <components>
+					...
+                </components>
+                
+            </configuration>
+        </container>
+    </containers>
+  </configuration>
+
+- Applied AndyD's patch fixing IOC-52
+  "Remote access to generic components"
+
+- Fixed IOC-45
+  "Proxying a component that has an interface that is extended from another interface throws an exception"
+
+- Applied patch by Ernst Naezer fixing IOC-37
+  "Resolving with arguments in Windsor"
+
+- Fixed IOC-43 
+  "Creation of an Attribute in the Kernel that allows one property to be ignored by the dependency builder"
+  
+  Introduced DoNotWireAttribute that marks a property and prevents it
+  from being considered by the container
+
+- Changed Windsor to use DynamicProxy 2
+
+- Applied patch by Adam Mills fixing IOC-42
+  "ResolveServices", new method added to IKernel
+
+- Applied patch by Adam Mills fixing IOC-41
+  "Bug Fix BinaryTreeComponentName - Assumed Lesser nodes went to left"
+
+- Applied patch by Adam Mills fixing IOC-40
+  "Provided an Implementation for BinaryTreeComponentName.Remove"
+
+- Applied patch by Adam Mills fixing IOC-39
+  "Fix for Null Reference when accessing empty BinaryTreeComponentName"
+
+- Fixed IOC-35 
+  "Add bootstrap section to configuration file"
+
+- Fixed issue where KeyAlreadyAdded exception would be throw for 
+  components accepting two parameters of the same type, without overrides
+
+- Fixed IOC-36 
+  "Transient components with multliple constructors throw 
+   unresolved dependency exceptions."
+
+  Removed best candidate reference, as the kernel is dynamic it should
+  not cache best constructors as components can be added or removed
+  at any time
+  
+  Removed Points from candidates, as in a multithreaded scenario
+  this would lead to failures
+  
+
+- Fixed IOC-34 
+  "Cannot use types having their own base type as constructor argument"
+
+  See revision r2787
+
+- IOC-32, Support generic collections. 
+  Supported collections are: ICollection<T>, IList<T>, List<T>, IDictionary<K,V>, Dictionary<K,V>, IEnumerable<T> 
+
 RC 3
 ====
+ 
+- Applied patch by William C. Pierce <wcpierce@gmail.com> adding PerWebRequestAttribute
 
 - Added setter to ReleasePolicy property
 

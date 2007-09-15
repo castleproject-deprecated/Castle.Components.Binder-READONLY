@@ -1,4 +1,4 @@
- // Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+ // Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ namespace AspectSharp.Core
 {
 	using System;
 	using Castle.DynamicProxy;
+	using IInterceptor=Castle.Core.Interceptor.IInterceptor;
 
 	/// <summary>
 	/// Generates a dynamic proxy. This overrides the .Net proxy requirements 
@@ -40,13 +41,14 @@ namespace AspectSharp.Core
 		/// redirecting method invocations to the specifed interceptor.
 		/// </summary>
 		/// <param name="inter">Interface to be implemented.</param>
+		/// <param name="target"></param>
 		/// <param name="mixins">Array of instances (mixins) to be introducted.</param>
 		/// <param name="interceptor">Instance of <see cref="IInterceptor"/>.</param>
 		/// <returns>Proxy Instance.</returns>
 		public object CreateProxy(Type inter, object target, object[] mixins, IInterceptor interceptor)
 		{
-			GeneratorContext context = CreateGeneratorContext(mixins);
-			return base.CreateCustomProxy(inter, interceptor, target, context);
+			ProxyGenerationOptions options = CreateProxyGenerationOptions(mixins);
+			return CreateInterfaceProxyWithTarget(inter, target, options, interceptor);
 		}
 
 		/// <summary>
@@ -56,12 +58,13 @@ namespace AspectSharp.Core
 		/// <param name="baseClass">Super class</param>
 		/// <param name="mixins">Array of mixins to be implemented by the proxy</param>
 		/// <param name="interceptor">Instance of <see cref="IInterceptor"/></param>
+		/// <param name="constructorArgs"></param>
 		/// <returns>Proxy instance</returns>
 		public object CreateClassProxy(Type baseClass, object[] mixins, IInterceptor interceptor,
 			params object[] constructorArgs)
 		{
-			GeneratorContext context = CreateGeneratorContext(mixins);
-			return base.CreateCustomClassProxy(baseClass, interceptor, context, constructorArgs);
+			ProxyGenerationOptions options = CreateProxyGenerationOptions(mixins);
+			return CreateClassProxy(baseClass, null, options, constructorArgs, interceptor);
 		}
 
 		/// <summary>
@@ -70,14 +73,14 @@ namespace AspectSharp.Core
 		/// </summary>
 		/// <param name="mixins">Array of mixins to be registered</param>
 		/// <returns>A GeneratorContext instance</returns>
-		protected GeneratorContext CreateGeneratorContext(object[] mixins)
+		private static ProxyGenerationOptions CreateProxyGenerationOptions(object[] mixins)
 		{
-			GeneratorContext context = new GeneratorContext();
+			ProxyGenerationOptions options = new ProxyGenerationOptions();
 			foreach (object mixin in mixins)
 			{
-				context.AddMixinInstance(mixin);
+				options.AddMixinInstance(mixin);
 			}
-			return context;
+			return options;
 		}
 	}
 }

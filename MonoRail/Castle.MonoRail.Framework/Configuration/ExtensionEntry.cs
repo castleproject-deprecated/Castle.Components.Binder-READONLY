@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,8 +31,9 @@ namespace Castle.MonoRail.Framework.Configuration
 
 			if (typeAtt == null || typeAtt.Value == String.Empty)
 			{
-				throw new ConfigurationException("To add a service, please specify the 'type' attribute. " + 
-					"Check the documentation for more information");
+				String message = "To add a service, please specify the 'type' attribute. " + 
+					"Check the documentation for more information";
+				throw new ConfigurationErrorsException(message);
 			}
 		
 			extensionType = TypeLoadUtil.GetType(typeAtt.Value);

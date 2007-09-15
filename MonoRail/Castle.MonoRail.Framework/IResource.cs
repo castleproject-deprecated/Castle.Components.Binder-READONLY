@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.Collections;
 
 	/// <summary>
 	/// Dictates the contract for resources that are publishable
 	/// through the PropertyBag context.
 	/// </summary>
-	public interface IResource : IDisposable
+	public interface IResource : IDisposable, IEnumerable
 	{
 		/// <summary>
 		/// Returns the object linked to the specific key.
@@ -38,11 +39,11 @@ namespace Castle.MonoRail.Framework
 		object GetObject(String key);
 	}
 
-	/// <summary>
+/*	/// <summary>
 	/// Marker interface that declares that this attribute should
 	/// be used as a definition for a resource in the user ResourceFactory.
 	/// </summary>
 //	public interface IResourceDefinition
 //	{
-//	}
+//	}*/
 }

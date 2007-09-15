@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,21 +15,12 @@
 namespace Castle.VSNetIntegration.CastleWizards.Shared
 {
 	using System.Runtime.InteropServices;
-	
 	using Castle.VSNetIntegration.CastleWizards.Shared.Dialogs;
-
-
 	
 	public delegate void WizardEventHandler(object sender, ExtensionContext context);
-
 	public delegate void WizardUIEventHandler(object sender, WizardDialog dlg, ExtensionContext context);
 
-
-#if DOTNET2
 	[ComVisible(true)]
-#else
-	[ComVisible(false)]
-#endif
 	public interface ICastleWizard
 	{
 		event WizardEventHandler OnAddProjects;

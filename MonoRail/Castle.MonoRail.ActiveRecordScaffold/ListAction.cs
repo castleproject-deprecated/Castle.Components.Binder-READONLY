@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			base.PerformActionProcess(controller);
 			
 			controller.PropertyBag.Add( "items", 
-				PaginationHelper.CreatePagination(PerformFindAll(), 10) );
+				PaginationHelper.CreatePagination(controller, PerformFindAll(), 10) );
 			
 			controller.PropertyBag["properties"] = ObtainListableProperties(Model);
 
@@ -106,15 +106,14 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			bool isUnsupportedType = (type == typeof(IList) || 
 				type == typeof(ISet) || 
 				type == typeof(IDictionary));
-#if DOTNET2
-            if( !isUnsupportedType && type.IsGenericType ) 
+
+			if( !isUnsupportedType && type.IsGenericType ) 
 			{
-                isUnsupportedType = (
+				isUnsupportedType = (
 					typeof(System.Collections.Generic.ICollection<>).IsAssignableFrom(type.GetGenericTypeDefinition()) || 
 					typeof(System.Collections.Generic.IList<>).IsAssignableFrom(type.GetGenericTypeDefinition()) || 
 					typeof(System.Collections.Generic.IDictionary<,>).IsAssignableFrom(type.GetGenericTypeDefinition()));
-            }
-#endif
+			}
 			return isUnsupportedType;
 		}
 	}

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 
 	using Castle.MicroKernel.SubSystems.Conversion;
 
-
 	/// <summary>
 	/// Base for inspectors that want configuration associated with methods.
 	/// For each child a <see cref="MethodMetaModel"/> is created
@@ -34,11 +33,11 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 	/// Implementors should override the <see cref="ObtainNodeName"/> return
 	/// the name of the node to be inspected. For example:
 	/// <code>
-	/// <pre>
+	/// <![CDATA[
 	///   <transactions>
 	///     <method name="Save" transaction="requires" />
 	///   </transactions>
-	/// </pre>
+	/// ]]>
 	/// </code>
 	/// </remarks>
 	public abstract class MethodMetaInspector : IContributeComponentModelConstruction
@@ -52,6 +51,8 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 
 		public virtual void ProcessModel(IKernel kernel, ComponentModel model)
 		{
+			if (model == null) throw new ArgumentNullException("model");
+
 			if (model.Configuration == null || model.Implementation == null) return;
 
 			IConfiguration methodsNode = model.Configuration.Children[ObtainNodeName()];
@@ -89,7 +90,7 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 						String message = String.Format( "The class {0} has tried to expose configuration for " + 
 							"a method named {1} which could not be found.", model.Implementation.FullName, name );
 
-						throw new ConfigurationException(message);
+						throw new ConfigurationErrorsException(message);
 					}
 
 					ProcessMeta(model, methods, metaModel);
@@ -118,25 +119,6 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 
 		protected abstract String ObtainNodeName();
 
-//		private void RegisterMethodsForFastAccess(MethodInfo[] methods, 
-//			String signature, MethodMetaModel metaModel, ComponentModel model)
-//		{
-//			foreach(MethodInfo method in methods)
-//			{
-//				if (signature != null && signature.Length != 0)
-//				{
-//					model.MethodMetaModels.MethodInfo2Model[method] = metaModel;
-//				}
-//				else
-//				{
-//					if (!model.MethodMetaModels.MethodInfo2Model.Contains(method))
-//					{
-//						model.MethodMetaModels.MethodInfo2Model[method] = metaModel;
-//					}
-//				}
-//			}
-//		}
-
 		private void AssertNameIsNotNull(string name, ComponentModel model)
 		{
 			if (name == null)
@@ -144,7 +126,8 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 				String message = String.Format("The configuration nodes within 'methods' " + 
 					"for the component '{0}' does not have a name. You can either name " + 
 					"the node as the method name or provide an attribute 'name'", model.Name);
-				throw new ConfigurationException(message);
+
+				throw new ConfigurationErrorsException(message);
 			}
 		}
 
@@ -196,13 +179,13 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 				{
 					types.Add( converter.PerformConversion( param, typeof(Type) ) );
 				}
-				catch(Exception ex)
+				catch(Exception)
 				{
 					String message = String.Format("The signature {0} contains an entry type {1} " + 
 						"that could not be converted to System.Type. Check the inner exception for " + 
 						"details", signature, param);
 
-					throw new ConfigurationException(message, ex);
+					throw new ConfigurationErrorsException(message);
 				}
 			}
 

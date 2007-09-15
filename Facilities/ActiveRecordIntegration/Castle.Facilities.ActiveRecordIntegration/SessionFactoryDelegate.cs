@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ namespace Castle.Facilities.ActiveRecordIntegration
 	using System.Data;
 
 	using NHibernate;
+	using NHibernate.Cfg;
 	using NHibernate.Connection;
 	using NHibernate.Dialect;
+	using NHibernate.Engine;
 	using NHibernate.Metadata;
 
 	using Castle.ActiveRecord.Framework;
@@ -28,7 +30,7 @@ namespace Castle.Facilities.ActiveRecordIntegration
 	/// <summary>
 	/// Implements <see cref="ISessionFactory"/> allowing 
 	/// it to be used by the container as an ordinary component.
-	/// However only <see cref="ISessionFactory.OpenSession"/>
+	/// However only <see cref="ISessionFactory.OpenSession(IDbConnection)"/>
 	/// is implemented
 	/// </summary>
 	public sealed class SessionFactoryDelegate : ISessionFactory
@@ -88,6 +90,12 @@ namespace Castle.Facilities.ActiveRecordIntegration
 		{
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
 		}
+		
+		/// <remarks>Needed for NHibernate 1.2 from trunk</remarks>
+		public ISession GetCurrentSession()
+		{
+			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
+		}
 
 		public void Close()
 		{
@@ -124,6 +132,11 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
 		}
 
+		public FilterDefinition GetFilterDefinition(string filterName)
+		{
+			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
+		}
+
 		public IConnectionProvider ConnectionProvider
 		{
 			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
@@ -132,6 +145,20 @@ namespace Castle.Facilities.ActiveRecordIntegration
 		public Dialect Dialect
 		{
 			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
+		}
+
+		public ICollection DefinedFilterNames
+		{
+			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
+		}
+
+		public Settings Settings
+		{
+			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
+		}
+
+		public void Dispose()
+		{
 		}
 	}
 }

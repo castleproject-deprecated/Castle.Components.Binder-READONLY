@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,24 +26,29 @@ namespace Castle.MonoRail.Framework
 	public class MonoRailHttpHandlerFactory : IHttpHandlerFactory
 	{
 		private ILoggerFactory loggerFactory;
-		
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MonoRailHttpHandlerFactory"/> class.
+		/// </summary>
 		public MonoRailHttpHandlerFactory()
 		{
 		}
 
+		/// <summary>
+		/// Returns an instance of a class that implements 
+		/// the <see cref="T:System.Web.IHttpHandler"></see> interface.
+		/// </summary>
+		/// <param name="context">An instance of the <see cref="T:System.Web.HttpContext"></see> class that provides references to intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
+		/// <param name="requestType">The HTTP data transfer method (GET or POST) that the client uses.</param>
+		/// <param name="url">The <see cref="P:System.Web.HttpRequest.RawUrl"></see> of the requested resource.</param>
+		/// <param name="pathTranslated">The <see cref="P:System.Web.HttpRequest.PhysicalApplicationPath"></see> to the requested resource.</param>
+		/// <returns>
+		/// A new <see cref="T:System.Web.IHttpHandler"></see> object that processes the request.
+		/// </returns>
 		public virtual IHttpHandler GetHandler(HttpContext context, 
 		                                       String requestType, 
 		                                       String url, String pathTranslated)
 		{
-#if ALLOWTEST
-			String isTest = context.Request.Headers["IsTestWorkerRequest"];
-			
-			if ("true" == isTest)
-			{
-				Castle.MonoRail.Framework.Internal.Test.TestContextHolder.SetContext(context);
-			}
-#endif
-
 			if (!EngineContextModule.Initialized)
 			{
 				throw new RailsException("Looks like you forgot to register the http module " +
@@ -62,6 +67,10 @@ namespace Castle.MonoRail.Framework
 			return ObtainMonoRailHandler(mrContext);
 		}
 
+		/// <summary>
+		/// Enables a factory to reuse an existing handler instance.
+		/// </summary>
+		/// <param name="handler">The <see cref="T:System.Web.IHttpHandler"></see> object to reuse.</param>
 		public virtual void ReleaseHandler(IHttpHandler handler)
 		{
 			HttpContext httpContext = HttpContext.Current;

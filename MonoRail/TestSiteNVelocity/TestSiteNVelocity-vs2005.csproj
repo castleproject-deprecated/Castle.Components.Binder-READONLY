@@ -4,6 +4,7 @@
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{824EC872-2992-4518-8C41-4F87640D752A}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ApplicationIcon>
@@ -34,7 +35,7 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DEBUG;DOTNET2</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
@@ -45,7 +46,7 @@
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -68,7 +69,7 @@
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -78,18 +79,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Castle.Components.Common.EmailSender.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Components.Common.EmailSender.SmtpEmailSender, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build\net-2.0\debug\Castle.Components.Common.EmailSender.SmtpEmailSender.dll</HintPath>
-    </Reference>
     <Reference Include="Nullables, Version=1.0.1.0, Culture=neutral, PublicKeyToken=154fdcb44c4484fc">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Nullables.dll</HintPath>
     </Reference>
-    <Reference Include="NVelocity">
-      <Name>NVelocity</Name>
-      <HintPath>..\..\build\net-2.0\debug\NVelocity.dll</HintPath>
-    </Reference>
+    <Reference Include="NVelocity, Version=0.5.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -120,6 +114,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Components\AutoParameterBinding.cs" />
     <Compile Include="Components\BlockComponent1.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -180,6 +175,7 @@
     <Compile Include="Controllers\HomeController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\JSGenerationController.cs" />
     <Compile Include="Controllers\LayoutController.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -233,11 +229,31 @@
     <None Include="views\flash\flashIt.vm" />
     <None Include="views\flash\validateRequest.vm" />
     <None Include="views\formhelper\index.vm" />
+    <None Include="views\formhelper\numbersonly.vm" />
     <None Include="views\formhelper\useparamstofillinputs.vm" />
+    <None Include="views\helper\StaticHelpers.vm" />
     <None Include="views\helper\DictHelperUsage.vm" />
     <None Include="views\home\display.vm" />
+    <Content Include="views\jsgeneration\_partial1.vm" />
+    <None Include="views\jsgeneration\CheckCNPJ.njs" />
+    <None Include="views\jsgeneration\collectionaccess.njs" />
+    <None Include="views\jsgeneration\collectionfirstlast.njs" />
+    <None Include="views\jsgeneration\index.vm" />
+    <None Include="views\jsgeneration\multipleactions.njs" />
+    <None Include="views\jsgeneration\replace.njs" />
+    <None Include="views\jsgeneration\InsertHtml.njs" />
+    <None Include="views\jsgeneration\replacehtml.njs" />
+    <None Include="views\jsgeneration\elementmethoddepth.njs" />
+    <None Include="views\jsgeneration\elementattributedepth.njs" />
+    <None Include="views\jsgeneration\elementattribute.njs" />
+    <None Include="views\jsgeneration\elementmethod.njs" />
+    <None Include="views\jsgeneration\elementreplace.njs" />
+    <None Include="views\jsgeneration\elementreplacehtml.njs" />
+    <None Include="views\jsgeneration\replacehtmlwithpartial.njs" />
+    <None Include="views\jsgeneration\elementaccess.njs" />
     <None Include="views\home\heyhello.vm" />
     <None Include="views\home\index.vm" />
+    <None Include="views\jsgeneration\visualeffect.njs" />
     <None Include="views\layoutable\changelayout.vm" />
     <None Include="views\layoutable\index.vm" />
     <None Include="views\layouts\master.vm" />
@@ -254,13 +270,17 @@
     <None Include="views\rescues\updateerrormsg.vm" />
     <None Include="views\resourced\getresources.vm" />
     <None Include="views\SubArea\home\index.vm" />
+    <None Include="views\testwizardconditions\InnerAction2.vm" />
+    <None Include="views\testwizardconditions\page1.vm" />
     <None Include="views\testwizard\InnerAction2.vm" />
     <None Include="views\testwizard\page1.vm" />
     <None Include="views\testwizard\page3.vm" />
     <None Include="views\testwizard\page4.vm" />
     <None Include="views\userlist.vm" />
+    <None Include="views\UsingComponent2\AutoParameterBinding1.vm" />
     <None Include="views\UsingComponent2\ComponentAndParams1.vm" />
     <None Include="views\UsingComponent2\ComponentWithInvalidSections.vm" />
+    <None Include="views\UsingComponent2\AutoParameterBinding2.vm" />
     <None Include="views\UsingComponent2\GridComponent1.vm" />
     <None Include="views\UsingComponent2\GridComponent2.vm" />
     <None Include="views\UsingComponent\CaptureFor.vm" />
@@ -278,8 +298,14 @@
     <None Include="views\UsingComponent\index8.vm" />
     <None Include="views\UsingComponent\index9.vm" />
     <None Include="views\validated\default.vm" />
+    <None Include="views\wizard\testwizardwitharea\InnerAction2.vm" />
+    <None Include="views\wizard\testwizardwitharea\page1.vm" />
+    <None Include="views\wizard\testwizardwitharea\page3.vm" />
+    <None Include="views\wizard\testwizardwitharea\page4.vm" />
     <None Include="web.config" />
-    <EmbeddedResource Include="Controllers\ResourceFile.resx" />
+    <EmbeddedResource Include="Controllers\ResourceFile.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Content Include="views\ajax\autocom.vm" />
     <Content Include="views\ajax\index.vm" />
     <Content Include="views\filter\index.vm" />
@@ -288,11 +314,30 @@
     <Content Include="views\home\bag.vm" />
     <Content Include="views\home\bag2.vm" />
   </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v8.0\WebApplications\Microsoft.WebApplication.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>1565</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

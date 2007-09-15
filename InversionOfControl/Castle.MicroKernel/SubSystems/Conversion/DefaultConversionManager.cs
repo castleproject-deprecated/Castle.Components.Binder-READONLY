@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 {
 	using System;
 	using System.Collections;
-
+	using System.Threading;
 	using Castle.Core;
 	using Castle.Core.Configuration;
 
@@ -26,9 +26,9 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 	[Serializable]
 	public class DefaultConversionManager : AbstractSubSystem, IConversionManager, ITypeConverterContext
 	{
+		private static LocalDataStoreSlot slot = Thread.AllocateDataSlot();
 		private IList converters;
 		private IList standAloneConverters;
-		private Stack modelStack = new Stack();
 
 		public DefaultConversionManager()
 		{
@@ -40,14 +40,17 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 
 		protected virtual void InitDefaultConverters()
 		{
-			Add( new PrimitiveConverter() );
-			Add( new TimeSpanConverter() );
-			Add( new TypeNameConverter() );
-			Add( new EnumConverter() );
-			Add( new ListConverter() );
-			Add( new DictionaryConverter() );
-			Add( new ArrayConverter() ); 
-			Add( new ComponentConverter() ); 
+			Add(new PrimitiveConverter());
+			Add(new TimeSpanConverter());
+			Add(new TypeNameConverter());
+			Add(new EnumConverter());
+			Add(new ListConverter());
+			Add(new DictionaryConverter());
+			Add(new GenericDictionaryConverter());
+			Add(new GenericListConverter());
+			Add(new ArrayConverter());
+			Add(new ComponentConverter());
+			Add(new AttributeAwareConverter());
 		}
 
 		#region IConversionManager Members
@@ -94,27 +97,28 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 			return false;
 		}
 
-	    public bool CanHandleType(Type type, IConfiguration configuration)
-	    {
-            foreach (ITypeConverter converter in converters)
-            {
-                if (converter.CanHandleType(type,configuration))
-                    return true;
-            }
-
-            return false;
-	    }
-
-	    public object PerformConversion(String value, Type targetType)
+		public bool CanHandleType(Type type, IConfiguration configuration)
 		{
 			foreach(ITypeConverter converter in converters)
 			{
-				if (converter.CanHandleType(targetType)) 
-					return converter.PerformConversion(value, targetType);
+				if (converter.CanHandleType(type, configuration)) return true;
 			}
 
-			String message = String.Format("No converter registered to handle the type {0}", 
-				targetType.FullName);
+			return false;
+		}
+
+		public object PerformConversion(String value, Type targetType)
+		{
+			foreach(ITypeConverter converter in converters)
+			{
+				if (converter.CanHandleType(targetType))
+				{
+					return converter.PerformConversion(value, targetType);
+				}
+			}
+
+			String message = String.Format("No converter registered to handle the type {0}",
+			                               targetType.FullName);
 
 			throw new ConverterException(message);
 		}
@@ -123,12 +127,14 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 		{
 			foreach(ITypeConverter converter in converters)
 			{
-				if (converter.CanHandleType(targetType,configuration)) 
+				if (converter.CanHandleType(targetType, configuration))
+				{
 					return converter.PerformConversion(configuration, targetType);
+				}
 			}
 
-			String message = String.Format("No converter registered to handle the type {0}", 
-				targetType.FullName);
+			String message = String.Format("No converter registered to handle the type {0}",
+			                               targetType.FullName);
 
 			throw new ConverterException(message);
 		}
@@ -144,18 +150,21 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 
 		public void PushModel(ComponentModel model)
 		{
-			modelStack.Push(model);
+			CurrentStack.Push(model);
 		}
 
 		public void PopModel()
 		{
-			modelStack.Pop();
+			CurrentStack.Pop();
 		}
 
 		public ComponentModel CurrentModel
 		{
-			get { if (modelStack.Count == 0) return null; 
-				  else return (ComponentModel) modelStack.Peek(); }
+			get
+			{
+				if (CurrentStack.Count == 0) return null;
+				else return (ComponentModel) CurrentStack.Peek();
+			}
 		}
 
 		public ITypeConverter Composition
@@ -164,5 +173,21 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 		}
 
 		#endregion
+
+		private Stack CurrentStack
+		{
+			get
+			{
+				Stack stack = (Stack) Thread.GetData(slot);
+
+				if (stack == null)
+				{
+					stack = new Stack();
+					Thread.SetData(slot, stack);
+				}
+
+				return stack;
+			}
+		}
 	}
 }

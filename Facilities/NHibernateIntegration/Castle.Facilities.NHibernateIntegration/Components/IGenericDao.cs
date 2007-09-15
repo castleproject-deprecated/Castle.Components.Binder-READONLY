@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace Castle.Facilities.NHibernateIntegration
 	/// Summary description for IGenericDao.
 	/// </summary>
 	/// <remarks>
-	/// Contributed by Steve Degosserie <steve.degosserie@vn.netika.com>
+	/// Contributed by Steve Degosserie &lt;steve.degosserie@vn.netika.com&gt;
 	/// </remarks>
 	public interface IGenericDao
 	{

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		public static Type[] Union(Type[] set1, Type[] set2)
 		{
 			ArrayList types = new ArrayList();
-			
+
 			if (set1 != null) types.AddRange(set1);
 			if (set2 != null) types.AddRange(set2);
 

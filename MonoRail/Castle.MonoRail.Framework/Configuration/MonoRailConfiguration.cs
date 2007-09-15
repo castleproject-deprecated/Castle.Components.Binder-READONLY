@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		private static readonly String SectionName = "monorail";
 		private static readonly String AlternativeSectionName = "monoRail";
 
-		private bool checkClientIsConnected, useWindsorIntegration;
+		private bool checkClientIsConnected, useWindsorIntegration, matchHostNameAndPath, excludeAppPath;
 		private Type customFilterFactory;
 		private XmlNode configurationSection;
 
@@ -39,12 +39,12 @@ namespace Castle.MonoRail.Framework.Configuration
 		private RoutingRuleCollection routingRules;
 		private ExtensionEntryCollection extensions;
 		private ServiceEntryCollection services;
-		
+		private DefaultUrlCollection defaultUrls;
+
 		/// <summary>
-		/// Pendent
+		/// Initializes a new instance of the <see cref="MonoRailConfiguration"/> class.
 		/// </summary>
-		/// <param name="section"></param>
-		public MonoRailConfiguration(XmlNode section)
+		public MonoRailConfiguration()
 		{
 			smtpConfig = new SmtpConfig();
 			viewEngineConfig = new ViewEngineConfig();
@@ -54,36 +54,36 @@ namespace Castle.MonoRail.Framework.Configuration
 			routingRules = new RoutingRuleCollection();
 			extensions = new ExtensionEntryCollection();
 			services = new ServiceEntryCollection();
-			
+			defaultUrls = new DefaultUrlCollection();
+
 			checkClientIsConnected = false;
-			
+			matchHostNameAndPath = false;
+			excludeAppPath = false;
+		}
+
+		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="section"></param>
+		public MonoRailConfiguration(XmlNode section) : this()
+		{
 			configurationSection = section;
 		}
 
 		public static MonoRailConfiguration GetConfig()
 		{
-#if DOTNET2
 			MonoRailConfiguration config =
-				System.Configuration.ConfigurationManager.GetSection(MonoRailConfiguration.SectionName) as MonoRailConfiguration;
-#else
-			MonoRailConfiguration config = 
-				ConfigurationSettings.GetConfig(MonoRailConfiguration.SectionName) as MonoRailConfiguration;
-#endif
+				ConfigurationManager.GetSection(SectionName) as MonoRailConfiguration;
 
 			if (config == null)
 			{
-#if DOTNET2
-				config = 
-					System.Configuration.ConfigurationManager.GetSection(MonoRailConfiguration.AlternativeSectionName) as MonoRailConfiguration;
-#else
-				config = 
-					ConfigurationSettings.GetConfig(MonoRailConfiguration.AlternativeSectionName) as MonoRailConfiguration;
-#endif
+				config =
+					ConfigurationManager.GetSection(AlternativeSectionName) as MonoRailConfiguration;
 			}
 
 			if (config == null)
 			{
-				throw new ApplicationException("You have to provide a small configuration to use " + 
+				throw new ApplicationException("You have to provide a small configuration to use " +
 				                               "MonoRail. Check the samples or the documentation");
 			}
 
@@ -91,7 +91,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		}
 
 		#region ISerializedConfig implementation
-		
+
 		public void Deserialize(XmlNode node)
 		{
 			viewEngineConfig.Deserialize(node);
@@ -99,20 +99,23 @@ namespace Castle.MonoRail.Framework.Configuration
 			controllersConfig.Deserialize(node);
 			viewComponentsConfig.Deserialize(node);
 			scaffoldConfig.Deserialize(node);
-			
+
 			services.Deserialize(node);
 			extensions.Deserialize(node);
 			routingRules.Deserialize(node);
+			defaultUrls.Deserialize(node);
 
 			ProcessFilterFactoryNode(node.SelectSingleNode("customFilterFactory"));
-			
+			ProcessMatchHostNameAndPath(node.SelectSingleNode("routing"));
+			ProcessExcludeAppPath(node.SelectSingleNode("routing"));
+
 			XmlAttribute checkClientIsConnectedAtt = node.Attributes["checkClientIsConnected"];
 
 			if (checkClientIsConnectedAtt != null && checkClientIsConnectedAtt.Value != String.Empty)
 			{
 				checkClientIsConnected = String.Compare(checkClientIsConnectedAtt.Value, "true", true) == 0;
 			}
-			
+
 			XmlAttribute useWindsorAtt = node.Attributes["useWindsorIntegration"];
 
 			if (useWindsorAtt != null && useWindsorAtt.Value != String.Empty)
@@ -125,22 +128,8 @@ namespace Castle.MonoRail.Framework.Configuration
 				}
 			}
 		}
-		
+
 		#endregion
-		
-		private void ProcessFilterFactoryNode(XmlNode node)
-		{
-			if (node == null) return;
-			
-			XmlAttribute type = node.Attributes["type"];
-
-			if (type == null)
-			{
-				throw new ConfigurationException("The custom filter factory node must specify a 'type' attribute");
-			}
-
-			customFilterFactory = TypeLoadUtil.GetType(type.Value);
-		}
 
 		public SmtpConfig SmtpConfig
 		{
@@ -197,24 +186,87 @@ namespace Castle.MonoRail.Framework.Configuration
 			get { return useWindsorIntegration; }
 		}
 
+		public bool MatchHostNameAndPath
+		{
+			get { return matchHostNameAndPath; }
+		}
+
+		public bool ExcludeAppPath
+		{
+			get { return excludeAppPath; }
+		}
+
 		public XmlNode ConfigurationSection
 		{
 			get { return configurationSection; }
 		}
 
+		public DefaultUrlCollection DefaultUrls
+		{
+			get { return defaultUrls; }
+		}
+
+		private void ProcessFilterFactoryNode(XmlNode node)
+		{
+			if (node == null) return;
+
+			XmlAttribute type = node.Attributes["type"];
+
+			if (type == null)
+			{
+				String message = "The custom filter factory node must specify a 'type' attribute";
+				throw new ConfigurationErrorsException(message);
+			}
+
+			customFilterFactory = TypeLoadUtil.GetType(type.Value);
+		}
+
+		private void ProcessMatchHostNameAndPath(XmlNode node)
+		{
+			if (node == null) return;
+
+			XmlAttribute matchHostNameAndPathAtt = node.Attributes["matchHostNameAndPath"];
+
+			if (matchHostNameAndPathAtt != null && matchHostNameAndPathAtt.Value != String.Empty)
+			{
+				matchHostNameAndPath = String.Compare(matchHostNameAndPathAtt.Value, "true", true) == 0;
+			}
+		}
+
+		private void ProcessExcludeAppPath(XmlNode node)
+		{
+			if (node == null) return;
+
+			// maybe a check to make sure both matchHostNameAndPathAtt & includeAppPath 
+			// are not both set as that wouldn't make sense?
+			XmlAttribute excludeAppPathAtt = node.Attributes["excludeAppPath"];
+
+			if (excludeAppPathAtt != null && excludeAppPathAtt.Value != String.Empty)
+			{
+				excludeAppPath = String.Compare(excludeAppPathAtt.Value, "true", true) == 0;
+			}
+		}
+
 		private void ConfigureWindsorIntegration()
 		{
-			const String windsorAssembly = "Castle.MonoRail.WindsorExtension";
-			
+			const string windsorExtensionAssemblyName = "Castle.MonoRail.WindsorExtension";
+
+			services.RegisterService(ServiceIdentification.ControllerTree, TypeLoadUtil.GetType(
+			                                                               	TypeLoadUtil.GetEffectiveTypeName(
+			                                                               		"Castle.MonoRail.WindsorExtension.ControllerTreeAccessor, " +
+			                                                               		windsorExtensionAssemblyName)));
+
 			controllersConfig.CustomControllerFactory = TypeLoadUtil.GetType(
-				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorControllerFactory, " + windsorAssembly));
-			
+				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorControllerFactory, " +
+				                                  windsorExtensionAssemblyName));
+
 			viewComponentsConfig.CustomViewComponentFactory = TypeLoadUtil.GetType(
-				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorViewComponentFactory, " + windsorAssembly));
-			
+				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorViewComponentFactory, " +
+				                                  windsorExtensionAssemblyName));
+
 			customFilterFactory = TypeLoadUtil.GetType(
-				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorFilterFactory, " + windsorAssembly));
+				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorFilterFactory, " +
+				                                  windsorExtensionAssemblyName));
 		}
-		
 	}
 }

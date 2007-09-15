@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -237,15 +237,20 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 #endif
 				
 				writer = layoutwriter;
-			}
 
-			controller.DirectRender( writer.GetStringBuilder().ToString() );		
+				controller.CancelView();
+				controller.Response.Write(writer.GetStringBuilder().ToString());
+			}
+			else
+			{
+				controller.DirectRender(writer.GetStringBuilder().ToString());
+			}
 		}
 
 		protected static void SetUpHelpers(Controller controller)
 		{
-			ARFormHelper htmlHelper = new ARFormHelper();
-			htmlHelper.SetController(controller);
+			ARFormHelper formHelper = new ARFormHelper();
+			formHelper.SetController(controller);
 	
 			ValidationHelper validationHelper = new ValidationHelper();
 			validationHelper.SetController(controller);
@@ -256,7 +261,15 @@ namespace Castle.MonoRail.ActiveRecordScaffold
             PaginationHelper paginationHelper = new PaginationHelper();
             paginationHelper.SetController(controller);
 
-			controller.PropertyBag["HtmlHelper"] = htmlHelper;
+			ScriptaculousHelper scriptaculous = new ScriptaculousHelper();
+			scriptaculous.SetController(controller);
+
+			AjaxHelper ajaxHelper = new AjaxHelper();
+			ajaxHelper.SetController(controller);
+
+			controller.PropertyBag["Scriptaculous"] = scriptaculous;
+			controller.PropertyBag["Ajax"] = ajaxHelper;
+			controller.PropertyBag["Form"] = formHelper;
 			controller.PropertyBag["ValidationHelper"] = validationHelper;
 			controller.PropertyBag["PresentationHelper"] = presentationHelper;
             controller.PropertyBag["PaginationHelper"] = paginationHelper;

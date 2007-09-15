@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -86,7 +86,6 @@ namespace Castle.MicroKernel
 			remove { events.RemoveHandler(ComponentUnregisteredEvent, value); }
 		}
 
-
 		/// <summary>
 		/// Pending
 		/// </summary>
@@ -136,13 +135,11 @@ namespace Castle.MicroKernel
 			remove { events.RemoveHandler(ComponentModelCreatedEvent, value); }
 		}
 
-
 		public event DependencyDelegate DependencyResolving
 		{
 			add { events.AddHandler(DependencyResolvingEvent, value); }
 			remove { events.RemoveHandler(DependencyResolvingEvent, value); }
 		}
-
 
 		protected virtual void RaiseComponentRegistered(String key, IHandler handler)
 		{
@@ -187,7 +184,7 @@ namespace Castle.MicroKernel
 			if (eventDelegate != null) eventDelegate(model);
 		}
 
-		protected virtual void RaiseHandlerRegistered(IHandler handler)
+		public virtual void RaiseHandlerRegistered(IHandler handler)
 		{
 			bool stateChanged = true;
 

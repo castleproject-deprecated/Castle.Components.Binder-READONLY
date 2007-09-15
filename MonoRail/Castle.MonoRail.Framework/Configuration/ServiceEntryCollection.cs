@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ namespace Castle.MonoRail.Framework.Configuration
 	using System.Xml;
 	
 	using Castle.Components.Common.EmailSender;
+	using Castle.Components.Validator;
 	using Castle.MonoRail.Framework.Internal;
-	
+	using Castle.MonoRail.Framework.Services.AjaxProxyGenerator;
+
 
 	public class ServiceEntryCollection : ISerializedConfig
 	{
@@ -127,12 +129,28 @@ namespace Castle.MonoRail.Framework.Configuration
 					return typeof(IViewSourceLoader);
 				case ServiceIdentification.ScaffoldingSupport:
 					return typeof(IScaffoldingSupport);
-				case ServiceIdentification.ViewEngine:
-					return typeof(IViewEngine);
+				case ServiceIdentification.ViewEngineManager:
+					return typeof(IViewEngineManager);
 				case ServiceIdentification.ResourceFactory:
 					return typeof(IResourceFactory);
+				case ServiceIdentification.ExecutorFactory:
+					return typeof(IControllerLifecycleExecutorFactory);
+				case ServiceIdentification.TransformationFilterFactory:
+					return typeof(ITransformFilterFactory);
+				case ServiceIdentification.TransformFilterDescriptorProvider:
+					return typeof(ITransformFilterDescriptorProvider);
+				case ServiceIdentification.UrlBuilder:
+					return typeof(IUrlBuilder);
+				case ServiceIdentification.UrlTokenizer:
+					return typeof(IUrlTokenizer);
+				case ServiceIdentification.ServerUtility:
+					return typeof(IServerUtility);
+				case ServiceIdentification.ValidatorRegistry:
+					return typeof(IValidatorRegistry);
+				case ServiceIdentification.AjaxProxyGenerator:
+					return typeof(IAjaxProxyGenerator);
 				default:
-					throw new NotSupportedException("Id not supported " + id.ToString());
+					throw new NotSupportedException("Id not supported " + id);
 			}
 		}
 	}

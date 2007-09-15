@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace NVelocity.Exception
 	/// <summary>
 	/// Application-level exception thrown when a reference method is
 	/// invoked and an exception is thrown.
-	/// <br>
+	/// <br/>
 	/// When this exception is thrown, a best effort will be made to have
 	/// useful information in the exception's message.  For complete
 	/// information, consult the runtime log.
@@ -36,26 +36,28 @@ namespace NVelocity.Exception
 		/// <summary>
 		/// Wraps the passed in exception for examination later
 		/// </summary>
-		public MethodInvocationException(String message, Exception innerException, String methodName) 
+		public MethodInvocationException(String message, Exception innerException, String methodName)
 			: base(message, innerException)
 		{
 			this.methodName = methodName;
 		}
 
 		#region Serialization Support
-		protected MethodInvocationException(SerializationInfo info, StreamingContext context) 
+
+		protected MethodInvocationException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
 			methodName = info.GetString("methodName");
 			referenceName = info.GetString("referenceName");
 		}
-		
+
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("methodName", methodName);
 			info.AddValue("referenceName", referenceName);
 			base.GetObjectData(info, context);
 		}
+
 		#endregion
 
 		public String MethodName

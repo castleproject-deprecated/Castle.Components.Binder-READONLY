@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,11 @@
 
 namespace Castle.Core.Interceptor
 {
-	/// <summary>
-	/// Basic implementation of <see cref="IInterceptor"/>
-	/// </summary>
-	public class StandardInterceptor : IInterceptor
+	using System;
+
+	[Serializable]
+	public class StandardInterceptor : MarshalByRefObject, IInterceptor
 	{
-		/// <summary>
-		/// Intercepts the specified invocation.
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
 		public void Intercept(IInvocation invocation)
 		{
 			PreProceed(invocation);
@@ -30,18 +26,10 @@ namespace Castle.Core.Interceptor
 			PostProceed(invocation);
 		}
 
-		/// <summary>
-		/// Pre-process the invocation.
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
 		protected virtual void PreProceed(IInvocation invocation)
 		{
 		}
 
-		/// <summary>
-		/// Post-process the invocation.
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
 		protected virtual void PostProceed(IInvocation invocation)
 		{
 		}

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ namespace Castle.MonoRail.Framework
 	public interface IServerUtility
 	{
 		/// <summary>
-		/// Returns the physical path for the 
+		/// Returns the physical path for the
 		/// specified virtual path.
 		/// </summary>
-		/// <param name="virtualPath"></param>
-		/// <returns></returns>
+		/// <param name="virtualPath">The virtual path.</param>
+		/// <returns>The mapped path</returns>
 		String MapPath(String virtualPath);
 
 		/// <summary>
@@ -42,6 +42,13 @@ namespace Castle.MonoRail.Framework
 		String UrlEncode(String content);
 
 		/// <summary>
+		/// URL decodes a string and returns the decoded string.  
+		/// </summary>
+		/// <param name="content">The text to URL decode.</param>
+		/// <returns>The URL decoded text.</returns>
+		String UrlDecode(String content);
+
+		/// <summary>
 		/// URL encodes the path portion of a URL string and returns the encoded string.  
 		/// </summary>
 		/// <param name="content">The text to URL encode.</param>
@@ -51,15 +58,11 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Escapes JavaScript with Url encoding and returns the encoded string.  
 		/// </summary>
+		/// <remarks>
+		/// Converts quotes, single quotes and CR/LFs to their representation as an escape character.
+		/// </remarks>
 		/// <param name="content">The text to URL encode and escape JavaScript within.</param>
 		/// <returns>The URL encoded and JavaScript escaped text.</returns>
 		String JavaScriptEscape(String content);
-
-		/// <summary>
-		/// Build an encoded QueryString
-		/// </summary>
-		/// <param name="queryParams">A NameValueCollection with the values for the QueryParams</param>
-		/// <returns>The QueryString encoded.</returns>
-		String BuildWebParams(NameValueCollection queryParams);
 	}
 }

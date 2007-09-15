@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,6 +33,14 @@ namespace Castle.MonoRail.Framework.Tests
 		}
 
 		[Test]
+		public void UrlDecode()
+		{
+			DoGet("ServerUtility/UrlDecode.rails", "content=this+is+a+path");
+
+			AssertReplyEqualTo("this is a path");
+		}
+
+		[Test]
 		public void HtmlEncode()
 		{
 			DoGet("ServerUtility/HtmlEncode.rails", "content=<html>content</html>");
@@ -43,17 +51,17 @@ namespace Castle.MonoRail.Framework.Tests
 		[Test]
 		public void UrlPathEncode()
 		{
-			DoGet("ServerUtility/UrlPathEncode.rails", @"content=My path folder\is this one");
+			DoGet("ServerUtility/UrlPathEncode.rails", @"content=My path folder is this one");
 
-			AssertReplyEqualTo(@"My%20path%20folder\is%20this%20one");
+			AssertReplyEqualTo(@"My%20path%20folder%20is%20this%20one");
 		}
 	
 		[Test]
 		public void JavaScriptEscape()
 		{
-			DoGet("ServerUtility/JavaScriptEscape.rails", "content=some js \" content \"");
+			DoGet("ServerUtility/JavaScriptEscape.rails", "content=some js \" content \", test's");
 
-			AssertReplyEqualTo("some+js+%22+content+%22");
+			AssertReplyEqualTo("some js \\\" content \\\", test\\'s");
 		}
 	}
 }

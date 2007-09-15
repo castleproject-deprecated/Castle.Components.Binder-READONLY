@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 	using System;
 	using System.Reflection.Emit;
 
-	[CLSCompliant(false)]
 	public class ConvertExpression : Expression
 	{
-		private readonly Type target;
-		private readonly Type fromType;
 		private readonly Expression right;
+		private Type fromType;
+		private Type target;
 
 		public ConvertExpression(Type targetType, Expression right)
 			: this(targetType, typeof(object), right)
@@ -31,7 +30,7 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 
 		public ConvertExpression(Type targetType, Type fromType, Expression right)
 		{
-			this.target = targetType;
+			target = targetType;
 			this.fromType = fromType;
 			this.right = right;
 		}
@@ -47,12 +46,12 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 
 			if (fromType.IsByRef)
 			{
-				throw new NotSupportedException("Cannot convert from ByRef types");
+				fromType = fromType.GetElementType();
 			}
 
 			if (target.IsByRef)
 			{
-				throw new NotSupportedException("Cannot convert to ByRef types");
+				target = target.GetElementType();
 			}
 
 			if (target.IsValueType)

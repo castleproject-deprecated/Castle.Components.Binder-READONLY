@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 namespace Castle.MicroKernel.Lifestyle
 {
-
 	using System;
 	using System.Collections;
 	using System.Configuration;
 	using System.Web;
-
-	using Castle.MicroKernel;
-	using Castle.MicroKernel.Lifestyle;
 
 	/// <summary>
 	/// Implements a Lifestyle Manager for Web Apps that
@@ -38,15 +33,21 @@ namespace Castle.MicroKernel.Lifestyle
 		public override object Resolve(CreationContext context)
 		{
 			HttpContext current = HttpContext.Current;
-			
+
+			if (current == null)
+				throw new InvalidOperationException(
+					"HttpContext.Current is null.  PerWebRequestLifestyle can only be used in ASP.Net");
+
 			if (current.Items[PerRequestObjectID] == null)
 			{
 				if (!PerWebRequestLifestyleModule.Initialized)
 				{
-					throw new ConfigurationException("Looks like you forgot to register the http module " +
-						typeof(PerWebRequestLifestyleModule).FullName +
-						"\r\nAdd '<add name=\"PerRequestLifestyle\" type=\"ClientService.RBT.Components.IoC.PerWebRequestLifestyleModule, ClientService.RBT.Components\" />' " +
-                        "to the <httpModules> section on your web.config");
+					string message = "Looks like you forgot to register the http module " +
+					                 typeof(PerWebRequestLifestyleModule).FullName +
+					                 "\r\nAdd '<add name=\"PerRequestLifestyle\" type=\"Castle.MicroKernel.Lifestyle.PerWebRequestLifestyleModule, Castle.MicroKernel\" />' " +
+					                 "to the <httpModules> section on your web.config";
+
+					throw new ConfigurationErrorsException(message);
 				}
 
 				object instance = base.Resolve(context);
@@ -71,11 +72,11 @@ namespace Castle.MicroKernel.Lifestyle
 		{
 			base.Release(instance);
 		}
-		
+
 		public override void Dispose()
 		{
 		}
-		
+
 		#endregion
 	}
 
@@ -85,7 +86,7 @@ namespace Castle.MicroKernel.Lifestyle
 	{
 		private static bool initialized;
 
-		private const string PerRequestEvict = "PerRequestLifestyleManager_Evict"; 
+		private const string PerRequestEvict = "PerRequestLifestyleManager_Evict";
 
 		public void Init(HttpApplication context)
 		{
@@ -95,7 +96,6 @@ namespace Castle.MicroKernel.Lifestyle
 
 		public void Dispose()
 		{
-
 		}
 
 		internal static void RegisterForEviction(PerWebRequestLifestyleManager manager, object instance)
@@ -112,15 +112,15 @@ namespace Castle.MicroKernel.Lifestyle
 
 			candidates.Add(manager, instance);
 		}
-		
+
 		protected void Application_EndRequest(Object sender, EventArgs e)
 		{
 			HttpApplication application = (HttpApplication) sender;
 			IDictionary candidates = (IDictionary) application.Context.Items[PerRequestEvict];
-			
+
 			if (candidates != null)
 			{
-				foreach (DictionaryEntry candidate in candidates)
+				foreach(DictionaryEntry candidate in candidates)
 				{
 					PerWebRequestLifestyleManager manager =
 						(PerWebRequestLifestyleManager) candidate.Key;
@@ -130,12 +130,12 @@ namespace Castle.MicroKernel.Lifestyle
 				application.Context.Items.Remove(PerRequestEvict);
 			}
 		}
-		
+
 		internal static bool Initialized
 		{
 			get { return initialized; }
 		}
 	}
-	
+
 	#endregion
 }

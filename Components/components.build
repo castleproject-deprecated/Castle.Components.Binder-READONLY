@@ -2,17 +2,22 @@
 <project
 	name="castle-components"
 	default="build"
-	xmlns="http://nant.sf.net/release/0.85-rc4/nant.xsd"
+	xmlns="http://nant.sf.net/release/0.85/nant.xsd"
 >
+	<property name="root.dir" value=".." />
+	<include buildfile="${root.dir}/common-project.xml" />
 
-	<target name="build" depends="general, winforms" />
+	<fileset id="buildfiles.all">
+		<!-- Files have to be in dependency order -->
+		<include name="Validator/Validator.build" />
+		<include name="Binder/Binder.build" />
+		<include name="TemplateEngine/TemplateEngine.build" />
+		<include name="EmailSender/EmailSender.build" />
+		<include name="DictionaryAdapter/DictionaryAdapter.build" />
+	</fileset>
+
+	<target name="build" depends="common.build" />
 	
-	<target name="general">
-		<nant buildfile="General/General.build" />
-	</target>
-	
-	<target name="winforms">
-		<nant buildfile="Winforms/Winforms.build" />
-	</target>
+	<target name="generate-assemblyinfo" depends="common.assemblyinfo" />
 
 </project>

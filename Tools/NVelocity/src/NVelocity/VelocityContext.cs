@@ -2,8 +2,7 @@ namespace NVelocity
 {
 	using System;
 	using System.Collections;
-
-	using NVelocity.Context;
+	using Context;
 
 	/// <summary>
 	/// General purpose implemention of the application Context
@@ -105,7 +104,7 @@ namespace NVelocity
 		/// <returns>keys as []</returns>
 		public override Object[] InternalGetKeys()
 		{
-			Object[] keys = new object[context.Count];
+			Object[] keys = new object[context.Keys.Count];
 			context.Keys.CopyTo(keys, 0);
 			return keys;
 		}

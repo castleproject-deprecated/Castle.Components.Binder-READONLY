@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 namespace Castle.MicroKernel.LifecycleConcerns
 {
-	using System;
-
 	using Castle.Core;
 
 	/// <summary>
@@ -23,6 +21,6 @@ namespace Castle.MicroKernel.LifecycleConcerns
 	/// </summary>
 	public interface ILifecycleConcern
 	{
-		void Apply( ComponentModel model, object component );
+		void Apply(ComponentModel model, object component);
 	}
 }

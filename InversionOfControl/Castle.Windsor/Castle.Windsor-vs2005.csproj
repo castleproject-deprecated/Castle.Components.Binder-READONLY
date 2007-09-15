@@ -11,8 +11,7 @@
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>Castle.Windsor</AssemblyName>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\CastleKey.snk</AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -26,6 +25,7 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\aa\</OutputPath>
@@ -34,18 +34,16 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DEBUG;DOTNET2</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DocumentationFile>..\bin\aa\Castle.Windsor.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>1591</NoWarn>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -58,29 +56,24 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Release\Castle.Windsor.XML</DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>1591</NoWarn>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.DynamicProxy, Version=1.1.5.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build\net-2.0\debug\Castle.DynamicProxy.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
@@ -91,8 +84,12 @@
       <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
       <Name>Castle.Core-vs2005</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Tools\Castle.DynamicProxy2\Castle.DynamicProxy\Castle.DynamicProxy-vs2005.csproj">
+      <Project>{2DE7CC8C-6F06-43BC-A7B6-9466BEDEAC28}</Project>
+      <Name>Castle.DynamicProxy-net-2-0</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Castle.MicroKernel\Castle.MicroKernel-vs2005.csproj">
-      <Name>Castle.MicroKernel</Name>
+      <Name>Castle.MicroKernel-vs2005</Name>
       <Project>{8C6AADEB-D099-4D2A-8F5B-4EBC12AC9159}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
@@ -116,13 +113,7 @@
     <Compile Include="Adapters\ComponentModel\ServiceCreatorCallbackActivator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AsyncInitializationContainer.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Configuration\AppDomain\CastleSectionHandler.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Configuration\CascadeConfigurationStore.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Configuration\IConfigurationInterpreter.cs">
@@ -165,6 +156,7 @@
     <Compile Include="Configuration\Interpreters\XmlProcessor\ElementProcessors\DefineElementProcessor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Configuration\Interpreters\XmlProcessor\ElementProcessors\EvalProcessingInstructionProcessor.cs" />
     <Compile Include="Configuration\Interpreters\XmlProcessor\ElementProcessors\IfElementProcessor.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -198,9 +190,7 @@
     <Compile Include="Configuration\Interpreters\XmlProcessor\XmlProcessorException.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IContainerAccessor.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="IEnvironmentInfo.cs" />
     <Compile Include="InitializationException.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -213,30 +203,14 @@
     <Compile Include="IWindsorContainer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IContainerAccessor.cs" />
     <Compile Include="Proxy\AbstractProxyFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Proxy\ComponentRealProxy.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Proxy\DefaultMethodInvocation.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Proxy\DefaultProxyFactory.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Proxy\InterceptorChain.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Proxy\MessageProxyInvocation.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Proxy\ProxySmartFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Proxy\RealProxyProxyFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Proxy\ProxyGenerationHookAdapter.cs" />
     <Compile Include="WindsorContainer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -246,6 +220,14 @@
     <EmbeddedResource Include="Adapters\ComponentModel\ContainerWrapper.resx">
       <DependentUpon>ContainerWrapper.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\CastleKey.snk">
+      <Link>CastleKey.snk</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

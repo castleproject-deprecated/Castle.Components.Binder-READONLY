@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ namespace Castle.MonoRail.Framework.Tests
 	using System;
 	
 	using NUnit.Framework;
-
-	using Castle.MonoRail.TestSupport;
 
 
 	[TestFixture]
@@ -107,8 +105,8 @@ namespace Castle.MonoRail.Framework.Tests
 
 			AssertReplyEqualTo( @"My View contents for Cookies\Index" );
 			
-			/// One of the cookies will be the asp.net used by the flash property
-			///Assert.AreEqual( 3, Response.Cookies.Count );
+			// One of the cookies will be the asp.net used by the flash property
+			// Assert.AreEqual( 3, Response.Cookies.Count );
 
 			AssertHasCookie( "cookiename" );
 			AssertHasCookie( "cookiename2" );

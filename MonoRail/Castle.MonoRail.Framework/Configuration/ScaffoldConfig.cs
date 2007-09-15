@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ namespace Castle.MonoRail.Framework.Configuration
 			
 			if (typeAtt == null || typeAtt.Value == String.Empty)
 			{
-				throw new ConfigurationException("Please specify the 'type' attribute to define an implementation for scaffolding support");
+				String message = "Please specify the 'type' attribute to define an implementation for scaffolding support";
+				throw new ConfigurationErrorsException(message);
 			}
 			
 			scaffoldImplType = TypeLoadUtil.GetType(typeAtt.Value);

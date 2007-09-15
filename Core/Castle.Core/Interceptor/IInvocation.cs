@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,40 +22,22 @@ namespace Castle.Core.Interceptor
 	/// </summary>
 	public interface IInvocation
 	{
-		// object Proxy { get; }
+		object Proxy { get; }
 
-		// object InvocationTarget { get;set; }
+		object InvocationTarget { get; }
 
-		/// <summary>
-		/// 
-		/// </summary>
 		Type TargetType { get; }
 
-		/// <summary>
-		/// 
-		/// </summary>
 		object[] Arguments { get; }
 
-		/// <summary>
-		/// 
-		/// </summary>
 		void SetArgumentValue(int index, object value);
 
-		/// <summary>
-		/// 
-		/// </summary>
 		object GetArgumentValue(int index);
 
 		/// <summary>
-		/// 
+		/// The generic arguments of the method, or null if not a generic method.
 		/// </summary>
-		/// <returns></returns>
-		void Proceed();
-
-		/// <summary>
-		/// 
-		/// </summary>
-		object ReturnValue { get; set; }
+		Type[] GenericArguments { get; }
 
 		/// <summary>
 		/// 
@@ -63,10 +45,31 @@ namespace Castle.Core.Interceptor
 		MethodInfo Method { get; }
 
 		/// <summary>
-		/// Returns the method on the target of invocation, 
-		/// which can be for example the method defined on an
-		/// interface, if dealing with an interface proxy
+		/// Returns the concrete instantiation of <see cref="Method"/>, with any generic parameters bound to real types.
+		/// </summary>
+		/// <returns>The concrete instantiation of <see cref="Method"/>, or <see cref="Method"/> if not a generic method.</returns>
+		/// <remarks>Can be slower than calling <see cref="Method"/>.</remarks>
+		MethodInfo GetConcreteMethod();
+
+		/// <summary>
+		/// For interface proxies, this will point to the
+		/// <see cref="MethodInfo"/> on the target class
 		/// </summary>
 		MethodInfo MethodInvocationTarget { get; }
+
+		/// <summary>
+		/// Returns the concrete instantiation of <see cref="MethodInvocationTarget"/>, with any generic parameters bound to real types.
+		/// </summary>
+		/// <returns>The concrete instantiation of <see cref="MethodInvocationTarget"/>, or <see cref="MethodInvocationTarget"/> if not a generic method.</returns>
+		/// <remarks>Can be slower than calling <see cref="MethodInvocationTarget"/>.</remarks>
+		MethodInfo GetConcreteMethodInvocationTarget();
+
+		object ReturnValue { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		void Proceed();
 	}
 }

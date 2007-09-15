@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	[CLSCompliant(false)]
 	public class MethodTokenExpression : Expression
 	{
 		private readonly MethodInfo method;
@@ -27,18 +26,13 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 		public MethodTokenExpression(MethodInfo method)
 		{
 			this.method = method;
-		}
-
-		public MethodTokenExpression(MethodInfo method, Type declaringType)
-		{
-			this.method = method;
-			this.declaringType = declaringType;
+			declaringType = method.DeclaringType;
 		}
 
 		public override void Emit(IMemberEmitter member, ILGenerator gen)
 		{
 			gen.Emit(OpCodes.Ldtoken, method);
-#if DOTNET2
+#if !MONO
 			if (declaringType == null)
 			{
 				throw new GeneratorException("declaringType can't be null for this situation");
@@ -46,12 +40,12 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 			gen.Emit(OpCodes.Ldtoken, declaringType);
 #endif
 
-			MethodInfo minfo = Constants.GetMethodFromHandle1; 
+			MethodInfo minfo = Constants.GetMethodFromHandle1;
 
-#if DOTNET2
-			minfo = Constants.GetMethodFromHandle2; 
+#if !MONO
+			minfo = Constants.GetMethodFromHandle2;
 #endif
-			
+
 			gen.Emit(OpCodes.Call, minfo);
 			gen.Emit(OpCodes.Castclass, typeof(MethodInfo));
 		}

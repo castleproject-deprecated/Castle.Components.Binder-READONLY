@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,24 +18,35 @@ namespace Castle.Windsor.Installer
 	using System.Configuration;
 
 	using Castle.Core.Configuration;
-
+	using Castle.Core.Resource;
 	using Castle.MicroKernel;
+	using Castle.Windsor.Configuration.Interpreters;
 
 	/// <summary>
-	/// 
+	/// Default <see cref="IComponentsInstaller"/> implementation.
 	/// </summary>
 	public class DefaultComponentInstaller : IComponentsInstaller
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultComponentInstaller"/> class.
+		/// </summary>
 		public DefaultComponentInstaller()
 		{
 		}
 
 		#region IComponentsInstaller Members
 
+		/// <summary>
+		/// Perform installation.
+		/// </summary>
+		/// <param name="container">Target container</param>
+		/// <param name="store">Configuration store</param>
 		public void SetUp(IWindsorContainer container, IConfigurationStore store)
 		{
+			SetUpComponents(store.GetBootstrapComponents(), container);
 			SetUpFacilities(store.GetFacilities(), container);
 			SetUpComponents(store.GetComponents(), container);
+			SetUpChildContainers(store.GetConfigurationForChildContainers(), container);
 		}
 
 		#endregion
@@ -86,6 +97,19 @@ namespace Castle.Windsor.Installer
 			}
 		}
 
+		private void SetUpChildContainers(IConfiguration[] configurations, IWindsorContainer parentContainer)
+		{
+			foreach(IConfiguration childContainerConfig in configurations)
+			{
+				String id = childContainerConfig.Attributes["name"];
+				
+				System.Diagnostics.Debug.Assert( id != null );
+
+				new WindsorContainer(id, parentContainer, 
+					new XmlInterpreter(new StaticContentResource(childContainerConfig.Value)));
+			}
+		}
+
 		private Type ObtainType(String typeName)
 		{
 			Type type = Type.GetType(typeName, false, false);
@@ -93,7 +117,8 @@ namespace Castle.Windsor.Installer
 			if (type == null)
 			{
 				String message = String.Format("The type name {0} could not be located", typeName);
-				throw new ConfigurationException(message);
+
+				throw new ConfigurationErrorsException(message);
 			}
 
 			return type;
@@ -104,7 +129,8 @@ namespace Castle.Windsor.Installer
 			if (!typeof(IFacility).IsAssignableFrom( facilityType ))
 			{
 				String message = String.Format("Type {0} does not implement the interface IFacility", facilityType.FullName);
-				throw new ConfigurationException(message);
+
+				throw new ConfigurationErrorsException(message);
 			}
 
 			try
@@ -114,7 +140,8 @@ namespace Castle.Windsor.Installer
 			catch(Exception)
 			{
 				String message = String.Format("Could not instantiate {0}. Does it have a public default constructor?", facilityType.FullName);
-				throw new ConfigurationException(message);
+
+				throw new ConfigurationErrorsException(message);
 			}
 		}
 	}

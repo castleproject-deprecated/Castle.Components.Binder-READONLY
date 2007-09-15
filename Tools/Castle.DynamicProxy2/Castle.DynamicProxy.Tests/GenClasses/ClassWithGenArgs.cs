@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace Castle.DynamicProxy.Tests.GenClasses
 			set { propVal = value; }
 			get { return propVal; }
 		}
-		
+
 		public virtual void DoSomething()
 		{
 			invoked = true;
@@ -57,12 +57,14 @@ namespace Castle.DynamicProxy.Tests.GenClasses
 			invoked = true;
 		}
 	}
-	
+
 	public class SubClassWithGenArgs<T, Z, Y> : ClassWithGenArgs<T, Z>
 	{
 		public override void DoSomething()
 		{
+#pragma warning disable 219
 			int x = 1 + 10; // Just something to fool the compiler 
+#pragma warning restore 219
 			base.DoSomething();
 		}
 	}

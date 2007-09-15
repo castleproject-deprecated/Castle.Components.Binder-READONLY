@@ -1,6 +1,21 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace Castle.DynamicProxy.Tests
 {
 	using System.IO;
+	using Castle.Core.Interceptor;
 	using Castle.DynamicProxy.Tests.Classes;
 	using NUnit.Framework;
 
@@ -13,7 +28,7 @@ namespace Castle.DynamicProxy.Tests
 			ProxyGenerator generator = new ProxyGenerator();
 
 			AttributedClass instance = (AttributedClass)
-				generator.CreateClassProxy(typeof(AttributedClass), new StandardInterceptor());
+			                           generator.CreateClassProxy(typeof(AttributedClass), new StandardInterceptor());
 
 			object[] attributes = instance.GetType().GetCustomAttributes(typeof(NonInheritableAttribute), false);
 			Assert.AreEqual(1, attributes.Length);
@@ -30,7 +45,7 @@ namespace Castle.DynamicProxy.Tests
 			ProxyGenerator generator = new ProxyGenerator();
 
 			AttributedClass2 instance = (AttributedClass2)
-				generator.CreateClassProxy(typeof(AttributedClass2), new StandardInterceptor());
+			                            generator.CreateClassProxy(typeof(AttributedClass2), new StandardInterceptor());
 
 			object[] attributes = instance.GetType().GetCustomAttributes(typeof(ComplexNonInheritableAttribute), false);
 			Assert.AreEqual(1, attributes.Length);
@@ -57,7 +72,7 @@ namespace Castle.DynamicProxy.Tests
 			attributes = instance.GetType().GetMethod("Do2").GetCustomAttributes(typeof(ComplexNonInheritableAttribute), false);
 			Assert.AreEqual(1, attributes.Length);
 			Assert.IsInstanceOfType(typeof(ComplexNonInheritableAttribute), attributes[0]);
-			att = (ComplexNonInheritableAttribute)attributes[0];
+			att = (ComplexNonInheritableAttribute) attributes[0];
 			// (3, 4, "Do2", IsSomething=true)
 			Assert.AreEqual(3, att.Id);
 			Assert.AreEqual(4, att.Num);

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,12 @@
 
 namespace Castle.Facilities.NHibernateIntegration.Tests
 {
-	using System;
-
+	using Castle.Core.Resource;
+	using Castle.Windsor;
+	using Castle.Windsor.Configuration.Interpreters;
 	using NHibernate.Cfg;
 	using NHibernate.Tool.hbm2ddl;
-	
 	using NUnit.Framework;
-
-	using Castle.Windsor;
-
 
 	public abstract class AbstractNHibernateTestCase
 	{
@@ -31,7 +28,7 @@ namespace Castle.Facilities.NHibernateIntegration.Tests
 		[SetUp]
 		public void Init()
 		{
-			container = new WindsorContainer( GetContainerConfig() );
+			container = new WindsorContainer(new XmlInterpreter(new ConfigResource()));
 
 			// Reset tables
 
@@ -67,11 +64,6 @@ namespace Castle.Facilities.NHibernateIntegration.Tests
 			container.Dispose();
 
 			container = null;
-		}
-
-		protected virtual String GetContainerConfig()
-		{
-			return ConfigHelper.ResolvePath("facilityconfig.xml");
 		}
 	}
 }

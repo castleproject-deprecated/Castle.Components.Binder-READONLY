@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,11 @@ namespace TestSite.Controllers
 		public void UrlEncode(String content)
 		{
 			RenderText( Context.Server.UrlEncode(content) );
+		}
+
+		public void UrlDecode(String content)
+		{
+			RenderText(Context.Server.UrlDecode(content));
 		}
 
 		public void HtmlEncode(String content)

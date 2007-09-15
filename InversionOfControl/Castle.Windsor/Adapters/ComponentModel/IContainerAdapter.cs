@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 namespace Castle.Windsor.Adapters.ComponentModel
 {
-	using System;
 	using System.ComponentModel;
 	using System.ComponentModel.Design;
 
@@ -25,8 +24,7 @@ namespace Castle.Windsor.Adapters.ComponentModel
 	/// <seealso cref="IComponent"/>
 	/// <seealso cref="IContainer"/>
 	/// <seealso cref="IServiceContainer"/>
-	public interface IContainerAdapter :
-		IComponent, IContainer, IServiceContainer, IContainerAccessor
+	public interface IContainerAdapter : IComponent, IContainer, IServiceContainer, IContainerAccessor
 	{
 	}
 }

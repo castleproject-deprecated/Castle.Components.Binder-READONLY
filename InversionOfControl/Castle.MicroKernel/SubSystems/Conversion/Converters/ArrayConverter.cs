@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,45 +14,39 @@
 
 namespace Castle.MicroKernel.SubSystems.Conversion
 {
-    using System;
+	using System;
+	using Castle.Core.Configuration;
 
-    using Castle.Core.Configuration;
+	[Serializable]
+	public class ArrayConverter : AbstractTypeConverter
+	{
+		public override bool CanHandleType(Type type)
+		{
+			return type.IsArray;
+		}
 
+		public override object PerformConversion(String value, Type targetType)
+		{
+			throw new NotImplementedException();
+		}
 
-    [Serializable]
-    public class ArrayConverter : AbstractTypeConverter
-    {
-        public ArrayConverter()
-        {
-        }
+		public override object PerformConversion(IConfiguration configuration, Type targetType)
+		{
+			System.Diagnostics.Debug.Assert(targetType.IsArray);
 
-        public override bool CanHandleType(Type type)
-        {
-            return type.IsArray;
-        }
+			int count = configuration.Children.Count;
+			Type itemType = targetType.GetElementType();
 
-        public override object PerformConversion(String value, Type targetType)
-        {
-            throw new NotImplementedException();
-        }
+			Array array = Array.CreateInstance(itemType, count);
 
-        public override object PerformConversion(IConfiguration configuration, Type targetType)
-        {
-            System.Diagnostics.Debug.Assert(targetType.IsArray);
+			int index = 0;
+			foreach(IConfiguration itemConfig in configuration.Children)
+			{
+				object value = Context.Composition.PerformConversion(itemConfig, itemType);
+				array.SetValue(value, index++);
+			}
 
-            int count = configuration.Children.Count;
-            Type itemType = targetType.GetElementType();
-
-            Array array = Array.CreateInstance(itemType, count);
-
-            int index = 0;
-            foreach(IConfiguration itemConfig in configuration.Children)
-            {
-                object value = Context.Composition.PerformConversion(itemConfig, itemType);
-                array.SetValue(value, index++);
-            }
-
-            return array;
-        }
-    }
+			return array;
+		}
+	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -565,6 +565,22 @@ namespace Castle.DynamicProxy.Test
 			Assert.AreEqual("DoSomethingElse", interceptor.Invocations[1]);
 			Assert.AreEqual("DoOtherThing", interceptor.Invocations[2]);
 			Assert.AreEqual("DoSomethingElse", interceptor.Invocations[3]);
+		}
+
+		/// <summary>
+		/// See http://support.castleproject.org/browse/DYNPROXY-42
+		/// </summary>
+		[Test]
+		public void NameBugReportedTest()
+		{
+			ProxyGenerator proxyGenerator = new ProxyGenerator();
+			Castle.DynamicProxy.Test.ClassInterfaces.C.IBubu bubuC = (Castle.DynamicProxy.Test.ClassInterfaces.C.IBubu)
+				proxyGenerator.CreateProxy(typeof(Castle.DynamicProxy.Test.ClassInterfaces.C.IBubu), new SimpleInterceptor(), new object());
+			bubuC.OperationA();
+			
+			Castle.DynamicProxy.Test.ClassInterfaces.D.IBubu bubuD = (Castle.DynamicProxy.Test.ClassInterfaces.D.IBubu)
+				proxyGenerator.CreateProxy(typeof(Castle.DynamicProxy.Test.ClassInterfaces.D.IBubu), new SimpleInterceptor(), new object());
+			bubuD.OperationB();
 		}
 
 		[Test]

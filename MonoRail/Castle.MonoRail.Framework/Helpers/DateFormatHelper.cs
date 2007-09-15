@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -113,15 +113,20 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// Formats to short date
 		/// </summary>
 		/// <param name="date"></param>
-		/// <returns></returns>
-		public String FormatDate(DateTime date)
+		/// <returns>Short date, or <c>String.Empty</c> if <paramref name="date"/> is <c>null</c>.</returns>
+		public String ToShortDate(DateTime? date)
 		{
-			return date.ToShortDateString();
+			return date.HasValue ? date.Value.ToShortDateString() : string.Empty;
 		}
-
-		public String ToShortDateTime(DateTime date)
+		
+		/// <summary>
+		/// Formats to short date
+		/// </summary>
+		/// <param name="date"></param>
+		/// <returns>Short date and time, or <c>String.Empty</c> if <paramref name="date"/> is <c>null</c>.</returns>
+		public String ToShortDateTime(DateTime? date)
 		{
-			return date.ToShortDateString() + " " + date.ToShortTimeString();
+			return date.HasValue ? date.Value.ToShortDateString() + " " + date.Value.ToShortTimeString() : string.Empty;
 		}
 	}
 }

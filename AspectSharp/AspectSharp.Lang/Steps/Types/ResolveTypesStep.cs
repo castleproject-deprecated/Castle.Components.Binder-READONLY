@@ -1,5 +1,5 @@
 using AspectSharp.Lang.AST.Visitors;
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ using AspectSharp.Lang.AST.Visitors;
 namespace AspectSharp.Lang.Steps.Types
 {
 	using System;
+	using System.IO;
 	using System.Reflection;
 	using System.Collections;
 
@@ -57,7 +58,15 @@ namespace AspectSharp.Lang.Steps.Types
 		{
 			try
 			{
-				Assembly assembly = Assembly.LoadWithPartialName(assemblyReference.AssemblyName);
+				Assembly assembly;
+				try
+				{
+					assembly = Assembly.Load(assemblyReference.AssemblyName);
+                }
+                catch(FileNotFoundException)
+                {
+                    assembly = GacHelper.FindAssembly(assemblyReference.AssemblyName);
+                }
 				assemblyReference.ResolvedAssembly = assembly;
 			}
 			catch(Exception ex)

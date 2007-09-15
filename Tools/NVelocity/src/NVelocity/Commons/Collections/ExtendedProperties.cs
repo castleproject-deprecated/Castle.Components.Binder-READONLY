@@ -10,7 +10,7 @@ namespace Commons.Collections
 	/// to use the same key many times concatenating the value strings
 	/// instead of overwriting them.
 	///
-	/// <p>The Extended Properties syntax is explained here:
+	/// <para>The Extended Properties syntax is explained here:
 	///
 	/// <ul>
 	/// <li>
@@ -55,10 +55,10 @@ namespace Commons.Collections
 	///
 	/// </li>
 	/// </ul>
-	///
-	/// <p>Here is an example of a valid extended properties file:
-	///
-	/// <p><pre>
+	/// </para>
+	/// <para>Here is an example of a valid extended properties file:
+	/// </para>
+	/// <para><pre>
 	/// # lines starting with # are comments
 	///
 	/// # This is the simplest property
@@ -78,19 +78,18 @@ namespace Commons.Collections
 	/// # commas may be escaped in tokens
 	/// commas.excaped = Hi\, what'up?
 	/// </pre>
-	///
-	/// <p><b>NOTE</b>: this class has <b>not</b> been written for
+	/// </para>
+	/// <para><b>NOTE</b>: this class has <b>not</b> been written for
 	/// performance nor low memory usage.  In fact, it's way slower than it
 	/// could be and generates too much memory garbage.  But since
 	/// performance is not an issue during intialization (and there is not
 	/// much time to improve it), I wrote it this way.  If you don't like
-	/// it, go ahead and tune it up!
+	/// it, go ahead and tune it up!</para>
 	/// </summary>
 	public class ExtendedProperties : Hashtable
 	{
 		private static readonly Byte DEFAULT_BYTE = 0;
 		private static readonly Boolean DEFAULT_BOOLEAN = false;
-		private static readonly Int16 DEFAULT_INT16 = 0;
 		private static readonly Int32 DEFAULT_INT32 = 0;
 		private static readonly Single DEFAULT_SINGLE = 0;
 		private static readonly Int64 DEFAULT_INT64 = 0;
@@ -157,6 +156,7 @@ namespace Commons.Collections
 		/// file.
 		/// </summary>
 		/// <param name="file">A String.</param>
+		/// <param name="defaultFile">File to load defaults from.</param>
 		/// <exception cref="IOException" />
 		public ExtendedProperties(String file, String defaultFile)
 		{
@@ -165,7 +165,7 @@ namespace Commons.Collections
 			basePath = new FileInfo(file).FullName;
 			basePath = basePath.Substring(0, (basePath.LastIndexOf(fileSeparator) + 1) - (0));
 
-			this.Load(new FileStream(file, FileMode.Open, FileAccess.Read));
+			Load(new FileStream(file, FileMode.Open, FileAccess.Read));
 
 			if (defaultFile != null)
 			{
@@ -194,8 +194,8 @@ namespace Commons.Collections
 
 		public String Include
 		{
-			get { return ExtendedProperties.include; }
-			set { ExtendedProperties.include = value; }
+			get { return include; }
+			set { include = value; }
 		}
 
 		public new IEnumerable Keys
@@ -216,9 +216,7 @@ namespace Commons.Collections
 		/// </param>
 		/// <param name="enc">An encoding.
 		/// </param>
-		/// <exception cref="">IOException.
-		///
-		/// </exception>
+		/// <exception cref="IOException" />
 		public void Load(Stream input, String enc)
 		{
 			lock(this)
@@ -230,7 +228,7 @@ namespace Commons.Collections
 					{
 						reader = new PropertiesReader(new StreamReader(input, Encoding.GetEncoding(enc)));
 					}
-					catch (IOException e)
+					catch(IOException)
 					{
 						// Get one with the default encoding...
 					}
@@ -243,11 +241,11 @@ namespace Commons.Collections
 
 				try
 				{
-					while (true)
+					while(true)
 					{
 						String line = reader.ReadProperty();
 
-						if (line==null) break;
+						if (line == null) break;
 
 						int equalSign = line.IndexOf((Char) '=');
 
@@ -304,7 +302,7 @@ namespace Commons.Collections
 								}
 								// TODO: make sure file is readable or handle exception appropriately
 								//if (file != null && tmpBool && file.canRead()) {
-								if (file != null && tmpBool)
+								if (tmpBool)
 								{
 									Load(new FileStream(file.FullName, FileMode.Open, FileAccess.Read));
 								}
@@ -316,7 +314,7 @@ namespace Commons.Collections
 						}
 					}
 				}
-				catch (NullReferenceException e)
+				catch(NullReferenceException)
 				{
 					/*
 					 * Should happen only when EOF is reached.
@@ -372,11 +370,8 @@ namespace Commons.Collections
 		/// ["file", "classpath"]
 		/// *
 		/// </summary>
-		/// <param name="String">key
-		/// </param>
-		/// <param name="String">value
-		///
-		/// </param>
+		/// <param name="key"></param>
+		/// <param name="token"></param>
 		public void AddProperty(String key, Object token)
 		{
 			Object o = this[key];
@@ -425,7 +420,7 @@ namespace Commons.Collections
 				{
 					PropertiesTokenizer tokenizer = new PropertiesTokenizer((String) token);
 
-					while (tokenizer.HasMoreTokens())
+					while(tokenizer.HasMoreTokens())
 					{
 						String s = tokenizer.NextToken();
 
@@ -531,10 +526,8 @@ namespace Commons.Collections
 		/// set values. Set values is implicitly a call
 		/// to clearProperty(key), addProperty(key,value).
 		/// </summary>
-		/// <param name="String">key
-		/// </param>
-		/// <param name="String">value
-		/// </param>
+		/// <param name="key"></param>
+		/// <param name="value_"></param>
 		public void SetProperty(String key, Object value_)
 		{
 			ClearProperty(key);
@@ -545,13 +538,13 @@ namespace Commons.Collections
 		/// </summary>
 		/// <param name="output">An OutputStream.
 		/// </param>
-		/// <param name="header">A String.
+		/// <param name="Header">A String.
 		/// </param>
-		/// <exception cref="">IOException.
+		/// <exception cref="IOException">
 		/// </exception>
 		public void Save(TextWriter output, String Header)
 		{
-			lock (this)
+			lock(this)
 			{
 				if (output != null)
 				{
@@ -559,7 +552,7 @@ namespace Commons.Collections
 					if (Header != null)
 						w.WriteLine(Header);
 
-					foreach (String key in Keys)
+					foreach(String key in Keys)
 					{
 						Object value = this[key];
 						if (value == null)
@@ -569,10 +562,10 @@ namespace Commons.Collections
 							WriteKeyOutput(w, key, (String) value);
 						else if (value is IEnumerable)
 						{
-							foreach (String currentElement in (IEnumerable) value)
+							foreach(String currentElement in (IEnumerable) value)
 								WriteKeyOutput(w, key, currentElement);
 						}
-						
+
 						w.WriteLine();
 						w.Flush();
 					}
@@ -592,18 +585,18 @@ namespace Commons.Collections
 		/// Warning: It will overwrite previous entries without warning.
 		/// *
 		/// </summary>
-		/// <param name="">ExtendedProperties
+		/// <param name="c">ExtendedProperties
 		///
 		/// </param>
 		public void Combine(ExtendedProperties c)
 		{
-			foreach (String key in c.Keys)
+			foreach(String key in c.Keys)
 			{
 				Object o = c[key];
 				// if the value is a String, escape it so that if there are delmiters that the value is not converted to a list
 				if (o is String)
 					o = ((String) o).Replace(",", @"\,");
-				
+
 				SetProperty(key, o);
 			}
 		}
@@ -611,7 +604,7 @@ namespace Commons.Collections
 		/// <summary> Clear a property in the configuration.
 		/// *
 		/// </summary>
-		/// <param name="String">key to remove along with corresponding value.
+		/// <param name="key">key to remove along with corresponding value.
 		///
 		/// </param>
 		public void ClearProperty(String key)
@@ -623,7 +616,7 @@ namespace Commons.Collections
 				* things get *very* confusing
 				*/
 
-				for (int i = 0; i < keysAsListed.Count; i++)
+				for(int i = 0; i < keysAsListed.Count; i++)
 				{
 					if (((String) keysAsListed[i]).Equals(key))
 					{
@@ -656,7 +649,7 @@ namespace Commons.Collections
 		{
 			ArrayList matchingKeys = new ArrayList();
 
-			foreach (Object key in Keys)
+			foreach(Object key in Keys)
 			{
 				if (key is String && ((String) key).StartsWith(prefix))
 					matchingKeys.Add(key);
@@ -669,7 +662,7 @@ namespace Commons.Collections
 		/// by using the setProperty() in ExtendedProperties.
 		/// *
 		/// </summary>
-		/// <param name="String">prefix
+		/// <param name="prefix">prefix
 		///
 		/// </param>
 		public ExtendedProperties Subset(String prefix)
@@ -677,7 +670,7 @@ namespace Commons.Collections
 			ExtendedProperties c = new ExtendedProperties();
 			bool validSubset = false;
 
-			foreach (Object key in Keys)
+			foreach(Object key in Keys)
 			{
 				if (key is String && ((String) key).StartsWith(prefix))
 				{
@@ -719,7 +712,7 @@ namespace Commons.Collections
 		public override String ToString()
 		{
 			StringBuilder sb = new StringBuilder();
-			foreach (String key in Keys)
+			foreach(String key in Keys)
 			{
 				Object value = this[key];
 				sb.Append(key + " => " + ValueToString(value)).Append(Environment.NewLine);
@@ -732,7 +725,7 @@ namespace Commons.Collections
 			if (value is ArrayList)
 			{
 				String s = "ArrayList :: ";
-				foreach (Object o in (ArrayList) value)
+				foreach(Object o in (ArrayList) value)
 				{
 					if (!s.EndsWith(", "))
 					{
@@ -755,7 +748,7 @@ namespace Commons.Collections
 		/// </param>
 		/// <returns>The associated string.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a String.
 		///
 		/// </exception>
@@ -774,7 +767,7 @@ namespace Commons.Collections
 		/// <returns>The associated string if key is found,
 		/// default value otherwise.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a String.
 		///
 		/// </exception>
@@ -815,10 +808,10 @@ namespace Commons.Collections
 		/// </param>
 		/// <returns>The associated properties if key is found.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a String/Vector.
 		/// </exception>
-		/// <exception cref="">IllegalArgumentException if one of the tokens is
+		/// <exception cref="ArgumentException"> if one of the tokens is
 		/// malformed (does not contain an equals sign).
 		///
 		/// </exception>
@@ -834,16 +827,18 @@ namespace Commons.Collections
 		/// </summary>
 		/// <param name="key">The configuration key.
 		/// </param>
+		/// <param name="defaultProps">Default property values.
+		/// </param>
 		/// <returns>The associated properties if key is found.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a String/Vector.
 		/// </exception>
-		/// <exception cref="">IllegalArgumentException if one of the tokens is
+		/// <exception cref="ArgumentException"> if one of the tokens is
 		/// malformed (does not contain an equals sign).
 		///
 		/// </exception>
-		public Hashtable GetProperties(String key, Hashtable defaults)
+		public Hashtable GetProperties(String key, Hashtable defaultProps)
 		{
 			/*
 	    * Grab an array of the tokens for this key.
@@ -853,8 +848,8 @@ namespace Commons.Collections
 			/*
 	    * Each token is of the form 'key=value'.
 	    */
-			Hashtable props = new Hashtable(defaults);
-			for (int i = 0; i < tokens.Length; i++)
+			Hashtable props = new Hashtable(defaultProps);
+			for(int i = 0; i < tokens.Length; i++)
 			{
 				String token = tokens[i];
 				int equalSign = token.IndexOf((Char) '=');
@@ -880,7 +875,7 @@ namespace Commons.Collections
 		/// </param>
 		/// <returns>The associated string array if key is found.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a String/Vector.
 		///
 		/// </exception>
@@ -916,7 +911,7 @@ namespace Commons.Collections
 			}
 
 			String[] tokens = new String[vector.Count];
-			for (int i = 0; i < tokens.Length; i++)
+			for(int i = 0; i < tokens.Length; i++)
 			{
 				tokens[i] = (String) vector[i];
 			}
@@ -932,7 +927,7 @@ namespace Commons.Collections
 		/// </param>
 		/// <returns>The associated Vector.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Vector.
 		///
 		/// </exception>
@@ -951,7 +946,7 @@ namespace Commons.Collections
 		/// </param>
 		/// <returns>The associated Vector.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Vector.
 		///
 		/// </exception>
@@ -978,7 +973,7 @@ namespace Commons.Collections
 				}
 				else
 				{
-					return ((defaultValue == null) ? new ArrayList() : defaultValue);
+					return (defaultValue ?? new ArrayList());
 				}
 			}
 			else
@@ -994,10 +989,10 @@ namespace Commons.Collections
 		/// </param>
 		/// <returns>The associated boolean.
 		/// </returns>
-		/// <exception cref="">NoSuchElementException is thrown if the key doesn't
+		/// <exception cref="Exception"> is thrown if the key doesn't
 		/// map to an existing object.
 		/// </exception>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Boolean.
 		///
 		/// </exception>
@@ -1024,7 +1019,7 @@ namespace Commons.Collections
 		/// <returns>The associated boolean if key is found and has valid
 		/// format, default value otherwise.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Boolean.
 		///
 		/// </exception>
@@ -1068,7 +1063,7 @@ namespace Commons.Collections
 		/// boolean status is ignored.
 		/// *
 		/// </summary>
-		/// <param name="String">The value to test for boolean state.
+		/// <param name="value_">The value to test for boolean state.
 		/// </param>
 		/// <returns><code>true</code> or <code>false</code> if the supplied
 		/// text maps to a boolean value, or <code>null</code> otherwise.
@@ -1076,7 +1071,7 @@ namespace Commons.Collections
 		/// </returns>
 		public String TestBoolean(String value_)
 		{
-			String s = ((String) value_).ToLower();
+			String s = value_.ToLower();
 
 			if (s.Equals("true") || s.Equals("on") || s.Equals("yes"))
 			{
@@ -1097,17 +1092,14 @@ namespace Commons.Collections
 		/// </summary>
 		/// <param name="key">The configuration key.
 		/// </param>
-		/// <returns>The associated byte.
+		/// <returns>The associated byte if key is found and has valid
+		/// format, <see cref="DEFAULT_BYTE"/> otherwise.
 		/// </returns>
-		/// <exception cref="">NoSuchElementException is thrown if the key doesn't
+		/// <exception cref="Exception"> is thrown if the key doesn't
 		/// map to an existing object.
 		/// </exception>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Byte.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public sbyte GetByte(String key)
 		{
@@ -1129,14 +1121,11 @@ namespace Commons.Collections
 		/// </param>
 		/// <param name="defaultValue">The default value.
 		/// </param>
-		/// <returns>The associated byte.
+		/// <returns>The associated byte if key is found and has valid
+		/// format, default value otherwise.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Byte.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public sbyte GetByte(String key, sbyte defaultValue)
 		{
@@ -1153,12 +1142,8 @@ namespace Commons.Collections
 		/// <returns>The associated byte if key is found and has valid
 		/// format, default value otherwise.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Byte.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public Byte GetByte(String key, Byte defaultValue)
 		{
@@ -1188,84 +1173,6 @@ namespace Commons.Collections
 			else
 			{
 				throw new InvalidCastException('\'' + key + "' doesn't map to a Byte object");
-			}
-		}
-
-		/// <summary> Get a short associated with the given configuration key.
-		/// *
-		/// </summary>
-		/// <param name="key">The configuration key.
-		/// </param>
-		/// <returns>The associated short.
-		/// </returns>
-		/// <exception cref="">NoSuchElementException is thrown if the key doesn't
-		/// map to an existing object.
-		/// </exception>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
-		/// object that is not a Short.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
-		/// </exception>
-		public short GetShort(String key)
-		{
-			Int16 s = GetShort(key, DEFAULT_INT16);
-			if ((Object) s != null)
-			{
-				return (short) s;
-			}
-			else
-			{
-				throw new Exception('\'' + key + "' doesn't map to an existing object");
-			}
-		}
-
-		/// <summary> Get a short associated with the given configuration key.
-		/// *
-		/// </summary>
-		/// <param name="key">The configuration key.
-		/// </param>
-		/// <param name="defaultValue">The default value.
-		/// </param>
-		/// <returns>The associated short if key is found and has valid
-		/// format, default value otherwise.
-		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
-		/// object that is not a Short.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
-		/// </exception>
-		public Int16 GetShort(String key, Int16 defaultValue)
-		{
-			Object value_ = this[key];
-
-			if (value_ is Int16)
-			{
-				return (Int16) value_;
-			}
-			else if (value_ is String)
-			{
-				Int16 s = Int16.Parse((String) value_);
-				CollectionsUtil.PutElement(this, key, s);
-				return s;
-			}
-			else if (value_ == null)
-			{
-				if (defaults != null)
-				{
-					return defaults.GetShort(key, defaultValue);
-				}
-				else
-				{
-					return defaultValue;
-				}
-			}
-			else
-			{
-				throw new InvalidCastException('\'' + key + "' doesn't map to a Short object");
 			}
 		}
 
@@ -1304,17 +1211,14 @@ namespace Commons.Collections
 		/// </summary>
 		/// <param name="key">The configuration key.
 		/// </param>
-		/// <returns>The associated int.
+		/// <returns>The associated int if key is found and has valid
+		/// format, <see cref="DEFAULT_INT32"/> otherwise.
 		/// </returns>
-		/// <exception cref="">NoSuchElementException is thrown if the key doesn't
+		/// <exception cref="Exception"> is thrown if the key doesn't
 		/// map to an existing object.
 		/// </exception>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Integer.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public Int32 GetInteger(String key)
 		{
@@ -1337,14 +1241,13 @@ namespace Commons.Collections
 		/// <param name="defaultValue">The default value.
 		/// </param>
 		/// <returns>The associated int if key is found and has valid
+		/// format, <see cref="DEFAULT_INT32"/> otherwise.
+		/// </returns>
+		/// <returns>The associated int if key is found and has valid
 		/// format, default value otherwise.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Integer.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public Int32 GetInteger(String key, Int32 defaultValue)
 		{
@@ -1382,17 +1285,14 @@ namespace Commons.Collections
 		/// </summary>
 		/// <param name="key">The configuration key.
 		/// </param>
-		/// <returns>The associated long.
+		/// <returns>The associated long if key is found and has valid
+		/// format, <see cref="DEFAULT_INT64"/> otherwise.
 		/// </returns>
-		/// <exception cref="">NoSuchElementException is thrown if the key doesn't
+		/// <exception cref="Exception"> is thrown if the key doesn't
 		/// map to an existing object.
 		/// </exception>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Long.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public Int64 GetLong(String key)
 		{
@@ -1415,14 +1315,10 @@ namespace Commons.Collections
 		/// <param name="defaultValue">The default value.
 		/// </param>
 		/// <returns>The associated long if key is found and has valid
-		/// format, default value otherwise.
+		/// format, <see cref="DEFAULT_INT64"/> otherwise.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Long.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public Int64 GetLong(String key, Int64 defaultValue)
 		{
@@ -1460,17 +1356,14 @@ namespace Commons.Collections
 		/// </summary>
 		/// <param name="key">The configuration key.
 		/// </param>
-		/// <returns>The associated float.
+		/// <returns>The associated float if key is found and has valid
+		/// format, <see cref="DEFAULT_SINGLE"/> otherwise.
 		/// </returns>
-		/// <exception cref="">NoSuchElementException is thrown if the key doesn't
+		/// <exception cref="Exception"> is thrown if the key doesn't
 		/// map to an existing object.
 		/// </exception>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Float.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public float GetFloat(String key)
 		{
@@ -1493,14 +1386,10 @@ namespace Commons.Collections
 		/// <param name="defaultValue">The default value.
 		/// </param>
 		/// <returns>The associated float if key is found and has valid
-		/// format, default value otherwise.
+		/// format, <see cref="DEFAULT_SINGLE"/> otherwise.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Float.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public Single GetFloat(String key, Single defaultValue)
 		{
@@ -1539,17 +1428,14 @@ namespace Commons.Collections
 		/// </summary>
 		/// <param name="key">The configuration key.
 		/// </param>
-		/// <returns>The associated double.
+		/// <returns>The associated double if key is found and has valid
+		/// format, <see cref="DEFAULT_DOUBLE"/> otherwise.
 		/// </returns>
-		/// <exception cref="">NoSuchElementException is thrown if the key doesn't
+		/// <exception cref="Exception"> is thrown if the key doesn't
 		/// map to an existing object.
 		/// </exception>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Double.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public Double GetDouble(String key)
 		{
@@ -1572,14 +1458,10 @@ namespace Commons.Collections
 		/// <param name="defaultValue">The default value.
 		/// </param>
 		/// <returns>The associated double if key is found and has valid
-		/// format, default value otherwise.
+		/// format, <see cref="DEFAULT_DOUBLE"/> otherwise.
 		/// </returns>
-		/// <exception cref="">ClassCastException is thrown if the key maps to an
+		/// <exception cref="InvalidCastException"> is thrown if the key maps to an
 		/// object that is not a Double.
-		/// </exception>
-		/// <exception cref="">NumberFormatException is thrown if the value mapped
-		/// by the key has not a valid number format.
-		///
 		/// </exception>
 		public Double GetDouble(String key, Double defaultValue)
 		{
@@ -1622,10 +1504,10 @@ namespace Commons.Collections
 		{
 			ExtendedProperties c = new ExtendedProperties();
 
-			foreach (String key in p.Keys)
+			foreach(String key in p.Keys)
 			{
 				Object value = p.GetProperty(key);
-				
+
 				// if the value is a String, escape it so that if there are delmiters that the value is not converted to a list
 				if (value is String)
 					value = value.ToString().Replace(",", @"\,");

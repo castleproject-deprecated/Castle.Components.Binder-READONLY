@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,23 +15,30 @@
 namespace Castle.ActiveRecord.Framework.Internal
 {
 	using System;
-	using System.Reflection;
 	using System.Collections;
+	using System.Reflection;
+	using Castle.Components.Validator;
 
+	/// <summary>
+	/// Bulids an <see cref="ActiveRecordModel"/> from a type and does some inital validation.
+	/// </summary>
 	public class ActiveRecordModelBuilder
 	{
 		private static readonly BindingFlags DefaultBindingFlags = BindingFlags.DeclaredOnly | BindingFlags.Public |
-		                                                           BindingFlags.Instance | BindingFlags.NonPublic;
+																   BindingFlags.Instance | BindingFlags.NonPublic;
 
 		private static readonly BindingFlags FieldDefaultBindingFlags = BindingFlags.DeclaredOnly | BindingFlags.Public |
-		                                                                BindingFlags.NonPublic | BindingFlags.Instance;
+																		BindingFlags.NonPublic | BindingFlags.Instance;
 
 		private readonly ActiveRecordModelCollection coll = new ActiveRecordModelCollection();
 
-		public ActiveRecordModelBuilder()
-		{
-		}
+		private static readonly IValidatorRegistry validatorRegistry = new CachedValidationRegistry();
 
+		/// <summary>
+		/// Creates a <see cref="ActiveRecordModel"/> from the specified type.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns></returns>
 		public ActiveRecordModel Create(Type type)
 		{
 			if (type == null) throw new ArgumentNullException("type");
@@ -49,12 +56,29 @@ namespace Castle.ActiveRecord.Framework.Internal
 			return model;
 		}
 
+		/// <summary>
+		/// Gets the models.
+		/// </summary>
+		/// <value>The models.</value>
 		public ActiveRecordModelCollection Models
 		{
 			get { return coll; }
 		}
 
-		private void PopulateModel(ActiveRecordModel model, Type type)
+		/// <summary>
+		/// Gets the validator registry used to create the validators
+		/// </summary>
+		public static IValidatorRegistry ValidatorRegistry
+		{
+			get { return validatorRegistry; }
+		}
+
+		/// <summary>
+		/// Populates the model from tye type
+		/// </summary>
+		/// <param name="model">The model.</param>
+		/// <param name="type">The type.</param>
+		private static void PopulateModel(ActiveRecordModel model, Type type)
 		{
 			ProcessActiveRecordAttribute(type, model);
 
@@ -67,23 +91,23 @@ namespace Castle.ActiveRecord.Framework.Internal
 			ProcessFields(type, model);
 		}
 
-		private void ProcessImports(Type type, ActiveRecordModel model)
+		private static void ProcessImports(Type type, ActiveRecordModel model)
 		{
 			object[] attrs = type.GetCustomAttributes(typeof(ImportAttribute), false);
 
-			foreach(ImportAttribute att in attrs)
+			foreach (ImportAttribute att in attrs)
 			{
 				ImportModel im = new ImportModel(att);
 				model.Imports.Add(im);
 			}
 		}
 
-		private void ProcessJoinedBaseAttribute(Type type, ActiveRecordModel model)
+		private static void ProcessJoinedBaseAttribute(Type type, ActiveRecordModel model)
 		{
 			model.IsJoinedSubClassBase = type.IsDefined(typeof(JoinedBaseAttribute), false);
 		}
 
-		private void PopulateActiveRecordAttribute(ActiveRecordAttribute attribute, ActiveRecordModel model)
+		private static void PopulateActiveRecordAttribute(ActiveRecordAttribute attribute, ActiveRecordModel model)
 		{
 			model.ActiveRecordAtt = attribute;
 
@@ -105,11 +129,28 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 			if (model.ActiveRecordAtt.Table == null)
 			{
-				model.ActiveRecordAtt.Table = model.Type.Name;
+				string safename = GetSafeName(model.Type.Name);
+				model.ActiveRecordAtt.Table = ActiveRecordModel.pluralizeTableNames
+												? Inflector.Pluralize(safename)
+												: safename;
 			}
 		}
 
-		private void ProcessFields(Type type, ActiveRecordModel model)
+		/// <summary>
+		/// Remove the generic part from the type name.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		private static string GetSafeName(string name)
+		{
+			int index = name.IndexOf("`");
+
+			if (index == -1) return name;
+
+			return name.Substring(0, index);
+		}
+
+		private static void ProcessFields(Type type, ActiveRecordModel model)
 		{
 			//Check persistent fields of the base class as well
 			if (ShouldCheckBase(type))
@@ -119,7 +160,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 			FieldInfo[] fields = type.GetFields(FieldDefaultBindingFlags);
 
-			foreach(FieldInfo field in fields)
+			foreach (FieldInfo field in fields)
 			{
 				if (field.IsDefined(typeof(FieldAttribute), false))
 				{
@@ -130,7 +171,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			}
 		}
 
-		private void ProcessProperties(Type type, ActiveRecordModel model)
+		private static void ProcessProperties(Type type, ActiveRecordModel model)
 		{
 			// Check persistent properties of the base class as well
 			if (ShouldCheckBase(type))
@@ -140,34 +181,43 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 			PropertyInfo[] props = type.GetProperties(DefaultBindingFlags);
 
-			foreach(PropertyInfo prop in props)
+			foreach (PropertyInfo prop in props)
 			{
 				bool isArProperty = false;
-				AnyModel anyModel = null;
-				ArrayList anyMetaValues = new ArrayList();
+				AnyModel anyModel;
+				HasManyToAnyModel hasManyToAnyModel;
 
 				object[] valAtts = prop.GetCustomAttributes(typeof(AbstractValidationAttribute), true);
 
-				foreach(AbstractValidationAttribute valAtt in valAtts)
+				foreach (AbstractValidationAttribute valAtt in valAtts)
 				{
-					valAtt.Validator.Initialize(prop);
+					IValidator validator = valAtt.Build();
+					validator.Initialize(validatorRegistry, prop);
 
-					model.Validators.Add(valAtt.Validator);
+					model.Validators.Add(validator);
 				}
 
-				foreach(object attribute in prop.GetCustomAttributes(false))
+				foreach (object attribute in prop.GetCustomAttributes(false))
 				{
 					if (attribute is PrimaryKeyAttribute)
 					{
 						PrimaryKeyAttribute propAtt = attribute as PrimaryKeyAttribute;
 						isArProperty = true;
-						
+
+						// Joined Subclasses must not have PrimaryKey
+						if (type.IsDefined(typeof(JoinedBaseAttribute), true) && // JoinedBase in a superclass
+							!type.IsDefined(typeof(JoinedBaseAttribute), false)) // but not here
+						{
+							throw new ActiveRecordException("You can't specify a PrimaryKeyAttribute in a joined subclass. " +
+															"Check type " + model.Type.FullName);
+						}
+
 						if (prop.PropertyType.IsDefined(typeof(CompositeKeyAttribute), true))
 						{
 							object[] att = prop.PropertyType.GetCustomAttributes(typeof(CompositeKeyAttribute), true);
-							
+
 							CompositeKeyAttribute cAtt = att[0] as CompositeKeyAttribute;
-							
+
 							model.CompositeKey = new CompositeKeyModel(prop, cAtt);
 						}
 						else
@@ -188,12 +238,8 @@ namespace Castle.ActiveRecord.Framework.Internal
 						isArProperty = true;
 						anyModel = new AnyModel(prop, anyAtt);
 						model.Anys.Add(anyModel);
-					}
-					else if (attribute is Any.MetaValueAttribute)
-					{
-						Any.MetaValueAttribute meta = attribute as Any.MetaValueAttribute;
-						isArProperty = true;
-						anyMetaValues.Add(meta);
+
+						CollectMetaValues(anyModel.MetaValues, prop);
 					}
 					else if (attribute is PropertyAttribute)
 					{
@@ -211,9 +257,19 @@ namespace Castle.ActiveRecord.Framework.Internal
 
 						nestedModel.IsNestedType = true;
 
-						ProcessProperties(propAtt.MapType != null ? propAtt.MapType : prop.PropertyType, nestedModel);
+						Type nestedType = propAtt.MapType != null ? propAtt.MapType : prop.PropertyType;
+						nestedModel.IsNestedCompositeType = model.IsNestedCompositeType;
+						ProcessProperties(nestedType, nestedModel);
+						ProcessFields(nestedType, nestedModel);
 
 						model.Components.Add(new NestedModel(prop, propAtt, nestedModel));
+					}
+					else if (attribute is NestedParentReferenceAttribute)
+					{
+						NestedParentReferenceAttribute nestedParentAtt = attribute as NestedParentReferenceAttribute;
+						isArProperty = true;
+
+						model.ComponentParent.Add(new NestedParentReferenceModel(prop, nestedParentAtt));
 					}
 					else if (attribute is JoinedKeyAttribute)
 					{
@@ -223,7 +279,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 						if (model.Key != null)
 						{
 							throw new ActiveRecordException("You can't specify more than one JoinedKeyAttribute. " +
-							                                "Check type " + model.Type.FullName);
+															"Check type " + model.Type.FullName);
 						}
 
 						model.Key = new KeyModel(prop, propAtt);
@@ -236,7 +292,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 						if (model.Version != null)
 						{
 							throw new ActiveRecordException("You can't specify more than one VersionAttribute. " +
-							                                "Check type " + model.Type.FullName);
+															"Check type " + model.Type.FullName);
 						}
 
 						model.Version = new VersionModel(prop, propAtt);
@@ -249,7 +305,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 						if (model.Timestamp != null)
 						{
 							throw new ActiveRecordException("You can't specify more than one TimestampAttribute. " +
-							                                "Check type " + model.Type.FullName);
+															"Check type " + model.Type.FullName);
 						}
 
 						model.Timestamp = new TimestampModel(prop, propAtt);
@@ -275,14 +331,27 @@ namespace Castle.ActiveRecord.Framework.Internal
 						HasManyToAnyAttribute propAtt = attribute as HasManyToAnyAttribute;
 						isArProperty = true;
 
-						model.HasManyToAny.Add(new HasManyToAnyModel(prop, propAtt));
+						hasManyToAnyModel = new HasManyToAnyModel(prop, propAtt);
+						model.HasManyToAny.Add(hasManyToAnyModel);
+
+						CollectMetaValues(hasManyToAnyModel.MetaValues, prop);
 					}
 					else if (attribute is HasManyAttribute)
 					{
 						HasManyAttribute propAtt = attribute as HasManyAttribute;
 						isArProperty = true;
 
-						model.HasMany.Add(new HasManyModel(prop, propAtt));
+						HasManyModel hasManyModel = new HasManyModel(prop, propAtt);
+						if (propAtt.DependentObjects)
+						{
+							ActiveRecordModel dependentObjectModel = new ActiveRecordModel(propAtt.MapType);
+							dependentObjectModel.IsNestedType = true;
+							dependentObjectModel.IsNestedCompositeType = true;
+							ProcessProperties(propAtt.MapType, dependentObjectModel);
+
+							hasManyModel.DependentObjectModel = new DependentObjectModel(prop, propAtt, dependentObjectModel);
+						}
+						model.HasMany.Add(hasManyModel);
 					}
 					else if (attribute is HasAndBelongsToManyAttribute)
 					{
@@ -290,6 +359,22 @@ namespace Castle.ActiveRecord.Framework.Internal
 						isArProperty = true;
 
 						model.HasAndBelongsToMany.Add(new HasAndBelongsToManyModel(prop, propAtt));
+					}
+					else if (attribute is Any.MetaValueAttribute)
+					{
+						if (prop.GetCustomAttributes(typeof(HasManyToAnyAttribute), false).Length == 0 &&
+							prop.GetCustomAttributes(typeof(AnyAttribute), false).Length == 0
+							)
+							throw new ActiveRecordException(
+								"You can't specify an Any.MetaValue without specifying the Any or HasManyToAny attribute. " +
+								"Check type " + prop.DeclaringType.FullName);
+					}
+					else if (attribute is CompositeUserTypeAttribute)
+					{
+						CompositeUserTypeAttribute propAtt = attribute as CompositeUserTypeAttribute;
+						isArProperty = true;
+
+						model.CompositeUserType.Add(new CompositeUserTypeModel(prop, propAtt));
 					}
 
 					if (attribute is CollectionIDAttribute)
@@ -306,20 +391,27 @@ namespace Castle.ActiveRecord.Framework.Internal
 					}
 				}
 
-				if (anyMetaValues.Count > 0)
-				{
-					if (anyModel == null)
-					{
-						throw new ActiveRecordException("You can't specify a Any.MetaValue without specifying the Any attribute. " +
-						                                "Check type " + prop.DeclaringType.FullName);
-					}
-					anyModel.MetaValues = anyMetaValues;
-				}
-
 				if (!isArProperty)
 				{
 					model.NotMappedProperties.Add(prop);
 				}
+			}
+		}
+
+		private static void CollectMetaValues(IList metaStore, PropertyInfo prop)
+		{
+			if (metaStore == null)
+				throw new ArgumentNullException("metaStore");
+
+			Any.MetaValueAttribute[] metaValues =
+				prop.GetCustomAttributes(typeof(Any.MetaValueAttribute), false) as Any.MetaValueAttribute[];
+
+			if (metaValues == null || metaValues.Length == 0)
+				return;
+
+			foreach (Any.MetaValueAttribute attribute in metaValues)
+			{
+				metaStore.Add(attribute);
 			}
 		}
 
@@ -332,7 +424,7 @@ namespace Castle.ActiveRecord.Framework.Internal
 			{
 				Type basetype = type.BaseType;
 
-				while(basetype != typeof(object))
+				while (basetype != typeof(object))
 				{
 					if (basetype.IsDefined(typeof(JoinedBaseAttribute), false)) return false;
 
@@ -356,26 +448,24 @@ namespace Castle.ActiveRecord.Framework.Internal
 			return shouldCheck;
 		}
 
-		private static bool IsRootType(Type type) {
-			
+		private static bool IsRootType(Type type)
+		{
 			bool isRootType = type.BaseType != typeof(object) &&
-			                   type.BaseType != typeof(ActiveRecordBase) &&
-			                   type.BaseType != typeof(ActiveRecordValidationBase);
-								// && !type.BaseType.IsDefined(typeof(ActiveRecordAttribute), false);
+							  type.BaseType != typeof(ActiveRecordBase) &&
+							  type.BaseType != typeof(ActiveRecordValidationBase);
+			// && !type.BaseType.IsDefined(typeof(ActiveRecordAttribute), false);
 
-#if DOTNET2
 			// generic check
 			if (type.BaseType.IsGenericType)
 			{
 				isRootType = type.BaseType.GetGenericTypeDefinition() != typeof(ActiveRecordBase<>) &&
-				              type.BaseType.GetGenericTypeDefinition() != typeof(ActiveRecordValidationBase<>);
+							 type.BaseType.GetGenericTypeDefinition() != typeof(ActiveRecordValidationBase<>);
 			}
-#endif
 
 			return isRootType;
 		}
 
-		private void ProcessActiveRecordAttribute(Type type, ActiveRecordModel model)
+		private static void ProcessActiveRecordAttribute(Type type, ActiveRecordModel model)
 		{
 			object[] attrs = type.GetCustomAttributes(typeof(ActiveRecordAttribute), false);
 

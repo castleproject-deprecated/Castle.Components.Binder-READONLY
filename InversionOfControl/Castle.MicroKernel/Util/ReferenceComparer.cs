@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace Castle.MicroKernel.Util
 {
 	using System;
 	using System.Collections;
-	
+
 	/// <summary>
 	/// Compares if the reference of two objects are equals.
 	/// </summary>
@@ -30,6 +30,24 @@ namespace Castle.MicroKernel.Util
 		public int Compare(object x, object y)
 		{
 			return object.ReferenceEquals(x, y) ? 0 : 1;
+		}
+	}
+
+	[Serializable]
+	public class ReferenceEqualityComparer : IEqualityComparer
+	{
+		public new bool Equals(object x, object y)
+		{
+			return ReferenceEquals(x, y);
+		}
+
+		public int GetHashCode(object obj)
+		{
+			if (obj == null)
+			{
+				throw new ArgumentNullException("obj");
+			}
+			return obj.GetHashCode();
 		}
 	}
 }

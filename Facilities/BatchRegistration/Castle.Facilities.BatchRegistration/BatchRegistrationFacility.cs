@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,8 +41,9 @@ namespace Castle.Facilities.BatchRegistration
 				}
 				else
 				{
-					throw new ConfigurationException("Invalid node inside facility configuration. " + 
-						"Expected assemblyBatch");
+					String message = "Invalid node inside facility configuration. Expected assemblyBatch";
+
+					throw new ConfigurationErrorsException(message);
 				}
 			}
 		}
@@ -53,8 +54,9 @@ namespace Castle.Facilities.BatchRegistration
 
 			if (assemblyName == null || assemblyName.Length == 0)
 			{
-				throw new ConfigurationException("The assemblyBatch node must have a 'name' " + 
-					" attribute with the name of the assembly");
+				String message = "The assemblyBatch node must have a 'name' attribute with the name of the assembly";
+
+				throw new ConfigurationErrorsException(message);
 			}
 
 			ComponentScanner scanner = new ComponentScanner(assemblyName);
@@ -83,13 +85,15 @@ namespace Castle.Facilities.BatchRegistration
 
 			if (type == null || type.Length == 0)
 			{
-				throw new ConfigurationException("The addFacility node must have a 'type' " + 
-					" attribute with the Type's name");
+				String message = "The addFacility node must have a 'type' attribute with the Type's name";
+
+				throw new ConfigurationErrorsException(message);
 			}
 			if (id == null || id.Length == 0)
 			{
-				throw new ConfigurationException("The addFacility node must have a 'id' " + 
-					" attribute with facility's key");
+				String message = "The addFacility node must have a 'id' attribute with facility's key";
+
+				throw new ConfigurationErrorsException(message);
 			}
 
 			Kernel.AddFacility( id, InstatiateFacility( type ) );
@@ -127,8 +131,9 @@ namespace Castle.Facilities.BatchRegistration
 				}
 				else
 				{
-					throw new ConfigurationException("Invalid node inside assemblyBatch " + 
-						"configuration. Expected 'include' or 'exclude'");
+					String message = "Invalid node inside assemblyBatch configuration. Expected 'include' or 'exclude'";
+
+					throw new ConfigurationErrorsException(message);
 				}
 			}
 		}

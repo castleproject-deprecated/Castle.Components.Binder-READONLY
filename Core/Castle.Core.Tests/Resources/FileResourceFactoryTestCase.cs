@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 namespace Castle.Core.Tests.Resources
 {
 	using System;
+	using System.Configuration;
 	using System.IO;
 
 	using NUnit.Framework;
@@ -26,7 +27,7 @@ namespace Castle.Core.Tests.Resources
 	public class FileResourceFactoryTestCase
 	{
 		private FileResourceFactory resFactory = new FileResourceFactory();
-		private String basePath = Path.Combine(System.Configuration.ConfigurationSettings.AppSettings["tests.src"], "Resources");
+		private String basePath = Path.Combine(ConfigurationManager.AppSettings["tests.src"], "Resources");
 
 		[TestFixtureSetUp]
 		public void Init()

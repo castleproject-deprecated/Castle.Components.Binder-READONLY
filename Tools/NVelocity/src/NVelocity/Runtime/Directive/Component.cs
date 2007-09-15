@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace NVelocity.Runtime.Directive
 {
 	using System;
 	using System.IO;
-	using NVelocity.Context;
+	using Context;
 	using NVelocity.Runtime.Parser.Node;
 
 	public class Component : Directive
@@ -32,14 +32,13 @@ namespace NVelocity.Runtime.Directive
 
 		public override bool Render(IInternalContextAdapter context, TextWriter writer, INode node)
 		{
-
 			return true;
 		}
 
 		public override String Name
 		{
 			get { return "component"; }
-			set {  }
+			set { }
 		}
 
 		public override DirectiveType Type

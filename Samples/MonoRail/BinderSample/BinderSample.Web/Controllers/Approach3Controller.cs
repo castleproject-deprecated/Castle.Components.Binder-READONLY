@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,16 +31,17 @@ namespace BinderSample.Web.Controllers
 		public void EditPublisher(int publisherId)
 		{
 			PropertyBag.Add("publisher", Publisher.Find(publisherId));
-
-			RenderView("EditPublisher");
 		}
 
-		public void Update([ARDataBind("publisher", AutoLoad=AutoLoadBehavior.Always)] Publisher publisher,
+		[AccessibleThrough(Verb.Post)]
+		public void Update([ARDataBind("publisher", AutoLoad = AutoLoadBehavior.Always)] Publisher publisher,
 			[ARDataBind("book", AutoLoad=AutoLoadBehavior.Always)] Book[] books)
 		{
 			publisher.Save();
 
-			EditPublisher(publisher.Id);
+			Flash["message"] = "Changes saved";
+
+			RedirectToAction("EditPublisher", "publisherId=" + publisher.Id);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ namespace Castle.Core
 {
 	using System;
 	using System.Collections;
-    using System.Reflection;
 
 	/// <summary>
 	/// Collection of <see cref="ConstructorCandidate"/>
@@ -25,7 +24,6 @@ namespace Castle.Core
 	public class ConstructorCandidateCollection : ReadOnlyCollectionBase
 	{
 		private ConstructorCandidate fewerArgumentsCandidate;
-		private ConstructorCandidate bestCandidate;
 
 		/// <summary>
 		/// Adds the specified candidate.
@@ -39,8 +37,8 @@ namespace Castle.Core
 			}
 			else
 			{
-				if (candidate.Constructor.GetParameters().Length < 
-					fewerArgumentsCandidate.Constructor.GetParameters().Length)
+				if (candidate.Constructor.GetParameters().Length <
+				    fewerArgumentsCandidate.Constructor.GetParameters().Length)
 				{
 					fewerArgumentsCandidate = candidate;
 				}
@@ -56,16 +54,6 @@ namespace Castle.Core
 		public ConstructorCandidate FewerArgumentsCandidate
 		{
 			get { return fewerArgumentsCandidate; }
-		}
-
-		/// <summary>
-		/// Gets or sets the best candidate.
-		/// </summary>
-		/// <value>The best candidate.</value>
-		public ConstructorCandidate BestCandidate
-		{
-			get { return bestCandidate; }
-			set { bestCandidate = value; }
 		}
 
 		/// <summary>

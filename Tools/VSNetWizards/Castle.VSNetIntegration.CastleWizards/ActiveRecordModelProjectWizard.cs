@@ -1,4 +1,4 @@
-// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,14 +26,9 @@ namespace Castle.VSNetIntegration.CastleWizards
 	using EnvDTE;
 	using Constants=Castle.VSNetIntegration.CastleWizards.Shared.Constants;
 
-#if DOTNET2
 	[Guid("1D90721C-B0AA-4F9A-BDE5-A588911E38B6")]
 	[ProgId("Castle.ActiveRecordModelProjectWizardVS8")]
 	[ComDefaultInterface(typeof(IDTWizard))]
-#else
-	[Guid("50E5A1CA-8ABD-4AD2-8A60-176F5BFC9706")]
-	[ProgId("Castle.ActiveRecordModelProjectWizardVS7")]
-#endif
 	[ComVisibleAttribute(true)]
 	public class ActiveRecordModelProjectWizard : BaseProjectWizard
 	{
@@ -64,13 +59,13 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 			Project project = 
 				context.DteInstance.Solution.AddFromTemplate(projectFile, LocalProjectPath, ProjectName + ".csproj", Exclusive);
-			
-			project.Properties.Item("DefaultNamespace").Value = ProjectName;
+
+			project.Properties.Item("DefaultNamespace").Value = NameSpace;
 
 			Project testProject = 
 				context.DteInstance.Solution.AddFromTemplate(testProjectFile, localTestProjectPath, ProjectName + ".Tests.csproj", false);
 
-			testProject.Properties.Item("DefaultNamespace").Value = ProjectName + ".Tests";
+			testProject.Properties.Item("DefaultNamespace").Value = NameSpace + ".Tests";
 
 			context.Projects.Add(Constants.ProjectMain, project);
 			context.Projects.Add(Constants.ProjectTest, testProject);
@@ -101,7 +96,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 		{
 			Project testProject = context.Projects[Constants.ProjectTest];
 
-			Utils.PerformReplacesOn(testProject, ProjectName, LocalProjectPath, "AbstractModelTestCase.cs");
+			Utils.PerformReplacesOn(testProject, NameSpace, LocalProjectPath, "AbstractModelTestCase.cs");
 
 			base.PostProcess(context);
 		}

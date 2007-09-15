@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
 namespace TestSiteARSupport.Model
 {
 	using System;
-
+	using System.Collections.Generic;
 	using Castle.ActiveRecord;
-	using Iesi.Collections;
+	using Castle.Components.Validator;
+	using Iesi.Collections.Generic;
+	using ValidateEmailAttribute=Castle.Components.Validator.ValidateEmailAttribute;
 
 	[ActiveRecord("TSAS_Account")]
 	public class Account : ActiveRecordValidationBase
@@ -28,10 +30,18 @@ namespace TestSiteARSupport.Model
 		private String password;
 		private String confirmationpassword;
 		private ProductLicense productLicense;
-		private ISet permissions;
+		private ISet<AccountPermission> permissions;
+		private IList<User> users = new List<User>();
 
 		public Account()
 		{
+		}
+
+		public Account(string name, string email, string password)
+		{
+			this.name = name;
+			this.email = email;
+			this.password = password;
 		}
 
 		[PrimaryKey]
@@ -41,28 +51,28 @@ namespace TestSiteARSupport.Model
 			set { id = value; }
 		}
 
-		[Property, ValidateNotEmpty]
+		[Property, ValidateNonEmpty]
 		public string Name
 		{
 			get { return name; }
 			set { name = value; }
 		}
 
-		[Property, ValidateNotEmpty, ValidateEmail]
+		[Property, ValidateNonEmpty, ValidateEmail]
 		public string Email
 		{
 			get { return email; }
 			set { email = value; }
 		}
 
-		[Property, ValidateNotEmpty, ValidateConfirmation("ConfirmationPassword")]
+		[Property, ValidateNonEmpty]
 		public string Password
 		{
 			get { return password; }
 			set { password = value; }
 		}
 
-		[ValidateNotEmpty]
+		[ValidateSameAs("Password")]
 		public string ConfirmationPassword
 		{
 			get { return confirmationpassword; }
@@ -76,17 +86,30 @@ namespace TestSiteARSupport.Model
 			set { productLicense = value; }
 		}
 
-		[HasAndBelongsToMany( typeof(AccountPermission), Table="AccountAccountPermission", 
-			 ColumnRef="permission_id", ColumnKey="account_id", Inverse=false)]
-		public ISet Permissions
+		[HasAndBelongsToMany(
+			Table="AccountAccountPermission", 
+			ColumnRef="permission_id", ColumnKey="account_id", Inverse=false)]
+		public ISet<AccountPermission> Permissions
 		{
 			get { return permissions; }
 			set { permissions = value; }
 		}
-		
+
+		[HasMany]
+		public IList<User> Users
+		{
+			get { return users; }
+			set { users = value; }
+		}
+
+		public override string ToString()
+		{
+			return name;
+		}
+
 		public static Account[] FindAll()
 		{
-			return (Account[]) ActiveRecordBase.FindAll(typeof(Account));
+			return (Account[]) FindAll(typeof(Account));
 		}
 	}
 }

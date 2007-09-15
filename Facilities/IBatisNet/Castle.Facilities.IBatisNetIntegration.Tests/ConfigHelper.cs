@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,11 +21,7 @@ namespace Castle.Facilities.IBatisNetIntegration.Tests
 	{
 		public static string ResolvePath(string configFilePath)
 		{
-#if DOTNET2
 			return Path.Combine(ConfigurationManager.AppSettings["tests.src"], configFilePath);
-#else
-			return Path.Combine(ConfigurationSettings.AppSettings["tests.src"], configFilePath);
-#endif
 		}
 	}
 }

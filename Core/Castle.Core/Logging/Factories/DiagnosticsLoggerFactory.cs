@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace Castle.Core.Logging
 	public class DiagnosticsLoggerFactory : AbstractLoggerFactory
 	{
 		private static readonly String DefaultLogName = "CastleDefaultLogger";
-		
+
 		public override ILogger Create(string name)
 		{
 			return new DiagnosticsLogger(DefaultLogName, name);

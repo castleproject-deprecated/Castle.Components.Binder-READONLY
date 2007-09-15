@@ -1,6 +1,489 @@
 Change history
 --------------
 
+Release Candidate 3
+===================
+
+- Applied Lee Henson's patch adding generic overloads to ReflectionHelper
+
+- Added a few more RenderView overloads that take a mimeType to configure the Response.ContentType
+
+- If the controller cannot be found, MR searches for a special rescue "rescues/404" before throwing throwing an exception.
+
+- If an action could not be found, we go through normal path an use a general rescue if it can be found for the controller. 
+
+- UrlHelper change: Now if the param encode wasn't set, UrlHelper assumes it's true.
+
+- Applied patch by Oleg Snurnikov fixing MR-319
+  "MockResponse - basic implementation of Redirect, Write, BinaryWrite and Clear overloads"
+
+- Applied patch by Chirs Ortman fixing MR-296
+  "Dont get validation summary when binding with AR attribute but controller inherits smart dispatcher controller"
+
+- Applied patch by Rafael Teixeira fixing MR-298
+  "ColumnRenderer with an empty enumeration still renders table start and end sections"
+
+- Fixed MR-300
+  "DataBindAttribute in a ARSmartDispatcherController inherit the behavior from ARDataBinder"
+
+- Applied minor patch by James Su fixing MR-303
+  "Behavior is not consistent between FormToAttributed and LinkToAttributed in HtmlHelper"
+
+- Applied goodwill's patch adding cookie support to BaseControllerTest MR-304
+
+- Applied goodwill's patch fixing MR-305
+  "fValidate fix a bug on unassociated label for element"
+
+- Applied Oleg Snurnikov's patch fixing MR-306
+  "PrototypeWebValidator - regular expression validation"
+
+- Fixed MR-311 
+  "The '\' character in templates goes unescaped when processed via NJS"
+
+- The DefaultUrlBuilder now accepts a basePath parameter, which basically overrides the path information.
+
+- Fixed MR-317
+  "ARDataBind handles BelongsTo attribute in Nested component incorrectly."
+
+- FlashBinderAttribute was removed as I doesnt work with the new 
+  MonoRail design (changed to make the cache support work)
+
+- Applied Tim Haines' patch adding TextAreaValue to FormHelper 
+
+- Fixed MR-281 
+  "View components params problem"
+
+- Applied Markus Zywitza's patch adding a Fold method to TextHelper. 
+  His description "Shortens a text to the specified length (using full words only and
+adding an ellipsis at the end) and wraps it into a span-element that
+has the title-property with the full text associated. This is
+convenient for displaying properties in tables that might have very
+much content (desription fields etc.) without destroying the table's
+layout. Due to the title-property of the surrounding span-element, the
+full text is displayed in the browser while hovering over the
+shortened text."
+
+- Applied Aaron Jensen's patch fixing MR-288
+  "ApplicationPhysicalPath returns request path instead of / path"
+
+- Fixed MR-284
+  "MockServerUtility.MapPath throws NotImplementedException"
+
+- Applied Bill Pierce's patch fixing MR-278
+  "Add UrlDecode to IServerUtility"
+
+- Applied Bryan Brown's patch fixing MR-273. This one adds a new attribute to 
+  the routing configuration node: 'excludeAppPath'
+  "Automatically handle ApplicationPath in the routing module"
+
+- Applied goodwill's patch fixing MR-275
+  "DefaultRailsEngineContext triggers RTE on ApplicationPhysicalPath 
+   when running under ASPX Dev Server with virtual directory"
+
+- Changed the BaseControllerTest vdir to "" instead "/"
+
+- Added the Declare(String variable) to IJSGenerator inteface
+
+- Applied Tim Haines' patch changing FormHelper to make calls to FormatIfNecessary 
+
+- Applied chris ortman's patch fixing MR-271
+  "AdditionalSources not loaded when using the viewEngines element"
+
+- Applied Ricardo Stuven's patch fixing MR-258
+  "JSON serialization in Ajax calls"
+
+- Applied goodwill's patch fixing MR-212
+  "Script Helpers (e.g. $Scriptaculous) installscript function clear flash unexpected"
+
+- Applied Georges Benatti's patch 
+  adding the attribute matchHostNameAndPath to the routing node on the configuration. 
+  
+  If set to 'true', the regular expression is matched against the whole url. Defaults to 'false'
+
+- Added ability to customise Next/Prev links in DiggStylePagination.
+   Patch from Markus Zywitza.
+
+- Applied Mathias Doenitz's patch fixing MR-265
+  "(Re)enable initialization of Controller.AreaName, Controller.Name and Controller.Action before invoking Controller.Initialize()."
+
+- Applied Adam Tybor's patch fixing MR-266
+  "Fix for GetErrorSummary() throwing an KeyNotFoundException for SmartDispatch Controller and Binder"
+
+- Fixed MR-260
+  "PropertyBag in WizardStep is null when access via key"
+
+- Applied Kyle Marshall's patch fixing MR-261
+  "The default ValidatorRegistry is not overriddable in the monorail configuration"
+
+- Add support to BaseControllerTest (well MockRequest actually) for Mocking Url Referer. Patch from Colin Ramsay. 
+
+- Fix SupportsSection implementation in ViewComponent (was comparing section name equality against StringComparer.InvariantCultureIgnoreCase). 
+  Also add a SupportsSection implementation to DiggStylePagination. Patches from Tim Haines. 
+
+- Small change to DiggStylePagination to allow supplying querystring parameters in the url. Suggested by kalle.stenflo@gmail.com.
+
+- Applied Tim Haines' patch adding BindObject overloads that accept the AutoLoadBehavior enum, 
+  to the ARSmartDispatcherController 
+
+- Changes from Lee Henson to add WizardStep support to TestSupport and provide a Generic BaseControllerTest. 
+
+- Patch from Maruis Marais allowing BuildFormRemoteTag to gracefully degrade when JavaScript is disabled. 
+
+- Patch from Lee Henson fixing regression introduced in 3783 in Prototype Validator. (Could not use hyphens in element id's). 
+
+- Fixed MR-241 
+  "When Windsor integration is enabled, the ControllerTree is empty"
+
+- Apply patches from Tim Haynes. 
+  "add a renderIfOnlyOnePage property to the DiggStylePagination View Component"
+  "Add NewRootInstanceIfInvalidKey AutoloadBehaviour to Castle.MonoRail.ActiveRecordSupport"
+
+- Applied Goodwill's patch adding PersisteFlashFilter and the fValidate's localization support. Fixed MR-246.
+
+- Fixed the use of Scaffolding without Layouts (MR-251).
+
+- Added support for eager fetching of lazy collections, in [ARFetch] attribute.
+
+- Added support for auto load bevahior configuration when invokling the BindObject in the   ARSmartDispatcherController
+
+- Added support for different access and naming strategies in the ARDatabind attribute.
+
+- Applied Matt Berther's patch adding LoggingExceptionHandler and FilteredExceptionHandler.
+
+- Applied chris ortman's patch fixing MR-242
+  "FormHelper.LabelFor does not generate valid HTML when attributes are supplied"
+
+- Applied bonskijr's patch fixing MR-234
+  "Under some circunstances ColumnRenderer generates invalid html"
+
+- Applied Marc-André's patch fixing MR-238
+  "HtmlHelper.LinkTo: bugs- don't function when existing a area"
+
+- Applied Aaron Jensen's patch fixing the Resource Manager usage 
+  Changed from ResourceSet to ResourceManager
+
+- Applied Lee Henson's patch adding the 'onCreateAdvice'
+  to PrototypeWebValidator
+
+- Applied Chris Ortman's patch fixing MR-235
+  "Allow overriding of select generation in FormHelper"
+
+- Added Item(string id) overload to Checkboxlist
+  Used to generate a checkbox with the specified id. Useful to label for='id' constructions
+
+- Added the Expect property to the ARDataBindAttr. Now it will clear the collections 
+  that are declared as expected, if not can be found on the resquest params. (MR-163)
+
+- Applied Colin Ramsay's patch fixing MR-232
+  "HtmlHelper.InputButton should create <button> not <input type="button">"
+
+- Fixed MR-228
+  "incorrect component configuration results in an 'The container seems to be unavailable 
+   in your HttpApplication subclass' exception"
+
+- Applied Bart Reyserhove's patch fixing MR-226 
+  "ARDataBinder has problems when using generic collections"
+
+- Applied Jacob Lewallen's patch adding a new attribute (ViewComponentAttribute) used
+  to name view components. The behavior is changed to strip the 'Component' suffix from the class name as well.
+
+- Applied Ernst Naezer's patch fixing MR-191
+  "Add TransformFilter support to MR"
+
+- Applied Lee Henson's patch fixing MR-222
+  "Use of IRailsEngineContext.Items"
+
+- Fixed MR-224
+  "ARDataBindAttribute does not set the Controllers validator on it's DataBinder"
+
+- Fixed MR-219
+  "FormHelper.Select with an interface datasource throws an Object mismatch exception."
+
+- Applied chris ortman's patch fixing MR-188
+  "Allow the #component directive to support variables for the component name"
+
+- Fixed MR-208
+  "Using a lazy loaded nested object, "Ambiguous match found" exception occures when 
+   trying to use FormHelper to render control for the nested objects property."
+
+- Applied goodwill's patch fixing MR-213
+  "DiggStylePagination has a typo which prevents the code from build"
+
+- Applied Edward Kreis' patch fixing MR-214
+  "ARDataBinding and joined subclasses with derived BelongsTo, HasMany, HasAndBelongsToMany proeprties"
+
+- Fixed MR-217 
+  "fValidate box message contains <BR/> if being triggered twice"
+
+- Fixed MR-221
+  "HtmlHelper.LinkToAttributed bug"
+
+- Applied Jacob Lewallen's patch adding an optional attribute to define a view component's name
+  The patch also introduces a IViewComponentTree.
+
+- Added 'noaction' parameter to FormHelper.FormTag to prevent action attribute generation
+
+- Added Select list from Enum.
+
+	in controller:
+		PropertyBag.Add("colors",Enum.GetValues(typeof(ColorEnum)));
+
+	in view:
+		$Form.Select("Color", $colors)
+
+- Applied Chris Ortman's patch adding MooHelper/JS generation based on it.
+
+- Applied Jacob Lewallen's patch adding virtuals to some FormHelper methods
+
+- Applied Patrick McEvoy's patch with a new approach to delete cookies
+
+- Added 
+
+	SmartDispatcherController.ValidationSummaryPerInstance : IDictionary
+	SmartDispatcherController.GetErrorSummary(object instance) : ErrorSummary
+	SmartDispatcherController.HasValidationError(object instance) : bool
+	
+  Those can be used if DataBinder is configured to validate
+
+- Added Controller.RedirectToReferer
+
+- Configuration changed, added defaultUrls section (see monorail_configuration_ref.txt)
+
+- Added Controller.RenderMailMessage(string templateName, bool doNotApplyLayout) overload
+
+- Added static accessor support to NVelocity view engine. Default helpers are 
+  the Common System Types in dotnet (i.e. Double, String, Decimal, etc.)
+  
+    In your template: $String.Concat("foo","bar","me","please:",$Double.Epsilon)
+    (dotnet 2 only.)
+
+- Added better ControllerBinder support for indexed property expressions.
+   This allows you to pass DataKeys as your action arguments
+
+- Applied Freyr Magnússon's patch fixing MR-206 
+  "ARBadaBinder does not resolve primary key for discriminator subclass from parent"
+
+- Retrieve target properties on demand for ControllerBinders ActionArgument editor
+
+- Added ControllerBinder Extender Control for WebForm views to eliminate the
+   need to add event handlers in the codebehind that call Controller.Send
+
+- Brail now has Ruby's like symbols, using @symbol.
+    For instance, component DiggStylePagination, ${ @useInlineStyle : true }
+	
+- Brail can now accept " inside a ${ }, which used to break the parser previously.
+
+- Added IViewComponentContext.RenderView(name, textwriter)
+
+- Fixed MR-201
+  "DiggStylePagination.Initialize() doesn't check useInlineStyle parameter"
+
+- Added FormHelper.HiddenField("key", value) overload
+
+- Added 'valueformat' to SetOperations (affects FormHelper.Select, Checkboxlist)
+
+- Fixed MR-197
+  "Exception thrown by AccessibleThrough are not caught by rescues"
+
+- Added 'textformat' support to the all FormHelper operations (that create input elements).
+
+- Added BrailJS Support, allowing to generate javascript via brail scripts.
+ Note; BrailJS scripts do not need <?brail ?> and any output statements there will be ignored.
+  They are used strictly to create the generator.
+
+- Changed Brail extention from Boo to Brail / BrailJS
+
+- Added mask support to FormHelper field elements
+
+- Added FormHelper.PasswordNumberField
+
+- Refactored FormHelper to support other approaches to extract values from instance.
+  Now it supports DataRows, DataRowViews and reflection
+
+- Added ColumnRenderer view component
+
+- Added DiggStylePagination ViewComponent, based on Alex Henderson work. 
+  See http://blog.bittercoder.com/PermaLink,guid,579711a8-0b16-481b-b52b-ebdfa1a7e225.aspx
+
+- Added PaginationHelper.CreateCustomPage
+  
+  This is only useful if the application code takes care of slicing (select top and etc)
+
+- Added formatting support to SetOperations (affects FormHelper.Select, Checkboxlist)
+  
+  Example:
+  
+  $Form.Select("price", [1..100], "%{textformat='C'}")
+  
+  This will render a select with options like
+  
+  <option value="1">$1.00</option>
+  <option value="2">$2.00</option>
+  <option value="3">$3.00</option>
+  ...
+
+- Added ScriptaculousHelper, deprecated Effects2Helper
+
+- Extract Behaviour related operations from AjaxHelper into BehaviourHelper
+
+- Added BehaviourHelper
+
+- Added UpdatePage and UpdatePageTag ViewComponents. Both allow you to have a "page"
+  which is a JS generator. It evaluates the view component body to generate the JS.
+  
+  Example:
+  
+#blockcomponent(UpdatePageTag)
+$page.el('products').style.bgcolor.set('"white"')
+#end
+
+
+#blockcomponent(UpdatePage)
+$page.el('products').style.bgcolor.set('"white"')
+#end
+
+- Added FormHelper.NumberField() which renders a 'input text' with a javascript that
+  prevents chars other than numbers (and period) from being entered.
+
+	You can optionally pass an <c>exceptions</c> value through the dictionary.
+	It must be a comma separated list of chars that can be accepted on the field. 
+
+- Added FormHelper scripts:
+
+  View must use FormHelper.InstallScripts()
+
+- Refactored generation of script blocks
+
+- Created stub for UrlForHelper
+
+- Helpers are added with a less verbose name 
+  FormHelper and Form, AjaxHelper and Ajax are made available to the view
+
+- Added AuthenticatedContent ViewComponent that allows context to be 
+  render based on the user state (authenticated or anonymous)
+
+- Removed CompositeViewEngine as it's useless now that we support multiple view engines
+
+- Multiple view engine support:
+  Configuration schema changed, see monorail_configuration_ref.txt for more information
+
+- Introduced IViewEngineManager that sits between the controller and the view engines
+  deciding which view engine will be used output the contents
+
+- Applied patch by Luke Melia for MR-192: 
+  "Add TextHelper"
+
+- Introduced IPaginatedPage.HasPage(), useful for Google-like pagination.
+
+- PaginationHelper.CreatePagination<T>() now accepts ICollection<T> as a parameter.
+
+- New method PaginationHelper.CreatePageLinkWithCurrentQueryString().
+  Creates a page link, copying the current QueryString parameters as well.
+
+- Enhanced AbstractHelper.BuildQueryString to support multi-value query strings:
+  IDictionary dict = new Hashtable();
+  dict.Add("id", 5);
+  dict.Add("selectedItem", new int[] { 2, 4, 99 });
+  string queryString = BuildQueryString(dict);
+  // should result in: "id=5&amp;selectedItem=2&amp;selectedItem=4&amp;selectedItem=99&amp;"
+
+- FormHelper.Select() - applied patch from James Sapara allowing firstoptionvalue to be set to 
+  something other than null. 
+
+- Restored property IsPostback checking (For use with WebFormViewEngine).
+
+- Restored support for passing additional arguments to a controller
+  via Send and use a dictionary to supply that information.
+
+- Applied patch by Andrew Peters fixing MR-182
+  "Adds FormTo and LinkToWithPost methods to HtmlHelper"
+
+- Fixed MR-180
+  "Url Tokenizer Bug at Turkish Culture Info"
+
+- Properly quote file/directory arguments in Pre/Post Build Events to accomodate
+  names with spaces.
+  Also added some missing files to TestSiteWindsor-vs2005 Project
+
+- Removed DetermineIfPostBack due to side effects when using a custom upload approach
+  Also removed PreRequestHandler setting the session as it wasn't really necessary using
+  this event for that. Moved to the handler.
+
+- Included abstract Filter class, just as a helper to implement filters 
+  with a better interface (instead of IFilter.Process)
+
+- Fixed MR-165 "DataBind doesn't bind NullableDateTime"
+
+- Fixed MR-169
+  "Scarfold record modification results exception Can't edit without 
+  the proper id when validation is failed in the defined validation rule"
+
+- Fixed MR-168 
+  "ValidateEmail attribute does not work properly in Monorail Scarfold"
+
+- Introduced CacheAttribute which can be used on actions to configure 
+  the underlying HttpCachePolicy
+
+- Modified WizardActionProvider to use ControllerLifecycleExecutor
+
+- Modified EngineContextModule a MonoRailHttpHandler to use ControllerLifecycleExecutor
+
+- Refactored controller. Extracted process to ControllerLifecycleExecutor
+
+- Changed ExecuteEnum.Always to include 'StartRequest'
+
+- Added Filter step: StartRequest
+
+  This step runs on the ResolveRequestCache, and is suitable 
+  for authentication. However, a session will not be available.
+
+- Fixed MR-158
+  "IRequest/Controller must expose the Http method"
+  
+  Added the following properties to the Controller class:
+    IsPost/IsGet/IsPut/IsHead
+
+- Fixed problem with view components reported by Ernst Naezer. The problem
+  is that the view component were cached, and instances shared during 
+  template executions.
+
+- Introduced smtpPort, smtpUsername, smtpPassword configuration to <monorail> node
+
+- Introduced a PageSize property on the IPaginatedPage.
+
+
+Release Candidate 2
+===================
+
+- Applied patch by Ivan Porto Carrero fixing MR-158
+  "Validation throws errors when using group box."
+  
+  Quoting description:
+  
+	"When validating with the option of using a group box then the valdation routine throws an error.
+	The error is only thrown after the valdation failed for a couple of controls in the form. And when those errors are corrected and the form gets validated again that's when the error occurs
+
+	"I also added functionality to have a header in the group error box. I also added the possibility to have a separate error label to append to.
+	For this I added 2 properties to the config of the validation library.
+	The first property is boxErrorHeadingClass and the second one is errorSelectorCssClass
+
+	"In the core script I added 5 lines or so to add this functionality. "
+
+- Applied patch by Nick Hemsley fixing MR-157
+  "add fromNameValueCollection method for creating IDictionary instances from (i.e.) Context.Params, or Request.QueryString"
+  
+  Method was renamed to FromNameValueCollection
+
+- Introduced ARPagination.CreatePagination<T>(SimpleQuery<T>). Looks like it can be
+  extended later for the non-generic SimpleQuery.
+
+- Made all Helpers that install javascript code use the same signature Helper.InstallScripts(). Should we mandate an interface?
+
+- Fixed the GenerateJSProxy(string proxyName, string controller), which was passing a null areaName;
+
+- Fixed the conflict between the Array.reduce function of Prototype e fValidate scripts (MR-166).
+
+
 Release Candidate 1
 ===================
 

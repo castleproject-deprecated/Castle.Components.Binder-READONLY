@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace TestSiteNVelocity.Controllers
 				list.Add( i.ToString() );
 			}
 
-			PropertyBag.Add( "list1", PaginationHelper.CreatePagination(list, 10) );
+            PropertyBag.Add("list1", PaginationHelper.CreatePagination(this, list, 10));
 		}
 	}
 }

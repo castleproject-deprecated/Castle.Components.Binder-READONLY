@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,10 +23,19 @@ namespace Castle.MicroKernel.Resolvers
 	[Serializable]
 	public class DependencyResolverException : ApplicationException
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DependencyResolverException"/> class.
+		/// </summary>
+		/// <param name="message">The message.</param>
 		public DependencyResolverException(string message) : base(message)
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DependencyResolverException"/> class.
+		/// </summary>
+		/// <param name="info">The object that holds the serialized object data.</param>
+		/// <param name="context">The contextual information about the source or destination.</param>
 		public DependencyResolverException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
 		}

@@ -2,8 +2,8 @@ namespace NVelocity.Runtime.Visitor
 {
 	using System;
 	using System.Text;
-	using NVelocity.Runtime.Parser;
 	using NVelocity.Runtime.Parser.Node;
+	using Parser;
 
 	/// <summary> This class is simply a visitor implementation
 	/// that traverses the AST, produced by the Velocity
@@ -29,7 +29,7 @@ namespace NVelocity.Runtime.Visitor
 		private String IndentString()
 		{
 			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < indent; ++i)
+			for(int i = 0; i < indent; ++i)
 			{
 				sb.Append("  ");
 			}
@@ -97,7 +97,7 @@ namespace NVelocity.Runtime.Visitor
 			return ShowNode(node, data);
 		}
 
-		/// <summary>Display an ASTAndNode ( && )
+		/// <summary>Display an ASTAndNode ( &amp;&amp; )
 		/// </summary>
 		public override Object Visit(ASTAndNode node, Object data)
 		{
@@ -118,28 +118,28 @@ namespace NVelocity.Runtime.Visitor
 			return ShowNode(node, data);
 		}
 
-		/// <summary>Display an ASTLTNode ( < )
+		/// <summary>Display an ASTLTNode ( &lt; )
 		/// </summary>
 		public override Object Visit(ASTLTNode node, Object data)
 		{
 			return ShowNode(node, data);
 		}
 
-		/// <summary>Display an ASTGTNode ( > )
+		/// <summary>Display an ASTGTNode ( &gt; )
 		/// </summary>
 		public override Object Visit(ASTGTNode node, Object data)
 		{
 			return ShowNode(node, data);
 		}
 
-		/// <summary>Display an ASTLENode ( <= )
+		/// <summary>Display an ASTLENode ( &lt;= )
 		/// </summary>
 		public override Object Visit(ASTLENode node, Object data)
 		{
 			return ShowNode(node, data);
 		}
 
-		/// <summary>Display an ASTGENode ( >= )
+		/// <summary>Display an ASTGENode ( &gt;= )
 		/// </summary>
 		public override Object Visit(ASTGENode node, Object data)
 		{

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,6 +58,16 @@ namespace Castle.ActiveRecord
 		private string typeColumn, idColumn;
 		private string index;
 		private bool insert = true, update = true;
+		private bool notNull = false;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AnyAttribute"/> class.
+		/// </summary>
+		/// <remarks>Using this constructor defaults the idType to Int32</remarks>
+		public AnyAttribute()
+			: this(typeof(Int32))
+		{
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AnyAttribute"/> class.
@@ -67,6 +77,7 @@ namespace Castle.ActiveRecord
 		{
 			this.idType = idType;
 		}
+
 
 		/// <summary>
 		/// Gets or sets the type of the id.
@@ -147,6 +158,17 @@ namespace Castle.ActiveRecord
 			get { return update; }
 			set { update = value; }
 		}
+
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this property cannot be null.
+		/// </summary>
+		/// <value><c>true</c> if this property cannot be null; otherwise, <c>false</c>.</value>
+		public bool NotNull
+		{
+			get { return notNull; }
+			set { notNull = value; }
+		}
 	}
 
 	/// <summary>
@@ -159,7 +181,7 @@ namespace Castle.ActiveRecord
 		/// Any.MetaValue is used to connect a value (such as "CREDIT_CARD") to its type ( typeof(CreditCard) ).
 		/// </summary>
 		[AttributeUsage(AttributeTargets.Property, AllowMultiple=true), Serializable]
-		public class MetaValueAttribute : Attribute
+		public class MetaValueAttribute : Attribute, IComparable
 		{
 			private string value;
 			private Type clazz;
@@ -181,7 +203,7 @@ namespace Castle.ActiveRecord
 			/// <value>The value.</value>
 			public string Value
 			{
-				get { return this.value; }
+				get { return value; }
 				set { this.value = value; }
 			}
 
@@ -193,6 +215,16 @@ namespace Castle.ActiveRecord
 			{
 				get { return clazz; }
 				set { clazz = value; }
+			}
+
+			/// <summary>
+			/// This is here so the XmlGenerationVisitor will always
+			/// output the meta-values in consistent order, to aid the tests.
+			/// </summary>
+			int IComparable.CompareTo(object obj)
+			{
+				MetaValueAttribute other = (MetaValueAttribute)obj;
+				return Class.FullName.CompareTo(other.Class.FullName);
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
 
 namespace Castle.MicroKernel.Tests
 {
-	using Castle.MicroKernel.Handlers;
-	using NUnit.Framework;
-
 	using System.Collections;
-
+	using Castle.MicroKernel.Handlers;
 	using Castle.MicroKernel.Tests.RuntimeParameters;
-
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class RuntimeParametersTestCase
@@ -48,11 +45,27 @@ namespace Castle.MicroKernel.Tests
 
 		[Test]
 		[ExpectedException(typeof(HandlerException), "Can't create component 'compb' as it has " +
-			"dependencies to be satisfied. \r\ncompb is waiting for the following dependencies: \r\n\r\n" +
-			"Services: \r\n- Castle.MicroKernel.Tests.RuntimeParameters.CompC which was not registered. \r\n")]
+		                                             "dependencies to be satisfied. \r\ncompb is waiting for the following dependencies: \r\n\r\n" +
+		                                             "Services: \r\n- Castle.MicroKernel.Tests.RuntimeParameters.CompC which was not registered. \r\n"
+			)]
 		public void WithoutParameters()
 		{
 			CompB compb = kernel[typeof(CompB)] as CompB;
+		}
+
+		[Test]
+		public void WillAlwaysResolveCustomParameterFromServiceComponent()
+		{
+			kernel.AddComponent("compc", typeof(CompC));
+			Hashtable c_dependencies = new Hashtable();
+			c_dependencies["test"] = 15;
+			kernel.RegisterCustomDependencies(typeof(CompC), c_dependencies);
+			Hashtable b_dependencies = new Hashtable();
+			b_dependencies["myArgument"] = "foo";
+			kernel.RegisterCustomDependencies(typeof(CompB), b_dependencies);
+			CompB b = kernel["compb"] as CompB;
+			Assert.IsNotNull(b);
+			Assert.AreEqual(15, b.Compc.test);
 		}
 
 		[Test]
@@ -77,19 +90,36 @@ namespace Castle.MicroKernel.Tests
 		{
 			kernel.RegisterCustomDependencies("compb", deps);
 
-			CompB instance_with_model = (CompB)kernel[typeof(CompB)];
+			CompB instance_with_model = (CompB) kernel[typeof(CompB)];
 			Assert.AreSame(deps["cc"], instance_with_model.Compc, "Model dependency should override kernel dependency");
 
 			Hashtable deps2 = new Hashtable();
 			deps2.Add("cc", new CompC(12));
 			deps2.Add("myArgument", "ayende");
-	
+
 			CompB instance_with_args = (CompB) kernel.Resolve(typeof(CompB), deps2);
-			
-			Assert.AreSame(deps2["cc"],instance_with_args.Compc, "Should get it from resolve params");
+
+			Assert.AreSame(deps2["cc"], instance_with_args.Compc, "Should get it from resolve params");
 			Assert.AreEqual("ayende", instance_with_args.MyArgument);
 		}
-		
+
+		[Test]
+		public void AddingDependencyToServiceWithCustomDependency()
+		{
+			DefaultKernel k = new DefaultKernel();
+			k.AddComponent("NeedClassWithCustomerDependency",typeof(NeedClassWithCustomerDependency));
+			k.AddComponent("HasCustomDependency", typeof(HasCustomDependency));
+
+			Assert.AreEqual(HandlerState.WaitingDependency, k.GetHandler("HasCustomDependency").CurrentState);
+
+			Hashtable hash = new Hashtable();
+			hash["name"] = new CompA();
+			k.RegisterCustomDependencies("HasCustomDependency", hash);
+			Assert.AreEqual(HandlerState.Valid, k.GetHandler("HasCustomDependency").CurrentState);
+
+			Assert.IsNotNull(k.Resolve(typeof(NeedClassWithCustomerDependency)));
+		}
+
 		private void AssertDependencies(CompB compb)
 		{
 			Assert.IsNotNull(compb, "Component B should have been resolved");
@@ -98,7 +128,8 @@ namespace Castle.MicroKernel.Tests
 			Assert.IsTrue(compb.MyArgument != string.Empty, "MyArgument property should not be empty");
 
 			Assert.AreSame(deps["cc"], compb.Compc, "CompC property should be the same instnace as in the hashtable argument");
-			Assert.IsTrue("ernst".Equals(compb.MyArgument),string.Format( "The MyArgument property of compb should be equal to ernst, found {0}", compb.MyArgument));
+			Assert.IsTrue("ernst".Equals(compb.MyArgument),
+			              string.Format("The MyArgument property of compb should be equal to ernst, found {0}", compb.MyArgument));
 		}
 	}
 }

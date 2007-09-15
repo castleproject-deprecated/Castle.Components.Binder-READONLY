@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		private StindOpCodesDictionary() : base()
 		{
 			Dictionary[typeof(bool)] = OpCodes.Stind_I1;
+			Dictionary[typeof(char)] = OpCodes.Stind_I2;
 			Dictionary[typeof(SByte)] = OpCodes.Stind_I1;
 			Dictionary[typeof(Int16)] = OpCodes.Stind_I2;
 			Dictionary[typeof(Int32)] = OpCodes.Stind_I4;
@@ -44,12 +45,12 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		}
 
 		public OpCode this[Type type]
-		{		
+		{
 			get
 			{
 				if (Dictionary.Contains(type))
 				{
-					return (OpCode)Dictionary[type];
+					return (OpCode) Dictionary[type];
 				}
 				return EmptyOpCode;
 			}

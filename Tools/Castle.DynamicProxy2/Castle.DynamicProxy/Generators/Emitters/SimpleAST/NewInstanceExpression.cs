@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	[CLSCompliant(false)]
 	public class NewInstanceExpression : Expression
 	{
 		private Type type;
@@ -29,14 +28,14 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 		public NewInstanceExpression(ConstructorInfo constructor, params Expression[] args)
 		{
 			this.constructor = constructor;
-			this.arguments = args;
+			arguments = args;
 		}
 
 		public NewInstanceExpression(Type target, Type[] constructor_args, params Expression[] args)
 		{
-			this.type = target;
+			type = target;
 			this.constructor_args = constructor_args;
-			this.arguments = args;
+			arguments = args;
 		}
 
 		public override void Emit(IMemberEmitter member, ILGenerator gen)

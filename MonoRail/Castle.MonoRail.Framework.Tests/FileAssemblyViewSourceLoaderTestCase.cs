@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace Castle.MonoRail.Framework.Tests
 		public void SetUp()
 		{
 			loader = new FileAssemblyViewSourceLoader();
-			loader.ViewRootDir = Path.GetFullPath(System.Configuration.ConfigurationSettings.AppSettings["tests.src"]);
+			loader.ViewRootDir = Path.GetFullPath(System.Configuration.ConfigurationManager.AppSettings["tests.src"]);
 			loader.Service(new TestServiceContainer());
 		}
 
@@ -45,7 +45,7 @@ namespace Castle.MonoRail.Framework.Tests
 		[Test]
 		public void LoadFromAssembly()
 		{
-			loader.AdditionalSources.Add(new AssemblySourceInfo("Castle.MonoRail.Framework.Tests", "Castle.MonoRail.Framework.Tests"));
+			loader.AddAssemblySource(new AssemblySourceInfo("Castle.MonoRail.Framework.Tests", "Castle.MonoRail.Framework.Tests"));
 
 			Assert.IsFalse(loader.HasTemplate("Content/contentinassembly2.vm"));
 			Assert.IsTrue(loader.HasTemplate("Content/contentinassembly.vm"));
@@ -59,17 +59,74 @@ namespace Castle.MonoRail.Framework.Tests
 		[Test]
 		public void ListViews()
 		{
-			loader.AdditionalSources.Add(new AssemblySourceInfo("Castle.MonoRail.Framework.Tests", "Castle.MonoRail.Framework.Tests"));
+			loader.AddAssemblySource(new AssemblySourceInfo("Castle.MonoRail.Framework.Tests", "Castle.MonoRail.Framework.Tests"));
 
 			string[] views = loader.ListViews("Content");
 			
 			Assert.IsNotNull(views);
 			Assert.AreEqual(3, views.Length);
-			Assert.AreEqual(@"Content\contentinassembly.vm", views[0]);
-			Assert.AreEqual(@"Content\notinassembly.vm", views[1]);
+			Assert.AreEqual(@"Content" + Path.DirectorySeparatorChar + "contentinassembly.vm", views[0]);
+			Assert.AreEqual(@"Content" + Path.DirectorySeparatorChar + "notinassembly.vm", views[1]);
 			Assert.AreEqual(@"content.contentinassembly.vm", views[2]);
 
 			foreach(string view in views)
+			{
+				Assert.IsTrue(loader.HasTemplate(view));
+				Assert.IsNotNull(loader.GetViewSource(view));
+			}
+		}
+	}
+
+	[TestFixture]
+	public class FileAssemblyViewSourceLoaderWithoutViewDirectoryTestCase
+	{
+		private FileAssemblyViewSourceLoader loader;
+
+		[SetUp]
+		public void SetUp()
+		{
+			loader = new FileAssemblyViewSourceLoader();
+			loader.ViewRootDir = Path.GetFullPath(@"c:\idontexist");
+			loader.Service(new TestServiceContainer());
+		}
+
+		[Test]
+		public void DoesNotThrowException_IfSubscribingToViewSourceChangedEvent_AndViewFolderIsMissing()
+		{
+			loader.ViewChanged += delegate
+			                      {
+			                      	//do nothing
+			                      };
+		}
+
+		[Test]
+		public void LoadFromAssembly()
+		{
+			loader.AddAssemblySource(new AssemblySourceInfo("Castle.MonoRail.Framework.Tests", "Castle.MonoRail.Framework.Tests"));
+
+			Assert.IsFalse(loader.HasTemplate("Content/contentinassembly2.vm"));
+			Assert.IsTrue(loader.HasTemplate("Content/contentinassembly.vm"));
+			Assert.IsNotNull(loader.GetViewSource("Content/contentinassembly.vm"));
+
+			Assert.IsFalse(loader.HasTemplate("Content\\contentinassembly2.vm"));
+			Assert.IsTrue(loader.HasTemplate("Content\\contentinassembly.vm"));
+			Assert.IsNotNull(loader.GetViewSource("Content\\contentinassembly.vm"));
+		}
+
+		[Test]
+		public void ListViews()
+		{
+			loader.AddAssemblySource(new AssemblySourceInfo("Castle.MonoRail.Framework.Tests", "Castle.MonoRail.Framework.Tests"));
+
+			string[] views = loader.ListViews("Content");
+
+			Assert.IsNotNull(views);
+			Assert.AreEqual(1, views.Length);
+			//Assert.AreEqual(@"Content" + Path.DirectorySeparatorChar + "contentinassembly.vm", views[0]);
+			//Assert.AreEqual(@"Content" + Path.DirectorySeparatorChar + "notinassembly.vm", views[1]);
+			Assert.AreEqual(@"content.contentinassembly.vm", views[0]);
+
+			foreach (string view in views)
 			{
 				Assert.IsTrue(loader.HasTemplate(view));
 				Assert.IsNotNull(loader.GetViewSource(view));
@@ -87,6 +144,7 @@ namespace Castle.MonoRail.Framework.Tests
 			AddService(typeof(ILayoutDescriptorProvider), new DefaultLayoutDescriptorProvider());
 			AddService(typeof(IHelperDescriptorProvider), new DefaultHelperDescriptorProvider());
 			AddService(typeof(IFilterDescriptorProvider), new DefaultFilterDescriptorProvider());
+			AddService(typeof(ITransformFilterDescriptorProvider), new DefaultTransformFilterDescriptorProvider());
 		}
 	}
 }

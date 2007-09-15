@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@ namespace TestSiteARSupport.Model
 {
 	using System;
 	using Castle.ActiveRecord;
+	using Castle.Components.Validator;
 
 	[ActiveRecord("TSAS_SimplePerson")]
-	public class SimplePerson : ActiveRecordValidationBase
+	public class SimplePerson : ActiveRecordBase
 	{
 		private String _id;
 		private String _name;
@@ -31,7 +32,7 @@ namespace TestSiteARSupport.Model
 			set { _id = value; }
 		}
 
-		[Property, ValidateRegExpAttribute(@"^(?:\w| )+$")]
+		[Property, ValidateRegExp(@"^(?:\w| )+$")]
 		public String Name
 		{
 			get { return _name; }

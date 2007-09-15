@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@ namespace Castle.MicroKernel.Tests.ClassComponents
 {
 	using System;
 
-
 	public class CustomerImpl2 : CustomerImpl
 	{
 		public CustomerImpl2(String name, String address, int age)
 		{
-			this.Name = name; this.Address = address; this.Age = age;
+			Name = name;
+			Address = address;
+			Age = age;
 		}
 	}
 }

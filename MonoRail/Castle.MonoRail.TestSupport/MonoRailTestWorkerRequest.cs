@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,9 +47,9 @@ namespace Castle.MonoRail.TestSupport
 			this.output = output;
 			this.filePath = requestData.Url;
 
-			if (!appPhysicalPath.EndsWith(@"\"))
+			if (!appPhysicalPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
 			{
-				appPhysicalPath = appPhysicalPath + @"\";
+				appPhysicalPath = appPhysicalPath + Path.DirectorySeparatorChar;
 			}
 		}
 

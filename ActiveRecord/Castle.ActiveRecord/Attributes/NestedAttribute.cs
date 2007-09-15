@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -92,13 +92,13 @@ namespace Castle.ActiveRecord
 	/// </code>
 	/// </example>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple=false), Serializable]
-	public class NestedAttribute : Attribute
+	public class NestedAttribute : WithAccessAttribute
 	{
 		private bool update = true;
 		private bool insert = true;
 		private Type mapType;
 		private String columnPrefix;
-
+		
 		/// <summary>
 		/// Informs ActiveRecord that the marked property contains nested elements, contained
 		/// in a separate, reusable class.
@@ -151,5 +151,7 @@ namespace Castle.ActiveRecord
 			get { return this.columnPrefix; }
 			set { this.columnPrefix = value; }
 		}
+
+		
 	}
 }

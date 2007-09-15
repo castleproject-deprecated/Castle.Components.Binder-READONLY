@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,11 +45,18 @@ namespace Castle.Core.Logging.Tests
 			log.Debug("Some debug message");
 			log.Info("Some info message");
 			log.Error("Some error message");
-			log.FatalError("Some fatal error message");
+			log.Fatal("Some fatal error message");
 			log.Warn("Some warn message");
 
 			String logcontents = outWriter.GetStringBuilder().ToString();
-			Assert.AreEqual("[Info] 'Logger' Some info message\r\n[Error] 'Logger' Some error message\r\n[Fatal] 'Logger' Some fatal error message\r\n[Warn] 'Logger' Some warn message\r\n", logcontents, "logcontents don't match");
+			
+			StringWriter expected = new StringWriter();
+			expected.WriteLine("[Info] 'Logger' Some info message");
+			expected.WriteLine("[Error] 'Logger' Some error message");
+			expected.WriteLine("[Fatal] 'Logger' Some fatal error message");
+			expected.WriteLine("[Warn] 'Logger' Some warn message");
+			
+			Assert.AreEqual(expected.GetStringBuilder().ToString(), logcontents, "logcontents don't match");
 		}
 
 		[Test]
@@ -60,27 +67,41 @@ namespace Castle.Core.Logging.Tests
 			log.Debug("Some debug message");
 			log.Info("Some info message");
 			log.Error("Some error message");
-			log.FatalError("Some fatal error message");
+			log.Fatal("Some fatal error message");
 			log.Warn("Some warn message");
 
 			String logcontents = outWriter.GetStringBuilder().ToString();
-			Assert.AreEqual("[Debug] 'Logger' Some debug message\r\n[Info] 'Logger' Some info message\r\n[Error] 'Logger' Some error message\r\n[Fatal] 'Logger' Some fatal error message\r\n[Warn] 'Logger' Some warn message\r\n", logcontents);
+			
+			StringWriter expected = new StringWriter();
+			expected.WriteLine("[Debug] 'Logger' Some debug message");
+			expected.WriteLine("[Info] 'Logger' Some info message");
+			expected.WriteLine("[Error] 'Logger' Some error message");
+			expected.WriteLine("[Fatal] 'Logger' Some fatal error message");
+			expected.WriteLine("[Warn] 'Logger' Some warn message");
+
+			Assert.AreEqual(expected.GetStringBuilder().ToString(), logcontents, "logcontents don't match");
 		}
 
-        [Test]
-        public void WarnLogger() 
-        {
-            ConsoleLogger log = new ConsoleLogger("Logger", LoggerLevel.Warn);
+		[Test]
+		public void WarnLogger()
+		{
+			ConsoleLogger log = new ConsoleLogger("Logger", LoggerLevel.Warn);
 
-            log.Debug("Some debug message");
-            log.Info("Some info message");
-            log.Error("Some error message");
-            log.FatalError("Some fatal error message");
-            log.Warn("Some warn message");
+			log.Debug("Some debug message");
+			log.Info("Some info message");
+			log.Error("Some error message");
+			log.Fatal("Some fatal error message");
+			log.Warn("Some warn message");
 
-            String logcontents = outWriter.GetStringBuilder().ToString();
-            Assert.AreEqual("[Error] 'Logger' Some error message\r\n[Fatal] 'Logger' Some fatal error message\r\n[Warn] 'Logger' Some warn message\r\n", logcontents);            
-        }
+			String logcontents = outWriter.GetStringBuilder().ToString();
+			
+			StringWriter expected = new StringWriter();
+			expected.WriteLine("[Error] 'Logger' Some error message");
+			expected.WriteLine("[Fatal] 'Logger' Some fatal error message");
+			expected.WriteLine("[Warn] 'Logger' Some warn message");
+
+			Assert.AreEqual(expected.GetStringBuilder().ToString(), logcontents, "logcontents don't match");
+		}
 
 		[Test]
 		public void ExceptionLogging()
@@ -90,7 +111,12 @@ namespace Castle.Core.Logging.Tests
 			log.Debug("Some debug message", new ApplicationException("Some exception message"));
 
 			String logcontents = outWriter.GetStringBuilder().ToString();
-			Assert.AreEqual("[Debug] 'Logger' Some debug message\r\n[Debug] 'Logger' System.ApplicationException: Some exception message \r\n", logcontents);
+			
+			StringWriter expected = new StringWriter();
+			expected.WriteLine("[Debug] 'Logger' Some debug message");
+			expected.WriteLine("[Debug] 'Logger' System.ApplicationException: Some exception message ");
+
+			Assert.AreEqual(expected.GetStringBuilder().ToString(), logcontents, "logcontents don't match");
 		}
 	}
 }

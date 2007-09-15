@@ -9,15 +9,12 @@ namespace NVelocity.Runtime.Parser
 
 	public class ParserTokenManager : ParserConstants
 	{
-		private int fileDepth = 0;
-
 		private int lparen = 0;
 		private int rparen = 0;
 
 		private Stack stateStack = new Stack();
 		public bool debugPrint = false;
 
-		private bool inReference;
 		public bool inDirective;
 		private bool inComment;
 		public bool inSet;
@@ -25,7 +22,7 @@ namespace NVelocity.Runtime.Parser
 		/**
 	 *  pushes the current state onto the 'state stack',
 	 *  and maintains the parens counts
-	 *  public because we need it in PD & VM handling
+	 *  public because we need it in PD &amp; VM handling
 	 *
 	 *  @return bool : success.  It can fail if the state machine
 	 *     gets messed up (do don't mess it up :)
@@ -40,7 +37,7 @@ namespace NVelocity.Runtime.Parser
 				h = (Hashtable) stateStack.Pop();
 			}
 				// was EmptyStackException
-			catch (InvalidOperationException e)
+			catch(InvalidOperationException)
 			{
 				lparen = 0;
 				SwitchTo(DEFAULT);
@@ -50,8 +47,8 @@ namespace NVelocity.Runtime.Parser
 			if (debugPrint)
 				Console.Out.WriteLine(
 					" stack pop (" + stateStack.Count + ") : lparen=" +
-						((Int32) h["lparen"]) +
-						" newstate=" + ((Int32) h["lexstate"]));
+					((Int32) h["lparen"]) +
+					" newstate=" + ((Int32) h["lexstate"]));
 
 			lparen = (Int32) h["lparen"];
 			rparen = (Int32) h["rparen"];
@@ -71,7 +68,7 @@ namespace NVelocity.Runtime.Parser
 		{
 			if (debugPrint)
 				Console.Out.WriteLine(" (" + stateStack.Count + ") pushing cur state : " +
-					curLexState);
+				                      curLexState);
 
 			Hashtable h = new Hashtable();
 
@@ -99,7 +96,6 @@ namespace NVelocity.Runtime.Parser
 
 			lparen = 0;
 			rparen = 0;
-			inReference = false;
 			inDirective = false;
 			inComment = false;
 			inSet = false;
@@ -125,7 +121,7 @@ namespace NVelocity.Runtime.Parser
 			if (inComment)
 				closed = true;
 
-			while (!closed)
+			while(!closed)
 			{
 				/*
 		 * look at current state.  If we haven't seen a lparen 
@@ -172,7 +168,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_0(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0x6000000L) != 0L)
@@ -238,7 +234,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -247,7 +243,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_0()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 33:
 					jjmatchedKind = 41;
@@ -303,12 +299,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_0(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -358,12 +354,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_0(1, active0);
 				return 2;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 108:
 					return jjMoveStringLiteralDfa3_0(active0, 0x4000000L);
@@ -383,12 +379,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_0(2, active0);
 				return 3;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					if ((active0 & 0x2000000L) != 0L)
@@ -410,12 +406,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_0(3, active0);
 				return 4;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					if ((active0 & 0x4000000L) != 0L)
@@ -441,7 +437,7 @@ namespace NVelocity.Runtime.Parser
 			do
 			{
 				jjstateSet[jjnewStateCnt++] = (uint) jjnextStates[start];
-			} while (start++ != end);
+			} while(start++ != end);
 		}
 
 		private void jjCheckNAddTwoStates(int state1, int state2)
@@ -455,7 +451,7 @@ namespace NVelocity.Runtime.Parser
 			do
 			{
 				jjCheckNAdd(jjnextStates[start]);
-			} while (start++ != end);
+			} while(start++ != end);
 		}
 
 		private void jjCheckNAddStates(int start)
@@ -465,32 +461,30 @@ namespace NVelocity.Runtime.Parser
 		}
 
 		private static ulong[] jjbitVec0 = {
-			0xfffffffffffffffeL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL
-		};
+		                                   	0xfffffffffffffffeL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL
+		                                   };
 
 		private static ulong[] jjbitVec2 = {
-			0x0L, 0x0L, 0xffffffffffffffffL, 0xffffffffffffffffL
-		};
+		                                   	0x0L, 0x0L, 0xffffffffffffffffL, 0xffffffffffffffffL
+		                                   };
 
 		private int jjMoveNfa_0(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 42;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 0:
 								if ((0x3ff000000000000L & l) != 0L)
@@ -684,15 +678,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 0:
 								if ((0x7fffffe87fffffeL & l) != 0L)
@@ -754,7 +747,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -763,10 +756,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 6:
 								if (jjCanMove_0(hiByte, i1, i2, l1, l2) && kind > 13)
@@ -783,7 +775,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -798,7 +790,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 				}
@@ -807,7 +799,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_6(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0xd000L) != 0L)
@@ -831,7 +823,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -840,7 +832,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_6()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					jjmatchedKind = 15;
@@ -858,12 +850,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_6(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -883,23 +875,21 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveNfa_6(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 12;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if (curChar == 36)
@@ -945,15 +935,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if (curChar == 92)
@@ -978,7 +967,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -987,10 +976,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 1:
 								if (jjCanMove_0(hiByte, i1, i2, l1, l2) && kind > 13)
@@ -999,7 +987,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -1014,7 +1002,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 				}
@@ -1023,7 +1011,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_4(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0xd000L) != 0L)
@@ -1107,7 +1095,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -1116,7 +1104,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_4()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					jjmatchedKind = 15;
@@ -1138,12 +1126,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_4(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -1175,12 +1163,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_4(1, active0);
 				return 2;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 111:
 					return jjMoveStringLiteralDfa3_4(active0, 0x800000000000L);
@@ -1200,12 +1188,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_4(2, active0);
 				return 3;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					return jjMoveStringLiteralDfa4_4(active0, 0x200000000000L);
@@ -1227,12 +1215,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_4(3, active0);
 				return 4;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 105:
 					return jjMoveStringLiteralDfa5_4(active0, 0x200000000000L);
@@ -1250,12 +1238,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_4(4, active0);
 				return 5;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 102:
 					if ((active0 & 0x200000000000L) != 0L)
@@ -1269,23 +1257,21 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveNfa_4(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 30;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if ((0x3ff000000000000L & l) != 0L)
@@ -1421,15 +1407,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if ((0x7fffffe87fffffeL & l) != 0L)
@@ -1532,7 +1517,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -1541,10 +1526,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 1:
 								if (jjCanMove_0(hiByte, i1, i2, l1, l2) && kind > 13)
@@ -1553,7 +1537,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -1568,7 +1552,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 				}
@@ -1577,7 +1561,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_3(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0x30000L) != 0L)
@@ -1603,7 +1587,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -1612,7 +1596,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_3()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					jjmatchedKind = 15;
@@ -1631,12 +1615,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_3(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -1658,23 +1642,21 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveNfa_3(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 23;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 23:
 								if (curChar == 36)
@@ -1774,15 +1756,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 23:
 								if (curChar == 92)
@@ -1867,7 +1848,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -1876,10 +1857,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 11:
 							case 5:
@@ -1896,7 +1876,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -1912,7 +1892,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 					// TODO:  added because this is what will happen when you read past the end of the buffer
@@ -1924,7 +1904,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_7(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0xd000L) != 0L)
@@ -1948,7 +1928,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -1957,7 +1937,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_7()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					jjmatchedKind = 15;
@@ -1975,12 +1955,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_7(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -2000,23 +1980,21 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveNfa_7(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 12;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if (curChar == 36)
@@ -2062,15 +2040,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if (curChar == 92)
@@ -2095,7 +2072,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -2104,10 +2081,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 1:
 								if (jjCanMove_0(hiByte, i1, i2, l1, l2) && kind > 13)
@@ -2116,7 +2092,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -2131,7 +2107,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 				}
@@ -2140,7 +2116,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_8(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0xd000L) != 0L)
@@ -2164,7 +2140,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -2173,7 +2149,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_8()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					jjmatchedKind = 15;
@@ -2189,12 +2165,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_8(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -2212,23 +2188,21 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveNfa_8(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 15;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if ((0x2400L & l) != 0L)
@@ -2293,15 +2267,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if (curChar == 92)
@@ -2326,7 +2299,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -2335,10 +2308,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 1:
 								if (jjCanMove_0(hiByte, i1, i2, l1, l2) && kind > 13)
@@ -2347,7 +2319,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -2362,7 +2334,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 				}
@@ -2371,7 +2343,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_5(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0xd000L) != 0L)
@@ -2428,7 +2400,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -2437,7 +2409,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_5()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					jjmatchedKind = 15;
@@ -2461,12 +2433,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_5(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -2494,12 +2466,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_5(1, active0);
 				return 2;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 108:
 					return jjMoveStringLiteralDfa3_5(active0, 0x4000000L);
@@ -2519,12 +2491,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_5(2, active0);
 				return 3;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					if ((active0 & 0x2000000L) != 0L)
@@ -2546,12 +2518,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_5(3, active0);
 				return 4;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					if ((active0 & 0x4000000L) != 0L)
@@ -2565,23 +2537,21 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveNfa_5(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 16;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if (curChar == 36)
@@ -2640,15 +2610,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if ((0x7fffffe87fffffeL & l) != 0L)
@@ -2695,7 +2664,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -2704,10 +2673,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 1:
 								if (jjCanMove_0(hiByte, i1, i2, l1, l2) && kind > 13)
@@ -2716,7 +2684,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -2731,7 +2699,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 				}
@@ -2740,7 +2708,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_1(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0xd000L) != 0L)
@@ -2799,7 +2767,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -2808,7 +2776,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_1()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					jjmatchedKind = 15;
@@ -2842,12 +2810,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_1(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -2879,12 +2847,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_1(1, active0);
 				return 2;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 108:
 					return jjMoveStringLiteralDfa3_1(active0, 0x4000000L);
@@ -2904,12 +2872,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_1(2, active0);
 				return 3;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					if ((active0 & 0x2000000L) != 0L)
@@ -2931,12 +2899,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_1(3, active0);
 				return 4;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					if ((active0 & 0x4000000L) != 0L)
@@ -2950,23 +2918,21 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveNfa_1(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 36;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if ((0x3ff000000000000L & l) != 0L)
@@ -3121,15 +3087,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if ((0x7fffffe87fffffeL & l) != 0L)
@@ -3195,7 +3160,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -3204,10 +3169,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 1:
 								if (jjCanMove_0(hiByte, i1, i2, l1, l2) && kind > 13)
@@ -3224,7 +3188,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -3239,7 +3203,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 				}
@@ -3248,7 +3212,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjStopStringLiteralDfa_2(int pos, long active0)
 		{
-			switch (pos)
+			switch(pos)
 			{
 				case 0:
 					if ((active0 & 0xd000L) != 0L)
@@ -3305,7 +3269,7 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				return pos + 1;
 			}
@@ -3314,7 +3278,7 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveStringLiteralDfa0_2()
 		{
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					jjmatchedKind = 15;
@@ -3340,12 +3304,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_2(0, active0);
 				return 1;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 35:
 					if ((active0 & 0x1000L) != 0L)
@@ -3373,12 +3337,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_2(1, active0);
 				return 2;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 108:
 					return jjMoveStringLiteralDfa3_2(active0, 0x4000000L);
@@ -3398,12 +3362,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_2(2, active0);
 				return 3;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					if ((active0 & 0x2000000L) != 0L)
@@ -3425,12 +3389,12 @@ namespace NVelocity.Runtime.Parser
 			{
 				curChar = input_stream.ReadChar();
 			}
-			catch (IOException e)
+			catch(IOException)
 			{
 				jjStopStringLiteralDfa_2(3, active0);
 				return 4;
 			}
-			switch (curChar)
+			switch(curChar)
 			{
 				case (char) 101:
 					if ((active0 & 0x4000000L) != 0L)
@@ -3444,23 +3408,21 @@ namespace NVelocity.Runtime.Parser
 
 		private int jjMoveNfa_2(int startState, int curPos)
 		{
-			int[] nextStates;
 			int startsAt = 0;
 			jjnewStateCnt = 16;
 			int i = 1;
 			jjstateSet[0] = (uint) startState;
-			int j, kind = 0x7fffffff;
-			for (;; )
+			int kind = 0x7fffffff;
+			for(;;)
 			{
 				if (++jjround == 0x7fffffff)
 					ReInitRounds();
 				if (curChar < 64)
 				{
 					long l = 1L << curChar;
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if (curChar == 36)
@@ -3519,15 +3481,14 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else if (curChar < 128)
 				{
 					long l = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 3:
 								if ((0x7fffffe87fffffeL & l) != 0L)
@@ -3574,7 +3535,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				else
 				{
@@ -3583,10 +3544,9 @@ namespace NVelocity.Runtime.Parser
 					long l1 = 1L << (hiByte & 63);
 					int i2 = (curChar & 0xff) >> 6;
 					long l2 = 1L << (curChar & 63);
-					MatchLoop:
 					do
 					{
-						switch (jjstateSet[--i])
+						switch(jjstateSet[--i])
 						{
 							case 1:
 								if (jjCanMove_0(hiByte, i1, i2, l1, l2) && kind > 13)
@@ -3595,7 +3555,7 @@ namespace NVelocity.Runtime.Parser
 							default:
 								break;
 						}
-					} while (i != startsAt);
+					} while(i != startsAt);
 				}
 				if (kind != 0x7fffffff)
 				{
@@ -3610,7 +3570,7 @@ namespace NVelocity.Runtime.Parser
 				{
 					curChar = input_stream.ReadChar();
 				}
-				catch (IOException e)
+				catch(IOException)
 				{
 					return curPos;
 				}
@@ -3618,17 +3578,17 @@ namespace NVelocity.Runtime.Parser
 		}
 
 		private static int[] jjnextStates = {
-			22, 23, 26, 11, 12, 13, 1, 2, 4, 11, 16, 12, 13, 19, 20, 24,
-			25, 35, 36, 37, 38, 14, 15, 17, 19, 20, 39, 40, 5, 6, 7, 8,
-			9, 10, 24, 25, 27, 18, 19, 21, 9, 10, 11, 12, 22, 29, 13, 14,
-			7, 8, 16, 17, 18, 19, 20, 21, 8, 9, 10, 11, 12, 13, 17, 18,
-			21, 6, 7, 8, 6, 11, 7, 8, 14, 15, 29, 30, 31, 32, 9, 10,
-			12, 14, 15, 33, 34,
-		};
+		                                    	22, 23, 26, 11, 12, 13, 1, 2, 4, 11, 16, 12, 13, 19, 20, 24,
+		                                    	25, 35, 36, 37, 38, 14, 15, 17, 19, 20, 39, 40, 5, 6, 7, 8,
+		                                    	9, 10, 24, 25, 27, 18, 19, 21, 9, 10, 11, 12, 22, 29, 13, 14,
+		                                    	7, 8, 16, 17, 18, 19, 20, 21, 8, 9, 10, 11, 12, 13, 17, 18,
+		                                    	21, 6, 7, 8, 6, 11, 7, 8, 14, 15, 29, 30, 31, 32, 9, 10,
+		                                    	12, 14, 15, 33, 34,
+		                                    };
 
 		private static bool jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)
 		{
-			switch (hiByte)
+			switch(hiByte)
 			{
 				case 0:
 					return ((jjbitVec2[i2] & (ulong) l2) != 0L);
@@ -3640,46 +3600,52 @@ namespace NVelocity.Runtime.Parser
 		}
 
 		public static String[] jjstrLiteralImages = {
-			null, null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, null,
-		};
+		                                            	null, null, null, null, null, null, null, null, null, null, null, null,
+		                                            	null,
+		                                            	null, null, null, null, null, null, null, null, null, null, null, null,
+		                                            	null, null,
+		                                            	null, null, null, null, null, null, null, null, null, null, null, null,
+		                                            	null, null,
+		                                            	null, null, null, null, null, null, null, null, null, null, null, null,
+		                                            	null, null,
+		                                            	null, null, null, null, null, null, null,
+		                                            };
 
 		public static String[] lexStateNames = {
-			"DIRECTIVE",
-			"REFMOD2",
-			"REFMODIFIER",
-			"DEFAULT",
-			"PRE_DIRECTIVE",
-			"REFERENCE",
-			"IN_MULTI_LINE_COMMENT",
-			"IN_FORMAL_COMMENT",
-			"IN_SINGLE_LINE_COMMENT",
-		};
+		                                       	"DIRECTIVE",
+		                                       	"REFMOD2",
+		                                       	"REFMODIFIER",
+		                                       	"DEFAULT",
+		                                       	"PRE_DIRECTIVE",
+		                                       	"REFERENCE",
+		                                       	"IN_MULTI_LINE_COMMENT",
+		                                       	"IN_FORMAL_COMMENT",
+		                                       	"IN_SINGLE_LINE_COMMENT",
+		                                       };
 
 		public static int[] jjnewLexState = {
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		};
+		                                    	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		                                    	-1, -1, -1, -1, -1,
+		                                    	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		                                    	-1, -1, -1, -1, -1,
+		                                    	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		                                    };
 
 		private static long[] jjtoToken = {
-			0xf12ffffffbf03ffL,
-		};
+		                                  	0xf12ffffffbf03ffL,
+		                                  };
 
 		private static long[] jjtoSkip = {
-			0x3000000000000000L,
-		};
+		                                 	0x3000000000000000L,
+		                                 };
 
 		private static long[] jjtoSpecial = {
-			0x3000000000000000L,
-		};
+		                                    	0x3000000000000000L,
+		                                    };
 
 		private static long[] jjtoMore = {
-			0x40fc00L,
-		};
+		                                 	0x40fc00L,
+		                                 };
 
 		private ICharStream input_stream;
 		private uint[] jjrounds = new uint[42];
@@ -3711,7 +3677,7 @@ namespace NVelocity.Runtime.Parser
 		{
 			int i;
 			jjround = 0x80000001;
-			for (i = 42; i-- > 0; )
+			for(i = 42; i-- > 0;)
 				jjrounds[i] = 0x80000000;
 		}
 
@@ -3724,7 +3690,8 @@ namespace NVelocity.Runtime.Parser
 		public void SwitchTo(int lexState)
 		{
 			if (lexState >= 9 || lexState < 0)
-				throw new TokenMgrError("Error: Ignoring invalid lexical state : " + lexState + ". State unchanged.", TokenMgrError.INVALID_LEXICAL_STATE);
+				throw new TokenMgrError("Error: Ignoring invalid lexical state : " + lexState + ". State unchanged.",
+				                        TokenMgrError.INVALID_LEXICAL_STATE);
 			else
 				curLexState = lexState;
 		}
@@ -3753,18 +3720,17 @@ namespace NVelocity.Runtime.Parser
 		{
 			get
 			{
-				int kind;
 				Token specialToken = null;
 				Token matchedToken;
 				int curPos = 0;
 
-				for (;; )
+				for(;;)
 				{
 					try
 					{
 						curChar = input_stream.BeginToken();
 					}
-					catch (IOException e)
+					catch(IOException)
 					{
 						jjmatchedKind = 0;
 						matchedToken = jjFillToken();
@@ -3774,9 +3740,9 @@ namespace NVelocity.Runtime.Parser
 					image = null;
 					jjimageLen = 0;
 
-					for (;; )
+					for(;;)
 					{
-						switch (curLexState)
+						switch(curLexState)
 						{
 							case 0:
 								jjmatchedKind = 0x7fffffff;
@@ -3895,7 +3861,7 @@ namespace NVelocity.Runtime.Parser
 								curChar = input_stream.ReadChar();
 								continue;
 							}
-							catch (IOException e1)
+							catch(IOException)
 							{
 							}
 						}
@@ -3908,7 +3874,7 @@ namespace NVelocity.Runtime.Parser
 							input_stream.ReadChar();
 							input_stream.Backup(1);
 						}
-						catch (IOException e1)
+						catch(IOException)
 						{
 							EOFSeen = true;
 							error_after = curPos <= 1 ? "" : input_stream.GetImage();
@@ -3925,7 +3891,8 @@ namespace NVelocity.Runtime.Parser
 							input_stream.Backup(1);
 							error_after = curPos <= 1 ? "" : input_stream.GetImage();
 						}
-						throw new TokenMgrError(EOFSeen, curLexState, error_line, error_column, error_after, curChar, TokenMgrError.LEXICAL_ERROR);
+						throw new TokenMgrError(EOFSeen, curLexState, error_line, error_column, error_after, curChar,
+						                        TokenMgrError.LEXICAL_ERROR);
 					}
 					EOFLoop_GOTO :
 					;
@@ -3935,7 +3902,7 @@ namespace NVelocity.Runtime.Parser
 
 		private void SkipLexicalActions(Token matchedToken)
 		{
-			switch (jjmatchedKind)
+			switch(jjmatchedKind)
 			{
 				case 60:
 					if (image == null)
@@ -3947,8 +3914,6 @@ namespace NVelocity.Runtime.Parser
 		    */
 
 					input_stream.Backup(1);
-
-					inReference = false;
 
 					if (debugPrint)
 						Console.Out.Write("REF_TERM :");
@@ -3975,7 +3940,7 @@ namespace NVelocity.Runtime.Parser
 		private void MoreLexicalActions()
 		{
 			jjimageLen += (lengthOfMatch = jjmatchedPos + 1);
-			switch (jjmatchedKind)
+			switch(jjmatchedKind)
 			{
 				case 10:
 					if (image == null)
@@ -3992,11 +3957,8 @@ namespace NVelocity.Runtime.Parser
 
 						if (curLexState == REFERENCE)
 						{
-							inReference = false;
 							StateStackPop();
 						}
-
-						inReference = true;
 
 						if (debugPrint)
 							Console.Out.Write("$  : going to " + REFERENCE);
@@ -4020,11 +3982,8 @@ namespace NVelocity.Runtime.Parser
 
 						if (curLexState == REFERENCE)
 						{
-							inReference = false;
 							StateStackPop();
 						}
-
-						inReference = true;
 
 						if (debugPrint)
 							Console.Out.Write("$!  : going to " + REFERENCE);
@@ -4043,7 +4002,6 @@ namespace NVelocity.Runtime.Parser
 					{
 						if (curLexState == REFERENCE)
 						{
-							inReference = false;
 							StateStackPop();
 						}
 
@@ -4090,7 +4048,6 @@ namespace NVelocity.Runtime.Parser
 
 						if (curLexState == REFERENCE || curLexState == REFMODIFIER)
 						{
-							inReference = false;
 							StateStackPop();
 						}
 
@@ -4110,7 +4067,7 @@ namespace NVelocity.Runtime.Parser
 
 		private void TokenLexicalActions(Token matchedToken)
 		{
-			switch (jjmatchedKind)
+			switch(jjmatchedKind)
 			{
 				case 5:
 					if (image == null)
@@ -4255,7 +4212,6 @@ namespace NVelocity.Runtime.Parser
 					else
 						image.Append(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));
 					matchedToken.Kind = EOF;
-					fileDepth = 0;
 					break;
 				case 49:
 					if (image == null)
@@ -4294,7 +4250,7 @@ namespace NVelocity.Runtime.Parser
 
 					if (debugPrint)
 						Console.Out.Write("DOT : switching to " + REFMODIFIER);
-					SwitchTo(ParserConstants.REFMODIFIER);
+					SwitchTo(REFMODIFIER);
 					break;
 				case 59:
 					if (image == null)
@@ -4308,5 +4264,4 @@ namespace NVelocity.Runtime.Parser
 			}
 		}
 	}
-
 }

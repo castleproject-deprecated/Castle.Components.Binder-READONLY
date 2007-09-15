@@ -1,4 +1,4 @@
- // Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+ // Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,22 +50,24 @@ namespace AspectSharp.Core.Dispatcher
 			_method2Advices = new Hashtable();
 		}
 
-		public object Intercept(Castle.DynamicProxy.IInvocation invocation, params object[] arguments)
+		public void Intercept(Castle.Core.Interceptor.IInvocation invocation)
 		{
 			IMethodInterceptor[] interceptors = ObtainAdvicesForMethod(invocation.Method,
-			                                                           invocation.InvocationTarget, arguments);
+			                                                           invocation.InvocationTarget, invocation.Arguments);
 
 			if (interceptors.Length == 0)
 			{
 				// Nothing to intercept. 
 				// Get on with it!
-				return invocation.Proceed(arguments);
+				invocation.Proceed();
+				return;
 			}
 
 			InvocationComposite alliance_invocation = new InvocationComposite(
-				interceptors, invocation, arguments);
+				interceptors, invocation, invocation.Arguments);
 
-			return alliance_invocation.Proceed();
+			object retval = alliance_invocation.Proceed();
+			invocation.ReturnValue = retval;
 		}
 
 		private IMethodInterceptor[] ObtainAdvicesForMethod(MethodInfo method, object instance, object[] arguments)

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Castle.Core.Logging
 	public class WebLogger : LevelFilteredLogger
 	{
 		private static readonly LoggerLevel DefaultLogLevel = LoggerLevel.Debug;
-		
+
 		/// <summary>
 		/// Creates a new WebLogger with the priority set to DEBUG.
 		/// </summary>
@@ -63,6 +63,7 @@ namespace Castle.Core.Logging
 		/// A Common method to log.
 		/// </summary>
 		/// <param name="level">The level of logging</param>
+		/// <param name="name">The Log name.</param>
 		/// <param name="message">The Message</param>
 		/// <param name="exception">The Exception</param>
 		protected override void Log(LoggerLevel level, String name, String message, Exception exception)
@@ -73,14 +74,14 @@ namespace Castle.Core.Logging
 			{
 				String category = String.Format("[{0}]", level.ToString());
 				String formattedMessage = String.Format("{0} {1}", name, message);
-				
+
 				ctx.Write(category, formattedMessage);
 
 				if (exception != null)
 				{
 					formattedMessage = String.Format("{0}: {1} {2}Stack Trace: {3}",
-						exception.GetType(), exception.Message, Environment.NewLine, exception.StackTrace);
-					
+					                                 exception.GetType(), exception.Message, Environment.NewLine, exception.StackTrace);
+
 					ctx.Warn(category, formattedMessage);
 				}
 			}
@@ -97,7 +98,7 @@ namespace Castle.Core.Logging
 			{
 				throw new ArgumentNullException("newName", "To create a child logger you must supply a non null name");
 			}
-			
+
 			return new WebLogger(String.Format("{0}.{1}", Name, newName), Level);
 		}
 	}

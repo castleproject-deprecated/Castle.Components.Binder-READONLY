@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -144,6 +144,16 @@ namespace Castle.Facilities.NHibernateIntegration
 			return inner.Load(theType, id);
 		}
 
+		public T Load<T>(object id, LockMode lockMode)
+		{
+			return inner.Load<T>(id, lockMode);
+		}
+
+		public T Load<T>(object id)
+		{
+			return inner.Load<T>(id);
+		}
+
 		public void Load(object obj, object id)
 		{
 			inner.Load(obj, id);
@@ -157,6 +167,41 @@ namespace Castle.Facilities.NHibernateIntegration
 		public object Get(Type clazz, object id, LockMode lockMode)
 		{
 			return inner.Get(clazz, id, lockMode);
+		}
+		
+		public NHibernate.Engine.ISessionImplementor GetSessionImplementation()
+		{
+			return inner.GetSessionImplementation();
+		}
+		
+		public T Get<T>(object id)
+		{
+			return inner.Get<T>(id);
+		}
+
+		public T Get<T>(object id, LockMode lockMode)
+		{
+			return inner.Get<T>(id, lockMode);
+		}
+
+		public IFilter EnableFilter(string filterName)
+		{
+			return inner.EnableFilter(filterName);
+		}
+
+		public IFilter GetEnabledFilter(string filterName)
+		{
+			return inner.GetEnabledFilter(filterName);
+		}
+
+		public void DisableFilter(string filterName)
+		{
+			inner.DisableFilter(filterName);
+		}
+
+		public IMultiQuery CreateMultiQuery()
+		{
+			return inner.CreateMultiQuery();
 		}
 
 		public void Replicate(object obj, ReplicationMode replicationMode)
@@ -206,46 +251,54 @@ namespace Castle.Facilities.NHibernateIntegration
 
 		public IList Find(string query)
 		{
-			return inner.Find(query);
+			return inner.CreateQuery(query).List();
 		}
 
 		public IList Find(string query, object value, IType type)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return inner.Find(query, value, type);
 		}
 
 		public IList Find(string query, object[] values, IType[] types)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return inner.Find(query, values, types);
 		}
 
 		public IEnumerable Enumerable(string query)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return inner.Enumerable(query);
 		}
 
 		public IEnumerable Enumerable(string query, object value, IType type)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return inner.Enumerable(query, value, type);
 		}
 
 		public IEnumerable Enumerable(string query, object[] values, IType[] types)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return inner.Enumerable(query, values, types);
 		}
 
 		public ICollection Filter(object collection, string filter)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return inner.Filter(collection, filter);
 		}
 
 		public ICollection Filter(object collection, string filter, object value, IType type)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return inner.Filter(collection, filter, value, type);
 		}
 
 		public ICollection Filter(object collection, string filter, object[] values, IType[] types)
 		{
+			// TODO: This is deprecated. Use ISession.CreateQuery().SetXYZ().List()
 			return inner.Filter(collection, filter, values, types);
 		}
 
@@ -299,6 +352,11 @@ namespace Castle.Facilities.NHibernateIntegration
 			return inner.CreateCriteria(persistentClass);
 		}
 
+		public ICriteria CreateCriteria(Type persistentClass, string alias)
+		{
+			return inner.CreateCriteria(persistentClass, alias);
+		}
+
 		public IQuery CreateQuery(string queryString)
 		{
 			return inner.CreateQuery(queryString);
@@ -312,6 +370,11 @@ namespace Castle.Facilities.NHibernateIntegration
 		public IQuery GetNamedQuery(string queryName)
 		{
 			return inner.GetNamedQuery(queryName);
+		}
+
+		public ISQLQuery CreateSQLQuery(string queryString)
+		{
+			return inner.CreateSQLQuery(queryString);
 		}
 
 		public IQuery CreateSQLQuery(string sql, string returnAlias, Type returnClass)

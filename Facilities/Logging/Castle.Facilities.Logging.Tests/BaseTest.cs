@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,11 @@
 namespace Castle.Facilities.Logging.Tests
 {
 	using System;
-	
-	using Castle.Windsor;
-	
 	using Castle.Core.Configuration;
-	
 	using Castle.MicroKernel.SubSystems.Configuration;
+	using Castle.Windsor;
 
-    /// <summary>
+	/// <summary>
 	/// Summary description for BaseTest.
 	/// </summary>
 	public abstract class BaseTest
@@ -32,20 +29,42 @@ namespace Castle.Facilities.Logging.Tests
 			return CreateConfiguredContainer(loggerApi, String.Empty);
 		}
 
-        protected virtual IWindsorContainer CreateConfiguredContainer(LoggerImplementation loggerApi, String custom)
-        {
-            IWindsorContainer container = new WindsorContainer(new DefaultConfigurationStore());
+		protected virtual IWindsorContainer CreateConfiguredContainer(LoggerImplementation loggerApi, String custom)
+		{
+			IWindsorContainer container = new WindsorContainer(new DefaultConfigurationStore());
+			string configFile = string.Empty;
 
-            MutableConfiguration confignode = new MutableConfiguration("facility");
+   
+			switch (loggerApi)
+			{
+				case LoggerImplementation.Log4net:
+					{
+						configFile = "log4net.facilities.test.config";
+						break;
+					}
+				case LoggerImplementation.NLog:
+					{
+						configFile = "NLog.facilities.test.config";
+						break;
+					}
+				case LoggerImplementation.ExtendedLog4net:
+					{
+						configFile = "log4net.facilities.test.config";
+						break;
+					}
+				case LoggerImplementation.ExtendedNLog:
+					{
+						configFile = "NLog.facilities.test.config";
+						break;
+					}
+			}
 
-            confignode.Attributes.Add("loggingApi", loggerApi.ToString());
-            confignode.Attributes.Add("customLoggerFactory", custom);
 
-            container.Kernel.ConfigurationStore.AddFacilityConfiguration("logging", confignode);
+			LoggingFacility facility = new LoggingFacility(loggerApi, custom, configFile);
 
-            container.AddFacility("logging", new LoggingFacility());
+			container.AddFacility("logging", facility);
 
-            return container;
-        }
+			return container;
+		}
 	}
 }

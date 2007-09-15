@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ namespace Castle.Windsor.Tests.Components
 	public interface IView
 	{
 		void Display();
+
+        IController Controller { get; set; }
 	}
 
 	public interface IController
@@ -26,7 +28,7 @@ namespace Castle.Windsor.Tests.Components
 
 	public class View : IView
 	{
-		IController controller;
+		private IController controller;
 
 		public IController Controller
 		{
@@ -41,39 +43,44 @@ namespace Castle.Windsor.Tests.Components
 
 	public class Controller : IController
 	{
-		IView View;
+		private IView view;
 
 		public Controller(IView view)
 		{
-			View = view;
+			this.view = view;
 		}
 
-		public void Process()
+	    public IView View
+	    {
+	        get { return view; }
+	    }
+
+	    public void Process()
 		{
 		}
 	}
-	
+
 	public class CompA
 	{
 		public CompA(CompB compb)
 		{
 		}
 	}
-	
+
 	public class CompB
 	{
 		public CompB(CompC compC)
 		{
 		}
 	}
-	
+
 	public class CompC
 	{
 		public CompC(CompD compD)
 		{
 		}
 	}
-	
+
 	public class CompD
 	{
 		public CompD(CompA compA)

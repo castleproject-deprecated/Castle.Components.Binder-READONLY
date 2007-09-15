@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,9 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 
 	using Castle.Core.Configuration;
 
-
 	[Serializable]
 	public class DictionaryConverter : AbstractTypeConverter
 	{
-		public DictionaryConverter()
-		{
-		}
-
 		public override bool CanHandleType(Type type)
 		{
 			return (type == typeof(IDictionary) || type == typeof(Hashtable));
@@ -73,7 +68,8 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 
 				if (itemConfig.Attributes["keyType"] != null)
 				{
-					convertKeyTo = (Type) Context.Composition.PerformConversion( itemConfig.Attributes["keyType"], typeof(Type) );
+					convertKeyTo = (Type) Context.Composition.PerformConversion( 
+						itemConfig.Attributes["keyType"], typeof(Type) );
 				}
 
 				object key = Context.Composition.PerformConversion(keyValue, convertKeyTo);
@@ -84,9 +80,22 @@ namespace Castle.MicroKernel.SubSystems.Conversion
 
 				if (itemConfig.Attributes["valueType"] != null)
 				{
-					convertValueTo = (Type) Context.Composition.PerformConversion( itemConfig.Attributes["valueType"], typeof(Type) );
+					convertValueTo = (Type) Context.Composition.PerformConversion( 
+						itemConfig.Attributes["valueType"], typeof(Type) );
 				}
-				object value = Context.Composition.PerformConversion(itemConfig.Value, convertValueTo);
+
+				object value;
+
+				if (itemConfig.Children.Count == 0)
+				{
+					value = Context.Composition.PerformConversion(
+						itemConfig, convertValueTo);
+				}
+				else
+				{
+					value = Context.Composition.PerformConversion(
+						itemConfig.Children[0], convertValueTo);
+				}
 
 				dict.Add( key, value );
 			}

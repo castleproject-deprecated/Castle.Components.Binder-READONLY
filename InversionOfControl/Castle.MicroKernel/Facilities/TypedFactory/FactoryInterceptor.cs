@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace Castle.Facilities.TypedFactory
 	/// Summary description for FactoryInterceptor.
 	/// </summary>
 	[Transient]
-	public class FactoryInterceptor : IMethodInterceptor, IOnBehalfAware
+	public class FactoryInterceptor : IInterceptor, IOnBehalfAware
 	{
 		private FactoryEntry _entry;
 		private IKernel _kernel;
@@ -40,19 +40,23 @@ namespace Castle.Facilities.TypedFactory
 			_entry = (FactoryEntry) target.ExtendedProperties["typed.fac.entry"];
 		}
 
-		public object Intercept(IMethodInvocation invocation, params object[] args)
+		public void Intercept(IInvocation invocation)
 		{
 			String name = invocation.Method.Name;
+
+			object[] args = invocation.Arguments;
 
 			if (name.Equals(_entry.CreationMethod))
 			{
 				if (args.Length == 0 || args[0] == null)
 				{
-					return _kernel[ invocation.Method.ReturnType ];
+					invocation.ReturnValue = _kernel[ invocation.Method.ReturnType ];
+					return;
 				}
 				else
 				{
-					return _kernel[ (String) args[0] ];
+					invocation.ReturnValue = _kernel[(String)args[0]];
+					return;
 				}
 			}
 			else if (name.Equals(_entry.DestructionMethod))
@@ -60,12 +64,12 @@ namespace Castle.Facilities.TypedFactory
 				if (args.Length == 1)
 				{
 					_kernel.ReleaseComponent( args[0] );
-					
-					return null;
+					invocation.ReturnValue = null;
+					return;
 				}
 			}
 			
-			return invocation.Proceed(args);
+			invocation.Proceed();
 		}
 	}
 }

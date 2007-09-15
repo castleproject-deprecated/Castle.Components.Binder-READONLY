@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 	/// and invoke the handlers to process an exception
 	/// </para>
 	/// <code>
+	/// <![CDATA[
 	/// public void BuyMercedes()
 	/// {
 	///		try
@@ -53,12 +54,13 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 	///		}
 	///		catch(Exception ex)
 	///		{
-	///			IExceptionProcessor exProcessor = (IExceptionProcessor) ServiceProvider.GetService(typeof(IExceptionProcessor));
+	///			IExceptionProcessor exProcessor = ServiceProvider.GetService<IExceptionProcessor>();
 	///			exProcessor.ProcessException(ex);
 	/// 
 	///			RenderView("CouldNotBuyMercedes");
 	///		}
 	/// }
+	/// ]]>
 	/// </code>
 	/// </remarks>
 	public class ExceptionChainingExtension : IMonoRailExtension, IExceptionProcessor
@@ -124,14 +126,14 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		{
 			const String mrExceptionKey = "MonoRail.ExceptionHandled";
 			
-			if (context.UnderlyingContext.Items.Contains(mrExceptionKey))
+			if (context.Items.Contains(mrExceptionKey))
 			{
 				return;
 			}
 			
 			if (firstHandler != null)
 			{
-				context.UnderlyingContext.Items.Add(mrExceptionKey, true);
+				context.Items.Add(mrExceptionKey, true);
 				
 				firstHandler.Process(context);
 			}
@@ -145,8 +147,9 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 
 			if (handlerType == null)
 			{
-				throw new ConfigurationException("The Type for the custom session could not be loaded. " + 
-					typeName);
+				String message = "The Type for the custom session could not be loaded. " + 
+					typeName;
+				throw new ConfigurationErrorsException(message);
 			}
 
 			try
@@ -155,8 +158,9 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 			}
 			catch(InvalidCastException)
 			{
-				throw new ConfigurationException("The Type for the custom session must " + 
-					"implement ICustomSessionFactory. " + typeName);
+				String message = "The Type for the custom session must " + 
+					"implement ICustomSessionFactory. " + typeName;
+				throw new ConfigurationErrorsException(message);
 			}
 
 			IConfigurableHandler configurableHandler = handler as IConfigurableHandler;

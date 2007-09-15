@@ -23,6 +23,9 @@ Committers
 - Roelof Blom
 - Ahmed Ghandour 
 - Josh Robb
+- Ernst Naezer
+- Marc-Andre Cournoyer
+- Fabian Schmied
 
 Managers 
 ========

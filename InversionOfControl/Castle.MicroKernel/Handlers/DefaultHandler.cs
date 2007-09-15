@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,10 +25,20 @@ namespace Castle.MicroKernel.Handlers
 	[Serializable]
 	public class DefaultHandler : AbstractHandler
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultHandler"/> class.
+		/// </summary>
+		/// <param name="model"></param>
 		public DefaultHandler(ComponentModel model) : base(model)
 		{
 		}
 
+		/// <summary>
+		/// Returns an instance of the component this handler
+		/// is responsible for
+		/// </summary>
+		/// <param name="context"></param>
+		/// <returns></returns>
 		public override object Resolve(CreationContext context)
 		{
 			if (!context.HasAdditionalParameters)
@@ -36,17 +46,17 @@ namespace Castle.MicroKernel.Handlers
 				AssertNotWaitingForDependency();
 			}
 
-#if DOTNET2
-			CreationContext newContext = new CreationContext(this, ComponentModel.Service, context);
-#else
-			CreationContext newContext = new CreationContext(this, context);
-#endif
-
-			// return lifestyleManager.Resolve(newContext);
-			return lifestyleManager.Resolve(context);
+			using (context.ResolvingHandler(this))
+			{
+			    return lifestyleManager.Resolve(context);
+			}
 		}
 
-	    public override void Release(object instance)
+		/// <summary>
+		/// disposes the component instance (or recycle it)
+		/// </summary>
+		/// <param name="instance"></param>
+		public override void Release(object instance)
 		{
 			lifestyleManager.Release(instance);
 		}
@@ -56,7 +66,7 @@ namespace Castle.MicroKernel.Handlers
 			if (CurrentState == HandlerState.WaitingDependency)
 			{
 				String message = String.Format("Can't create component '{1}' " +
-					"as it has dependencies to be satisfied. {0}", 
+					"as it has dependencies to be satisfied. {0}",
 					ObtainDependencyDetails(new ArrayList()), ComponentModel.Name);
 
 				throw new HandlerException(message);

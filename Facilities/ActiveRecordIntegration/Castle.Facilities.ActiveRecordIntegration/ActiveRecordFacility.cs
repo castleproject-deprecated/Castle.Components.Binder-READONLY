@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,15 +57,17 @@ namespace Castle.Facilities.ActiveRecordIntegration
 				throw new FacilityException("Sorry, but the ActiveRecord Facility depends on a proper configuration node.");
 			}
 
-			ConfigurationCollection assembliyConfigNodes = FacilityConfig.Children["assemblies"].Children;
+			IConfiguration assemblyConfig = FacilityConfig.Children["assemblies"];
 
-			if (assembliyConfigNodes.Count == 0)
+			if (assemblyConfig == null || assemblyConfig.Children.Count == 0)
 			{
 				log.FatalError("No assembly specified on AR Facility config.");
 
 				throw new FacilityException("You need to specify at least one assembly that contains " +
 					"the ActiveRecord classes. For example, <assemblies><item>MyAssembly</item></assemblies>");
 			}
+
+			ConfigurationCollection assembliyConfigNodes = assemblyConfig.Children;
 
 			ArrayList assemblies = new ArrayList(assembliyConfigNodes.Count);
 
@@ -122,13 +124,16 @@ namespace Castle.Facilities.ActiveRecordIntegration
 				log.Info("No Transaction Manager registered on Kernel, registering AR Transaction Manager");
 
 				Kernel.AddComponent("ar.transaction.manager",
-				                    typeof(ITransactionManager), typeof(ActiveRecordTransactionManager));
+				                    typeof(ITransactionManager), typeof(DefaultTransactionManager));
 			}
 		}
 
-		private void OnNewTransaction(ITransaction transaction, TransactionMode transactionMode, IsolationMode isolationMode)
+		private void OnNewTransaction(ITransaction transaction, TransactionMode transactionMode, IsolationMode isolationMode, bool distributedTransaction)
 		{
-			transaction.Enlist(new TransactionScopeResourceAdapter(transactionMode));
+			if (!transaction.DistributedTransaction)
+			{
+				transaction.Enlist(new TransactionScopeResourceAdapter(transactionMode));
+			}
 		}
 
 		private Assembly ObtainAssembly(String assemblyName)
@@ -200,10 +205,12 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			String threadinfotype = facilityConfig.Attributes["threadinfotype"];
 			string isDebug = facilityConfig.Attributes["isDebug"];
 			string sessionfactoryholdertype = facilityConfig.Attributes["sessionfactoryholdertype"];
+			string isLazyByDefault = facilityConfig.Attributes["default-lazy"];
 
 			SetUpThreadInfoType("true" == isWeb, threadinfotype);
 			SetDebugFlag("true" == isDebug);
 			SetUpSessionFactoryHolderType(sessionfactoryholdertype);
+			SetIsLazyByDefault("true" == isLazyByDefault);
 
 			foreach(IConfiguration config in facilityConfig.Children)
 			{
@@ -244,7 +251,8 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			if (type == null)
 			{
 				String message = String.Format("Could not obtain type from name {0}", typeAtt);
-				throw new ConfigurationException(message);
+
+				throw new ConfigurationErrorsException(message);
 			}
 
 			return type;

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ namespace NVelocity.Exception
 
 	/// <summary>  Application-level exception thrown when a resource of any type
 	/// has a syntax or other error which prevents it from being parsed.
-	/// <br>
+	/// <br/>
 	/// When this resource is thrown, a best effort will be made to have
 	/// useful information in the exception's message.  For complete
 	/// information, consult the runtime log.

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ namespace Castle.ActiveRecord
 	using System;
 	using System.Collections;
 	
-	using NHibernate;
 	using NHibernate.Type;
 
 	/// <summary>
@@ -25,7 +24,7 @@ namespace Castle.ActiveRecord
 	/// that are interested in NHibernate's hooks.
 	/// </summary>
 	[Serializable]
-	public abstract class ActiveRecordHooksBase : ILifecycle
+	public abstract class ActiveRecordHooksBase
 	{
 		/// <summary>
 		/// Hook to change the object state
@@ -35,6 +34,8 @@ namespace Castle.ActiveRecord
 		/// <returns>Return <c>true</c> if you have changed the state. <c>false</c> otherwise</returns>
 		protected virtual internal bool BeforeSave(IDictionary state)
 		{
+			OnSave();
+
 			return false;
 		}
 
@@ -43,10 +44,13 @@ namespace Castle.ActiveRecord
 		/// from the database before populating 
 		/// the object instance
 		/// </summary>
-		/// <param name="adapter"></param>
+		/// <param name="id">id of the obejct</param>
+		/// <param name="adapter">list of properties and their values</param>
 		/// <returns>Return <c>true</c> if you have changed the state. <c>false</c> otherwise</returns>
-		protected virtual internal bool BeforeLoad(IDictionary adapter)
+		protected virtual internal bool BeforeLoad(object id, IDictionary adapter)
 		{
+			OnLoad(id);
+
 			return false;
 		}
 
@@ -58,6 +62,7 @@ namespace Castle.ActiveRecord
 		/// <param name="adapter"></param>
 		protected virtual internal void BeforeDelete(IDictionary adapter)
 		{
+			OnDelete();
 		}
 
 		/// <summary>
@@ -113,35 +118,24 @@ namespace Castle.ActiveRecord
 			return null;
 		}
 
-		#region ILifecycle
-
-		LifecycleVeto ILifecycle.OnSave(ISession session)
-		{
-			OnSave();
-
-			return LifecycleVeto.NoVeto;
-		}
-
-		LifecycleVeto ILifecycle.OnUpdate(ISession session)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="previousState"></param>
+		/// <param name="currentState"></param>
+		/// <param name="types"></param>
+		/// <returns></returns>
+		protected virtual internal bool OnFlushDirty(object id, IDictionary previousState, IDictionary currentState,
+		                                           IType[] types)
 		{
 			OnUpdate();
 
-			return LifecycleVeto.NoVeto;
+			return false;
 		}
 
-		LifecycleVeto ILifecycle.OnDelete(ISession session)
-		{
-			OnDelete();
-
-			return LifecycleVeto.NoVeto;
-		}
-
-		void ILifecycle.OnLoad(ISession session, object id)
-		{
-			OnLoad(id);
-		}
-
-		#endregion
+		// These methods present the same functions as the old lifecycle implementation
+		// but they are now driven by the hook functions instead.
 
 		/// <summary>
 		/// Lifecycle method invoked during Save of the entity

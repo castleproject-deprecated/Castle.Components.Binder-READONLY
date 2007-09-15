@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 	using System;
 	using Castle.MonoRail.Framework.Tests;
 	using NUnit.Framework;
-	using Castle.MonoRail.TestSupport;
 
 	[TestFixture]
 	public class ComponentsTestCase : AbstractTestCase
@@ -201,12 +200,35 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.Tests
 			AssertReplyContains("View content and 1 2 True Something hello");
 		}
 
-		void AssertOutput(String expected, object output)
+		[Test]
+		public void CanRenderMultipleDynamicComponents() 
+		{
+			DoGet("usingcomponent/dynamiccomponent.rails");
+			AssertReplyContains("Hello from SimpleInlineViewComponent");
+			AssertReplyContains("This is a view used by a component");
+		}
+
+		[Test]
+		public void AutoParameterBindingMustBeAbleToPerformSimpleConversions()
+		{
+			DoGet("usingcomponent2/autoparameterbinding1.rails");
+			AssertReplyContains("'1' 'xpto' 'something.castle?val=1'");
+		}
+
+		[Test]
+		public void AutoParameterBinding_IdIsARequiredParameter()
+		{
+			DoGet("usingcomponent2/autoparameterbinding2.rails");
+			AssertReplyContains("The parameter 'Id' is required by the ViewComponent " + 
+				"AutoParameterBinding but was not passed or had a null value");
+		}
+
+		private void AssertOutput(String expected, object output)
 		{
 			Assert.AreEqual(NormalizeWhitespace(expected), NormalizeWhitespace(output.ToString()));
 		}
 
-		String NormalizeWhitespace(String s)
+		private static string NormalizeWhitespace(String s)
 		{
 			return s.Replace("\r\n", "\n");
 		}

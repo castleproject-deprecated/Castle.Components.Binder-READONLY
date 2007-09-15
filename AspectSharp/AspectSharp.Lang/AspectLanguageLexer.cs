@@ -90,7 +90,7 @@
 		{
 			caseSensitiveLiterals = true;
 			setCaseSensitive(true);
-			literals = new Hashtable(100, (float) 0.4, null, Comparer.Default);
+			literals = new Hashtable(100, (float) 0.4, StringComparer.CurrentCulture);
 			literals.Add("assignableFrom", 18);
 			literals.Add("for", 5);
 			literals.Add("method", 14);

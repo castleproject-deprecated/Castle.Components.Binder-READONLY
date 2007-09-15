@@ -1,0 +1,17 @@
+May, 2007
+
+- Applied Ron Grabowski's patch fixing SERVICES-9
+  "Add Name and Resources properties to ITransaction"
+
+Jan, 2007
+
+
+- Added System.Transactions integration
+
+- Added ActivityManager/Activity concept
+
+Feb, 2006 
+
+- Added logging support
+
+- Added IsRollbackOnlySet

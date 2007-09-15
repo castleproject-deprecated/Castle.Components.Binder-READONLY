@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 namespace Castle.Windsor.Tests
 {
 	using System.Runtime.Remoting;
-	using NUnit.Framework;
-
+	using Castle.Core.Interceptor;
 	using Castle.Windsor.Tests.Components;
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class SmartProxyTestCase
@@ -33,9 +33,9 @@ namespace Castle.Windsor.Tests
 		{
 			_container = new WindsorContainer();
 
-			_container.AddFacility( "1", new MyInterceptorGreedyFacility() );
-			_container.AddFacility( "2", new MyInterceptorGreedyFacility() );
-			_container.AddFacility( "3", new MyInterceptorGreedyFacility() );
+			_container.AddFacility("1", new MyInterceptorGreedyFacility());
+			_container.AddFacility("2", new MyInterceptorGreedyFacility());
+			_container.AddFacility("3", new MyInterceptorGreedyFacility());
 		}
 
 		[TearDown]
@@ -45,57 +45,41 @@ namespace Castle.Windsor.Tests
 		}
 
 		[Test]
-		public void MBRInterfaceProxy()
+		public void InterfaceInheritance()
 		{
-			_container.AddComponent( "interceptor", typeof(ResultModifierInterceptor) );
-			_container.AddComponent( "key", typeof(ICalcService), typeof(MarshalCalculatorService)  );
+			_container.AddComponent("interceptor", typeof(StandardInterceptor));
+			_container.AddComponent("key", typeof(ICameraService), typeof(CameraService));
 
-			ICalcService service = (ICalcService) _container.Resolve("key");
+			ICameraService service = (ICameraService) _container.Resolve("key");
 
 			Assert.IsNotNull(service);
-			Assert.IsTrue(RemotingServices.IsTransparentProxy(service));
-			Assert.AreEqual( 7, service.Sum(2,2) );
-		}
-
-		[Test]
-		public void MBRConcreteClassProxy()
-		{
-			_container.AddComponent( "interceptor", typeof(ResultModifierInterceptor) );
-			_container.AddComponent( "key", typeof(MarshalCalculatorService), typeof(MarshalCalculatorService)  );
-
-			MarshalCalculatorService service = (MarshalCalculatorService) 
-				_container.Resolve("key");
-
-			Assert.IsNotNull(service);
-			Assert.IsTrue(RemotingServices.IsTransparentProxy(service));
-			Assert.AreEqual( 7, service.Sum(2,2) );
 		}
 
 		[Test]
 		public void InterfaceProxy()
 		{
-			_container.AddComponent( "interceptor", typeof(ResultModifierInterceptor) );
-			_container.AddComponent( "key", 
-				typeof(ICalcService), typeof(CalculatorService)  );
+			_container.AddComponent("interceptor", typeof(ResultModifierInterceptor));
+			_container.AddComponent("key",
+			                        typeof(ICalcService), typeof(CalculatorService));
 
 			ICalcService service = (ICalcService) _container.Resolve("key");
 
 			Assert.IsNotNull(service);
 			Assert.IsFalse(RemotingServices.IsTransparentProxy(service));
-			Assert.AreEqual( 7, service.Sum(2,2) );
+			Assert.AreEqual(7, service.Sum(2, 2));
 		}
 
 		[Test]
 		public void ConcreteClassProxy()
 		{
-			_container.AddComponent( "interceptor", typeof(ResultModifierInterceptor) );
-			_container.AddComponent( "key", typeof(CalculatorService)  );
+			_container.AddComponent("interceptor", typeof(ResultModifierInterceptor));
+			_container.AddComponent("key", typeof(CalculatorService));
 
 			CalculatorService service = (CalculatorService) _container.Resolve("key");
 
 			Assert.IsNotNull(service);
 			Assert.IsFalse(RemotingServices.IsTransparentProxy(service));
-			Assert.AreEqual( 7, service.Sum(2,2) );
+			Assert.AreEqual(7, service.Sum(2, 2));
 		}
 	}
 }

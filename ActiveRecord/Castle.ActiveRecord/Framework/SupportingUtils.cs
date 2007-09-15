@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,18 +25,27 @@ namespace Castle.ActiveRecord.Framework
 	/// </summary>
 	public abstract class SupportingUtils
 	{
+		/// <summary>
+		/// Obsolete method, use ActiveRecordMediator or ActiveRecordMediator{T} instead
+		/// </summary>
 		[Obsolete("Use ActiveRecordMediator instead")]
 		public static IList FindAll(Type type)
 		{
 			return ActiveRecordMediator.FindAll(type);
 		}
 
+		/// <summary>
+		/// Obsolete method, use ActiveRecordMediator or ActiveRecordMediator{T} instead
+		/// </summary>
 		[Obsolete("Use ActiveRecordMediator instead")]
 		public static object FindByPK(Type type, object id)
 		{
 			return ActiveRecordMediator.FindByPrimaryKey(type, id);
 		}
 
+		/// <summary>
+		/// Obsolete method, use ActiveRecordMediator or ActiveRecordMediator{T} instead
+		/// </summary>
 		[Obsolete("Use ActiveRecordMediator instead")]
 		public static object FindByPK(Type type, object id, bool throwOnNotFound)
 		{
@@ -45,6 +54,12 @@ namespace Castle.ActiveRecord.Framework
 
 		#region BuildArray
 
+		/// <summary>
+		/// Create an array from an IList.
+		/// </summary>
+		/// <param name="targetType">Type of the item in the array.</param>
+		/// <param name="list">The list.</param>
+		/// <returns></returns>
 		public static Array BuildArray(Type targetType, IList list)
 		{
 			Array array = Array.CreateInstance(targetType, list.Count);
@@ -170,12 +185,28 @@ namespace Castle.ActiveRecord.Framework
 
 		#endregion
 
-#if DOTNET2
-
 		#region BuildObjectArray
 
 		/// <summary>
 		/// Converts the results stored in an <see cref="IEnumerable"/> to an
+		/// strongly-typed array.
+		/// </summary>
+		/// <typeparam name="T">The type of the new array</typeparam>
+		/// <param name="list">The source list</param>
+		/// <param name="distinct">If true, only distinct results will be inserted in the array</param>
+		/// <returns>The strongly-typed array</returns>
+		public static T[] BuildObjectArray<T>(IEnumerable list, bool distinct)
+		{
+			return (T[]) BuildObjectArray(typeof(T), list, distinct);
+		}
+
+		#endregion
+
+		#region BuildArray
+
+
+		/// <summary>
+		/// Converts the results stored in an <see cref="IEnumerable"/> to a
 		/// strongly-typed array.
 		/// </summary>
 		/// <param name="list">The source list</param>
@@ -186,20 +217,26 @@ namespace Castle.ActiveRecord.Framework
 		/// the supplied <paramref name="list" />.
 		/// </typeparam>
 		/// <remarks>A good alternative is to use the new <see cref="ImportAttribute"/></remarks>
-		public static T[] BuildObjectArray<T>(IEnumerable list, bool distinct)
-		{
-			return (T[]) BuildObjectArray(typeof(T), list, distinct);
-		}
-
-		#endregion
-
-		#region BuildArray
-
 		public static T[] BuildArray<T>(IEnumerable list, bool distinct)
 		{
 			return (T[]) BuildArray(typeof(T), list, distinct);
 		}
 
+		/// <summary>
+		/// Converts the results stored in an <see cref="IEnumerable"/> to an
+		/// strongly-typed array.
+		/// </summary>
+		/// <typeparam name="T">The type of the new array</typeparam>
+		/// <param name="list">The source list</param>
+		/// <param name="entityIndex">
+		/// If the HQL clause selects more than one field, or a join is performed
+		/// without using <c>fetch join</c>, the contents of the result list will
+		/// be of type <c>object[]</c>. Specify which index in this array should be used to
+		/// compose the new result array. Use <c>-1</c> to ignore this parameter.
+		/// </param>
+		/// <param name="distinct">If true, only distinct results will be inserted in the array</param>
+		/// <returns>The strongly-typed array</returns>
+	
 		public static T[] BuildArray<T>(IEnumerable list, int? entityIndex, bool distinct)
 		{
 			return (T[]) BuildArray(typeof(T), list, entityIndex ?? -1, distinct);
@@ -207,6 +244,5 @@ namespace Castle.ActiveRecord.Framework
 
 		#endregion
 
-#endif
 	}
 }

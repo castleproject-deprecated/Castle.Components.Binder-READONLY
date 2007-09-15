@@ -1,4 +1,4 @@
-// Copyright 2004-2005 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@ namespace Castle.MonoRail.ActiveRecordSupport
 {
 	using System;
 	using System.Reflection;
+
+	using NHibernate;
+	using NHibernate.Expression;
 
 	using Castle.ActiveRecord;
 	using Castle.ActiveRecord.Framework.Internal;
@@ -85,15 +88,7 @@ namespace Castle.MonoRail.ActiveRecordSupport
 
 			if (pk != null && !String.Empty.Equals(pk))
 			{
-				PrimaryKeyModel pkModel;
-				if (model.IsJoinedSubClass)
-				{
-					pkModel = model.Parent.PrimaryKey;
-				}
-				else
-				{
-					pkModel = model.PrimaryKey;
-				}
+				PrimaryKeyModel pkModel = ObtainPrimaryKey(model);
 
 				Type pkType = pkModel.Property.PropertyType;
 
@@ -105,7 +100,31 @@ namespace Castle.MonoRail.ActiveRecordSupport
 					throw new RailsException("ARFetcher could not convert PK {0} to type {1}", pk, pkType);
 				}
 
-				instance = ActiveRecordMediator.FindByPrimaryKey(type, convertedPk, attr.Required);
+				if (attr.Eager == null || attr.Eager.Length == 0)
+				{
+					// simple load
+					instance = ActiveRecordMediator.FindByPrimaryKey(type, convertedPk, attr.Required);
+				}
+				else
+				{
+					// load using eager fetching of lazy collections
+					DetachedCriteria criteria = DetachedCriteria.For(type);
+					criteria.Add(Expression.Eq(pkModel.Property.Name, convertedPk));
+					foreach (string associationToEagerFetch in attr.Eager.Split(','))
+					{
+						string clean = associationToEagerFetch.Trim();
+						if (clean.Length == 0)
+						{
+							continue;
+						}
+						
+						criteria.SetFetchMode(clean, FetchMode.Eager);
+					}
+					
+					object[] result = (object[]) ActiveRecordMediator.FindAll(type, criteria);
+					if (result.Length > 0)
+						instance = result[0];
+				}
 			}
 
 			if (instance == null && attr.Create)
@@ -115,5 +134,15 @@ namespace Castle.MonoRail.ActiveRecordSupport
 
 			return instance;
 		}
+
+		private static PrimaryKeyModel ObtainPrimaryKey(ActiveRecordModel model)
+		{
+			if (model.IsJoinedSubClass || model.IsDiscriminatorSubClass)
+			{
+				return ObtainPrimaryKey(model.Parent);
+			}
+			return model.PrimaryKey;
+		}
+ 
 	}
 }

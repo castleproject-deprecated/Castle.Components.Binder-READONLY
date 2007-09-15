@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -72,6 +72,21 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 		/// </summary>
 		public override bool Render(IInternalContextAdapter context, TextWriter writer, INode node)
 		{
+			if (context == null)
+			{
+				throw new RailsException("context is null");
+			}
+
+			if (contextAdapter == null)
+			{
+				throw new RailsException("contextAdapter is null");
+			}
+
+			if (contextAdapter.ContextVars == null)
+			{
+				throw new RailsException("contextAdapter.ContextVars is null");
+			}
+
 			foreach(DictionaryEntry entry in contextAdapter.ContextVars)
 			{
 				context.Put(entry.Key.ToString(), entry.Value);

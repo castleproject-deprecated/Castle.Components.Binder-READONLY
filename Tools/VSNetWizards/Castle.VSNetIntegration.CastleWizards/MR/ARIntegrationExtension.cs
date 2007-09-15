@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -75,11 +75,11 @@ namespace Castle.VSNetIntegration.CastleWizards
 
 			RegisterSessionScopeHttpModule(webConfigDom);
 
-			XmlDocument facilitiesDom = (XmlDocument) context.Properties[MRConfigConstants.Facilities];
+			XmlDocument facilitiesDom = (XmlDocument) context.Properties[MRConfigConstants.FacilitiesConfig];
 
 			RegisterAndConfigureFacility(facilitiesDom);
 
-			XmlDocument propDom = (XmlDocument) context.Properties[MRConfigConstants.Properties];
+			XmlDocument propDom = (XmlDocument) context.Properties[MRConfigConstants.PropertiesConfig];
 
 			RegisterConnectionStringAsProperty(propDom);
 		}
@@ -112,7 +112,7 @@ namespace Castle.VSNetIntegration.CastleWizards
 			XmlElement facilitiesElem = (XmlElement) dom.SelectSingleNode("configuration/facilities");
 
 			facilitiesElem.AppendChild(dom.CreateComment(" For more information on ActiveRecord configuration "));
-			facilitiesElem.AppendChild(dom.CreateComment(" visit http://www.castleproject.org/index.php/ActiveRecord:Configuration_Reference "));
+			facilitiesElem.AppendChild(dom.CreateComment(" visit http://www.castleproject.org/activerecord/documentation/trunk/manual/xmlconfigref.html "));
 
 			XmlElement arElem = dom.CreateElement("facility");
 			

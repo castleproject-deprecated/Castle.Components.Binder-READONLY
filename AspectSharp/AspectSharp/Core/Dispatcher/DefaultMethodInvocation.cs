@@ -1,4 +1,4 @@
- // Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+ // Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ namespace AspectSharp.Core.Dispatcher
 	public class InvocationComposite : IMutableMethodInvocation
 	{
 		private IMethodInterceptor[] _interceptors;
-		private Castle.DynamicProxy.IInvocation _innerInvocation;
+		private Castle.Core.Interceptor.IInvocation _innerInvocation;
 		private object[] _arguments;
 		private int _currentIndex;
 
 		public InvocationComposite(IMethodInterceptor[] interceptors,
-		                           Castle.DynamicProxy.IInvocation innerInvocation, object[] arguments)
+								   Castle.Core.Interceptor.IInvocation innerInvocation, object[] arguments)
 		{
 			_interceptors = interceptors;
 			_innerInvocation = innerInvocation;
@@ -71,7 +71,8 @@ namespace AspectSharp.Core.Dispatcher
 			}
 			else
 			{
-				retVal = _innerInvocation.Proceed(_arguments);
+				_innerInvocation.Proceed();
+				retVal = _innerInvocation.ReturnValue;
 			}
 
 			return retVal;

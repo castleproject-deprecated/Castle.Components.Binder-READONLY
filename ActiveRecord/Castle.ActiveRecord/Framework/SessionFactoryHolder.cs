@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +18,9 @@ namespace Castle.ActiveRecord.Framework
 	using System.Threading;
 	using System.Collections;
 	using System.Runtime.CompilerServices;
-	
 	using Iesi.Collections;
-	
 	using NHibernate;
 	using NHibernate.Cfg;
-
 	using Castle.ActiveRecord.Framework.Scopes;
 
 	/// <summary>
@@ -34,17 +31,21 @@ namespace Castle.ActiveRecord.Framework
 	/// </remarks>
 	public class SessionFactoryHolder : MarshalByRefObject, ISessionFactoryHolder
 	{
-		private Hashtable type2Conf = Hashtable.Synchronized(new Hashtable());
-		private Hashtable type2SessFactory = Hashtable.Synchronized(new Hashtable());
-		private ReaderWriterLock readerWriterLock = new ReaderWriterLock();
+		private readonly Hashtable type2Conf = Hashtable.Synchronized(new Hashtable());
+		private readonly Hashtable type2SessFactory = Hashtable.Synchronized(new Hashtable());
+		private readonly ReaderWriterLock readerWriterLock = new ReaderWriterLock();
 		private IThreadScopeInfo threadScopeInfo;
-		
-		public SessionFactoryHolder()
-		{
-		}
 
+		/// <summary>
+		/// Raised when a root type is registered.
+		/// </summary>
 		public event RootTypeHandler OnRootTypeRegistered;
 
+		/// <summary>
+		/// Associates a Configuration object to a root type
+		/// </summary>
+		/// <param name="rootType"></param>
+		/// <param name="cfg"></param>
 		public void Register(Type rootType, Configuration cfg)
 		{
 			type2Conf.Add(rootType, cfg);
@@ -55,6 +56,9 @@ namespace Castle.ActiveRecord.Framework
 			}
 		}
 
+		/// <summary>
+		/// Requests the Configuration associated to the type.
+		/// </summary>
 		public Configuration GetConfiguration(Type type)
 		{
 			return type2Conf[type] as Configuration;
@@ -63,7 +67,6 @@ namespace Castle.ActiveRecord.Framework
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <returns></returns>
 		public Configuration[] GetAllConfigurations()
 		{
 			HashedSet set = new HashedSet(type2Conf.Values);
@@ -93,13 +96,7 @@ namespace Castle.ActiveRecord.Framework
 
 			try
 			{
-				
-				ISessionFactory sessFactory = null;
-
-				if (type2SessFactory.Contains(normalizedtype))
-				{
-					sessFactory = type2SessFactory[normalizedtype] as ISessionFactory;
-				}
+				ISessionFactory sessFactory = type2SessFactory[normalizedtype] as ISessionFactory;
 
 				if (sessFactory != null)
 				{
@@ -110,6 +107,12 @@ namespace Castle.ActiveRecord.Framework
 
 				try
 				{
+					sessFactory = type2SessFactory[normalizedtype] as ISessionFactory;
+
+					if (sessFactory != null)
+					{
+						return sessFactory;
+					}
 					Configuration cfg = GetConfiguration(normalizedtype);
 
 					sessFactory = cfg.BuildSessionFactory();
@@ -129,6 +132,22 @@ namespace Castle.ActiveRecord.Framework
 			}
 		}
 
+		///<summary>
+		/// This method allows direct registration
+		/// of a session factory to a type, bypassing the normal preperation that AR
+		/// usually does. 
+		/// The main usage is in testing, so you would be able to switch the session factory
+		/// for each test.
+		/// Note that this will override the current session factory for the baseType.
+		///</summary>
+		public void RegisterSessionFactory(ISessionFactory sessionFactory, Type baseType)
+		{
+			type2SessFactory[baseType] = sessionFactory;
+		}
+
+		/// <summary>
+		/// Creates a session for the associated type
+		/// </summary>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public ISession CreateSession(Type type)
 		{
@@ -141,20 +160,25 @@ namespace Castle.ActiveRecord.Framework
 
 			ISession session = OpenSession(sessionFactory);
 
-			System.Diagnostics.Debug.Assert( session != null );
-
 			return session;
 		}
 
+		/// <summary>
+		/// Gets the type of the root.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns></returns>
 		public Type GetRootType(Type type)
 		{
 			while(type != typeof(object))
 			{
-				if (type2Conf.ContainsKey(type)) return type;
+				if (type2Conf.ContainsKey(type))
+				{
+					return type;
+				}
 
 				type = type.BaseType;
 
-#if DOTNET2
 				//to enable multiple database support for generic types
 				if (type.IsGenericType)
 				{
@@ -165,7 +189,6 @@ namespace Castle.ActiveRecord.Framework
 						return genericTypeDef;
 					}
 				}
-#endif
 			}
 
 			return typeof(ActiveRecordBase);
@@ -175,7 +198,7 @@ namespace Castle.ActiveRecord.Framework
 		{
 			lock(sessionFactory)
 			{
-				return sessionFactory.OpenSession( HookDispatcher.Instance );
+				return sessionFactory.OpenSession(InterceptorFactory.Create());
 			}
 		}
 
@@ -183,22 +206,44 @@ namespace Castle.ActiveRecord.Framework
 		{
 			lock(sessionFactory)
 			{
-				return scope.OpenSession( sessionFactory, HookDispatcher.Instance );
+				return scope.OpenSession(sessionFactory, InterceptorFactory.Create());
 			}
 		}
 
+		/// <summary>
+		/// Releases the specified session
+		/// </summary>
+		/// <param name="session"></param>
 		public void ReleaseSession(ISession session)
+		{
+			if (!threadScopeInfo.HasInitializedScope)
+			{
+				session.Flush();
+				session.Dispose();
+			}
+		}
+
+		/// <summary>
+		/// Called if an action on the session fails
+		/// </summary>
+		/// <param name="session"></param>
+		public void FailSession(ISession session)
 		{
 			if (threadScopeInfo.HasInitializedScope)
 			{
-				ReleaseScopedSession(session);
+				ISessionScope scope = threadScopeInfo.GetRegisteredScope();
+				scope.FailSession(session);
 			}
 			else
 			{
-				session.Close();
+				session.Clear();
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the implementation of <see cref="IThreadScopeInfo"/>
+		/// </summary>
+		/// <value></value>
 		public IThreadScopeInfo ThreadScopeInfo
 		{
 			get { return threadScopeInfo; }
@@ -214,8 +259,8 @@ namespace Castle.ActiveRecord.Framework
 			ISessionScope scope = threadScopeInfo.GetRegisteredScope();
 			ISessionFactory sessionFactory = GetSessionFactory(type);
 #if DEBUG
-			System.Diagnostics.Debug.Assert( scope != null );
-			System.Diagnostics.Debug.Assert( sessionFactory != null );
+			System.Diagnostics.Debug.Assert(scope != null);
+			System.Diagnostics.Debug.Assert(sessionFactory != null);
 #endif
 			if (scope.IsKeyKnown(sessionFactory))
 			{
@@ -223,7 +268,7 @@ namespace Castle.ActiveRecord.Framework
 			}
 			else
 			{
-				ISession session = null;
+				ISession session;
 
 				if (scope.WantsToCreateTheSession)
 				{
@@ -234,17 +279,12 @@ namespace Castle.ActiveRecord.Framework
 					session = OpenSession(sessionFactory);
 				}
 #if DEBUG
-				System.Diagnostics.Debug.Assert( session != null );
+				System.Diagnostics.Debug.Assert(session != null);
 #endif
 				scope.RegisterSession(sessionFactory, session);
 
 				return session;
 			}
-		}
-
-		private void ReleaseScopedSession(ISession session)
-		{
-			
 		}
 	}
 }

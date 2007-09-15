@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace Castle.ActiveRecord.Tests.Model
 			set { lastName = value; }
 		}
 
-		[OneToOne(Constrained=true)]
+		[OneToOne]
 		public Award Award
 		{
 			get { return award; }
@@ -84,7 +84,7 @@ namespace Castle.ActiveRecord.Tests.Model
 			this.employee = employee;
 		}
 
-		[OneToOne]
+		[OneToOne(Constrained=true)]
 		public Employee Employee
 		{
 			get { return employee; }

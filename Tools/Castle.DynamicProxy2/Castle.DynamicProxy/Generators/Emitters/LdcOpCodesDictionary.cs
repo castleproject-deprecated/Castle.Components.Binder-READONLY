@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		private LdcOpCodesDictionary() : base()
 		{
 			Dictionary[typeof(bool)] = OpCodes.Ldc_I4;
+			Dictionary[typeof(char)] = OpCodes.Ldc_I4;
 			Dictionary[typeof(SByte)] = OpCodes.Ldc_I4;
 			Dictionary[typeof(Int16)] = OpCodes.Ldc_I4;
 			Dictionary[typeof(Int32)] = OpCodes.Ldc_I4;

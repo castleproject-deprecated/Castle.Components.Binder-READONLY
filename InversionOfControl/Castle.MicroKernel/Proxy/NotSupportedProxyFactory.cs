@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,11 +35,17 @@ namespace Castle.MicroKernel.Proxy
 	{
 		#region IProxyFactory Members
 
-		public object Create(IKernel kernel, ComponentModel mode, params object[] constructorArguments)
+		public object Create(IKernel kernel, object instance, ComponentModel mode, params object[] constructorArguments)
 		{
 			throw new NotImplementedException(
 				"You must supply an implementation of IProxyFactory " + 
 				"to use interceptors on the Microkernel");
+		}
+
+
+		public bool RequiresTargetInstance(IKernel kernel, ComponentModel model)
+		{
+			return false;
 		}
 
 		#endregion

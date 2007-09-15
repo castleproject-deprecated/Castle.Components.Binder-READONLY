@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Castle.MonoRail.WindsorExtension.Tests
 	[TestFixture]
 	public class WindsorMonoRailSectionHandlerTestCase
 	{
-		String dir = Path.Combine(ConfigurationSettings.AppSettings["tests.src"], "ConfigFiles/");
+		String dir = Path.Combine(ConfigurationManager.AppSettings["tests.src"], "ConfigFiles/");
 
 		[Test]
 		public void SimpleTest()
@@ -60,7 +60,7 @@ namespace Castle.MonoRail.WindsorExtension.Tests
 			Assert.AreEqual( "secret", config.SmtpConfig.Password);
 			Assert.AreEqual( "JoeDoe", config.SmtpConfig.Username);
 			Assert.AreEqual( "Castle.MonoRail.Framework.Views.NVelocity.NVelocityViewEngine", 
-			                 config.ViewEngineConfig.CustomEngine.FullName );			
+			                 config.ViewEngineConfig.ViewEngines[0].Engine.FullName );			
 			Assert.AreEqual( "MoviesDemo", config.ControllersConfig.Assemblies[0] );
 	
 			Assert.IsTrue( config.ViewEngineConfig.ViewPathRoot.EndsWith("views") );

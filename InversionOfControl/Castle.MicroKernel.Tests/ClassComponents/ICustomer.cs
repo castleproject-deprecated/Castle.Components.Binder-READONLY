@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,19 +21,10 @@ namespace Castle.MicroKernel.Tests.ClassComponents
 	/// </summary>
 	public interface ICustomer
 	{
-		String Name
-		{
-			get; set;
-		}
+		String Name { get; set; }
 
-		String Address
-		{
-			get; set;
-		}
+		String Address { get; set; }
 
-		int Age
-		{
-			get; set;
-		}
+		int Age { get; set; }
 	}
 }

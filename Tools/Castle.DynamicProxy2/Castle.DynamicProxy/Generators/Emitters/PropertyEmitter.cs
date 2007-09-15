@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	using System;
 	using System.Reflection;
 	using System.Reflection.Emit;
-	
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	
 	public class PropertyEmitter : IMemberEmitter
 	{
 		private PropertyBuilder builder;
@@ -29,10 +27,11 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		private MethodEmitter setMethod;
 		// private ParameterInfo[] indexParameters;
 
-		public PropertyEmitter(AbstractTypeEmitter parentTypeEmitter, String name, PropertyAttributes attributes, Type propertyType)
+		public PropertyEmitter(AbstractTypeEmitter parentTypeEmitter, String name, PropertyAttributes attributes,
+		                       Type propertyType)
 		{
 			this.parentTypeEmitter = parentTypeEmitter;
-			
+
 			builder = parentTypeEmitter.TypeBuilder.DefineProperty(name, attributes, propertyType, new Type[0]);
 		}
 
@@ -50,8 +49,8 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public MethodEmitter CreateGetMethod()
 		{
-			return CreateGetMethod(MethodAttributes.Public | 
-			                       MethodAttributes.Virtual | 
+			return CreateGetMethod(MethodAttributes.Public |
+			                       MethodAttributes.Virtual |
 			                       MethodAttributes.SpecialName);
 		}
 
@@ -68,10 +67,10 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			}
 			else
 			{
-				getMethod = new MethodEmitter(parentTypeEmitter, "get_" + builder.Name, 
-				                              attrs, 
-				                              new ReturnReferenceExpression(ReturnType), 
-				                              ArgumentsUtil.ConvertToArgumentReference(parameters));
+				getMethod = new MethodEmitter(parentTypeEmitter, "get_" + builder.Name,
+				                              attrs,
+				                              ReturnType,
+				                              parameters);
 			}
 
 			return getMethod;
@@ -79,16 +78,16 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public MethodEmitter CreateSetMethod()
 		{
-			return CreateSetMethod(MethodAttributes.Public | 
-			                       MethodAttributes.Virtual | 
+			return CreateSetMethod(MethodAttributes.Public |
+			                       MethodAttributes.Virtual |
 			                       MethodAttributes.SpecialName);
 		}
 
 		public MethodEmitter CreateSetMethod(Type arg)
 		{
 			return CreateSetMethod(MethodAttributes.Public |
-								   MethodAttributes.Virtual |
-								   MethodAttributes.SpecialName, arg);
+			                       MethodAttributes.Virtual |
+			                       MethodAttributes.SpecialName, arg);
 		}
 
 		public MethodEmitter CreateSetMethod(MethodAttributes attrs, params Type[] parameters)
@@ -105,8 +104,8 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			else
 			{
 				setMethod = new MethodEmitter(parentTypeEmitter, "set_" + builder.Name,
-											  attrs, new ReturnReferenceExpression(typeof(void)),
-											  ArgumentsUtil.ConvertToArgumentReference(parameters));
+				                              attrs, typeof(void),
+				                              parameters);
 			}
 
 			return setMethod;

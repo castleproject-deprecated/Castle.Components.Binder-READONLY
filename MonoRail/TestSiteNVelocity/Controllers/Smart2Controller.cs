@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ namespace TestSiteNVelocity.Controllers
 
 		public void ComplexBindExcludePrice()
 		{
-			Order order = (Order) BindObject(ParamStore.Params, typeof(Order), "order", "Price", null);
+			Order order = (Order) BindObject(ParamStore.Params, typeof(Order), "order", "order.Price", null);
 			Person person = (Person) BindObject(typeof(Person), "person");
 
 			RenderText(String.Format("incoming {0} {1}", order.ToString(), person.ToString()));
@@ -62,7 +62,7 @@ namespace TestSiteNVelocity.Controllers
 
 		public void ComplexBindExcludeName()
 		{
-			Order order = (Order) BindObject(ParamStore.Params, typeof(Order), "order", "Name", null);
+			Order order = (Order) BindObject(ParamStore.Params, typeof(Order), "order", "order.Name", null);
 			Person person = (Person) BindObject(typeof(Person), "person");
 
 			RenderText(String.Format("incoming {0} {1}", order.ToString(), person.ToString()));
@@ -89,7 +89,7 @@ namespace TestSiteNVelocity.Controllers
 		{
 			Movement movement = (Movement) BindObject(typeof(Movement), "mov");
 			
-			RenderText(String.Format("incoming {0} {1}", movement.Name, movement.Amount.ToString()));
+			RenderText(String.Format("incoming {0} {1}", movement.Name, movement.Amount));
 		}
 
 		public void ArrayBinding()

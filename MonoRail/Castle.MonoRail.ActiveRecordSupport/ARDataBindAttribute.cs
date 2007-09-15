@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,7 +50,15 @@ namespace Castle.MonoRail.ActiveRecordSupport
 		/// create a new instance of the target type.
 		/// </summary>
 		NewInstanceIfInvalidKey,
-		
+
+		/// <summary>
+		/// Means that we should autoload target and nested types when the key is valid.
+		/// If the key is invalid, like <c>null</c>, 0 or an empty string, and the
+		/// instance is the root instance, then create a new instance of the target type.
+		/// If the key is invalid, and it's a nested instance, then set null on the nested type.
+		/// </summary>
+		NewRootInstanceIfInvalidKey,
+
 		/// <summary>
 		/// Means that we should autoload, but if the key is 
 		/// invalid, like <c>null</c>, 0 or an empty string, then just
@@ -67,6 +75,7 @@ namespace Castle.MonoRail.ActiveRecordSupport
 	public class ARDataBindAttribute : DataBindAttribute, IParameterBinder
 	{
 		private AutoLoadBehavior autoLoad = AutoLoadBehavior.Never;
+		private string expect = null;
 
 		/// <summary>
 		/// Defines a binder for the parameter
@@ -104,27 +113,38 @@ namespace Castle.MonoRail.ActiveRecordSupport
 			set { autoLoad = value; }
 		}
 
+		/// <summary>
+		/// Gets or sets the names of the collection that are expected to be binded.
+		/// If the binder does not find any value to an expected collection, it will clear to collection.
+		/// </summary>
+		/// <value>The expect collections names, in a csv fashion.</value>
+		public string Expect
+		{
+			get { return expect; }
+			set { expect = value; }
+		}
+
 		public override object Bind(SmartDispatcherController controller, ParameterInfo parameterInfo)
 		{
-			ARDataBinder binder = controller.Binder as ARDataBinder;
+			ARDataBinder binder = (ARDataBinder) CreateBinder();
 
-			if (binder == null)
-			{
-				binder = new ARDataBinder();
-			}
+			ConfigureValidator(controller, binder);
 
 			binder.AutoLoad = autoLoad;
 			
 			CompositeNode node = controller.ObtainParamsNode(From);
 
-			object instance = binder.BindObject(parameterInfo.ParameterType, Prefix, Exclude, Allow, node);
+			object instance = binder.BindObject(parameterInfo.ParameterType, Prefix, Exclude, Allow, Expect, node);
 
-			if (instance != null)
-			{
-				controller.BoundInstanceErrors[instance] = binder.ErrorList;
-			}
+			BindInstanceErrors(controller, binder, instance);
+			PopulateValidatorErrorSummary(controller, binder, instance);
 
 			return instance;
+		}
+
+		protected override IDataBinder CreateBinder()
+		{
+			return new ARDataBinder();
 		}
 	}
 }

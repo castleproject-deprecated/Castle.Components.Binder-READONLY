@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#if DOTNET2
 
 namespace Castle.ActiveRecord.Queries
 {
@@ -103,7 +101,7 @@ namespace Castle.ActiveRecord.Queries
 		/// </summary>
 		public T[] Execute()
 		{
-			return ActiveRecordBase<T>.ExecuteQuery2<T[]>(this);
+			return ActiveRecordBase<T>.ExecuteQuery2(this);
 		}
 
 		/// <summary>
@@ -128,6 +126,12 @@ namespace Castle.ActiveRecord.Queries
 
 		#endregion
 
+		/// <summary>
+		/// Simply creates the query and then call its <see cref="IQuery.Enumerable()"/> method.
+		/// Note: Only use when you expect most of the results to be in the second level cache
+		/// </summary>
+		/// <param name="session">The <c>NHibernate</c>'s <see cref="ISession"/></param>
+		/// <returns></returns>
 		protected override IEnumerable InternalEnumerate(ISession session)
 		{
 			return GenericEnumerate(session);
@@ -136,8 +140,11 @@ namespace Castle.ActiveRecord.Queries
 		private IEnumerable<T> GenericEnumerate(ISession session)
 		{
 			IEnumerable en = InternalEnumerateFromBase(session);
+			
 			foreach(T item in en)
+			{
 				yield return item;
+			}
 		}
 
 		/// <summary>
@@ -160,5 +167,3 @@ namespace Castle.ActiveRecord.Queries
 		}
 	}
 }
-
-#endif

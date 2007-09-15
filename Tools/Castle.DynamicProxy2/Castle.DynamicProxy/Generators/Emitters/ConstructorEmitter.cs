@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	using System;
 	using System.Reflection;
 	using System.Reflection.Emit;
-
 	using Castle.DynamicProxy.Generators.Emitters.CodeBuilders;
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
 	public class ConstructorEmitter : IMemberEmitter
 	{
-		protected ConstructorBuilder builder;
-		private AbstractTypeEmitter maintype;
-		private ConstructorCodeBuilder codebuilder;
+		private readonly ConstructorBuilder builder;
+		private readonly AbstractTypeEmitter maintype;
+
+		private ConstructorCodeBuilder constructorCodeBuilder;
 
 		internal ConstructorEmitter(AbstractTypeEmitter maintype, params ArgumentReference[] arguments)
 		{
@@ -37,24 +37,31 @@ namespace Castle.DynamicProxy.Generators.Emitters
 				MethodAttributes.Public, CallingConventions.Standard, args);
 		}
 
-		protected internal ConstructorEmitter()
+		protected internal ConstructorEmitter(AbstractTypeEmitter maintype, ConstructorBuilder builder)
 		{
+			this.maintype = maintype;
+			this.builder = builder;
+		}
+
+		public AbstractTypeEmitter MainType
+		{
+			get { return maintype; }
 		}
 
 		public virtual ConstructorCodeBuilder CodeBuilder
 		{
 			get
 			{
-				if (codebuilder == null)
+				if (constructorCodeBuilder == null)
 				{
-					codebuilder = new ConstructorCodeBuilder(
+					constructorCodeBuilder = new ConstructorCodeBuilder(
 						maintype.BaseType, builder.GetILGenerator());
 				}
-				return codebuilder;
+				return constructorCodeBuilder;
 			}
 		}
 
-		public ConstructorBuilder Builder
+		public ConstructorBuilder ConstructorBuilder
 		{
 			get { return builder; }
 		}
@@ -71,7 +78,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public virtual void Generate()
 		{
-			codebuilder.Generate(this, builder.GetILGenerator());
+			CodeBuilder.Generate(this, builder.GetILGenerator());
 		}
 
 		public virtual void EnsureValidCodeBlock()

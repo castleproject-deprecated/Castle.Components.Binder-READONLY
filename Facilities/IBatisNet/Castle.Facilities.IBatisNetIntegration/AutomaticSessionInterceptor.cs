@@ -1,25 +1,25 @@
 #region License
 
-/// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
-///  
-/// Licensed under the Apache License, Version 2.0 (the "License");
-/// you may not use this file except in compliance with the License.
-/// You may obtain a copy of the License at
-///  
-/// http://www.apache.org/licenses/LICENSE-2.0
-///  
-/// Unless required by applicable law or agreed to in writing, software
-/// distributed under the License is distributed on an "AS IS" BASIS,
-/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-/// See the License for the specific language governing permissions and
-/// limitations under the License.
-/// 
-/// -- 
-/// 
-/// This facility was a contribution kindly 
-/// donated by Gilles Bayon <gilles.bayon@gmail.com>
-/// 
-/// --
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+// http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// 
+// -- 
+// 
+// This facility was a contribution kindly 
+// donated by Gilles Bayon &lt;gilles.bayon@gmail.com&gt;
+// 
+// --
 
 #endregion
 
@@ -34,7 +34,7 @@ namespace Castle.Facilities.IBatisNetIntegration
 	using IBatisNet.DataMapper;
 	using Transaction = Services.Transaction.ITransaction;
 
-	public class AutomaticSessionInterceptor : IMethodInterceptor
+	public class AutomaticSessionInterceptor : IInterceptor
 	{
 		private IKernel _kernel = null;
 		private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -44,13 +44,14 @@ namespace Castle.Facilities.IBatisNetIntegration
 			_kernel = kernel;
 		}
 
-		public object Intercept(IMethodInvocation invocation, params object[] args)
+		public void Intercept(IInvocation invocation)
 		{
 			MethodInfo info = invocation.MethodInvocationTarget;
 
 			if (info.IsDefined(typeof (NoSessionAttribute), true))
 			{
-				return invocation.Proceed(args);
+				invocation.Proceed();
+				return;
 			}
 
 			String key = ObtainSqlMapKeyFor(info);
@@ -59,7 +60,8 @@ namespace Castle.Facilities.IBatisNetIntegration
 
 			if (sqlMap.IsSessionStarted)
 			{
-				return invocation.Proceed(args);
+				invocation.Proceed();
+				return;
 			}
 
 			if (_logger.IsDebugEnabled)
@@ -71,12 +73,14 @@ namespace Castle.Facilities.IBatisNetIntegration
 
 			if (EnlistSessionIfHasTransactionActive(key, sqlMap))
 			{
-				return invocation.Proceed(args);
+				invocation.Proceed();
+				return;
 			}
 
 			try
 			{
-				return invocation.Proceed(args);
+				invocation.Proceed();
+				return;
 			}
 			finally
 			{

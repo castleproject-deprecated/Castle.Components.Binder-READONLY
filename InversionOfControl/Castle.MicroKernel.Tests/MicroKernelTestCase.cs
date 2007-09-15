@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,9 @@
 namespace Castle.MicroKernel.Tests
 {
 	using System;
-
-	using NUnit.Framework;
-
+	using System.Collections;
 	using Castle.MicroKernel.Tests.ClassComponents;
-
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class MicroKernelTestCase
@@ -39,17 +37,31 @@ namespace Castle.MicroKernel.Tests
 		}
 
 		[Test]
+		public void IOC_50_AddTwoComponentWithSameService_RequestFirstByKey_RemoveFirst_RequestByService_ShouldReturnSecond()
+		{
+			kernel.AddComponent("key", typeof(ICustomer), typeof(CustomerImpl));
+			kernel.AddComponent("key2", typeof(ICustomer), typeof(CustomerImpl));
+			object result = kernel["key"];
+			Assert.IsNotNull(result);
+
+			kernel.RemoveComponent("key");
+
+			result = kernel[typeof(ICustomer)];
+			Assert.IsNotNull(result);
+		}
+
+		[Test]
 		public void AddClassComponentWithInterface()
 		{
 			kernel.AddComponent("key", typeof(CustomerImpl));
-			Assert.IsTrue( kernel.HasComponent("key") );
+			Assert.IsTrue(kernel.HasComponent("key"));
 		}
 
 		[Test]
 		public void AddClassComponentWithNoInterface()
 		{
 			kernel.AddComponent("key", typeof(DefaultCustomer));
-			Assert.IsTrue( kernel.HasComponent("key") );
+			Assert.IsTrue(kernel.HasComponent("key"));
 		}
 
 		[Test]
@@ -58,13 +70,13 @@ namespace Castle.MicroKernel.Tests
 			CustomerImpl customer = new CustomerImpl();
 
 			kernel.AddComponentInstance("key", typeof(ICustomer), customer);
-			Assert.IsTrue( kernel.HasComponent("key") );
+			Assert.IsTrue(kernel.HasComponent("key"));
 
 			CustomerImpl customer2 = kernel["key"] as CustomerImpl;
-			Assert.AreSame( customer, customer2 );
+			Assert.AreSame(customer, customer2);
 
-			customer2 = kernel[ typeof(ICustomer) ] as CustomerImpl;
-			Assert.AreSame( customer, customer2 );
+			customer2 = kernel[typeof(ICustomer)] as CustomerImpl;
+			Assert.AreSame(customer, customer2);
 		}
 
 		[Test]
@@ -73,20 +85,20 @@ namespace Castle.MicroKernel.Tests
 			CustomerImpl customer = new CustomerImpl();
 
 			kernel.AddComponentInstance("key", customer);
-			Assert.IsTrue( kernel.HasComponent("key") );
+			Assert.IsTrue(kernel.HasComponent("key"));
 
 			CustomerImpl customer2 = kernel["key"] as CustomerImpl;
-			Assert.AreSame( customer, customer2 );
+			Assert.AreSame(customer, customer2);
 
-			customer2 = kernel[ typeof(CustomerImpl) ] as CustomerImpl;
-			Assert.AreSame( customer, customer2 );
+			customer2 = kernel[typeof(CustomerImpl)] as CustomerImpl;
+			Assert.AreSame(customer, customer2);
 		}
 
 		[Test]
 		public void AddCommonComponent()
 		{
 			kernel.AddComponent("key", typeof(ICustomer), typeof(CustomerImpl));
-			Assert.IsTrue( kernel.HasComponent("key") );
+			Assert.IsTrue(kernel.HasComponent("key"));
 		}
 
 		[Test]
@@ -126,8 +138,33 @@ namespace Castle.MicroKernel.Tests
 		public void UnregisteredComponentByService()
 		{
 			kernel.AddComponent("key1", typeof(CustomerImpl));
-			object component = kernel[ typeof(IDisposable) ];
+			object component = kernel[typeof(IDisposable)];
 		}
 
+		[Test]
+		public void AddClassThatHasTwoParametersOfSameTypeAndNoOverloads()
+		{
+			kernel.AddComponent("test", typeof(ClassWithTwoParametersWithSameType));
+			kernel.AddComponent("test2", typeof(ICommon), typeof(CommonImpl1));
+			object resolved = kernel.Resolve(typeof(ClassWithTwoParametersWithSameType), new Hashtable());
+			Assert.IsNotNull(resolved);
+		}
+
+		[Test]
+		public void ResolveServices()
+		{
+			kernel.AddComponent("test", typeof(ICommon), typeof(CommonImpl2));
+			kernel.AddComponent("test2", typeof(ICommon), typeof(CommonImpl1));
+			ICommon[] services = kernel.ResolveServices<ICommon>();
+			Assert.AreEqual(2, services.Length);
+		}
+
+		[Test]
+		public void ResolveServicesWaitingOnDependencies()
+		{
+			kernel.AddComponent("test", typeof(ICommon), typeof(CommonImplWithDependancy));
+			ICommon[] services = kernel.ResolveServices<ICommon>();
+			Assert.AreEqual(0, services.Length);
+		}
 	}
 }

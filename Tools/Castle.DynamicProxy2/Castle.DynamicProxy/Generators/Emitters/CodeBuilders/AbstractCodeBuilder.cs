@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ namespace Castle.DynamicProxy.Generators.Emitters.CodeBuilders
 	using System;
 	using System.Collections;
 	using System.Reflection.Emit;
-
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
 	public abstract class AbstractCodeBuilder
@@ -40,10 +39,11 @@ namespace Castle.DynamicProxy.Generators.Emitters.CodeBuilders
 			get { return generator; }
 		}
 
-		public void AddStatement(Statement stmt)
+		public AbstractCodeBuilder AddStatement(Statement stmt)
 		{
 			SetNonEmpty();
 			stmts.Add(stmt);
+			return this;
 		}
 
 		public LocalReference DeclareLocal(Type type)

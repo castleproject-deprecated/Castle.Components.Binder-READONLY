@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	using System;
 	using System.Collections;
 
-	[CLSCompliant(false)]
 	public class EventCollection : CollectionBase
 	{
 		public void Add(EventEmitter eventEmitter)
@@ -26,4 +25,3 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		}
 	}
 }
-

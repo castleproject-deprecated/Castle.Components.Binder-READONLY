@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,7 +57,6 @@ namespace Castle.Core
 		/// </summary>
 		public SingletonAttribute() : base(LifestyleType.Singleton)
 		{
-				
 		}
 	}
 
@@ -73,7 +72,6 @@ namespace Castle.Core
 		/// </summary>
 		public TransientAttribute() : base(LifestyleType.Transient)
 		{
-				
 		}
 	}
 
@@ -89,7 +87,18 @@ namespace Castle.Core
 		/// </summary>
 		public PerThreadAttribute() : base(LifestyleType.Thread)
 		{
-			
+		}
+	}
+
+	/// <summary>
+	/// Indicates that the target components wants a
+	/// per web request lifestyle.
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+	public class PerWebRequestAttribute : LifestyleAttribute
+	{
+		public PerWebRequestAttribute() : base(LifestyleType.PerWebRequest)
+		{
 		}
 	}
 
@@ -102,7 +111,7 @@ namespace Castle.Core
 	{
 		private static readonly int Initial_PoolSize = 5;
 		private static readonly int Max_PoolSize = 15;
-		
+
 		private readonly int initialPoolSize;
 		private readonly int maxPoolSize;
 
@@ -157,7 +166,7 @@ namespace Castle.Core
 		/// Initializes a new instance of the <see cref="CustomLifestyleAttribute"/> class.
 		/// </summary>
 		/// <param name="lifestyleHandler">The lifestyle handler.</param>
-		public CustomLifestyleAttribute( Type lifestyleHandler ) : base(LifestyleType.Custom)
+		public CustomLifestyleAttribute(Type lifestyleHandler) : base(LifestyleType.Custom)
 		{
 			this.lifestyleHandler = lifestyleHandler;
 		}

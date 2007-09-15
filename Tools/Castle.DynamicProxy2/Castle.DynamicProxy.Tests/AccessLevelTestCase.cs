@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
 
 namespace Castle.DynamicProxy.Tests
 {
+	using System;
+	using System.Collections;
+	using Castle.Core.Interceptor;
 	using Castle.DynamicProxy.Tests.Classes;
 	using Castle.DynamicProxy.Tests.Interceptors;
-	
 	using NUnit.Framework;
 
 	[TestFixture]
@@ -30,7 +32,7 @@ namespace Castle.DynamicProxy.Tests
 			NonPublicConstructorClass proxy =
 				generator.CreateClassProxy(
 					typeof(NonPublicConstructorClass), new StandardInterceptor())
-						as NonPublicConstructorClass;
+				as NonPublicConstructorClass;
 
 			Assert.IsNotNull(proxy);
 
@@ -45,7 +47,7 @@ namespace Castle.DynamicProxy.Tests
 			LogInvocationInterceptor logger = new LogInvocationInterceptor();
 
 			NonPublicMethodsClass proxy = (NonPublicMethodsClass)
-				generator.CreateClassProxy(typeof(NonPublicMethodsClass), logger);
+			                              generator.CreateClassProxy(typeof(NonPublicMethodsClass), logger);
 
 			proxy.DoSomething();
 
@@ -53,5 +55,30 @@ namespace Castle.DynamicProxy.Tests
 			Assert.AreEqual("DoSomething", logger.Invocations[0]);
 			Assert.AreEqual("DoOtherThing", logger.Invocations[1]);
 		}
+
+		[Test]
+		public void InternalConstructorIsNotReplicated()
+		{
+			object proxy = generator.CreateClassProxy(typeof(Hashtable), new StandardInterceptor());
+			Assert.IsNull(proxy.GetType().GetConstructor(new Type[] {typeof(IInterceptor[]), typeof(bool)}));
+		}
+
+		internal class InternalClass
+		{
+			internal InternalClass()
+			{
+			}
+		}
+		
+#if !MONO
+
+		[Test]
+		public void InternalConstructorIsReplicatedWhenInternalsVisibleTo()
+		{
+			object proxy = generator.CreateClassProxy(typeof(InternalClass), new StandardInterceptor());
+			Assert.IsNotNull(proxy.GetType().GetConstructor(new Type[] {typeof(IInterceptor[])}));
+		}
+		
+#endif
 	}
 }

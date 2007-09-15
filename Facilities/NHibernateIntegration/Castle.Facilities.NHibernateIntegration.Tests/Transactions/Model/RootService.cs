@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 {
 	using System;
-
 	using Castle.Services.Transaction;
 
 	[Transactional]
@@ -76,6 +75,11 @@ namespace Castle.Facilities.NHibernateIntegration.Tests.Transactions
 			Blog blog = firstDao.Create();
 			secondDao.Create(blog);
 			orderDao.Create(1.122f);
+
+			if (throwException)
+			{
+				throw new Exception("Nah, giving up");
+			}
 		}
 	}
 }

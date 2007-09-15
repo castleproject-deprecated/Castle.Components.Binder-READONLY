@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,24 @@ namespace TestSiteARSupport.Model
 {
 	using System;
 	using Castle.ActiveRecord;
+	using Castle.Components.Validator;
+	using NHibernate.Expression;
 
 	[ActiveRecord("TSAS_User")]
-	public class User : ActiveRecordBase
+	public class User
 	{
 		private int id;
 		private String name;
+		private Account account;
+
+		public User()
+		{
+		}
+
+		public User(string name)
+		{
+			this.name = name;
+		}
 
 		[PrimaryKey]
 		public int Id
@@ -30,11 +42,23 @@ namespace TestSiteARSupport.Model
 			set { id = value; }
 		}
 
-		[Property]
+		[Property(NotNull=true), ValidateNonEmpty]
 		public string Name
 		{
 			get { return name; }
 			set { name = value; }
+		}
+
+		[BelongsTo("account_id")]
+		public Account Account
+		{
+			get { return account; }
+			set { account = value; }
+		}
+
+		public static User[] FindAll()
+		{
+			return ActiveRecordMediator<User>.FindAll(new Order[] { Order.Asc("Name") });
 		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Castle.DynamicProxy.Tests
 			Assert.IsTrue(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(typeof(string), typeof(string)));
 			Assert.IsTrue(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(typeof(int), typeof(int)));
 			Assert.IsTrue(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(typeof(long), typeof(long)));
-			
+
 			Assert.IsFalse(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(typeof(string), typeof(int)));
 			Assert.IsFalse(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(typeof(int), typeof(string)));
 		}
@@ -51,10 +51,10 @@ namespace Castle.DynamicProxy.Tests
 		public void GenericTypesWithGenericParameter()
 		{
 			Type[] genericArgs = typeof(Nested<,>).GetGenericArguments();
-			
+
 			Type T = genericArgs[0];
 			Type Z = genericArgs[1];
-			
+
 			Type listOfT = typeof(List<>).MakeGenericType(T);
 			Type listOfZ = typeof(List<>).MakeGenericType(Z);
 
@@ -70,10 +70,43 @@ namespace Castle.DynamicProxy.Tests
 			Assert.IsFalse(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(listOfT, listOfZ));
 			Assert.IsFalse(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(listOfZ, listOfT));
 		}
-		
+
+		[Test]
+		public void ArrayTypes()
+		{
+			Array arrayOfInt1 = Array.CreateInstance(typeof(int), 1);
+			Array arrayOfInt2 = Array.CreateInstance(typeof(int), 2);
+			Array arrayOfStr = Array.CreateInstance(typeof(string), 2);
+
+			Assert.IsTrue(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(arrayOfInt1.GetType(), arrayOfInt1.GetType()));
+			Assert.IsTrue(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(arrayOfInt1.GetType(), arrayOfInt2.GetType()));
+
+			Assert.IsFalse(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(arrayOfStr.GetType(), arrayOfInt1.GetType()));
+		}
+
+		[Test]
+		public void GenericArrayTypes()
+		{
+			Type[] genericArgs = typeof(Nested<,>).GetGenericArguments();
+
+			Type T = genericArgs[0];
+			Type Z = genericArgs[1];
+
+			Type arrayOfT = T.MakeArrayType();
+			Type arrayOfTDiff = T.MakeArrayType();
+			Type arrayOfT2 = T.MakeArrayType(2);
+			Type arrayOfZ = Z.MakeArrayType();
+
+			Assert.IsTrue(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(arrayOfT, arrayOfT));
+			Assert.IsTrue(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(arrayOfT, arrayOfTDiff));
+			Assert.IsTrue(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(arrayOfZ, arrayOfZ));
+
+			Assert.IsFalse(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(arrayOfZ, arrayOfT));
+			Assert.IsFalse(InterfaceProxyWithTargetGenerator.IsTypeEquivalent(arrayOfT, arrayOfT2));
+		}
+
 		public class Nested<T, Z>
 		{
-			
 		}
 	}
 }

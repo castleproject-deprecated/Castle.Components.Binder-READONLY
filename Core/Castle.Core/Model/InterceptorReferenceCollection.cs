@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ namespace Castle.Core
 {
 	using System;
 	using System.Collections;
-
 	using Castle.Core.Internal;
 
 	/// <summary>
@@ -33,7 +32,7 @@ namespace Castle.Core
 		/// <param name="interceptor">The interceptor.</param>
 		public void Add(InterceptorReference interceptor)
 		{
-			list.Add( interceptor );
+			list.Add(interceptor);
 		}
 
 		/// <summary>
@@ -61,7 +60,7 @@ namespace Castle.Core
 		/// <param name="interceptor">The interceptor.</param>
 		public void Insert(int index, InterceptorReference interceptor)
 		{
-			list.Insert( index, interceptor );
+			list.Insert(index, interceptor);
 		}
 
 		/// <summary>

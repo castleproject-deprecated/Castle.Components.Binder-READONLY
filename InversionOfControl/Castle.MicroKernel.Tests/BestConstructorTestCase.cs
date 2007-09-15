@@ -1,5 +1,4 @@
-using Castle.Core.Configuration;
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +15,9 @@ using Castle.Core.Configuration;
 namespace Castle.MicroKernel.Tests
 {
 	using System;
-
-	using NUnit.Framework;
-
+	using Castle.Core.Configuration;
 	using Castle.MicroKernel.SubSystems.Configuration;
+	using NUnit.Framework;
 
 	public class ServiceUser
 	{
@@ -117,46 +115,46 @@ namespace Castle.MicroKernel.Tests
 		[Test]
 		public void ConstructorWithMoreArguments()
 		{
-			kernel.AddComponent( "a", typeof(A) );
-			kernel.AddComponent( "b", typeof(B) );
-			kernel.AddComponent( "c", typeof(C) );
-			kernel.AddComponent( "service", typeof(ServiceUser) );
+			kernel.AddComponent("a", typeof(A));
+			kernel.AddComponent("b", typeof(B));
+			kernel.AddComponent("c", typeof(C));
+			kernel.AddComponent("service", typeof(ServiceUser));
 
 			ServiceUser service = (ServiceUser) kernel["service"];
 
-			Assert.IsNotNull( service );
-			Assert.IsNotNull( service.AComponent );
-			Assert.IsNotNull( service.BComponent );
-			Assert.IsNotNull( service.CComponent );
+			Assert.IsNotNull(service);
+			Assert.IsNotNull(service.AComponent);
+			Assert.IsNotNull(service.BComponent);
+			Assert.IsNotNull(service.CComponent);
 		}
 
 		[Test]
 		public void ConstructorWithTwoArguments()
 		{
-			kernel.AddComponent( "a", typeof(A) );
-			kernel.AddComponent( "b", typeof(B) );
-			kernel.AddComponent( "service", typeof(ServiceUser) );
+			kernel.AddComponent("a", typeof(A));
+			kernel.AddComponent("b", typeof(B));
+			kernel.AddComponent("service", typeof(ServiceUser));
 
 			ServiceUser service = (ServiceUser) kernel["service"];
 
-			Assert.IsNotNull( service );
-			Assert.IsNotNull( service.AComponent );
-			Assert.IsNotNull( service.BComponent );
-			Assert.IsNull( service.CComponent );
+			Assert.IsNotNull(service);
+			Assert.IsNotNull(service.AComponent);
+			Assert.IsNotNull(service.BComponent);
+			Assert.IsNull(service.CComponent);
 		}
 
 		[Test]
 		public void ConstructorWithOneArgument()
 		{
-			kernel.AddComponent( "a", typeof(A) );
-			kernel.AddComponent( "service", typeof(ServiceUser) );
+			kernel.AddComponent("a", typeof(A));
+			kernel.AddComponent("service", typeof(ServiceUser));
 
 			ServiceUser service = (ServiceUser) kernel["service"];
 
-			Assert.IsNotNull( service );
-			Assert.IsNotNull( service.AComponent );
-			Assert.IsNull( service.BComponent );
-			Assert.IsNull( service.CComponent );
+			Assert.IsNotNull(service);
+			Assert.IsNotNull(service.AComponent);
+			Assert.IsNull(service.BComponent);
+			Assert.IsNull(service.CComponent);
 		}
 
 		[Test]
@@ -165,26 +163,26 @@ namespace Castle.MicroKernel.Tests
 			DefaultConfigurationStore store = new DefaultConfigurationStore();
 
 			MutableConfiguration config = new MutableConfiguration("component");
-			MutableConfiguration parameters = (MutableConfiguration) 
-				config.Children.Add( new MutableConfiguration("parameters") );
-			parameters.Children.Add( new MutableConfiguration("name", "hammett") );
-			parameters.Children.Add( new MutableConfiguration("port", "120") );
+			MutableConfiguration parameters = (MutableConfiguration)
+			                                  config.Children.Add(new MutableConfiguration("parameters"));
+			parameters.Children.Add(new MutableConfiguration("name", "hammett"));
+			parameters.Children.Add(new MutableConfiguration("port", "120"));
 
 			store.AddComponentConfiguration("service", config);
 
 			kernel.ConfigurationStore = store;
 
-			kernel.AddComponent( "a", typeof(A) );
-			kernel.AddComponent( "service", typeof(ServiceUser2) );
+			kernel.AddComponent("a", typeof(A));
+			kernel.AddComponent("service", typeof(ServiceUser2));
 
 			ServiceUser2 service = (ServiceUser2) kernel["service"];
 
-			Assert.IsNotNull( service );
-			Assert.IsNotNull( service.AComponent );
-			Assert.IsNull( service.BComponent );
-			Assert.IsNull( service.CComponent );
-			Assert.AreEqual( "hammett", service.Name );
-			Assert.AreEqual( 120, service.Port );
+			Assert.IsNotNull(service);
+			Assert.IsNotNull(service.AComponent);
+			Assert.IsNull(service.BComponent);
+			Assert.IsNull(service.CComponent);
+			Assert.AreEqual("hammett", service.Name);
+			Assert.AreEqual(120, service.Port);
 		}
 
 		[Test]
@@ -193,28 +191,28 @@ namespace Castle.MicroKernel.Tests
 			DefaultConfigurationStore store = new DefaultConfigurationStore();
 
 			MutableConfiguration config = new MutableConfiguration("component");
-			MutableConfiguration parameters = (MutableConfiguration) 
-				config.Children.Add( new MutableConfiguration("parameters") );
-			parameters.Children.Add( new MutableConfiguration("name", "hammett") );
-			parameters.Children.Add( new MutableConfiguration("port", "120") );
-			parameters.Children.Add( new MutableConfiguration("Scheduleinterval", "22") );
+			MutableConfiguration parameters = (MutableConfiguration)
+			                                  config.Children.Add(new MutableConfiguration("parameters"));
+			parameters.Children.Add(new MutableConfiguration("name", "hammett"));
+			parameters.Children.Add(new MutableConfiguration("port", "120"));
+			parameters.Children.Add(new MutableConfiguration("Scheduleinterval", "22"));
 
 			store.AddComponentConfiguration("service", config);
 
 			kernel.ConfigurationStore = store;
 
-			kernel.AddComponent( "a", typeof(A) );
-			kernel.AddComponent( "service", typeof(ServiceUser2) );
+			kernel.AddComponent("a", typeof(A));
+			kernel.AddComponent("service", typeof(ServiceUser2));
 
 			ServiceUser2 service = (ServiceUser2) kernel["service"];
 
-			Assert.IsNotNull( service );
-			Assert.IsNotNull( service.AComponent );
-			Assert.IsNull( service.BComponent );
-			Assert.IsNull( service.CComponent );
-			Assert.AreEqual( "hammett", service.Name );
-			Assert.AreEqual( 120, service.Port );
-			Assert.AreEqual( 22, service.ScheduleInterval );
+			Assert.IsNotNull(service);
+			Assert.IsNotNull(service.AComponent);
+			Assert.IsNull(service.BComponent);
+			Assert.IsNull(service.CComponent);
+			Assert.AreEqual("hammett", service.Name);
+			Assert.AreEqual(120, service.Port);
+			Assert.AreEqual(22, service.ScheduleInterval);
 		}
 	}
 }

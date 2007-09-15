@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,24 +18,24 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	[CLSCompliant(false)]
 	public class MethodInvocationExpression : Expression
 	{
 		protected readonly MethodInfo method;
 		protected readonly Expression[] args;
 		protected readonly Reference owner;
+		private bool virtualCall;
 
-		public MethodInvocationExpression(MethodInfo method, params Expression[] args) : 
+		public MethodInvocationExpression(MethodInfo method, params Expression[] args) :
 			this(SelfReference.Self, method, args)
 		{
 		}
 
-		public MethodInvocationExpression(MethodEmitter method, params Expression[] args) : 
+		public MethodInvocationExpression(MethodEmitter method, params Expression[] args) :
 			this(SelfReference.Self, method.MethodBuilder, args)
 		{
 		}
 
-		public MethodInvocationExpression(Reference owner, MethodEmitter method, params Expression[] args) : 
+		public MethodInvocationExpression(Reference owner, MethodEmitter method, params Expression[] args) :
 			this(owner, method.MethodBuilder, args)
 		{
 		}
@@ -47,6 +47,12 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 			this.args = args;
 		}
 
+		public bool VirtualCall
+		{
+			get { return virtualCall; }
+			set { virtualCall = value; }
+		}
+
 		public override void Emit(IMemberEmitter member, ILGenerator gen)
 		{
 			ArgumentsUtil.EmitLoadOwnerAndReference(owner, gen);
@@ -56,7 +62,14 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 				exp.Emit(member, gen);
 			}
 
-			gen.Emit(OpCodes.Call, method);
+			if (virtualCall)
+			{
+				gen.Emit(OpCodes.Callvirt, method);
+			}
+			else
+			{
+				gen.Emit(OpCodes.Call, method);
+			}
 		}
 	}
 }

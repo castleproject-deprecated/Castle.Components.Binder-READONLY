@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,17 +28,7 @@ namespace MoviesDemo.Controllers
 
 		public void Edit(int movieId)
 		{
-			Movie movie;
-
-			if (movieId > 0)
-			{
-				movie = Movie.Find(movieId);
-			}
-			else
-			{
-				movie = new Movie();
-				movie.Added = DateTime.Today;
-			}
+			Movie movie = Movie.Find(movieId);
 
 			PropertyBag["movie"] = movie;
 		}
@@ -48,6 +38,12 @@ namespace MoviesDemo.Controllers
 			PropertyBag["movie"] = Movie.Find(movieId);
 		}
 
+		/// <summary>
+		/// This is a rather simplistic implementation of a save action.
+		/// It's only OK as the Movie class does not have any relation. 
+		/// For a more reliable method, check ARDataBindAttribute on 
+		/// the documentation 
+		/// </summary>
 		public void Save([DataBind("movie")] Movie movie)
 		{
 			if (movie.Id == 0)
@@ -60,7 +56,7 @@ namespace MoviesDemo.Controllers
 			}
 
 			//Redirect so a refresh doesn't post again
-			Response.Redirect("~/Movies/View.rails?movieId=" + movie.Id);
+			Response.Redirect("~/Movies/View.castle?movieId=" + movie.Id);
 
 			CancelView();
 		}

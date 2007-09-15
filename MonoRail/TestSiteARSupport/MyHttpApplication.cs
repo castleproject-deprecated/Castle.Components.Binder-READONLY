@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ namespace TestSiteARSupport
 	using Castle.ActiveRecord;
 	using Castle.ActiveRecord.Framework;
 	using Castle.ActiveRecord.Framework.Config;
-	using TestSiteARSupport.Model;
 
 	public class MyHttpApplication : HttpApplication
 	{
@@ -30,19 +29,7 @@ namespace TestSiteARSupport
 
 			ActiveRecordStarter.Initialize( Assembly.GetExecutingAssembly(), source );
 			
-			ActiveRecordStarter.CreateSchema();
-			
-			Comment comment = new Comment("hammett", "test 1");
-			comment.Create();
-			
-			comment = new Comment("someone", "test 2");
-			comment.Create();
-			
-			comment = new Comment("john doe", "test 3");
-			comment.Create();
-			
-			comment = new Comment("mary jane", "test 4");
-			comment.Create();
+//			ActiveRecordStarter.CreateSchema();
 		}
 	}
 }

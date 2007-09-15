@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ namespace Castle.MonoRail.WindsorExtension
 	using Castle.MicroKernel;
 
 	using Castle.MonoRail.Framework;
-	using Castle.MonoRail.Framework.Internal;
-
 
 	/// <summary>
 	/// Custom implementation of <see cref="IControllerFactory"/>
@@ -32,7 +30,7 @@ namespace Castle.MonoRail.WindsorExtension
 	{
 		public Controller CreateController(UrlInfo urlInfo)
 		{
-			IWindsorContainer container = ContainerAccessorUtil.ObtainContainer();
+			IWindsorContainer container = WindsorContainerAccessorUtil.ObtainContainer();
 
 			IControllerTree tree;
 			
@@ -45,24 +43,19 @@ namespace Castle.MonoRail.WindsorExtension
 				throw new RailsException("ControllerTree not found. Check whether RailsFacility is properly configured/registered");
 			}
 
-			String key = (String) tree.GetController(urlInfo.Area, urlInfo.Controller);
+			Type implType = tree.GetController(urlInfo.Area, urlInfo.Controller);
 
-			if (key == null || key.Length == 0)
+			if (implType == null)
 			{
 				throw new ControllerNotFoundException(urlInfo);
 			}
 
-			if (container.Kernel.HasComponent(key))
-			{
-				return (Controller) container[key];
-			}
-			
-			return null;
+			return (Controller) container[implType];
 		}
 
 		public void Release(Controller controller)
 		{
-			ContainerAccessorUtil.ObtainContainer().Release(controller);
+			WindsorContainerAccessorUtil.ObtainContainer().Release(controller);
 		}
 	}
 }

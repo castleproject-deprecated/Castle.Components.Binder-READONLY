@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Castle.ActiveRecord.Framework.Scopes;
-
 namespace Castle.ActiveRecord.Tests
 {
 	using System;
-
-	using NUnit.Framework;
-
-	using NHibernate;
-
-    using Castle.ActiveRecord.Tests.Model;
-
+	using Castle.ActiveRecord.Framework;
+	using Castle.ActiveRecord.Framework.Scopes;
+	using Castle.ActiveRecord.Tests.Model;
 	using Castle.ActiveRecord.Tests.Model.LazyModel;
-    using Castle.ActiveRecord.Framework;
-
+	using NHibernate;
+	using NUnit.Framework;
 
 	[TestFixture]
 	public class SessionScopeTestCase : AbstractActiveRecordTest
@@ -193,11 +187,6 @@ namespace Castle.ActiveRecord.Tests
 			product.Categories.Add( new CategoryLazy("y") );
 			product.Categories.Add( new CategoryLazy("z") );
 
-			foreach(CategoryLazy cat in product.Categories)
-			{
-				cat.Save();
-			}
-
 			product.Save();
 
 			using(new SessionScope())
@@ -231,6 +220,107 @@ namespace Castle.ActiveRecord.Tests
 						object dummy = cat.Name;
 					}
 				}
+			}
+		}
+
+		[Test]
+		public void AnExceptionInvalidatesTheScopeAndPreventItsFlushing()
+		{
+			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(Post), typeof(Blog));
+			Recreate();
+
+			Post.DeleteAll();
+			Blog.DeleteAll();
+
+			Blog blog;
+			Post post;
+
+			// Prepare
+			using(new SessionScope())
+			{
+				blog = new Blog();
+				blog.Author = "hammett";
+				blog.Name = "some name";
+				blog.Save();
+
+				post = new Post(blog, "title", "contents", "castle");
+				post.Save();
+			}
+
+			using(SessionScope session = new SessionScope())
+			{
+				Assert.IsFalse(session.HasSessionError);
+
+				try
+				{
+					// Forcing an exception
+					post = new Post(new Blog(100), "title", "contents", "castle");
+					post.SaveAndFlush();
+					Assert.Fail("Expecting exception as this operation violates a FK constraint");
+				}
+				catch(ActiveRecordException)
+				{
+					// Exception expected
+				}
+
+				Assert.IsTrue(session.HasSessionError);
+			}
+		}
+
+		[Test]
+		public void SessionScopeFlushModeNever()
+		{
+			ActiveRecordStarter.Initialize(GetConfigSource(), typeof(Post), typeof(Blog));
+			Recreate();
+
+			Post.DeleteAll();
+			Blog.DeleteAll();
+
+			using(new SessionScope(FlushAction.Never))
+			{
+				Blog blog = new Blog();					
+				blog.Author = "hammett";
+				blog.Name = "some name";
+				
+				//This gets flushed automatically because of the identity field
+				blog.Save();
+
+				Blog[] blogs = Blog.FindAll();
+				Assert.AreEqual(1, blogs.Length);
+
+				//This change won't be saved to the db
+				blog.Author = "A New Author";
+				blog.Save();
+
+				//The change should not be in the db
+				blogs = Blog.FindByProperty("Author", "A New Author");
+				Assert.AreEqual(0, blogs.Length);
+								
+				SessionScope.Current.Flush();
+
+				//The change should now be in the db
+				blogs = Blog.FindByProperty("Author", "A New Author");
+				Assert.AreEqual(1, blogs.Length);
+
+				//This change will be save to the db because it uses the SaveNow method
+				blog.Name = "A New Name";
+				blog.SaveAndFlush();
+
+				//The change should now be in the db
+				blogs = Blog.FindByProperty("Name", "A New Name");
+				Assert.AreEqual(1, blogs.Length);
+
+				//This deletion should not get to the db
+				blog.Delete();
+
+				blogs = Blog.FindAll();
+				Assert.AreEqual(1, blogs.Length);
+				
+				SessionScope.Current.Flush();
+
+				//The deletion should now be in the db
+				blogs = Blog.FindAll();
+				Assert.AreEqual(0, blogs.Length);
 			}
 		}
 	}

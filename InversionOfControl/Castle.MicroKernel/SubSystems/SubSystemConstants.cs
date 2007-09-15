@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,16 +30,16 @@ namespace Castle.MicroKernel
 		/// <summary>
 		/// Key used for the conversion manager
 		/// </summary>
-		public static readonly String ConversionManagerKey  = "conversion.mng";
+		public static readonly String ConversionManagerKey = "conversion.mng";
 
 		/// <summary>
 		/// Key used for the naming subsystem
 		/// </summary>
-		public static readonly String NamingKey             = "naming.sub.key";
+		public static readonly String NamingKey = "naming.sub.key";
 
 		/// <summary>
 		/// Key used for the resource subsystem
 		/// </summary>
-		public static readonly String ResourceKey           = "resource.sub.key";
+		public static readonly String ResourceKey = "resource.sub.key";
 	}
 }

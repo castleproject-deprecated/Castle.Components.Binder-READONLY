@@ -1,5 +1,5 @@
 
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ namespace Castle.Facilities.TypedFactory
 
 	using Castle.MicroKernel;
 	using Castle.MicroKernel.Facilities;
+	using Castle.MicroKernel.Proxy;
 	using Castle.MicroKernel.SubSystems.Conversion;
 
 	/// <summary>
@@ -38,6 +39,9 @@ namespace Castle.Facilities.TypedFactory
 			model.LifestyleType = LifestyleType.Singleton;
 			model.ExtendedProperties["typed.fac.entry"] = entry;
 			model.Interceptors.Add( new InterceptorReference( typeof(FactoryInterceptor) ) );
+
+			ProxyOptions proxyOptions = ProxyUtil.ObtainProxyOptions(model, true);
+			proxyOptions.OmitTarget = true;
 
 			Kernel.AddCustomComponent( model );
 		}
@@ -70,9 +74,11 @@ namespace Castle.Facilities.TypedFactory
 						AddTypedFactoryEntry( 
 							new FactoryEntry(id, factoryType, creation, destruction) );
 					}
-					catch(Exception ex)
+					catch(Exception)
 					{
-						throw new ConfigurationException("Invalid factory entry in configuration", ex);
+						string message = "Invalid factory entry in configuration";
+
+						throw new ConfigurationErrorsException(message);
 					}
 				}
 			}

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if DOTNET2
-
 namespace Castle.ActiveRecord
 {
 	using System;
 	using System.Collections;
 	using Castle.ActiveRecord.Framework;
-	
 	using NHibernate;
 	using NHibernate.Expression;
 
@@ -30,13 +27,6 @@ namespace Castle.ActiveRecord
 	[Serializable]
 	public abstract class ActiveRecordBase<T> : ActiveRecordBase
 	{
-		/// <summary>
-		/// Constructs an ActiveRecordBase subclass.
-		/// </summary>
-		public ActiveRecordBase()
-		{
-		}
-
 		#region protected internal static
 
 		#region Create/Update/Save/Delete/Refresh
@@ -77,7 +67,7 @@ namespace Castle.ActiveRecord
 		/// </remarks>
 		public static void DeleteAll()
 		{
-			ActiveRecordBase.DeleteAll(typeof(T));
+			DeleteAll(typeof(T));
 		}
 
 		/// <summary>
@@ -90,7 +80,7 @@ namespace Castle.ActiveRecord
 		/// <param name="where">HQL condition to select the rows to be deleted</param>
 		public static void DeleteAll(String where)
 		{
-			ActiveRecordBase.DeleteAll(typeof(T), where);
+			DeleteAll(typeof(T), where);
 		}
 
 		/// <summary>
@@ -100,7 +90,7 @@ namespace Castle.ActiveRecord
 		/// <returns>The number of objects deleted</returns>
 		public static int DeleteAll(IEnumerable pkValues)
 		{
-			return ActiveRecordBase.DeleteAll(typeof(T), pkValues);
+			return DeleteAll(typeof(T), pkValues);
 		}
 
 		#endregion
@@ -148,6 +138,21 @@ namespace Castle.ActiveRecord
 			ActiveRecordBase.Save(instance);
 		}
 
+        /// <summary>
+        /// Saves a copy of the instance to the database. If the primary key is unitialized
+        /// it creates the instance on the database. Otherwise it updates it.
+        /// <para>
+        /// If the primary key is assigned, then you must invoke <see cref="Create"/>
+        /// or <see cref="Update"/> instead.
+        /// </para>
+        /// </summary>
+        /// <param name="instance">The transient instance to be saved</param>
+        /// <returns>The saved ActiveRecord instance.</returns>
+        protected internal static T SaveCopy(T instance)
+        {
+            return (T) ActiveRecordBase.SaveCopy(instance);
+        }
+
 		#endregion
 
 		#endregion
@@ -163,12 +168,17 @@ namespace Castle.ActiveRecord
 		/// <returns>Whatever is returned by the delegate invocation</returns>
 		protected static object Execute(NHibernateDelegate call, object instance)
 		{
-			return ActiveRecordBase.Execute(typeof(T), call, instance);
+			return Execute(typeof(T), call, instance);
 		}
 
+		/// <summary>
+		/// Executes the query and return a strongly typed result
+		/// </summary>
+		/// <param name="query">The query.</param>
+		/// <returns>The query result.</returns>
 		protected internal static R ExecuteQuery2<R>(IActiveRecordQuery<R> query)
 		{
-			return (R)ActiveRecordBase.ExecuteQuery(query);
+			return (R) ExecuteQuery(query);
 		}
 
 		#endregion
@@ -187,15 +197,15 @@ namespace Castle.ActiveRecord
 		///   
 		///   public static int CountAllUsers()
 		///   {
-		///     return CountAll(); // Equivalent to: CountAll(typeof(User));
+		///     return Count(); // Equivalent to: Count(typeof(User));
 		///   }
 		/// }
 		/// </code>
 		/// </example>
 		/// <returns>The count query result</returns>
-		protected internal static int CountAll()
+		protected internal static int Count()
 		{
-			return ActiveRecordBase.CountAll(typeof(T));
+			return Count(typeof(T));
 		}
 
 		/// <summary>
@@ -210,7 +220,7 @@ namespace Castle.ActiveRecord
 		///   
 		///   public static int CountAllUsersLocked()
 		///   {
-		///     return CountAll("IsLocked = ?", true); // Equivalent to: CountAll(typeof(User), "IsLocked = ?", true);
+		///     return Count("IsLocked = ?", true); // Equivalent to: Count(typeof(User), "IsLocked = ?", true);
 		///   }
 		/// }
 		/// </code>
@@ -218,9 +228,30 @@ namespace Castle.ActiveRecord
 		/// <param name="filter">A sql where string i.e. Person=? and DOB &gt; ?</param>
 		/// <param name="args">Positional parameters for the filter string</param>
 		/// <returns>The count result</returns>
-		protected internal static int CountAll(String filter, params object[] args)
+		protected internal static int Count(String filter, params object[] args)
 		{
-			return ActiveRecordBase.CountAll(typeof(T), filter, args);
+			return Count(typeof(T), filter, args);
+		}
+
+		/// <summary>
+		/// Check if any instance matching the criteria exists in the database.
+		/// </summary>
+		/// <param name="criteria">The criteria expression</param>		
+		/// <returns>The count result</returns>
+		protected internal static int Count(params ICriterion[] criteria)
+		{
+			return Count(typeof(T), criteria);
+		}
+
+		/// <summary>
+		/// Returns the number of records of the specified 
+		/// type in the database
+		/// </summary>
+		/// <param name="detachedCriteria">The criteria expression</param>
+		/// <returns>The count result</returns>
+		protected internal static int Count(DetachedCriteria detachedCriteria)
+		{
+			return Count(typeof(T), detachedCriteria);
 		}
 
 		#endregion
@@ -244,7 +275,7 @@ namespace Castle.ActiveRecord
 		/// <returns><c>true</c> if there's at least one row</returns>
 		public static bool Exists(String filter, params object[] args)
 		{
-			return ActiveRecordBase.Exists(typeof(T), filter, args);
+			return Exists(typeof(T), filter, args);
 		}
 
 		/// <summary>
@@ -255,44 +286,86 @@ namespace Castle.ActiveRecord
 		/// <returns><c>true</c> if the ID exists; otherwise <c>false</c>.</returns>
 		public static bool Exists<PkType>(PkType id)
 		{
-			return ActiveRecordBase.Exists(typeof(T), id);
+			return Exists(typeof(T), id);
 		}
 
+		/// <summary>
+		/// Check if any instance matching the criteria exists in the database.
+		/// </summary>
+		/// <param name="criteria">The criteria expression</param>		
+		/// <returns><c>true</c> if an instance is found; otherwise <c>false</c>.</returns>
+		public static bool Exists(params ICriterion[] criteria)
+		{
+			return Exists(typeof(T), criteria);
+		}
+
+		/// <summary>
+		/// Check if any instance matching the criteria exists in the database.
+		/// </summary>
+		/// <param name="detachedCriteria">The criteria expression</param>		
+		/// <returns><c>true</c> if an instance is found; otherwise <c>false</c>.</returns>
+		public static bool Exists(DetachedCriteria detachedCriteria)
+		{
+			return Exists(typeof(T), detachedCriteria);
+		}
 
 		#endregion
 
 		#region FindAll
 
 		/// <summary>
+		/// Returns all the instances that match the detached criteria.
+		/// </summary>
+		/// <param name="criteria">Detached criteria</param>
+		/// <param name="orders">Optional ordering</param>
+		/// <returns>All entities that match the criteria</returns>
+		public static T[] FindAll(DetachedCriteria criteria, params Order[] orders)
+		{
+			return (T[]) FindAll(typeof(T), criteria, orders);
+		}
+
+		/// <summary>
 		/// Returns all instances found for <typeparamref name="T"/>
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>An <see cref="Array"/> of <typeparamref name="T"/></returns>
 		public static T[] FindAll()
 		{
-			return (T[]) ActiveRecordBase.FindAll(typeof(T));
+			return (T[]) FindAll(typeof(T));
+		}
+
+		/// <summary>
+		/// Returns all instances found for the specified type 
+		/// using sort orders and criteria.
+		/// </summary>
+		/// <param name="order">An <see cref="Order"/> object.</param>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>The <see cref="Array"/> of results.</returns>
+		public static T[] FindAll(Order order, params ICriterion[] criteria)
+		{
+			return (T[]) FindAll(typeof(T), new Order[] {order}, criteria);
 		}
 
 		/// <summary>
 		/// Returns all instances found for <typeparamref name="T"/>
-		/// using sort orders and criterias.
+		/// using sort orders and criteria.
 		/// </summary>
 		/// <param name="orders"></param>
-		/// <param name="criterias"></param>
-		/// <returns></returns>
-		public static T[] FindAll(Order[] orders, params ICriterion[] criterias)
+		/// <param name="criteria"></param>
+		/// <returns>An <see cref="Array"/> of <typeparamref name="T"/></returns>
+		public static T[] FindAll(Order[] orders, params ICriterion[] criteria)
 		{
-			return (T[]) ActiveRecordBase.FindAll(typeof(T), orders, criterias);
+			return (T[]) FindAll(typeof(T), orders, criteria);
 		}
 
 		/// <summary>
 		/// Returns all instances found for <typeparamref name="T"/>
-		/// using criterias.
+		/// using criteria.
 		/// </summary>
-		/// <param name="criterias"></param>
-		/// <returns></returns>
-		public static T[] FindAll(params ICriterion[] criterias)
+		/// <param name="criteria"></param>
+		/// <returns>An <see cref="Array"/> of <typeparamref name="T"/></returns>
+		public static T[] FindAll(params ICriterion[] criteria)
 		{
-			return (T[]) ActiveRecordBase.FindAll(typeof(T), criterias);
+			return (T[]) FindAll(typeof(T), criteria);
 		}
 
 		#endregion
@@ -304,10 +377,10 @@ namespace Castle.ActiveRecord
 		/// </summary>
 		/// <param name="property">A property name (not a column name)</param>
 		/// <param name="value">The value to be equals to</param>
-		/// <returns></returns>
+		/// <returns>An <see cref="Array"/> of <typeparamref name="T"/></returns>
 		public static T[] FindAllByProperty(String property, object value)
 		{
-			return (T[]) ActiveRecordBase.FindAllByProperty(typeof(T), property, value);
+			return (T[]) FindAllByProperty(typeof(T), property, value);
 		}
 
 		/// <summary>
@@ -316,10 +389,10 @@ namespace Castle.ActiveRecord
 		/// <param name="orderByColumn">The column name to be ordered ASC</param>
 		/// <param name="property">A property name (not a column name)</param>
 		/// <param name="value">The value to be equals to</param>
-		/// <returns></returns>
+		/// <returns>An <see cref="Array"/> of <typeparamref name="T"/></returns>
 		public static T[] FindAllByProperty(String orderByColumn, String property, object value)
 		{
-			return (T[]) ActiveRecordBase.FindAllByProperty(typeof(T), orderByColumn, property, value);
+			return (T[]) FindAllByProperty(typeof(T), orderByColumn, property, value);
 		}
 
 		#endregion
@@ -334,7 +407,7 @@ namespace Castle.ActiveRecord
 		/// <returns>T</returns>
 		public static T Find(object id)
 		{
-			return (T) ActiveRecordBase.FindByPrimaryKey(typeof(T), id, true);
+			return (T) FindByPrimaryKey(typeof(T), id, true);
 		}
 
 		/// <summary>
@@ -342,20 +415,20 @@ namespace Castle.ActiveRecord
 		/// If the row is not found this method will not throw an exception.
 		/// </summary>
 		/// <param name="id">ID value</param>
-		/// <returns></returns>
+		/// <returns>A <typeparamref name="T"/></returns>
 		public static T TryFind(object id)
 		{
-			return (T) ActiveRecordBase.FindByPrimaryKey(typeof(T), id, false);
+			return (T) FindByPrimaryKey(typeof(T), id, false);
 		}
 
 		/// <summary>
 		/// Finds an object instance by an unique ID for <typeparamref name="T"/>
 		/// </summary>
 		/// <param name="id">ID value</param>
-		/// <returns></returns>
+		/// <returns>A <typeparamref name="T"/></returns>
 		protected internal static T FindByPrimaryKey(object id)
 		{
-			return (T) ActiveRecordBase.FindByPrimaryKey(typeof(T), id);
+			return (T) FindByPrimaryKey(typeof(T), id);
 		}
 
 		/// <summary>
@@ -364,12 +437,12 @@ namespace Castle.ActiveRecord
 		/// <param name="id">ID value</param>
 		/// <param name="throwOnNotFound"><c>true</c> if you want to catch an exception 
 		/// if the object is not found</param>
-		/// <returns></returns>
+		/// <returns>A <typeparamref name="T"/></returns>
 		/// <exception cref="ObjectNotFoundException">if <c>throwOnNotFound</c> is set to 
 		/// <c>true</c> and the row is not found</exception>
 		protected internal static T FindByPrimaryKey(object id, bool throwOnNotFound)
 		{
-			return (T) ActiveRecordBase.FindByPrimaryKey(typeof(T), id, throwOnNotFound);
+			return (T) FindByPrimaryKey(typeof(T), id, throwOnNotFound);
 		}
 
 		#endregion
@@ -377,24 +450,46 @@ namespace Castle.ActiveRecord
 		#region FindFirst
 
 		/// <summary>
-		/// Searches and returns the first row for <typeparamref name="T"/>
+		/// Searches and returns the first row for <typeparamref name="T"/>.
 		/// </summary>
-		/// <param name="orders">The sort order - used to determine which record is the first one</param>
-		/// <param name="criterias">The criteria expression</param>
-		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
-		public static T FindFirst(Order[] orders, params ICriterion[] criterias)
+		/// <param name="criteria">Detached criteria.</param>
+		/// <param name="orders">The sort order - used to determine which record is the first one.</param>
+		/// <returns>A <c>targetType</c> instance or <c>null</c>.</returns>
+		public static T FindFirst(DetachedCriteria criteria, params Order[] orders)
 		{
-			return (T) ActiveRecordBase.FindFirst(typeof(T), orders, criterias);
+			return (T) FindFirst(typeof(T), criteria, orders);
 		}
 
 		/// <summary>
 		/// Searches and returns the first row for <typeparamref name="T"/>
 		/// </summary>
-		/// <param name="criterias">The criteria expression</param>
+		/// <param name="order">The sort order - used to determine which record is the first one</param>
+		/// <param name="criteria">The criteria expression</param>
 		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
-		public static T FindFirst(params ICriterion[] criterias)
+		public static T FindFirst(Order order, params ICriterion[] criteria)
 		{
-			return (T) ActiveRecordBase.FindFirst(typeof(T), criterias);
+			return (T) FindFirst(typeof(T), new Order[] {order}, criteria);
+		}
+
+		/// <summary>
+		/// Searches and returns the first row for <typeparamref name="T"/>
+		/// </summary>
+		/// <param name="orders">The sort order - used to determine which record is the first one</param>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
+		public static T FindFirst(Order[] orders, params ICriterion[] criteria)
+		{
+			return (T) FindFirst(typeof(T), orders, criteria);
+		}
+
+		/// <summary>
+		/// Searches and returns the first row for <typeparamref name="T"/>
+		/// </summary>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
+		public static T FindFirst(params ICriterion[] criteria)
+		{
+			return (T) FindFirst(typeof(T), criteria);
 		}
 
 		#endregion
@@ -405,11 +500,22 @@ namespace Castle.ActiveRecord
 		/// Searches and returns a row. If more than one is found, 
 		/// throws <see cref="ActiveRecordException"/>
 		/// </summary>
-		/// <param name="criterias">The criteria expression</param>
+		/// <param name="criteria">The criteria expression</param>
 		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
-		public static T FindOne(params ICriterion[] criterias)
+		public static T FindOne(params ICriterion[] criteria)
 		{
-			return (T) ActiveRecordBase.FindOne(typeof(T), criterias);
+			return (T) FindOne(typeof(T), criteria);
+		}
+
+		/// <summary>
+		/// Searches and returns a row. If more than one is found, 
+		/// throws <see cref="ActiveRecordException"/>
+		/// </summary>
+		/// <param name="criteria">The criteria</param>
+		/// <returns>A <c>targetType</c> instance or <c>null</c></returns>
+		public static T FindOne(DetachedCriteria criteria)
+		{
+			return (T) FindOne(typeof(T), criteria);
 		}
 
 		#endregion
@@ -419,19 +525,41 @@ namespace Castle.ActiveRecord
 		/// <summary>
 		/// Returns a portion of the query results (sliced)
 		/// </summary>
+		/// <param name="firstResult">The number of the first row to retrieve.</param>
+		/// <param name="maxResults">The maximum number of results retrieved.</param>
+		/// <param name="orders">An <see cref="Array"/> of <see cref="Order"/> objects.</param>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>The sliced query results.</returns>
 		public static T[] SlicedFindAll(int firstResult, int maxResults, Order[] orders,
-		                                              params ICriterion[] criterias)
+		                                params ICriterion[] criteria)
 		{
-			return (T[]) ActiveRecordBase.SlicedFindAll(typeof(T), firstResult, maxResults, orders, criterias);
+			return (T[]) SlicedFindAll(typeof(T), firstResult, maxResults, orders, criteria);
 		}
 
 		/// <summary>
 		/// Returns a portion of the query results (sliced)
 		/// </summary>
+		/// <param name="firstResult">The number of the first row to retrieve.</param>
+		/// <param name="maxResults">The maximum number of results retrieved.</param>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>The sliced query results.</returns>
 		public static T[] SlicedFindAll(int firstResult, int maxResults,
-		                                              params ICriterion[] criterias)
+		                                params ICriterion[] criteria)
 		{
-			return (T[]) ActiveRecordBase.SlicedFindAll(typeof(T), firstResult, maxResults, criterias);
+			return (T[]) SlicedFindAll(typeof(T), firstResult, maxResults, criteria);
+		}
+
+		/// <summary>
+		/// Returns a portion of the query results (sliced)
+		/// </summary>
+		/// <param name="firstResult">The number of the first row to retrieve.</param>
+		/// <param name="maxResults">The maximum number of results retrieved.</param>
+		/// <param name="orders">An <see cref="Array"/> of <see cref="Order"/> objects.</param>
+		/// <param name="criteria">The criteria expression</param>
+		/// <returns>The sliced query results.</returns>
+		public static T[] SlicedFindAll(int firstResult, int maxResults, DetachedCriteria criteria, params Order[] orders)
+		{
+			return (T[]) SlicedFindAll(typeof(T), firstResult, maxResults, orders, criteria);
 		}
 
 		#endregion
@@ -439,5 +567,3 @@ namespace Castle.ActiveRecord
 		#endregion
 	}
 }
-
-#endif

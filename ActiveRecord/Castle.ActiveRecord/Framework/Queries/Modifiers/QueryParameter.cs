@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,16 +32,27 @@ namespace Castle.ActiveRecord.Queries.Modifiers
 		private readonly ParameterFlags flags;
 
 		#region Constructors for Named Parameters
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QueryParameter"/> class.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="value">The value.</param>
 		public QueryParameter(string name, object value)
 		{
 			if (name == null)
 				throw new ArgumentNullException("name");
 
-			this.flags = ParameterFlags.Named;
+			flags = ParameterFlags.Named;
 			this.name = name;
 			this.value = value;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QueryParameter"/> class.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="value">The value.</param>
+		/// <param name="type">The type.</param>
 		public QueryParameter(String name, Object value, IType type)
 			: this(name, value)
 		{
@@ -50,16 +61,27 @@ namespace Castle.ActiveRecord.Queries.Modifiers
 		#endregion
 
 		#region Constructors for Positional Parameters
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QueryParameter"/> class.
+		/// </summary>
+		/// <param name="position">The position.</param>
+		/// <param name="value">The value.</param>
 		public QueryParameter(int position, object value)
 		{
 			if (position < 0)
 				throw new ArgumentException("Position must be equal or greater than 0", "position");
 
-			this.flags = ParameterFlags.Positional;
+			flags = ParameterFlags.Positional;
 			this.position = position;
 			this.value = value;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QueryParameter"/> class.
+		/// </summary>
+		/// <param name="position">The position.</param>
+		/// <param name="value">The value.</param>
+		/// <param name="type">The type.</param>
 		public QueryParameter(int position, object value, IType type)
 			: this(position, value)
 		{
@@ -68,16 +90,27 @@ namespace Castle.ActiveRecord.Queries.Modifiers
 		#endregion
 
 		#region Constructors for Named List Parameters
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QueryParameter"/> class.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="value">The value.</param>
+		/// <param name="type">The type.</param>
 		public QueryParameter(String name, ICollection value, IType type)
 			: this(name, (object) value, type)
 		{
-			this.flags |= ParameterFlags.List;
+			flags |= ParameterFlags.List;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QueryParameter"/> class.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="value">The value.</param>
 		public QueryParameter(String name, ICollection value)
 			: this(name, (object) value)
 		{
-			this.flags |= ParameterFlags.List;
+			flags |= ParameterFlags.List;
 		}
 		#endregion
 

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace Castle.Facilities.BatchRegistration
 				String message = 
 					String.Format("Could not load type {0} from {1}", typeName, assembly.FullName);
 				
-				throw new ConfigurationException(message);
+				throw new ConfigurationErrorsException(message);
 			}
 
 			return type;			
@@ -45,7 +45,7 @@ namespace Castle.Facilities.BatchRegistration
 				String message = 
 					String.Format("Could not load type {0}", typeName);
 				
-				throw new ConfigurationException(message);
+				throw new ConfigurationErrorsException(message);
 			}
 
 			return type;			

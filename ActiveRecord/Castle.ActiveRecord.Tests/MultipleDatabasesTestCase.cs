@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 namespace Castle.ActiveRecord.Tests
 {
-	using Castle.ActiveRecord.Tests.Model;
-	
+	using Framework;
+	using Model;
 	using NUnit.Framework;
 
 	[TestFixture]
@@ -24,11 +24,11 @@ namespace Castle.ActiveRecord.Tests
 		[SetUp]
 		public void Setup()
 		{
-			base.Init();
-			
-			ActiveRecordStarter.Initialize( GetConfigSource(), 
-				typeof(Blog), typeof(Post), typeof(Hand), typeof(Test2ARBase) );
-			
+			Init();
+
+			ActiveRecordStarter.Initialize(GetConfigSource(),
+			                               typeof(Blog), typeof(Post), typeof(Hand), typeof(Test2ARBase));
+
 			Recreate();
 		}
 
@@ -48,10 +48,10 @@ namespace Castle.ActiveRecord.Tests
 		private static void CreateBlog()
 		{
 			Blog blog = new Blog();
-	
+
 			blog.Author = "Henry";
 			blog.Name = "Senseless";
-            blog.Save();
+			blog.Save();
 		}
 
 		[Test]
@@ -71,9 +71,9 @@ namespace Castle.ActiveRecord.Tests
 		private static void CreateHand()
 		{
 			Hand hand = new Hand();
-	
+
 			hand.Side = "Right";
-	
+
 			hand.Save();
 		}
 

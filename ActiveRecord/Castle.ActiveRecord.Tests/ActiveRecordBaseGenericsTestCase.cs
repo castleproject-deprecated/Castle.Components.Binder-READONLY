@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if DOTNET2
 namespace Castle.ActiveRecord.Tests
 {
 	using System;
@@ -126,6 +125,27 @@ namespace Castle.ActiveRecord.Tests
 			Assert.AreEqual(1, blogs.Length);
 			Assert.AreEqual(blog.Name, blogs[0].Name);
 			Assert.AreEqual(blog.Author, blogs[0].Author);
+		}
+
+		[Test]
+		public void HasManyAndBelongsToMany()
+		{
+			Company company = new Company("Castle Corp.");
+			company.Address = new PostalAddress(
+				"Embau St., 102", "Sao Paulo", "SP", "040390-060");
+			company.Save();
+
+			Person person = new Person();
+			person.Name = "ayende";
+			person.Companies.Add(company);
+			company.People.Add(person);
+
+			person.Save();
+
+			Company fromDB = Company.FindFirst();
+			Assert.AreEqual(1, fromDB.People.Count);
+
+			Assert.AreEqual("ayende", new List<Person>(fromDB.People)[0].Name);
 		}
 
 		[Test]
@@ -294,4 +314,3 @@ namespace Castle.ActiveRecord.Tests
 		}
 	}
 }
-#endif

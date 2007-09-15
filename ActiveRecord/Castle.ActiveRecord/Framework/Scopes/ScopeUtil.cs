@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 namespace Castle.ActiveRecord.Framework.Scopes
 {
-	using System;
-
 	internal class ScopeUtil
 	{
 		internal static ISessionScope FindPreviousScope(ISessionScope thisScope, 
@@ -41,7 +39,7 @@ namespace Castle.ActiveRecord.Framework.Scopes
 
 				if (!preferenceForTransactional) break;
 
-				if (preferenceForTransactional && scope.ScopeType == SessionScopeType.Transactional)
+				if (scope.ScopeType == SessionScopeType.Transactional)
 				{
 					return scope;
 				}

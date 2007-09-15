@@ -45,7 +45,7 @@
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -68,7 +68,7 @@
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -77,10 +77,6 @@
     <Reference Include="Castle.Core, Version=0.0.1.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.DynamicProxy, Version=1.1.5.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build\net-2.0\debug\Castle.DynamicProxy.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MicroKernel, Version=1.0.0.2, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -109,6 +105,10 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
+    <ProjectReference Include="..\Castle.MonoRail.Framework.Views.NVelocity\Castle.MonoRail.Framework.Views.NVelocity-vs2005.csproj">
+      <Project>{ECCA4D19-65D7-4EED-B8EC-56AF79F41E69}</Project>
+      <Name>Castle.MonoRail.Framework.Views.NVelocity-vs2005</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Castle.MonoRail.WindsorExtension\Castle.MonoRail.WindsorExtension-vs2005.csproj">
       <Name>Castle.MonoRail.WindsorExtension-vs2005</Name>
       <Project>{6C51A1E3-7F20-4696-BFD6-829134678341}</Project>
@@ -123,19 +123,29 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\MyComponent.cs" />
+    <Compile Include="Controllers\TestWizardController.cs" />
+    <Compile Include="EmptyInterceptor.cs" />
     <Compile Include="MyHttpApplication.cs">
       <SubType>Code</SubType>
     </Compile>
     <Content Include="default.htm" />
     <Content Include="global.asax" />
-    <Content Include="views\cookies\index.aspx" />
-    <Content Include="views\home\bag.aspx" />
-    <Content Include="views\home\bag2.aspx" />
-    <Content Include="views\home\display.aspx" />
-    <Content Include="views\home\heyhello.aspx" />
     <Content Include="views\home\index.aspx" />
-    <Content Include="views\home\list.aspx" />
+    <None Include="views\home\ComponentOnLayout.vm" />
+    <None Include="views\home\ComponentTest.vm" />
+    <None Include="views\home\BuiltinComponentTest.vm" />
+    <None Include="views\layouts\layout.vm" />
+    <None Include="views\testwizard\InnerAction2.vm" />
+    <None Include="views\testwizard\page1.vm" />
+    <None Include="views\testwizard\page3.vm" />
+    <None Include="views\testwizard\page4.vm" />
     <None Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="views\cookies\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

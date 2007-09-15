@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,26 @@ namespace Castle.MicroKernel.Tests.RuntimeParameters
 		}
 	}
 
+	public class HasCustomDependency
+	{
+		private CompA name;
+
+		public HasCustomDependency(CompA name)
+		{
+			this.name = name;
+		}
+	}
+
+	public class NeedClassWithCustomerDependency
+	{
+		private HasCustomDependency dependency;
+
+		public NeedClassWithCustomerDependency(HasCustomDependency dependency)
+		{
+			this.dependency = dependency;
+		}
+	}
+
 	[Transient]
 	public class CompB
 	{
@@ -31,7 +51,7 @@ namespace Castle.MicroKernel.Tests.RuntimeParameters
 
 		public CompB(CompA ca, CompC cc, string myArgument)
 		{
-			this.compc = cc;
+			compc = cc;
 			this.myArgument = myArgument;
 		}
 
@@ -49,8 +69,11 @@ namespace Castle.MicroKernel.Tests.RuntimeParameters
 
 	public class CompC
 	{
+		public readonly int test;
+
 		public CompC(int test)
 		{
+			this.test = test;
 		}
 	}
 }

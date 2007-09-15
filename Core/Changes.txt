@@ -1,5 +1,37 @@
+Release Candidate 3
+===================
+
+- Added IServiceProviderEx which extends IServiceProvider
+
+- Added Pair<T,S> class. 
+
+- Applied Bill Pierce's patch fixing CORE-9 
+  "Allow CastleComponent Attribute to Specify Lifestyle in Constructor"
+
+- Added UseSingleInterfaceProxy to CompomentModel to control the proxying
+  behavior while maintaining backward compatibility.
+  Added the corresponding ComponentProxyBehaviorAttribute.
+
+- Made NullLogger and IExtnededLogger
+
+- Enabled a new format on ILogger interface, with 6 overloads for each method:
+    Debug(string)
+    Debug(string, Exception)
+    Debug(string, params object[])
+    DebugFormat(string, params object[])
+    DebugFormat(Exception, string, params object[])
+    DebugFormat(IFormatProvider, string, params object[])
+    DebugFormat(IFormatProvider, Exception, string, params object[])
+
+  The "FatalError" overloads where marked as [Obsolete], replaced by "Fatal" and "FatalFormat".
+
 0.0.1.0
 =======
+
+- Included IProxyTargetAccessor
+
+- Removed IMethodInterceptor and IMethodInvocation, that have been replaced
+  by IInterceptor and IInvocation
 
 - Added FindByPropertyInfo to PropertySetCollection
 

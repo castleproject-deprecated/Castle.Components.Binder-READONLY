@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,10 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#if DOTNET2
+
 namespace Castle.ActiveRecord.Tests.Validation.GenericModel
 {
 	using System;
+	using Castle.Components.Validator;
 
 	[ActiveRecord(DiscriminatorValue="y")]
 	public class Customer : Person
@@ -26,14 +27,14 @@ namespace Castle.ActiveRecord.Tests.Validation.GenericModel
 		{
 		}
 
-		[Property, ValidateNotEmpty]
+		[Property, ValidateNonEmpty]
 		public string ContactName
 		{
 			get { return contactName; }
 			set { contactName = value; }
 		}
 
-		[Property, ValidateNotEmpty]
+		[Property, ValidateNonEmpty]
 		public string Phone
 		{
 			get { return phone; }
@@ -41,4 +42,3 @@ namespace Castle.ActiveRecord.Tests.Validation.GenericModel
 		}
 	}
 }
-#endif

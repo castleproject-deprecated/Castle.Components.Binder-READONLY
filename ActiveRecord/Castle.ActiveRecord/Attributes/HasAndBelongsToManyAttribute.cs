@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ namespace Castle.ActiveRecord
 		private String[] compositeKeyColumnRefs;
 		private String columnKey;
 		private String[] compositeKeyColumnKeys;
+		private FetchEnum fetchMethod = FetchEnum.Unspecified;
+		private Type customCollectionType;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HasAndBelongsToManyAttribute"/> class.
@@ -51,6 +53,14 @@ namespace Castle.ActiveRecord
 		public HasAndBelongsToManyAttribute( Type mapType )
 		{
 			this.mapType = mapType;
+		}
+
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="HasAndBelongsToManyAttribute"/> class.
+		/// </summary>
+		public HasAndBelongsToManyAttribute()
+		{
 		}
 
 		/// <summary>
@@ -101,6 +111,25 @@ namespace Castle.ActiveRecord
 		{
 			get { return compositeKeyColumnKeys; }
 			set { compositeKeyColumnKeys = value; }
+		}
+
+		/// <summary>
+		/// Chooses between outer-join fetching
+		/// or sequential select fetching.
+		/// </summary>
+		public FetchEnum Fetch
+		{
+			get { return fetchMethod; }
+			set { fetchMethod = value; }
+		}
+
+		/// <summary>
+		/// Provides a custom collection type.
+		/// </summary>
+		public Type CollectionType
+		{
+			get { return customCollectionType; }
+			set { customCollectionType = value; }
 		}
 	}
 }

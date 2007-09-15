@@ -15,7 +15,8 @@ li
 	padding: 4px;
 }
 		</style>
-		$AjaxHelper.GetJavascriptFunctions()
+		$Ajax.InstallScripts()
+		$Form.InstallScripts()
 	</head>
 	<body>
 
@@ -23,7 +24,7 @@ $childContent
 
 <p>
 <br/>
-<a href="../home/index.rails">Main page</a>
+<a href="../home/index.castle">Main page</a>
 <br/>
 </p>
 

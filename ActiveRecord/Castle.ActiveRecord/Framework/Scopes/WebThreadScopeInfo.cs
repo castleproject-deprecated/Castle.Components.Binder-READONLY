@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,17 @@ namespace Castle.ActiveRecord.Framework.Scopes
 	using System.Web;
 
 	/// <summary>
-	/// 
+	/// This <see cref="IThreadScopeInfo"/> implementation will first get the current scope from the current 
+	/// request, thus implementing a Session Per Request pattern.
 	/// </summary>
-	public class WebThreadScopeInfo : AbstractThreadScopeInfo
+	public class WebThreadScopeInfo : AbstractThreadScopeInfo, IWebThreadScopeInfo
 	{
-        const string ActiveRecordCurrentStack = "activerecord.currentstack";
+		const string ActiveRecordCurrentStack = "activerecord.currentstack";
 
+		/// <summary>
+		/// Gets the current stack.
+		/// </summary>
+		/// <value>The current stack.</value>
 		public override Stack CurrentStack
 		{
 			[MethodImpl(MethodImplOptions.Synchronized)]
@@ -40,7 +45,7 @@ namespace Castle.ActiveRecord.Framework.Scopes
 					throw new ScopeMachineryException(message);
 				}
 
-			    Stack stack = (Stack) current.Items[ActiveRecordCurrentStack];
+				Stack stack = (Stack)current.Items[ActiveRecordCurrentStack];
 
 				if (stack == null)
 				{

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 namespace Castle.MicroKernel.Tests.ClassComponents
 {
-	using System;
-
 	/// <summary>
 	/// Summary description for DefaultSpamServiceWithConstructor.
 	/// </summary>
@@ -24,9 +22,9 @@ namespace Castle.MicroKernel.Tests.ClassComponents
 		private DefaultMailSenderService mailSender;
 		private DefaultTemplateEngine templateEngine;
 
-		public DefaultSpamServiceWithConstructor( DefaultMailSenderService mailsender, DefaultTemplateEngine templateEngine )
+		public DefaultSpamServiceWithConstructor(DefaultMailSenderService mailsender, DefaultTemplateEngine templateEngine)
 		{
-			this.mailSender = mailsender;
+			mailSender = mailsender;
 			this.templateEngine = templateEngine;
 		}
 

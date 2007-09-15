@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 namespace MoviesDemo 
 {
 	using System;
-	using System.Configuration;
 	using Castle.ActiveRecord;
 	using Castle.ActiveRecord.Framework;
 	using Castle.ActiveRecord.Framework.Config;
@@ -24,50 +23,13 @@ namespace MoviesDemo
 
 	public class Global : System.Web.HttpApplication
 	{
-		public Global()
-		{
-		}	
-		
 		protected void Application_Start(Object sender, EventArgs e)
 		{
 			IConfigurationSource config = ActiveRecordSectionHandler.Instance;
 			
 			ActiveRecordStarter.Initialize(config, typeof(Movie));
-		}
- 
-		protected void Session_Start(Object sender, EventArgs e)
-		{
 
-		}
-
-		protected void Application_BeginRequest(Object sender, EventArgs e)
-		{
-
-		}
-
-		protected void Application_EndRequest(Object sender, EventArgs e)
-		{
-
-		}
-
-		protected void Application_AuthenticateRequest(Object sender, EventArgs e)
-		{
-
-		}
-
-		protected void Application_Error(Object sender, EventArgs e)
-		{
-
-		}
-
-		protected void Session_End(Object sender, EventArgs e)
-		{
-
-		}
-
-		protected void Application_End(Object sender, EventArgs e)
-		{
-
+			ActiveRecordStarter.CreateSchema();
 		}
 	}
 }

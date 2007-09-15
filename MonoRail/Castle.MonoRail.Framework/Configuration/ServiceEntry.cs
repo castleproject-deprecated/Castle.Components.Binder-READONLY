@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ namespace Castle.MonoRail.Framework.Configuration
 	{
 		Custom,
 		ControllerFactory,
-		ViewEngine,
 		ViewComponentFactory,
 		ViewSourceLoader,
 		FilterFactory,
@@ -37,7 +36,16 @@ namespace Castle.MonoRail.Framework.Configuration
 		EmailTemplateService,
 		ControllerTree,
 		CacheProvider,
-		ScaffoldingSupport
+		ScaffoldingSupport,
+		ExecutorFactory,
+		TransformFilterDescriptorProvider,
+		TransformationFilterFactory,
+		ViewEngineManager,
+		UrlBuilder,
+		UrlTokenizer,
+		ServerUtility,
+		ValidatorRegistry,
+		AjaxProxyGenerator,
 	}
 
 	public class ServiceEntry : ISerializedConfig
@@ -56,14 +64,16 @@ namespace Castle.MonoRail.Framework.Configuration
 			
 			if (idAtt == null || idAtt.Value == String.Empty)
 			{
-				throw new ConfigurationException("To add a service, please specify the 'id' attribute. " + 
-					"Check the documentation for more information");
+				String message = "To add a service, please specify the 'id' attribute. " + 
+					"Check the documentation for more information";
+				throw new ConfigurationErrorsException(message);
 			}
 
 			if (typeAtt == null || typeAtt.Value == String.Empty)
 			{
-				throw new ConfigurationException("To add a service, please specify the 'type' attribute. " + 
-					"Check the documentation for more information");
+				String message = "To add a service, please specify the 'type' attribute. " + 
+					"Check the documentation for more information";
+				throw new ConfigurationErrorsException(message);
 			}
 			
 			try
@@ -73,7 +83,8 @@ namespace Castle.MonoRail.Framework.Configuration
 			}
 			catch(Exception ex)
 			{
-				throw new ConfigurationException("Invalid service id: " + idAtt.Value, ex);
+				String message = "Invalid service id: " + idAtt.Value;
+				throw new ConfigurationErrorsException(message, ex);
 			}
 			
 			service = TypeLoadUtil.GetType(typeAtt.Value);

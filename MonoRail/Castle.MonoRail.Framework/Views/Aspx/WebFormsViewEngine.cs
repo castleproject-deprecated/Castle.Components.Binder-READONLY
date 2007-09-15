@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,6 +36,23 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		{
 		}
 
+		#region ViewEngineBase overrides
+
+		public override bool SupportsJSGeneration
+		{
+			get { return false; }
+		}
+
+		public override string ViewFileExtension
+		{
+			get { return ".aspx"; }
+		}
+
+		public override string JSGeneratorFileExtension
+		{
+			get { throw new NotImplementedException(); }
+		}
+
 		public override bool HasTemplate(String templateName)
 		{
 			return ViewSourceLoader.HasTemplate(templateName + ".aspx");
@@ -64,7 +81,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			
 			if (processedBefore)
 			{
-#if DOTNET2
+#if !MONO
 				ProcessExecuteView(context, controller, viewName);
 				return;
 #else
@@ -74,7 +91,30 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 			ProcessInlineView(controller, viewName, httpContext);	
 		}
-		
+
+		public override void Process(TextWriter output, IRailsEngineContext context, Controller controller,
+		                             string templateName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void ProcessPartial(TextWriter output, IRailsEngineContext context, Controller controller,
+		                                    string partialName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override object CreateJSGenerator(IRailsEngineContext context)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void GenerateJS(TextWriter output, IRailsEngineContext context, Controller controller,
+		                                string templateName)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override void ProcessContents(IRailsEngineContext context, Controller controller, String contents)
 		{
 			AdjustContentType(context);
@@ -87,7 +127,9 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 			ProcessPage(controller, masterHandler, httpContext);
 		}
-		
+
+		#endregion
+
 		private void ProcessInlineView(Controller controller, String viewName, HttpContext httpContext)
 		{
 			PrepareLayout(controller, httpContext);
@@ -96,7 +138,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 			ProcessPropertyBag(controller.PropertyBag, childPage);
 
-#if DOTNET2		
+#if !MONO		
 			Page page = childPage as Page;
 
 			if (page != null)
@@ -110,7 +152,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			ProcessLayoutIfNeeded(controller, httpContext, childPage);			
 		}
 
-#if DOTNET2
+#if !MONO
 		private void ProcessExecuteView(IRailsEngineContext context, Controller controller, String viewName)
 		{				
 			HttpContext httpContext = context.UnderlyingContext;
@@ -131,8 +173,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		{
 			Page view = (Page) sender;
 
-			Controller controller = Controller.CurrentController;
-			
+			Controller controller = GetCurrentController();
+
 			ProcessPropertyBag(controller.PropertyBag, view);
 
 			PreSendView(controller, view);
@@ -149,7 +191,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			
 			if (masterPage != null)
 			{
-				Controller controller = Controller.CurrentController;
+				Controller controller = GetCurrentController();
 
 				if (masterPage is IControllerAware)
 				{
@@ -160,7 +202,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		
 		private void FinalizeView(object sender, EventArgs e)
 		{
-			Controller controller = Controller.CurrentController;
+			Controller controller = GetCurrentController();
+			
 			PostSendView(controller,  sender);
 		}
 #endif
@@ -256,8 +299,6 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 						httpContext.Items.Add("rails.child", childPage);
 
 						httpContext.Items["rails.layout.processed"] = true;
-
-						httpContext.Response.RedirectLocation = "foo";
 					}
 
 					ProcessPage(controller, masterHandler, httpContext);
@@ -308,7 +349,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			Page masterHandler;
 			String layout = "layouts/" + controller.LayoutName;
 
-#if DOTNET2
+#if !MONO
 			masterHandler = (Page)httpContext.Items["wfv.masterPage"];
 
 			if (masterHandler != null)
@@ -318,7 +359,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			}
 #endif
 			masterHandler = (Page) GetCompiledPageInstance(layout, httpContext);
-#if DOTNET2
+#if !MONO
 			masterHandler.Items["wfv.masterLayout"] = layout;
 #endif
 
@@ -333,7 +374,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			response.BufferOutput = true;
 		}
 
-		protected void ProcessPropertyBag(IDictionary bag, IHttpHandler handler)
+		private void ProcessPropertyBag(IDictionary bag, IHttpHandler handler)
 		{
 			foreach(DictionaryEntry entry in bag)
 			{
@@ -341,7 +382,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			}
 		}
 
-		protected void SetPropertyValue(IHttpHandler handler, object key, object value)
+		private void SetPropertyValue(IHttpHandler handler, object key, object value)
 		{
 			if (value == null) return;
 
@@ -370,7 +411,15 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			}
 		}
 
-#if DOTNET2
+#if !MONO
+
+		private Controller GetCurrentController()
+		{
+			IControllerLifecycleExecutor executor = (IControllerLifecycleExecutor)
+													MonoRailHttpHandler.CurrentContext.Items[ControllerLifecycleExecutor.ExecutorEntry];
+
+			return executor.Controller;
+		}
 
 		internal class ExecutePageProvider : IMonoRailHttpHandlerProvider
 		{
@@ -421,7 +470,6 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 			}
 		}
-	
 #endif
 	}
 

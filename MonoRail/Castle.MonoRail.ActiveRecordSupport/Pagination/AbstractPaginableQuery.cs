@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ namespace Castle.MonoRail.ActiveRecordSupport.Pagination
 		public virtual int ObtainCount()
 		{
 			ISessionFactoryHolder holder = ActiveRecordMediator.GetSessionFactoryHolder();
-			ISession session = holder.CreateSession(Target);
+			ISession session = holder.CreateSession(RootType);
 
 			try
 			{
@@ -85,7 +85,7 @@ namespace Castle.MonoRail.ActiveRecordSupport.Pagination
 			this.currentPage = currentPage;
 
 			ISessionFactoryHolder holder = ActiveRecordMediator.GetSessionFactoryHolder();
-			ISession session = holder.CreateSession(Target);
+			ISession session = holder.CreateSession(RootType);
 
 			try
 			{
@@ -168,7 +168,7 @@ namespace Castle.MonoRail.ActiveRecordSupport.Pagination
 
 		/// <summary>
 		/// Override to provide a custom query execution.
-		/// The default behaviour is to just call <see cref="IQuery.List"/>.
+		/// The default behaviour is to just call <see cref="IQuery.List()"/>.
 		/// </summary>
 		/// <param name="query">The query</param>
 		/// <returns>The query results.</returns>

@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@ namespace Castle.MonoRail.TestSupport
 	using System.Net;
 	using System.Web;
 	using System.Collections;
-	using System.Collections.Specialized;
-
 	using Castle.MonoRail.Framework.Internal.Test;
-
 
 	[Serializable]
 	public class TestResponse : MarshalByRefObject

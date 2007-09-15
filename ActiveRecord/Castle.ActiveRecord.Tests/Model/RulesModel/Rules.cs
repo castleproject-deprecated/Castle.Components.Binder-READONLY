@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace Castle.ActiveRecord.Tests.Model.RulesModel
     /// <summary>
     /// Base class that is persisted to database, 
     /// </summary>
-    [ActiveRecord(DiscriminatorColumn="discriminator", DiscriminatorValue="0")]
+    [ActiveRecord(DiscriminatorColumn="discriminator", DiscriminatorValue="0", Lazy=false)]
     public abstract class PersistedRule : RuleBase
     {
         int id;
@@ -66,7 +66,7 @@ namespace Castle.ActiveRecord.Tests.Model.RulesModel
         }
     }
 
-    [ActiveRecord(DiscriminatorValue="2")]
+	[ActiveRecord(DiscriminatorValue = "2", Lazy = false)]
     public class WorkDaysRules : EmployeeRule
     {
         int days;

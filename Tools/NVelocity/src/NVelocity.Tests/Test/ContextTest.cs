@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -285,7 +285,7 @@ namespace NVelocity.Test
 			Assert.AreEqual("Hello Cort $lastName", sw.ToString());
 
 			// create a context based on a case insensitive hashtable
-			Hashtable ht = new Hashtable(new CaseInsensitiveHashCodeProvider(), new CaseInsensitiveComparer());
+			Hashtable ht = new Hashtable(StringComparer.CurrentCultureIgnoreCase);
 			ht.Add("firstName", "Cort");
 			ht.Add("LastName", "Schaefer");
 			c = new VelocityContext(ht);
@@ -297,7 +297,7 @@ namespace NVelocity.Test
 			Assert.AreEqual("Hello Cort Schaefer", sw.ToString());
 
 			// create a context based on a case insensitive hashtable, verify that stuff added to the context after it is created if found case insensitive
-			ht = new Hashtable(new CaseInsensitiveHashCodeProvider(), new CaseInsensitiveComparer());
+			ht = new Hashtable(StringComparer.CurrentCultureIgnoreCase);
 			ht.Add("firstName", "Cort");
 			c = new VelocityContext(ht);
 			c.Put("LastName", "Schaefer");
@@ -308,10 +308,43 @@ namespace NVelocity.Test
 			Assert.IsTrue(ok, "Evalutation returned failure");
 			Assert.AreEqual("Hello Cort Schaefer", sw.ToString());
 		}
+
+		[Test]
+		public void PropertiesAreAlsoCaseInsensitive()
+		{
+			// normal case sensitive context
+			VelocityContext c = new VelocityContext();
+			c.Put("something", new Something());
+
+			VelocityEngine ve = new VelocityEngine();
+			ve.Init();
+
+			// verify the output, $lastName should not be resolved
+			StringWriter sw = new StringWriter();
+
+			bool ok = ve.Evaluate(c, sw, "", "Hello $something.firstName");
+			Assert.IsTrue(ok, "Evalutation returned failure");
+			Assert.AreEqual("Hello hammett", sw.ToString());
+
+			sw.GetStringBuilder().Length = 0;
+
+			ok = ve.Evaluate(c, sw, "", "Hello $something.Firstname");
+			Assert.IsTrue(ok, "Evalutation returned failure");
+			Assert.AreEqual("Hello hammett", sw.ToString());
+
+			sw.GetStringBuilder().Length = 0;
+
+			ok = ve.Evaluate(c, sw, "", "Hello $something.firstname");
+			Assert.IsTrue(ok, "Evalutation returned failure");
+			Assert.AreEqual("Hello hammett", sw.ToString());
+		}
 	}
 
 	public class Something
 	{
+		private string firstName = "hammett";
+		private string middleNameInitial = "V";
+
 		public String Print( String arg )
 		{
 			return arg;
@@ -320,6 +353,18 @@ namespace NVelocity.Test
 		public String Contents( params String[] args )
 		{
 			return String.Join( ",", args );
+		}
+
+		public string FirstName
+		{
+			get { return firstName; }
+			set { firstName = value; }
+		}
+
+		public string MiddleNameInitial
+		{
+			get { return middleNameInitial; }
+			set { middleNameInitial = value; }
 		}
 	}
 

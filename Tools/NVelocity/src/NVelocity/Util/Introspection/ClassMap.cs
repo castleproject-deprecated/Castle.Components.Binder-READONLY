@@ -2,6 +2,7 @@ namespace NVelocity.Util.Introspection
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.Reflection;
 	using System.Text;
 
@@ -12,17 +13,18 @@ namespace NVelocity.Util.Introspection
 	/// </summary>
 	public class ClassMap
 	{
-		private readonly static CacheMiss CACHE_MISS = new CacheMiss();
-		private readonly static Object OBJECT = new Object();
+		private static readonly MethodInfo CACHE_MISS =
+			typeof(ClassMap).GetMethod("MethodMiss", BindingFlags.Static | BindingFlags.NonPublic);
+
+		private static readonly Object OBJECT = new Object();
 
 		private readonly Type clazz;
 
 		/// <summary> Cache of Methods, or CACHE_MISS, keyed by method
 		/// name and actual arguments used to find it.
 		/// </summary>
-		private readonly Hashtable methodCache = new Hashtable();
-
-		private readonly Hashtable propertyCache = new Hashtable();
+		private readonly Dictionary<string, MethodInfo> methodCache = new Dictionary<string, MethodInfo>(StringComparer.OrdinalIgnoreCase);
+		private readonly Dictionary<string, MemberInfo> propertyCache = new Dictionary<string, MemberInfo>(StringComparer.OrdinalIgnoreCase);
 		private readonly MethodMap methodMap = new MethodMap();
 
 		/// <summary> Standard constructor
@@ -47,7 +49,7 @@ namespace NVelocity.Util.Introspection
 			get { return clazz; }
 		}
 
-		private sealed class CacheMiss
+		private static void MethodMiss()
 		{
 		}
 
@@ -65,35 +67,37 @@ namespace NVelocity.Util.Introspection
 		/// <returns>
 		/// the class object whose methods are cached by this map.
 		/// </returns>
-		public MethodInfo FindMethod(String name, Object[] params_Renamed)
+		public MethodInfo FindMethod(String name, Object[] parameters)
 		{
-			String methodKey = MakeMethodKey(name, params_Renamed);
-			Object cacheEntry = methodCache[methodKey];
+			String methodKey = MakeMethodKey(name, parameters);
+			MethodInfo cacheEntry;
 
-			if (cacheEntry == CACHE_MISS)
+			if (methodCache.TryGetValue(methodKey, out cacheEntry))
 			{
-				return null;
+				if (cacheEntry == CACHE_MISS)
+				{
+					return null;
+				}
 			}
-
-			if (cacheEntry == null)
+			else
 			{
 				try
 				{
-					cacheEntry = methodMap.Find(name, params_Renamed);
+					cacheEntry = methodMap.Find(name, parameters);
 				}
-				catch (AmbiguousException)
+				catch(AmbiguousException)
 				{
 					// that's a miss :)
 					methodCache[methodKey] = CACHE_MISS;
 					throw;
 				}
 
-				methodCache[methodKey] = cacheEntry == null ? CACHE_MISS : cacheEntry;
+				methodCache[methodKey] = cacheEntry ?? CACHE_MISS;
 			}
 
 			// Yes, this might just be null.
 
-			return (MethodInfo) cacheEntry;
+			return cacheEntry;
 		}
 
 		/// <summary>
@@ -110,10 +114,15 @@ namespace NVelocity.Util.Introspection
 		/// </summary>
 		public PropertyInfo FindProperty(String name)
 		{
-			Object cacheEntry = propertyCache[name];
+			MemberInfo cacheEntry;
 
-			if (cacheEntry == CACHE_MISS)
-				return null;
+			if (propertyCache.TryGetValue(name, out cacheEntry))
+			{
+				if (cacheEntry == CACHE_MISS)
+				{
+					return null;
+				}
+			}
 
 			// Yes, this might just be null.
 			return (PropertyInfo) cacheEntry;
@@ -130,7 +139,7 @@ namespace NVelocity.Util.Introspection
 			MethodInfo[] methods = GetAccessibleMethods(clazz);
 
 			// map and cache them
-			foreach (MethodInfo method in methods)
+			foreach(MethodInfo method in methods)
 			{
 				methodMap.Add(method);
 				methodCache[MakeMethodKey(method)] = method;
@@ -143,7 +152,7 @@ namespace NVelocity.Util.Introspection
 			PropertyInfo[] properties = GetAccessibleProperties(clazz);
 
 			// map and cache them
-			foreach (PropertyInfo property in properties)
+			foreach(PropertyInfo property in properties)
 			{
 				//propertyMap.add(publicProperty);
 				propertyCache[property.Name] = property;
@@ -155,12 +164,14 @@ namespace NVelocity.Util.Introspection
 		/// the concatenation of the name and the
 		/// types of the method parameters.
 		/// </summary>
-		private String MakeMethodKey(MethodInfo method)
+		private static String MakeMethodKey(MethodInfo method)
 		{
 			StringBuilder methodKey = new StringBuilder(method.Name);
 
-			foreach (ParameterInfo p in method.GetParameters())
+			foreach(ParameterInfo p in method.GetParameters())
+			{
 				methodKey.Append(p.ParameterType.FullName);
+			}
 
 			return methodKey.ToString();
 		}
@@ -171,12 +182,11 @@ namespace NVelocity.Util.Introspection
 
 			if (parameters != null)
 			{
-				for (int j = 0; j < parameters.Length; j++)
+				for(int j = 0; j < parameters.Length; j++)
 				{
 					Object arg = parameters[j];
 
-					if (arg == null)
-						arg = OBJECT;
+					if (arg == null) arg = OBJECT;
 
 					methodKey.Append(arg.GetType().FullName);
 				}
@@ -191,12 +201,12 @@ namespace NVelocity.Util.Introspection
 		private static MethodInfo[] GetAccessibleMethods(Type clazz)
 		{
 			ArrayList methods = new ArrayList();
-			
+
 			foreach(Type iface in clazz.GetInterfaces())
 			{
 				methods.AddRange(iface.GetMethods());
 			}
-			
+
 			methods.AddRange(clazz.GetMethods());
 
 			return (MethodInfo[]) methods.ToArray(typeof(MethodInfo));
@@ -205,12 +215,12 @@ namespace NVelocity.Util.Introspection
 		private static PropertyInfo[] GetAccessibleProperties(Type clazz)
 		{
 			ArrayList props = new ArrayList();
-			
-			foreach (Type iface in clazz.GetInterfaces())
+
+			foreach(Type iface in clazz.GetInterfaces())
 			{
 				props.AddRange(iface.GetProperties());
 			}
-			
+
 			props.AddRange(clazz.GetProperties());
 
 			return (PropertyInfo[]) props.ToArray(typeof(PropertyInfo));

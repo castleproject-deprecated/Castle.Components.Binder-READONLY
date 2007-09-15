@@ -4,8 +4,8 @@ namespace NVelocity.Runtime
 	using System.IO;
 	using Commons.Collections;
 	using NVelocity.Runtime.Parser.Node;
-	using NVelocity.Runtime.Resource;
 	using NVelocity.Util.Introspection;
+	using Resource;
 
 	/// <summary>
 	/// This is the Runtime system for Velocity. It is the
@@ -74,7 +74,7 @@ namespace NVelocity.Runtime
 		/// </summary>
 		public static void Init()
 		{
-			lock (typeof(RuntimeSingleton))
+			lock(typeof(RuntimeSingleton))
 			{
 				ri.Init();
 			}
@@ -325,9 +325,9 @@ namespace NVelocity.Runtime
 		/// configuration implementation.
 		///
 		/// </summary>
-		/// <param name="String">key property key
+		/// <param name="key">property key
 		/// </param>
-		/// <param name="String">defaultValue  default value to return if key not
+		/// <param name="defaultValue">default value to return if key not
 		/// found in resource manager.
 		/// </param>
 		/// <returns>String  value of key or default
@@ -371,6 +371,7 @@ namespace NVelocity.Runtime
 		/// Checks to see if a VM exists
 		/// </summary>
 		/// <param name="vmName">Name of velocimacro</param>
+		/// <param name="templateName">Template Name</param>
 		/// <returns>True if VM by that name exists, false if not</returns>
 		public static bool IsVelocimacro(String vmName, String templateName)
 		{
@@ -382,9 +383,9 @@ namespace NVelocity.Runtime
 		/// This is to support clearing the VM list when in 
 		/// inline-VM-local-scope mode
 		/// </summary>
-		public static bool DumpVMNamespace(String namespace_Renamed)
+		public static bool DumpVMNamespace(String ns)
 		{
-			return ri.DumpVMNamespace(namespace_Renamed);
+			return ri.DumpVMNamespace(ns);
 		}
 
 		/* --------------------------------------------------------------------
@@ -468,7 +469,6 @@ namespace NVelocity.Runtime
 		public static Introspector Introspector
 		{
 			get { return ri.Introspector; }
-
 		}
 
 		/// <summary>

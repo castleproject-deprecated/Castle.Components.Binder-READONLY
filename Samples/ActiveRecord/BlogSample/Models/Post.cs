@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,10 @@
 namespace BlogSample
 {
 	using System;
-
 	using Castle.ActiveRecord;
 
-
 	[ActiveRecord]
-	public class Post : ActiveRecordBase
+	public class Post : ActiveRecordBase<Post>
 	{
 		private int id;
 		private String title;
@@ -90,16 +88,6 @@ namespace BlogSample
 		{
 			get { return published; }
 			set { published = value; }
-		}
-
-		public static void DeleteAll()
-		{
-			ActiveRecordBase.DeleteAll( typeof(Post) );
-		}
-
-		public static Post[] FindAll()
-		{
-			return (Post[]) ActiveRecordBase.FindAll( typeof(Post) );
 		}
 	}
 }

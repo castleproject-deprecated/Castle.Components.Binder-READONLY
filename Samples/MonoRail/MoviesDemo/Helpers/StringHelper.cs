@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ namespace MoviesDemo.Helpers
 	using System;
 	using Castle.MonoRail.Framework.Helpers;
 
-
+	/// <summary>
+	/// Rather simplistic example of a helper
+	/// </summary>
 	public class StringHelper : AbstractHelper
 	{
 		public string Format(string format, object arg)

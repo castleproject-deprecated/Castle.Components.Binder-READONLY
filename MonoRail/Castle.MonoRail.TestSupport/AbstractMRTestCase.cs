@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ namespace Castle.MonoRail.TestSupport
 				String message = String.Format("The path specified for the " +
 				                               "web project doesnt look as a web project dir (bin directory or web.config missing): {0}",
 				                               physicalDir);
-				throw new ConfigurationException(message);
+				throw new ConfigurationErrorsException(message);
 			}
 
 			host = (WebAppHost) ApplicationHost.CreateApplicationHost(
@@ -720,7 +720,7 @@ namespace Castle.MonoRail.TestSupport
 
 		protected virtual string GetPhysicalDir()
 		{
-			String dir = ConfigurationSettings.AppSettings[PhysicalWebDirConfigKey];
+			String dir = ConfigurationManager.AppSettings[PhysicalWebDirConfigKey];
 
 			if (dir == null)
 			{
@@ -729,7 +729,7 @@ namespace Castle.MonoRail.TestSupport
 				                               "a key ('{0}') on your configuration file or override the method " +
 				                               "AbstractMRTestCase.GetPhysicalDir", PhysicalWebDirConfigKey);
 
-				throw new ConfigurationException(message);
+				throw new ConfigurationErrorsException(message);
 			}
 
 			return dir;
@@ -737,7 +737,7 @@ namespace Castle.MonoRail.TestSupport
 
 		protected virtual string GetVirtualDir()
 		{
-			String dir = ConfigurationSettings.AppSettings[VirtualWebDirConfigKey];
+			String dir = ConfigurationManager.AppSettings[VirtualWebDirConfigKey];
 
 			if (dir == null)
 			{

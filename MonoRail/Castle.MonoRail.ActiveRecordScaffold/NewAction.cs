@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 namespace Castle.MonoRail.ActiveRecordScaffold
 {
 	using System;
-	using Castle.Components.Binder;
 	using Castle.MonoRail.Framework;
 
 	using Castle.Components.Common.TemplateEngine;
@@ -48,13 +47,12 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			if (instance == null)
 			{
 				instance = Activator.CreateInstance(Model.Type);
-				
-//				instance = binder.BindObject(Model.Type, 
-//				                             Model.Type.Name, 
-//				                             builder.BuildSourceNode(controller.Request.QueryString) );
 			}
 
-			controller.PropertyBag["prefix"] = Model.Type.Name;
+			string prefix = Model.Type.Name;
+
+			controller.PropertyBag["prefix"] = prefix;
+			controller.PropertyBag[prefix + "type"] = Model.Type;
 			controller.PropertyBag["instance"] = instance;
 		}
 

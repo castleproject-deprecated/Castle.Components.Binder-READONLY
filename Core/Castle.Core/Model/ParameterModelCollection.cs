@@ -1,4 +1,4 @@
-// Copyright 2004-2006 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ namespace Castle.Core
 {
 	using System;
 	using System.Collections;
-
 	using Castle.Core.Configuration;
 
 	/// <summary>
@@ -32,9 +31,7 @@ namespace Castle.Core
 		/// </summary>
 		public ParameterModelCollection()
 		{
-			dictionary = new Hashtable(
-				CaseInsensitiveHashCodeProvider.Default, 
-				CaseInsensitiveComparer.Default);
+			dictionary = new Hashtable(StringComparer.CurrentCultureIgnoreCase);
 		}
 
 		/// <summary>
@@ -44,7 +41,7 @@ namespace Castle.Core
 		/// <param name="value">The value.</param>
 		public void Add(String name, String value)
 		{
-			dictionary.Add( name, new ParameterModel(name, value) );
+			dictionary.Add(name, new ParameterModel(name, value));
 		}
 
 		/// <summary>
@@ -54,7 +51,7 @@ namespace Castle.Core
 		/// <param name="configNode">The config node.</param>
 		public void Add(String name, IConfiguration configNode)
 		{
-			dictionary.Add( name, new ParameterModel(name, configNode) );
+			dictionary.Add(name, new ParameterModel(name, configNode));
 		}
 
 		/// <summary>
