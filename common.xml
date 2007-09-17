@@ -80,11 +80,12 @@
 		<call target="set-${project.config}-project-configuration" />
 
 		<property name="src.dir" 			value="${path::get-full-path(project::get-base-directory())}" />
-		<property name="build.base.dir"	value="${root.dir}/build" />
+		<property name="build.base.dir"		value="${path::get-full-path(root.dir)}/build" />
 		<property name="build.family.dir"	value="${build.base.dir}/${nant.settings.currentframework}" />
-		<property name="build.dir" 		value="${path::get-full-path(path::combine(build.family.dir,project.config))}" dynamic="true" />
+		<property name="build.dir" 			value="${path::get-full-path(path::combine(build.family.dir,project.config))}" dynamic="true" />
 		<property name="testresults.dir" 	value="${build.dir}/test-results" />
 		<property name="releasenotes.dir"	value="${build.dir}/ReleaseNotes" />
+		<property name="docs.dir" 			value="${build.base.dir}/docs" />
 		<property name="build.rebuild"		value="false" overwrite="false" />
 	</target>
 
@@ -98,17 +99,6 @@
 
 		<property name="build.msbuild" 	value="false" overwrite="false" />
 
-		<!-- Where is MbUnit.Cons.exe ? -->
-		<property name="mbunit-console" value="MbUnit.Cons.exe" overwrite="false" />
-
-		<!-- Where is nunit-console executable(win/mono) ? -->
-		<property name="nunit-console2" value="nunit-console2" overwrite="false" />
-		<property name="nunit-console" value="nunit-console" overwrite="false" />
-
-		<property name="testrunner" value="NUnit" />
-
-		<!-- Where is WiX? -->
-		<property name="wix.dir" value="%ProgramFiles%\wix" overwrite="false" />
 	</target>
 
 	<target name="set-net-2.0-framework-configuration">
@@ -165,7 +155,7 @@
 	</target>
 
 	<target name="common.init"
-		depends="set-framework-configuration set-project-configuration common.check-nant-version"
+		depends="common.check-nant-version common.find-tools set-framework-configuration set-project-configuration"
 		description="Initializes build properties">
 
 		<fileset id="project.sources" failonempty="true">
@@ -185,7 +175,7 @@
 			failonerror="false"/>
 		<xmlpeek
 			file="_revision.xml"
-			xpath="/info/entry/commit/@revision"
+			xpath="/info/entry/@revision"
 			property="svn.revision"
 			failonerror="false"/>
 		<delete file="_revision.xml" failonerror="false" />
@@ -225,6 +215,29 @@
 
 	<target name="common.check-nant-version">
 		<fail if="${current.nant-version&lt;required.nant-version}" message="Not using minimum required Nant version: ${required.nant-version} (current version: ${current.nant-version}). Please upgrade your copy of nant." />
+	</target>
+
+	<target name="common.find-tools">
+		<!-- Where is MbUnit.Cons.exe ? -->
+		<property name="mbunit-console" value="MbUnit.Cons.exe" overwrite="false" />
+
+		<!-- Where is nunit-console executable(win/mono) ? -->
+		<property name="nunit-console2" value="nunit-console2" overwrite="false" />
+		<property name="nunit-console" value="nunit-console" overwrite="false" />
+
+		<property name="testrunner" value="NUnit" />
+
+		<!-- Where is WiX? -->
+		<property name="wix.dir" value="${environment::get-folder-path('ProgramFiles')}\Windows Installer XML v3\bin" overwrite="false" />
+
+		<!-- Where is Sandcastle Help File Builder (SHFB)? -->
+		<property name="shfb.dir" value="${environment::get-folder-path('ProgramFiles')}\EWSoftware\Sandcastle Help File Builder" overwrite="false" />
+		
+		<!-- Where is Sandcastle? -->
+		<property name="sandcastle.dir" value="${environment::get-folder-path('ProgramFiles')}\Sandcastle" overwrite="false" />
+
+		<!-- Where is HTML Help 1.0? -->
+		<property name="htmlhelp1x.dir" value="${environment::get-folder-path('ProgramFiles')}\HTML Help Workshop" overwrite="false" />		
 	</target>
 
 </project>
