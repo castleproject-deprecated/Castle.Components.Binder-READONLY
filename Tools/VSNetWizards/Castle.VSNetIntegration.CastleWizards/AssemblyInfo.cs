@@ -22,8 +22,8 @@ using System.Security;
 [assembly: AssemblyProductAttribute("Castle.VSNetIntegration.CastleWizards")]
 [assembly: AssemblyCopyrightAttribute("Copyright (c) 2004-2007 Castle Project - http://www.castleproject.org")]
 [assembly: AssemblyVersionAttribute("1.0.6.0")]
-[assembly: AssemblyInformationalVersionAttribute("1.0.6.4312")]
-[assembly: AssemblyFileVersionAttribute("1.0.6.4312")]
+[assembly: AssemblyInformationalVersionAttribute("1.0.6.4315")]
+[assembly: AssemblyFileVersionAttribute("1.0.6.4315")]
 [assembly: AssemblyDelaySignAttribute(false)]
 [assembly: AllowPartiallyTrustedCallersAttribute()]
 
