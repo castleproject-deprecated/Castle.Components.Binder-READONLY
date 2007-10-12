@@ -222,6 +222,15 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// it invokes the <c>dataObtentionCallback</c> and caches the result
 		/// using the specifed <c>cacheKey</c>
 		/// </summary>
+		///
+		/// <remarks>
+		/// CreateCachedPagination is quite dangerous exactly because the cache is
+		/// shared. If the results vary per logged user, then the programmer must
+		/// rather pay a lot of attention when generating the cache key.
+		/// 
+		/// It is preferable to have caching happen at a lower level of the stack, for example the NHibernate query cache.
+		/// </remarks>
+		///
 		/// <param name="controller">the current controller</param>
 		/// <param name="cacheKey">Cache key used to query/store the datasource</param>
 		/// <param name="pageSize">Page size</param>
@@ -486,8 +495,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="total">The total.</param>
 		public GenericCustomPage(IList<T> list, int curPage, int pageSize, int total)
 		{
-			int startIndex = 0;
-			int endIndex = Math.Min(startIndex + pageSize, list.Count);
+			int startIndex = (pageSize * curPage) - pageSize;
+			int endIndex = Math.Min(startIndex + pageSize, total);
 
 			sourceList = list;
 

@@ -14,7 +14,6 @@
 
 namespace Castle.MonoRail.Views.Brail.Tests
 {
-	using System;
 	using System.IO;
 	using System.Threading;
 	using Castle.MonoRail.Framework.Tests;
@@ -28,6 +27,24 @@ namespace Castle.MonoRail.Views.Brail.Tests
 		{
 			DoGet("apppath/index.rails");
 			AssertReplyEqualTo("Current apppath is ");
+		}
+
+		[Test]
+		public void CanUseUrlHelperWithoutPrefix()
+		{
+			DoGet("home/CanUseUrlHelperWithoutPrefix.rails");
+			AssertReplyEqualTo("Castle.MonoRail.Framework.Helpers.UrlHelper");
+		}
+
+		[Test]
+		public void WithNullableDynamicProxyObject()
+		{
+			DoGet("home/WithNullableDynamicProxyObject.rails");
+			string expected = @"BarBaz
+foo
+what?
+there";
+			AssertReplyEqualTo(expected);
 		}
 
 		[Test]
