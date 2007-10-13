@@ -16,6 +16,7 @@ namespace Castle.Facilities.ActiveRecordIntegration
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.Data;
 
 	using NHibernate;
@@ -26,6 +27,7 @@ namespace Castle.Facilities.ActiveRecordIntegration
 	using NHibernate.Metadata;
 
 	using Castle.ActiveRecord.Framework;
+	using NHibernate.Stat;
 
 	/// <summary>
 	/// Implements <see cref="ISessionFactory"/> allowing 
@@ -97,6 +99,16 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
 		}
 
+		public IStatelessSession OpenStatelessSession()
+		{
+			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
+		}
+
+		public IStatelessSession OpenStatelessSession(IDbConnection connection)
+		{
+			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
+		}
+
 		public void Close()
 		{
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
@@ -108,6 +120,11 @@ namespace Castle.Facilities.ActiveRecordIntegration
 		}
 
 		public void Evict(Type persistentClass, object id)
+		{
+			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
+		}
+
+		public void EvictEntity(string entityName)
 		{
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
 		}
@@ -147,12 +164,27 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
 		}
 
+		ICollection<string> ISessionFactory.DefinedFilterNames
+		{
+			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
+		}
+
 		public ICollection DefinedFilterNames
 		{
 			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
 		}
 
 		public Settings Settings
+		{
+			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
+		}
+
+		public IDictionary Items
+		{
+			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
+		}
+
+		public IStatistics Statistics
 		{
 			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
 		}

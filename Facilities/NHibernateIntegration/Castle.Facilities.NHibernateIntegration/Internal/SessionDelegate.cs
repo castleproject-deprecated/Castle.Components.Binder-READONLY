@@ -19,6 +19,7 @@ namespace Castle.Facilities.NHibernateIntegration
 	using System.Collections;
 
 	using NHibernate;
+	using NHibernate.Stat;
 	using NHibernate.Type;
 
 	/// <summary>
@@ -252,6 +253,34 @@ namespace Castle.Facilities.NHibernateIntegration
 		public IList Find(string query)
 		{
 			return inner.CreateQuery(query).List();
+		}
+
+
+		public string GetEntityName(object obj)
+		{
+			return inner.GetEntityName(obj);
+		}
+
+		public ISession SetBatchSize(int batchSize)
+		{
+			return inner.SetBatchSize(batchSize);
+		}
+
+		public IMultiCriteria CreateMultiCriteria()
+		{
+			return inner.CreateMultiCriteria();
+		}
+
+
+		public CacheMode CacheMode
+		{
+			get { return inner.CacheMode; }
+			set { inner.CacheMode = value; }
+		}
+
+		public ISessionStatistics Statistics
+		{
+			get { return inner.Statistics; }
 		}
 
 		public IList Find(string query, object value, IType type)
