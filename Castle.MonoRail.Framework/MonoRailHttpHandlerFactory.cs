@@ -16,10 +16,10 @@ namespace Castle.MonoRail.Framework
 {
 	using System;
 	using System.Web;
-	using Castle.MonoRail.Framework.Container;
 	using Castle.Core;
-	using Configuration;
-	using Descriptors;
+	using Castle.MonoRail.Framework.Container;
+	using Castle.MonoRail.Framework.Configuration;
+	using Castle.MonoRail.Framework.Descriptors;
 
 	/// <summary>
 	/// Coordinates the creation of new <see cref="MonoRailHttpHandler"/> 

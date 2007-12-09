@@ -40,14 +40,6 @@ namespace Castle.MonoRail.Framework
 		Around = BeforeAction | AfterAction,
 
 		/// <summary>
-		/// The filter is invoked 
-		/// when the MonoRail request is started.
-		/// It is the best place to run authentication check
-		/// if you are using caching. However, the Session will
-		/// not be available.
-		/// </summary>
-		StartRequest = 0x01,
-		/// <summary>
 		/// The filter is invoked before the action.
 		/// </summary>
 		BeforeAction = 0x02,
@@ -62,7 +54,7 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// The filter is invoked around all steps.
 		/// </summary>
-		Always = StartRequest | BeforeAction | AfterAction | AfterRendering
+		Always = BeforeAction | AfterAction | AfterRendering
 	}
 
 	/// <summary>
