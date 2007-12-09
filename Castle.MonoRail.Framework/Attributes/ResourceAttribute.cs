@@ -15,8 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
-
-	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Descriptors;
 
 	/// <summary>
 	/// Declares that for the specified class or method, the given resource file should be 

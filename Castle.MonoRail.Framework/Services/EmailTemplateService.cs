@@ -28,7 +28,7 @@ namespace Castle.MonoRail.Framework
 	/// Default implementation of <see cref="IEmailTemplateService"/>
 	/// </summary>
 	/// <remarks>
-	/// Will work only during a MonoRail process as it needs a <see cref="IRailsEngineContext"/>
+	/// Will work only during a MonoRail process as it needs a <see cref="IHandlerContext"/>
 	/// and a <see cref="Controller"/> instance to execute.
 	/// </remarks>
 	public class EmailTemplateService : IServiceEnabledComponent, IEmailTemplateService
@@ -90,7 +90,7 @@ namespace Castle.MonoRail.Framework
 				logger.DebugFormat("Rendering email message. Template name {0}", templateName);
 			}
 
-			IRailsEngineContext context = EngineContextModule.ObtainRailsEngineContext(HttpContext.Current);
+			IHandlerContext context = EngineContextModule.ObtainRailsEngineContext(HttpContext.Current);
 
 			IController controller = context.CurrentController;
 
@@ -135,7 +135,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="controller">Controller instance</param>
 		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		public Message RenderMailMessage(String templateName, IRailsEngineContext context,
+		public Message RenderMailMessage(String templateName, IHandlerContext context,
 										 IController controller, bool doNotApplyLayout)
 		{
 			// create a message object

@@ -52,17 +52,17 @@ namespace Castle.MonoRail.Framework.ViewComponents
 
 			shouldRender = false;
 
-			if (RailsContext.CurrentUser != null)
+			if (HandlerContext.CurrentUser != null)
 			{
 				if (role != null)
 				{
-					shouldRender = RailsContext.CurrentUser.IsInRole(role);
+					shouldRender = HandlerContext.CurrentUser.IsInRole(role);
 				}
 				else
 				{
 					foreach(string itRole in roles.Split(','))
 					{
-						if (RailsContext.CurrentUser.IsInRole(itRole.Trim()))
+						if (HandlerContext.CurrentUser.IsInRole(itRole.Trim()))
 						{
 							shouldRender = true;
 							break;

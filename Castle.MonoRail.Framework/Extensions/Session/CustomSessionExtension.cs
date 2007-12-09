@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Castle.MonoRail.Framework;
+
 namespace Castle.MonoRail.Framework.Extensions.Session
 {
 	using System;
@@ -24,7 +26,7 @@ namespace Castle.MonoRail.Framework.Extensions.Session
 
 	/// <summary>
 	/// This extension allow one to provide a custom 
-	/// implementation of the session available on <see cref="IRailsEngineContext"/>
+	/// implementation of the session available on <see cref="IHandlerContext"/>
 	/// </summary>
 	/// <remarks>
 	/// To successfully install this extension you must add the attribute <c>customSession</c>
@@ -125,12 +127,12 @@ namespace Castle.MonoRail.Framework.Extensions.Session
 		}
 
 		/// <summary>
-		/// Overrides the ISession instance on <see cref="IRailsEngineContext"/>.
+		/// Overrides the ISession instance on <see cref="IHandlerContext"/>.
 		/// </summary>
 		/// <remarks>
 		/// Note that the session available through IHttpContext is left untouched</remarks>
 		/// <param name="context"></param>
-		private void OnAdquireSessionState(IRailsEngineContext context)
+		private void OnAdquireSessionState(IHandlerContext context)
 		{
 			IDictionary session = customSession.ObtainSession(context);
 
@@ -138,10 +140,10 @@ namespace Castle.MonoRail.Framework.Extensions.Session
 		}
 
 		/// <summary>
-		/// Retrives the ISession instance from <see cref="IRailsEngineContext"/>.
+		/// Retrives the ISession instance from <see cref="IHandlerContext"/>.
 		/// and invokes <see cref="ICustomSessionFactory.PersistSession"/>
 		/// </summary>
-		private void OnReleaseSessionState(IRailsEngineContext context)
+		private void OnReleaseSessionState(IHandlerContext context)
 		{
 			customSession.PersistSession(context.Session, context);
 		}

@@ -178,7 +178,7 @@ namespace Castle.MonoRail.Framework.ViewComponents
 				urlPartsBuilder.QueryString[pageParamName] = pageIndex.ToString();
 			}
 
-			return urlPartsBuilder.BuildPathForLink(RailsContext.Server);
+			return urlPartsBuilder.BuildPathForLink(HandlerContext.Server);
 		}
 
 		private void CreateUrlPartBuilder()
@@ -189,8 +189,8 @@ namespace Castle.MonoRail.Framework.ViewComponents
 			{
 				urlParams["encode"] = "true";
 
-				IUrlBuilder urlBuilder = RailsContext.GetService<IUrlBuilder>();
-				urlPartsBuilder = urlBuilder.CreateUrlPartsBuilder(RailsContext.UrlInfo, urlParams);
+				IUrlBuilder urlBuilder = HandlerContext.GetService<IUrlBuilder>();
+				urlPartsBuilder = urlBuilder.CreateUrlPartsBuilder(HandlerContext.UrlInfo, urlParams);
 			}
 			else
 			{
@@ -200,7 +200,7 @@ namespace Castle.MonoRail.Framework.ViewComponents
 				}
 				else
 				{
-					urlPartsBuilder = new UrlPartsBuilder(RailsContext.Request.FilePath);
+					urlPartsBuilder = new UrlPartsBuilder(HandlerContext.Request.FilePath);
 				}
 			}
 		}

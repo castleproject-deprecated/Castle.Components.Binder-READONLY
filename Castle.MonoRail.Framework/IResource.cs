@@ -21,7 +21,7 @@ namespace Castle.MonoRail.Framework
 	/// Dictates the contract for resources that are publishable
 	/// through the PropertyBag context.
 	/// </summary>
-	public interface IResource : IDisposable, IEnumerable
+	public interface IResource : IEnumerable
 	{
 		/// <summary>
 		/// Returns the object linked to the specific key.

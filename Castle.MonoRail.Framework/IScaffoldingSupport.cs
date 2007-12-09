@@ -28,6 +28,6 @@ namespace Castle.MonoRail.Framework
 		/// from the controller instance and add dynamic actions to the controller.
 		/// </summary>
 		/// <param name="controller"></param>
-		void Process(Controller controller);
+		void Process(IController controller);
 	}
 }

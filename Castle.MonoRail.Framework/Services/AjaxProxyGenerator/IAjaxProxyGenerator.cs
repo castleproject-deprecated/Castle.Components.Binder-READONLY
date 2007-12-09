@@ -29,6 +29,6 @@ namespace Castle.MonoRail.Framework.Services.AjaxProxyGenerator
 		/// <param name="proxyName">Name of the javascript proxy object</param>
 		/// <param name="controller">Controller which will be target of the proxy</param>
 		/// <param name="area">area which the controller belongs to</param>
-		String GenerateJSProxy(IRailsEngineContext context, String proxyName, String area, String controller);
+		String GenerateJSProxy(IEngineContext context, String proxyName, String area, String controller);
 	}
 }

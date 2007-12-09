@@ -40,7 +40,7 @@ namespace Castle.MonoRail.Framework
 		public const String ExecutorEntry = "mr.executor";
 
 		private readonly Controller controller;
-		private readonly IRailsEngineContext context;
+		private readonly IHandlerContext context;
 
 		private ControllerMetaDescriptor metaDescriptor;
 		private IServiceProvider serviceProvider;
@@ -87,7 +87,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="controller">The controller.</param>
 		/// <param name="context">The context.</param>
-		public ControllerLifecycleExecutor(Controller controller, IRailsEngineContext context)
+		public ControllerLifecycleExecutor(Controller controller, IHandlerContext context)
 		{
 			this.controller = controller;
 			this.context = context;

@@ -46,7 +46,7 @@ namespace Castle.MonoRail.Framework.Internal
 		/// </returns>
 		public static bool HasPreviousStep(Controller controller)
 		{
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 
 			String wizardName = WizardUtils.ConstructWizardNamespace(controller);
 
@@ -64,7 +64,7 @@ namespace Castle.MonoRail.Framework.Internal
 		/// </returns>
 		public static bool HasNextStep(Controller controller)
 		{
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 
 			String wizardName = WizardUtils.ConstructWizardNamespace(controller);
 
@@ -82,7 +82,7 @@ namespace Castle.MonoRail.Framework.Internal
 		/// <returns></returns>
 		public static String GetPreviousStepName(Controller controller)
 		{
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 
 			String wizardName = WizardUtils.ConstructWizardNamespace(controller);
 
@@ -105,7 +105,7 @@ namespace Castle.MonoRail.Framework.Internal
 		/// <returns></returns>
 		public static String GetNextStepName(Controller controller)
 		{
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 
 			String wizardName = WizardUtils.ConstructWizardNamespace(controller);
 
@@ -128,7 +128,7 @@ namespace Castle.MonoRail.Framework.Internal
 		/// <param name="actionName">Name of the action.</param>
 		public static void RegisterCurrentStepInfo(Controller controller, String actionName)
 		{
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 
 			IList stepList = (IList) context.Items["wizard.step.list"];
 
@@ -153,7 +153,7 @@ namespace Castle.MonoRail.Framework.Internal
 		/// <param name="stepName">Name of the step.</param>
 		public static void RegisterCurrentStepInfo(Controller controller, int stepIndex, String stepName)
 		{
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 			String wizardName = WizardUtils.ConstructWizardNamespace(controller);
 
 			context.Session[wizardName + "currentstepindex"] = stepIndex;

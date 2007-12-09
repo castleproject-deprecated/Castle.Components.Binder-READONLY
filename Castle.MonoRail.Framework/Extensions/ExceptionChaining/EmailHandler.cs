@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Castle.MonoRail.Framework;
+
 namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 {
 	using System;
@@ -58,10 +60,10 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		/// <summary>
 		/// Implementors should perform the action
 		/// on the exception. Note that the exception
-		/// is available in <see cref="IRailsEngineContext.LastException"/>
+		/// is available in <see cref="IHandlerContext.LastException"/>
 		/// </summary>
 		/// <param name="context"></param>
-		public override void Process(IRailsEngineContext context)
+		public override void Process(IHandlerContext context)
 		{
 			IEmailSender emailSender = (IEmailSender) context.GetService( typeof(IEmailSender) );
 

@@ -106,15 +106,6 @@ namespace Castle.MonoRail.Framework
 		{
 			HttpApplication app = (HttpApplication) sender;
 
-			// Is this request a MonoRail request?
-			if (!container.IsMonoRailRequest(app.Context.Request.FilePath))
-			{
-				return;
-			}
-
-			// Mark it so we dont have to check the file extension again
-			MarkRequestAsMonoRailRequest(app.Context);
-
 			// Creates the our context
 			IRailsEngineContext context = CreateRailsEngineContext(app.Context);
 

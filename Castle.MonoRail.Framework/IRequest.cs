@@ -25,78 +25,36 @@ namespace Castle.MonoRail.Framework
 	public interface IRequest
 	{
 		/// <summary>
-		/// Gets the Http headers.
+		/// Gets the accept header.
 		/// </summary>
-		/// <value>The Http headers.</value>
-		NameValueCollection Headers { get; }
+		/// <value>The accept header.</value>
+		string AcceptHeader { get; }
 
-		/// <summary>
-		/// Gets the <see cref="HttpPostedFile"/> per key.
-		/// </summary>
-		IDictionary Files { get; }
+//		/// <summary>
+//		/// Gets the request type (GET, POST, etc)
+//		/// </summary>
+//		String RequestType { get; }
+//
+//		/// <summary>
+//		/// Gets the request URL.
+//		/// </summary>
+//		String Url { get; }
+//
+//		/// <summary>
+//		/// Gets the referring URL.
+//		/// </summary>
+//		String UrlReferrer { get; }
+//
+//		/// <summary>
+//		/// Gets the <see cref="HttpPostedFile"/> per key.
+//		/// </summary>
+//		IDictionary Files { get; }
 
 		/// <summary>
 		/// Gets the params which accumulates headers, post, querystring and cookies.
 		/// </summary>
 		/// <value>The params.</value>
 		NameValueCollection Params { get; }
-
-		/// <summary>
-		/// Gets a value indicating whether this requeest is from a local address.
-		/// </summary>
-		/// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
-		bool IsLocal { get; }
-
-		/// <summary>
-		/// Gets additional path information for 
-		/// a resource with a URL extension.
-		/// </summary>
-		/// <value>The path info.</value>
-		String PathInfo { get; }
-
-		/// <summary>
-		/// Gets the raw URL.
-		/// </summary>
-		/// <value>The raw URL.</value>
-		String RawUrl { get; }
-
-		/// <summary>
-		/// Gets the URI.
-		/// </summary>
-		/// <value>The URI.</value>
-		Uri Uri { get; }
-
-		/// <summary>
-		/// Gets the HTTP method.
-		/// </summary>
-		/// <value>The HTTP method.</value>
-		String HttpMethod { get; }
-
-		/// <summary>
-		/// Gets the file path.
-		/// </summary>
-		/// <value>The file path.</value>
-		String FilePath { get; }
-
-		/// <summary>
-		/// Reads the request data as a byte array.
-		/// </summary>
-		/// <param name="count">How many bytes.</param>
-		/// <returns></returns>
-		byte[] BinaryRead(int count);
-
-		/// <summary>
-		/// Gets the param with the specified key.
-		/// </summary>
-		/// <value></value>
-		String this [String key] { get; }
-
-		/// <summary>
-		/// Reads the cookie.
-		/// </summary>
-		/// <param name="name">The cookie name.</param>
-		/// <returns></returns>
-		String ReadCookie( String name );
 
 		/// <summary>
 		/// Gets the query string.
@@ -111,16 +69,79 @@ namespace Castle.MonoRail.Framework
 		NameValueCollection Form { get; }
 
 		/// <summary>
+		/// Gets the Http headers.
+		/// </summary>
+		/// <value>The Http headers.</value>
+		NameValueCollection Headers { get; }
+
+//		/// <summary>
+//		/// Gets a value indicating whether this requeest is from a local address.
+//		/// </summary>
+//		/// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
+//		bool IsLocal { get; }
+//
+//		/// <summary>
+//		/// Gets additional path information for 
+//		/// a resource with a URL extension.
+//		/// </summary>
+//		/// <value>The path info.</value>
+//		String PathInfo { get; }
+//
+//		/// <summary>
+//		/// Gets the raw URL.
+//		/// </summary>
+//		/// <value>The raw URL.</value>
+//		String RawUrl { get; }
+//
+//		/// <summary>
+//		/// Gets the URI.
+//		/// </summary>
+//		/// <value>The URI.</value>
+//		Uri Uri { get; }
+
+		/// <summary>
+		/// Gets the HTTP method.
+		/// </summary>
+		/// <value>The HTTP method.</value>
+		String HttpMethod { get; }
+
+//		/// <summary>
+//		/// Gets the file path.
+//		/// </summary>
+//		/// <value>The file path.</value>
+//		String FilePath { get; }
+//
+//		/// <summary>
+//		/// Reads the request data as a byte array.
+//		/// </summary>
+//		/// <param name="count">How many bytes.</param>
+//		/// <returns></returns>
+//		byte[] BinaryRead(int count);
+//
+//		/// <summary>
+//		/// Gets the param with the specified key.
+//		/// </summary>
+//		/// <value></value>
+//		String this [String key] { get; }
+
+		/// <summary>
+		/// Reads the cookie.
+		/// </summary>
+		/// <param name="name">The cookie name.</param>
+		/// <returns></returns>
+		String ReadCookie(String name);
+
+		/// <summary>
 		/// Gets the user languages.
 		/// </summary>
 		/// <value>The user languages.</value>
 		String[] UserLanguages { get; }
 
-		/// <summary>
-		/// Gets the IP host address of the remote client. 
-		/// </summary>
-		/// <value>The IP address of the remote client.</value>
-		string UserHostAddress { get; }
+//		/// <summary>
+//		/// Gets the IP host address of the remote client. 
+//		/// </summary>
+//		/// <value>The IP address of the remote client.</value>
+//		string UserHostAddress { get; }
 
 		/// <summary>
 		/// Validates the input.

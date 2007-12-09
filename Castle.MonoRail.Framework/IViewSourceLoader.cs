@@ -26,9 +26,9 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Evaluates whether the specified template exists.
 		/// </summary>
-		/// <param name="templateName">The template name</param>
+		/// <param name="sourceName">The template name</param>
 		/// <returns><c>true</c> if it exists</returns>
-		bool HasTemplate(String templateName);
+		bool HasSource(String sourceName);
 
 		/// <summary>
 		/// Builds and returns a representation of a view template

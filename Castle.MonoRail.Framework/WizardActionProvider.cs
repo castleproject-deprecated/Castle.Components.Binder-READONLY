@@ -61,7 +61,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="controller">Wizard controller (must implement <see cref="IWizardController"/></param>
 		public void IncludeActions(Controller controller)
 		{
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 			
 			// Primordial assert
 
@@ -185,7 +185,7 @@ namespace Castle.MonoRail.Framework
 			
 			controller.CancelView();
 
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 
 			IWizardController wizController = (IWizardController) controller;
 
@@ -251,7 +251,7 @@ namespace Castle.MonoRail.Framework
 		{
 			String wizardName = WizardUtils.ConstructWizardNamespace(controller);
 
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 
 			return (context.Session.Contains(wizardName + "currentstepindex") && 
 			        context.Session.Contains(wizardName + "currentstep"));
@@ -271,7 +271,7 @@ namespace Castle.MonoRail.Framework
 
 			IWizardController wizardController = controller as IWizardController;
 
-			IRailsEngineContext context = controller.Context;
+			IHandlerContext context = controller.Context;
 
 			IList stepList = (IList) context.Items["wizard.step.list"];
 

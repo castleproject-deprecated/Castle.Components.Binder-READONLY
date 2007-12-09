@@ -130,7 +130,7 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		{
 			if (exception == null) return;
 			
-			IRailsEngineContext context = MonoRailHttpHandler.CurrentContext;
+			IHandlerContext context = MonoRailHttpHandler.CurrentContext;
 			context.LastException = exception;
 
 			OnException(context);
@@ -142,7 +142,7 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		/// Called when an exception happens.
 		/// </summary>
 		/// <param name="context">The context.</param>
-		private void OnException(IRailsEngineContext context)
+		private void OnException(IHandlerContext context)
 		{
 			const String mrExceptionKey = "MonoRail.ExceptionHandled";
 			

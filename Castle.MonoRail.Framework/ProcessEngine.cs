@@ -33,7 +33,7 @@ namespace Castle.MonoRail.Framework
 		/// request if one is available, otherwise <c>null</c>.
 		/// </summary>
 		[Obsolete("Use MonoRailHttpHandler.CurrentContext instead")]
-		public static IRailsEngineContext CurrentContext
+		public static IHandlerContext CurrentContext
 		{
 			get
 			{

@@ -17,11 +17,13 @@ namespace Castle.MonoRail.Framework.Configuration
 	using System;
 	using System.Configuration;
 	using System.Xml;
+	using Castle.Core.Configuration;
+	using Castle.Core.Configuration.Xml;
 
 	/// <summary>
 	/// Represents the MonoRail external configuration
 	/// </summary>
-	public class MonoRailConfiguration : ISerializedConfig
+	public class MonoRailConfiguration : IMonoRailConfiguration, ISerializedConfig
 	{
 		private static readonly String SectionName = "monorail";
 		private static readonly String AlternativeSectionName = "monoRail";
@@ -39,8 +41,8 @@ namespace Castle.MonoRail.Framework.Configuration
 
 		private RoutingRuleCollection routingRules;
 		private ExtensionEntryCollection extensions;
-		private ServiceEntryCollection services;
 		private DefaultUrlCollection defaultUrls;
+		private IConfiguration servicesConfig;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MonoRailConfiguration"/> class.
@@ -55,7 +57,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			urlConfig = new UrlConfig();
 			routingRules = new RoutingRuleCollection();
 			extensions = new ExtensionEntryCollection();
-			services = new ServiceEntryCollection();
 			defaultUrls = new DefaultUrlCollection();
 
 			checkClientIsConnected = false;
@@ -111,7 +112,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			scaffoldConfig.Deserialize(node);
 			urlConfig.Deserialize(node);
 
-			services.Deserialize(node);
 			extensions.Deserialize(node);
 			routingRules.Deserialize(node);
 			defaultUrls.Deserialize(node);
@@ -119,6 +119,13 @@ namespace Castle.MonoRail.Framework.Configuration
 			ProcessFilterFactoryNode(node.SelectSingleNode("customFilterFactory"));
 			ProcessMatchHostNameAndPath(node.SelectSingleNode("routing"));
 			ProcessExcludeAppPath(node.SelectSingleNode("routing"));
+
+			XmlNode services = node.SelectSingleNode("services");
+
+			if (services != null)
+			{
+				servicesConfig = XmlConfigurationDeserializer.GetDeserializedNode(services);
+			}
 
 			XmlAttribute checkClientIsConnectedAtt = node.Attributes["checkClientIsConnected"];
 
@@ -133,10 +140,10 @@ namespace Castle.MonoRail.Framework.Configuration
 			{
 				useWindsorIntegration = String.Compare(useWindsorAtt.Value, "true", true) == 0;
 
-				if (useWindsorIntegration)
-				{
-					ConfigureWindsorIntegration();
-				}
+//				if (useWindsorIntegration)
+//				{
+//					ConfigureWindsorIntegration();
+//				}
 			}
 		}
 
@@ -194,15 +201,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		public ExtensionEntryCollection ExtensionEntries
 		{
 			get { return extensions; }
-		}
-
-		/// <summary>
-		/// Gets the service entries.
-		/// </summary>
-		/// <value>The service entries.</value>
-		public ServiceEntryCollection ServiceEntries
-		{
-			get { return services; }
 		}
 
 		/// <summary>
@@ -293,6 +291,16 @@ namespace Castle.MonoRail.Framework.Configuration
 			get { return defaultUrls; }
 		}
 
+		/// <summary>
+		/// Gets or sets the services config.
+		/// </summary>
+		/// <value>The services config.</value>
+		public IConfiguration ServicesConfig
+		{
+			get { return servicesConfig; }
+			set { servicesConfig = value; }
+		}
+
 		private void ProcessFilterFactoryNode(XmlNode node)
 		{
 			if (node == null) return;
@@ -334,26 +342,26 @@ namespace Castle.MonoRail.Framework.Configuration
 			}
 		}
 
-		private void ConfigureWindsorIntegration()
-		{
-			const string windsorExtensionAssemblyName = "Castle.MonoRail.WindsorExtension";
-
-			services.RegisterService(ServiceIdentification.ControllerTree, TypeLoadUtil.GetType(
-			                                                               	TypeLoadUtil.GetEffectiveTypeName(
-			                                                               		"Castle.MonoRail.WindsorExtension.ControllerTreeAccessor, " +
-			                                                               		windsorExtensionAssemblyName)));
-
-			controllersConfig.CustomControllerFactory = TypeLoadUtil.GetType(
-				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorControllerFactory, " +
-				                                  windsorExtensionAssemblyName));
-
-			viewComponentsConfig.CustomViewComponentFactory = TypeLoadUtil.GetType(
-				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorViewComponentFactory, " +
-				                                  windsorExtensionAssemblyName));
-
-			customFilterFactory = TypeLoadUtil.GetType(
-				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorFilterFactory, " +
-				                                  windsorExtensionAssemblyName));
-		}
+//		private void ConfigureWindsorIntegration()
+//		{
+//			const string windsorExtensionAssemblyName = "Castle.MonoRail.WindsorExtension";
+//
+//			services.RegisterService(ServiceIdentification.ControllerTree, TypeLoadUtil.GetType(
+//			                                                               	TypeLoadUtil.GetEffectiveTypeName(
+//			                                                               		"Castle.MonoRail.WindsorExtension.ControllerTreeAccessor, " +
+//			                                                               		windsorExtensionAssemblyName)));
+//
+//			controllersConfig.CustomControllerFactory = TypeLoadUtil.GetType(
+//				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorControllerFactory, " +
+//				                                  windsorExtensionAssemblyName));
+//
+//			viewComponentsConfig.CustomViewComponentFactory = TypeLoadUtil.GetType(
+//				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorViewComponentFactory, " +
+//				                                  windsorExtensionAssemblyName));
+//
+//			customFilterFactory = TypeLoadUtil.GetType(
+//				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorFilterFactory, " +
+//				                                  windsorExtensionAssemblyName));
+//		}
 	}
 }

@@ -33,7 +33,7 @@ namespace Castle.MonoRail.Framework.Filters
 		/// 	<c>true</c> if the action
 		/// should be invoked, otherwise <c>false</c>
 		/// </returns>
-		public bool Perform(ExecuteEnum exec, IRailsEngineContext context, IController controller)
+		public bool Perform(ExecuteEnum exec, IHandlerContext context, IController controller)
 		{
 			controller.Flash.Keep();
 

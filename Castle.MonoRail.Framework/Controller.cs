@@ -40,7 +40,7 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Holds the request/context information
 		/// </summary>
-		internal IRailsEngineContext context;
+		internal IHandlerContext context;
 
 		/// <summary>
 		/// The reference to the <see cref="IViewEngineManager"/> instance
@@ -290,7 +290,7 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Gets the context of this request execution.
 		/// </summary>
-		public IRailsEngineContext Context
+		public IHandlerContext Context
 		{
 			get { return context; }
 		}
@@ -895,7 +895,7 @@ namespace Castle.MonoRail.Framework
 		/// is a service provider.
 		/// </summary>
 		/// <param name="context">The context/service provider.</param>
-		public void InitializeFieldsFromServiceProvider(IRailsEngineContext context)
+		public void InitializeFieldsFromServiceProvider(IHandlerContext context)
 		{
 			serviceProvider = context;
 
@@ -1233,7 +1233,7 @@ namespace Castle.MonoRail.Framework
 
 		internal class EmptyController : Controller
 		{
-			public EmptyController(IRailsEngineContext context)
+			public EmptyController(IHandlerContext context)
 			{
 				InitializeFieldsFromServiceProvider(context);
 			}

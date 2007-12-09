@@ -17,7 +17,6 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.IO;
-
 	using Castle.Core;
 	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Views;
@@ -26,7 +25,7 @@ namespace Castle.MonoRail.Framework
 	/// Default <see cref="IViewSourceLoader"/> implementation
 	/// that uses the file system and assembly source as source of view templates
 	/// </summary>
-	public class FileAssemblyViewSourceLoader : IViewSourceLoader, IServiceEnabledComponent
+	public class FileAssemblyViewSourceLoader : IViewSourceLoader, IMRServiceEnabled
 	{
 		private readonly IList additionalSources = ArrayList.Synchronized(new ArrayList());
 		private String viewRootDir;
@@ -49,20 +48,20 @@ namespace Castle.MonoRail.Framework
 			this.viewRootDir = viewRootDir;
 		}
 
-		#region IServiceEnabledComponent implementation
+		#region IMRServiceEnabled implementation
 
 		/// <summary>
 		/// Services the specified provider.
 		/// </summary>
 		/// <param name="provider">The provider.</param>
-		public void Service(IServiceProvider provider)
+		public void Service(IMonoRailServices provider)
 		{
-			MonoRailConfiguration config = (MonoRailConfiguration)provider.GetService(typeof(MonoRailConfiguration));
+			MonoRailConfiguration config = (MonoRailConfiguration) provider.GetService(typeof(MonoRailConfiguration));
 
 			if (config != null)
 			{
 				viewRootDir = config.ViewEngineConfig.ViewPathRoot;
-				
+
 				foreach(AssemblySourceInfo sourceInfo in config.ViewEngineConfig.Sources)
 				{
 					AddAssemblySource(sourceInfo);
@@ -75,16 +74,16 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Evaluates whether the specified template exists.
 		/// </summary>
-		/// <param name="templateName">The template name</param>
+		/// <param name="sourceName">The template name</param>
 		/// <returns><c>true</c> if it exists</returns>
-		public bool HasTemplate(String templateName)
+		public bool HasSource(String sourceName)
 		{
-			if (HasTemplateOnFileSystem(templateName))
+			if (HasTemplateOnFileSystem(sourceName))
 			{
 				return true;
 			}
 
-			return HasTemplateOnAssemblies(templateName);
+			return HasTemplateOnAssemblies(sourceName);
 		}
 
 		/// <summary>
@@ -118,7 +117,7 @@ namespace Castle.MonoRail.Framework
 			CollectViewsOnFileSystem(dirName, views);
 			CollectViewsOnAssemblies(dirName, views);
 
-			return (String[])views.ToArray(typeof(String));
+			return (String[]) views.ToArray(typeof(String));
 		}
 
 		/// <summary>
@@ -170,7 +169,7 @@ namespace Castle.MonoRail.Framework
 			{
 				//avoid concurrency problems with creating/removing the watcher
 				//in two threads in parallel. Unlikely, but better to be safe.
-				lock (this)
+				lock(this)
 				{
 					//create the watcher if it doesn't exists
 					if (viewFolderWatcher == null)
@@ -184,10 +183,10 @@ namespace Castle.MonoRail.Framework
 			{
 				//avoid concurrency problems with creating/removing the watcher
 				//in two threads in parallel. Unlikely, but better to be safe.
-				lock (this)
+				lock(this)
 				{
 					ViewChangedImpl -= value;
-					if (ViewChangedImpl == null)//no more subscribers.
+					if (ViewChangedImpl == null) //no more subscribers.
 					{
 						DisposeViewFolderWatch();
 					}
@@ -199,7 +198,7 @@ namespace Castle.MonoRail.Framework
 
 		private void DisposeViewFolderWatch()
 		{
-			ViewChangedImpl -= new FileSystemEventHandler(viewFolderWatcher_Changed);
+			ViewChangedImpl -= (viewFolderWatcher_Changed);
 			if (viewFolderWatcher != null)
 			{
 				viewFolderWatcher.Dispose();
@@ -212,10 +211,10 @@ namespace Castle.MonoRail.Framework
 			{
 				viewFolderWatcher = new FileSystemWatcher(ViewRootDir);
 				viewFolderWatcher.IncludeSubdirectories = true;
-				viewFolderWatcher.Changed += new FileSystemEventHandler(viewFolderWatcher_Changed);
-				viewFolderWatcher.Created += new FileSystemEventHandler(viewFolderWatcher_Changed);
-				viewFolderWatcher.Deleted += new FileSystemEventHandler(viewFolderWatcher_Changed);
-				viewFolderWatcher.Renamed += new RenamedEventHandler(viewFolderWatcher_Renamed);
+				viewFolderWatcher.Changed += (viewFolderWatcher_Changed);
+				viewFolderWatcher.Created += (viewFolderWatcher_Changed);
+				viewFolderWatcher.Deleted += (viewFolderWatcher_Changed);
+				viewFolderWatcher.Renamed += (viewFolderWatcher_Renamed);
 				viewFolderWatcher.EnableRaisingEvents = true;
 			}
 		}

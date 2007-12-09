@@ -56,14 +56,14 @@ namespace Castle.MonoRail.Framework.Test
 		/// Renders the mail message.
 		/// </summary>
 		/// <param name="templateName">Name of the template.</param>
-		/// <param name="engineContext">The engine context.</param>
+		/// <param name="context">The engine context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="doNotApplyLayout">if set to <c>true</c> [do not apply layout].</param>
 		/// <returns></returns>
-		public Message RenderMailMessage(string templateName, IRailsEngineContext engineContext, IController controller,
+		public Message RenderMailMessage(string templateName, IHandlerContext context, IController controller,
 		                                 bool doNotApplyLayout)
 		{
-			context.AddMailTemplateRendered(templateName, controller.PropertyBag);
+			this.context.AddMailTemplateRendered(templateName, controller.PropertyBag);
 
 			return new Message("from", "to", "subject", "body");
 		}

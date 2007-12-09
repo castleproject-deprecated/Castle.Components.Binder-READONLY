@@ -130,10 +130,14 @@ namespace Castle.MonoRail.Framework
 		/// Implementation of <see cref="IParameterBinder.CalculateParamPoints"/>
 		/// and it is used to give the method a weight when overloads are available.
 		/// </summary>
+		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller instance</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="parameterInfo">The parameter info</param>
-		/// <returns>Positive value if the parameter can be bound</returns>
-		public int CalculateParamPoints(SmartDispatcherController controller, ParameterInfo parameterInfo)
+		/// <returns>
+		/// Positive value if the parameter can be bound
+		/// </returns>
+		public int CalculateParamPoints(IEngineContext context, IController controller, IControllerContext controllerContext, ParameterInfo parameterInfo)
 		{
 			CompositeNode node = controller.ObtainParamsNode(From);
 
@@ -147,10 +151,12 @@ namespace Castle.MonoRail.Framework
 		/// and it is used to read the data available and construct the
 		/// parameter type accordingly.
 		/// </summary>
+		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller instance</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="parameterInfo">The parameter info</param>
 		/// <returns>The bound instance</returns>
-		public virtual object Bind(SmartDispatcherController controller, ParameterInfo parameterInfo)
+		public virtual object Bind(IEngineContext context, IController controller, IControllerContext controllerContext, ParameterInfo parameterInfo)
 		{
 			IDataBinder binder = CreateBinder();
 

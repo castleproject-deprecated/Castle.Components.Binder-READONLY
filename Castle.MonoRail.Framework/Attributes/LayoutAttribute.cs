@@ -15,13 +15,12 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
-
-	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Descriptors;
 
 	/// <summary>
 	/// Associates a layout name with a controller.
 	/// The layout can later be changed using the LayoutName
-	/// property of the <see cref="Controller"/>.
+	/// property of the <see cref="IController"/>.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple=false), Serializable]
 	public class LayoutAttribute : Attribute, ILayoutDescriptorBuilder

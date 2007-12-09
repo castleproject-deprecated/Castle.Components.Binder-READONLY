@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Castle.MonoRail.Framework;
+
 namespace Castle.MonoRail.Framework.Test
 {
 	using System;
@@ -26,9 +28,9 @@ namespace Castle.MonoRail.Framework.Test
 	using Castle.MonoRail.Framework.Services;
 
 	/// <summary>
-	/// Represents a mock implementation of <see cref="IRailsEngineContext"/> for unit test purposes.
+	/// Represents a mock implementation of <see cref="IHandlerContext"/> for unit test purposes.
 	/// </summary>
-	public class MockRailsEngineContext : AbstractServiceContainer, IRailsEngineContext
+	public class MockRailsEngineContext : AbstractServiceContainer, IHandlerContext
 	{
 		private readonly string physicalPath = AppDomain.CurrentDomain.BaseDirectory;
 		private readonly IRequest request;
@@ -71,7 +73,7 @@ namespace Castle.MonoRail.Framework.Test
 			this.urlInfo = urlInfo; 
 		}
 
-		#region IRailsEngineContext Members
+		#region IHandlerContext Members
 
 		/// <summary>
 		/// Gets the request type (GET, POST, etc)

@@ -29,7 +29,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// </summary>
 		/// <returns>An <see cref="IControllerLifecycleExecutor"/> 
 		/// implementation</returns>
-		public IControllerLifecycleExecutor CreateExecutor(Controller controller, IRailsEngineContext context)
+		public IControllerLifecycleExecutor CreateExecutor(Controller controller, IHandlerContext context)
 		{
 			if (controller == null) throw new ArgumentNullException("controller");
 			if (context == null) throw new ArgumentNullException("context");

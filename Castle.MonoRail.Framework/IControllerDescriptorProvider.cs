@@ -15,13 +15,13 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
-	
-	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Descriptors;
+	using Castle.MonoRail.Framework.Providers;
 
 	/// <summary>
 	/// Defines the contract for implementations that should
 	/// collect from one or more sources the meta information that
-	/// dictates the <see cref="Controller"/> behavior and the actions it exposes.
+	/// dictates the <see cref="IController"/> behavior and the actions it exposes.
 	/// </summary>
 	public interface IControllerDescriptorProvider : IProvider
 	{
@@ -30,7 +30,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="controller">The controller.</param>
 		/// <returns></returns>
-		ControllerMetaDescriptor BuildDescriptor(Controller controller);
+		ControllerMetaDescriptor BuildDescriptor(IController controller);
 
 		/// <summary>
 		/// Builds the descriptor.

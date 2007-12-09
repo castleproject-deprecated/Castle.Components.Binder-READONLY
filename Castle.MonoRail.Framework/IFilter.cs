@@ -79,9 +79,12 @@ namespace Castle.MonoRail.Framework
 		/// <param name="exec">When this filter is being invoked</param>
 		/// <param name="context">Current context</param>
 		/// <param name="controller">The controller instance</param>
-		/// <returns><c>true</c> if the action 
-		/// should be invoked, otherwise <c>false</c></returns>
-		bool Perform( ExecuteEnum exec, IRailsEngineContext context, IController controller );
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns>
+		/// 	<c>true</c> if the action
+		/// should be invoked, otherwise <c>false</c>
+		/// </returns>
+		bool Perform(ExecuteEnum exec, IEngineContext context, IController controller, IControllerContext controllerContext);
 	}
 
 	/// <summary>

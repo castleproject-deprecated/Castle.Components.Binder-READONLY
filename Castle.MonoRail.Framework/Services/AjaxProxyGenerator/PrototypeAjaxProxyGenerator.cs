@@ -22,7 +22,7 @@ namespace Castle.MonoRail.Framework.Services.AjaxProxyGenerator
 	using Castle.Core;
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Configuration;
-	using Castle.MonoRail.Framework.Internal;
+	using Descriptors;
 
 	/// <summary>
 	/// Provides a service which generates a <em>JavaScript</em> block, that
@@ -86,7 +86,7 @@ namespace Castle.MonoRail.Framework.Services.AjaxProxyGenerator
 		/// <param name="proxyName">Name of the javascript proxy object</param>
 		/// <param name="controller">Controller which will be target of the proxy</param>
 		/// <param name="area">area which the controller belongs to</param>
-		public String GenerateJSProxy(IRailsEngineContext context, string proxyName, string area, string controller)
+		public String GenerateJSProxy(IEngineContext context, string proxyName, string area, string controller)
 		{
 			String nl = Environment.NewLine;
 			String cacheKey = (area + "|" + controller).ToLower(CultureInfo.InvariantCulture);

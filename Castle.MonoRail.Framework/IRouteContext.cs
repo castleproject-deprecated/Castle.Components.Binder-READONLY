@@ -29,7 +29,6 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// The raw url with leading and trailing slashes stripped.
 		/// </summary>
-		/// <seealso cref="RouteContext.StripUrl(string)"/>
 		string Url { get; }
 
 		/// <summary>

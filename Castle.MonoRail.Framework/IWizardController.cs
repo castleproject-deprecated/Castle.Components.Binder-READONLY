@@ -40,7 +40,7 @@ namespace Castle.MonoRail.Framework
 	/// 	public void OnAfterStep(String wizardName, String stepName, WizardStepPage step)
 	///		{ }
 	///		
-	///		public WizardStepPage[] GetSteps(IRailsEngineContext context)
+	///		public WizardStepPage[] GetSteps(IHandlerContext context)
 	///		{
 	///			return new WizardStepPage[] { new MyPage1(), new MyPage2() }; 
 	///		}
@@ -91,6 +91,6 @@ namespace Castle.MonoRail.Framework
 		/// </remarks>
 		/// <param name="context">The web request context.</param>
 		/// <returns>An array of steps</returns>
-		WizardStepPage[] GetSteps(IRailsEngineContext context);
+		WizardStepPage[] GetSteps(IHandlerContext context);
 	}
 }

@@ -14,8 +14,6 @@
 
 namespace Castle.MonoRail.Framework
 {
-	using System;
-	using System.Xml;
 	using Castle.Core;
 
 	/// <summary>
@@ -32,6 +30,6 @@ namespace Castle.MonoRail.Framework
 		/// attributes and child nodes of the extension node
 		/// </summary>
 		/// <param name="node">The node that defines the MonoRail extension</param>
-		void SetExtensionConfigNode(XmlNode node);
+		void SetExtensionConfigNode(IConfiguration node);
 	}
 }

@@ -20,13 +20,13 @@ namespace Castle.MonoRail.Framework.Services
 	using Castle.Core;
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Configuration;
-	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Descriptors;
 	using Castle.MonoRail.Framework.Services.Utils;
 
 	/// <summary>
 	/// Standard implementation of <see cref="IControllerFactory"/>.
 	/// It inspects assemblies looking for concrete classes
-	/// that extend <see cref="Controller"/>.
+	/// that extend <see cref="IController"/>.
 	/// </summary>
 	public class DefaultControllerFactory : AbstractControllerFactory, IInitializable
 	{
@@ -126,7 +126,7 @@ namespace Castle.MonoRail.Framework.Services
 					continue;
 				}
 
-				if (typeof(Controller).IsAssignableFrom(type))
+				if (typeof(IController).IsAssignableFrom(type))
 				{
 					ControllerDescriptor contrDesc = ControllerInspectionUtil.Inspect(type);
 					

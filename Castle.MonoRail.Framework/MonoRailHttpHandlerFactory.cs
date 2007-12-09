@@ -16,7 +16,10 @@ namespace Castle.MonoRail.Framework
 {
 	using System;
 	using System.Web;
-	using Castle.Core.Logging;
+	using Castle.MonoRail.Framework.Container;
+	using Castle.Core;
+	using Configuration;
+	using Descriptors;
 
 	/// <summary>
 	/// Coordinates the creation of new <see cref="MonoRailHttpHandler"/> 
@@ -25,13 +28,26 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	public class MonoRailHttpHandlerFactory : IHttpHandlerFactory
 	{
-		private ILoggerFactory loggerFactory;
+		private readonly object locker = new object();
+		private readonly string CurrentEngineContextKey = "currentmrengineinstance";
+		private readonly string CurrentControllerKey = "currentmrcontroller";
+		private readonly string CurrentControllerContextContextKey = "currentmrcontrollercontext";
+
+		private IMonoRailConfiguration configuration;
+		private IMonoRailContainer mrContainer;
+		private IUrlTokenizer urlTokenizer;
+		private IEngineContextFactory engineContextFactory;
+		private IServiceProviderLocator serviceProviderLocator;
+		private IControllerFactory controllerFactory;
+		private IControllerContextFactory controllerContextFactory;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MonoRailHttpHandlerFactory"/> class.
 		/// </summary>
 		public MonoRailHttpHandlerFactory()
 		{
+			serviceProviderLocator = ServiceProviderLocator.Instance;
+			configuration = MonoRailConfiguration.GetConfig();
 		}
 
 		/// <summary>
@@ -49,22 +65,45 @@ namespace Castle.MonoRail.Framework
 		                                       String requestType, 
 		                                       String url, String pathTranslated)
 		{
-			if (!EngineContextModule.Initialized)
+			// TODO: Replace by a readwriterlock or something more efficient
+			lock(locker)
 			{
-				throw new MonoRailException("Looks like you forgot to register the http module " +
-					typeof(EngineContextModule).FullName + "\r\nAdd '<add name=\"monorail\" type=\"Castle.MonoRail.Framework.EngineContextModule, Castle.MonoRail.Framework\" />' " +
-					"to the <httpModules> section on your web.config");
+				if (mrContainer == null)
+				{
+					IServiceProviderEx userServiceProvider = serviceProviderLocator.LocateProvider();
+
+					mrContainer = CreateDefaultMonoRailContainer(userServiceProvider);
+				}
 			}
 
-			IRailsEngineContext mrContext = EngineContextModule.ObtainRailsEngineContext(context);
+			EnsureServices();
 
-			if (mrContext == null)
+			HttpRequest req = context.Request;
+
+			UrlInfo urlInfo = urlTokenizer.TokenizeUrl(req.FilePath, req.PathInfo, req.Url, req.IsLocal, req.ApplicationPath);
+
+			IEngineContext engineContext = engineContextFactory.Create(mrContainer, urlInfo, context);
+			engineContext.AddService(typeof(IEngineContext), engineContext);
+
+			IControllerContext controllerContext = controllerContextFactory.Create(urlInfo);
+			IController controller = controllerFactory.CreateController(urlInfo);
+
+			// TODO: Identify requests for files (js files) and serve them directly bypassing the flow
+
+			context.Items[CurrentEngineContextKey] = engineContext;
+			context.Items[CurrentControllerKey] = controller;
+			context.Items[CurrentControllerContextContextKey] = controllerContext;
+
+			ControllerMetaDescriptor controllerDesc = mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
+
+			if (IgnoresSession(controllerDesc.ControllerDescriptor))
 			{
-				throw new MonoRailException("IRailsEngineContext is null. Looks like the " + 
-					"EngineContextModule has not run for this request.");
+				return new SessionlessMonoRailHttpHandler(controller, engineContext);
 			}
-
-			return ObtainMonoRailHandler(mrContext);
+			else
+			{
+				return new MonoRailHttpHandler(controller, engineContext);
+			}
 		}
 
 		/// <summary>
@@ -73,67 +112,113 @@ namespace Castle.MonoRail.Framework
 		/// <param name="handler">The <see cref="T:System.Web.IHttpHandler"></see> object to reuse.</param>
 		public virtual void ReleaseHandler(IHttpHandler handler)
 		{
-			HttpContext httpContext = HttpContext.Current;
-
-			if (httpContext != null)
-			{
-				IRailsEngineContext mrContext = EngineContextModule.ObtainRailsEngineContext(HttpContext.Current);
-
-				if (mrContext != null)
-				{
-					IMonoRailHttpHandlerProvider provider = ObtainMonoRailHandlerProvider(mrContext);
-					if (provider != null) provider.ReleaseHandler(handler);
-				}
-			}
-		}
-
-		private IHttpHandler ObtainMonoRailHandler(IRailsEngineContext mrContext)
-		{
-			IHttpHandler mrHandler = null;
-			IMonoRailHttpHandlerProvider provider = ObtainMonoRailHandlerProvider(mrContext);
-
-			if (provider != null)
-			{
-				mrHandler = provider.ObtainMonoRailHttpHandler(mrContext);
-			}
-			
-			if (mrHandler == null)
-			{
-				ILogger logger = CreateLogger(typeof(MonoRailHttpHandler).FullName, mrContext);
-				
-				mrHandler = new MonoRailHttpHandler(logger);
-			} 
-
-			return mrHandler;
-		}
-
-		private IMonoRailHttpHandlerProvider ObtainMonoRailHandlerProvider(IRailsEngineContext mrContext)
-		{
-			return (IMonoRailHttpHandlerProvider) mrContext.GetService(typeof(IMonoRailHttpHandlerProvider));
 		}
 
 		/// <summary>
-		/// This might be subject to race conditions, but
-		/// I'd rather take the risk - which in the end
-		/// means just replacing the instance - than
-		/// creating locks that will affect every single request
+		/// Gets or sets the configuration.
 		/// </summary>
-		/// <param name="name">Logger name</param>
-		/// <param name="provider">Service provider</param>
-		/// <returns>Logger instance</returns>
-		private ILogger CreateLogger(String name, IServiceProvider provider)
+		/// <value>The configuration.</value>
+		public IMonoRailConfiguration Configuration
 		{
-			if (loggerFactory == null)
+			get { return configuration; }
+			set { configuration = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the container.
+		/// </summary>
+		/// <value>The container.</value>
+		public IMonoRailContainer Container
+		{
+			get { return mrContainer; }
+			set { mrContainer = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the service provider locator.
+		/// </summary>
+		/// <value>The service provider locator.</value>
+		public IServiceProviderLocator ProviderLocator
+		{
+			get { return serviceProviderLocator; }
+			set { serviceProviderLocator = value; }
+		}
+
+		/// <summary>
+		/// Checks whether we should ignore session for the specified controller.
+		/// </summary>
+		/// <param name="controllerDesc">The controller desc.</param>
+		/// <returns></returns>
+		protected virtual bool IgnoresSession(ControllerDescriptor controllerDesc)
+		{
+			return controllerDesc.Sessionless;
+		}
+
+		/// <summary>
+		/// Creates the default service container.
+		/// </summary>
+		/// <param name="userServiceProvider">The user service provider.</param>
+		/// <returns></returns>
+		protected virtual IMonoRailContainer CreateDefaultMonoRailContainer(IServiceProviderEx userServiceProvider)
+		{
+			DefaultMonoRailContainer container = new DefaultMonoRailContainer();
+
+			container.UseServicesFromParent();
+			container.Configure(Configuration);
+			container.InstallMissingServices();
+
+			return container;
+		}
+
+		#region Static accessors
+
+		/// <summary>
+		/// Gets the current engine context.
+		/// </summary>
+		/// <value>The current engine context.</value>
+		public static IEngineContext CurrentEngineContext
+		{
+			get { return HttpContext.Current.Items[CurrentEngineContext] as IEngineContext; }
+		}
+
+		/// <summary>
+		/// Gets the current controller.
+		/// </summary>
+		/// <value>The current controller.</value>
+		public static IController CurrentController
+		{
+			get { return HttpContext.Current.Items[CurrentController] as IController; }
+		}
+
+		/// <summary>
+		/// Gets the current controller context.
+		/// </summary>
+		/// <value>The current controller context.</value>
+		public static IControllerContext CurrentControllerContext
+		{
+			get { return HttpContext.Current.Items[CurrentControllerContext] as IControllerContext; }
+		}
+
+		#endregion
+
+		private void EnsureServices()
+		{
+			if (urlTokenizer == null)
 			{
-				loggerFactory = (ILoggerFactory) provider.GetService(typeof(ILoggerFactory));
-				
-				if (loggerFactory == null)
-				{
-					loggerFactory = new NullLogFactory();
-				}
+				urlTokenizer = mrContainer.UrlTokenizer;
 			}
-			
-			return loggerFactory.Create(name);
+			if (engineContextFactory == null)
+			{
+				engineContextFactory = mrContainer.EngineContextFactory;
+			}
+			if (controllerFactory == null)
+			{
+				controllerFactory = mrContainer.ControllerFactory;
+			}
+			if (controllerContextFactory == null)
+			{
+				controllerContextFactory = mrContainer.ControllerContextFactory;
+			}
 		}
 	}
 }

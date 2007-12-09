@@ -164,7 +164,7 @@ namespace Castle.MonoRail.Framework
 		/// before doing that you must send a redirect.
 		/// </summary>
 		/// <returns></returns>
-		protected internal virtual bool IsPreConditionSatisfied(IRailsEngineContext context)
+		protected internal virtual bool IsPreConditionSatisfied(IHandlerContext context)
 		{
 			return true;
 		}

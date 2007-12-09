@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework
 {
 	using System;
 	using System.IO;
+	using Castle.MonoRail.Framework.JSGeneration;
 
 	/// <summary>
 	/// Depicts the contract used by the engine
@@ -33,6 +34,38 @@ namespace Castle.MonoRail.Framework
 		bool SupportsJSGeneration { get; }
 
 		/// <summary>
+		/// Evaluates whether the specified template can be used to generate js.
+		/// </summary>
+		/// <returns><c>true</c> if it exists</returns>
+		bool IsTemplateForJSGeneration(String templateName);
+
+		/// <summary>
+		/// Gets the JS generator view template file extension.
+		/// </summary>
+		/// <value>The JS generator file extension.</value>
+		String JSGeneratorFileExtension { get; }
+
+		/// <summary>
+		/// Implementors should return a generator instance if
+		/// the view engine supports JS generation.
+		/// </summary>
+		/// <param name="context">The request context.</param>
+		/// <returns>A JS generator instance</returns>
+		IJSGenerator CreateJSGenerator(IEngineContext context);
+
+		/// <summary>
+		/// Processes the js generation view template - using the templateName
+		/// to obtain the correct template, and using the specified <see cref="TextWriter"/>
+		/// to output the result.
+		/// </summary>
+		/// <param name="output">The output.</param>
+		/// <param name="context">The request context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <param name="templateName">Name of the template.</param>
+		void GenerateJS(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String templateName);
+
+		/// <summary>
 		/// Gets or sets a value indicating whether the view engine should set the
 		/// content type to xhtml.
 		/// </summary>
@@ -46,29 +79,10 @@ namespace Castle.MonoRail.Framework
 		String ViewFileExtension { get; }
 
 		/// <summary>
-		/// Gets the JS generator view template file extension.
-		/// </summary>
-		/// <value>The JS generator file extension.</value>
-		String JSGeneratorFileExtension { get; }
-		
-		/// <summary>
 		/// Evaluates whether the specified template exists.
 		/// </summary>
 		/// <returns><c>true</c> if it exists</returns>
 		bool HasTemplate(String templateName);
-
-		/// <summary>
-		/// Evaluates whether the specified template can be used to generate js.
-		/// </summary>
-		/// <returns><c>true</c> if it exists</returns>
-		bool IsTemplateForJSGeneration(String templateName);
-
-		/// <summary>
-		/// Processes the view - using the templateName 
-		/// to obtain the correct template,
-		/// and using the context to output the result.
-		/// </summary>
-		void Process(IRailsEngineContext context, IController controller, String templateName);
 
 		///<summary>
 		/// Processes the view - using the templateName 
@@ -76,35 +90,17 @@ namespace Castle.MonoRail.Framework
 		/// and writes the results to the <see cref="TextWriter"/>. 
 		/// No layout is applied!
 		/// </summary>
-		void Process(TextWriter output, IRailsEngineContext context, IController controller, String templateName);
+		void Process(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String templateName);
 
 		/// <summary>
-		/// Implementors should return a generator instance if
-		/// the view engine supports JS generation.
-		/// </summary>
-		/// <param name="context">The request context.</param>
-		/// <returns>A JS generator instance</returns>
-		object CreateJSGenerator(IRailsEngineContext context);
-
-		/// <summary>
-		/// Processes the js generation view template - using the templateName 
-		/// to obtain the correct template, and using the context to output the result.
+		/// Wraps the specified content in the layout using
+		/// the context to output the result.
 		/// </summary>
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
-		/// <param name="templateName">Name of the template.</param>
-		void GenerateJS(IRailsEngineContext context, IController controller, String templateName);
-
-		/// <summary>
-		/// Processes the js generation view template - using the templateName 
-		/// to obtain the correct template, and using the specified <see cref="TextWriter"/>
-		/// to output the result.
-		/// </summary>
-		/// <param name="output">The output.</param>
-		/// <param name="context">The request context.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="templateName">Name of the template.</param>
-		void GenerateJS(TextWriter output, IRailsEngineContext context, IController controller, String templateName);
+		/// <param name="controllerContext">The controller context.</param>
+		/// <param name="contents">Content to output</param>
+		void ProcessContents(IEngineContext context, IController controller, IControllerContext controllerContext, String contents);
 
 		/// <summary>
 		/// Should process the specified partial. The partial name must contains
@@ -113,16 +109,8 @@ namespace Castle.MonoRail.Framework
 		/// <param name="output">The output.</param>
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="partialName">The partial name.</param>
-		void ProcessPartial(TextWriter output, IRailsEngineContext context, IController controller, String partialName);
-
-		/// <summary>
-		/// Wraps the specified content in the layout using 
-		/// the context to output the result.
-		/// </summary>
-		/// <param name="context">The request context.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="contents">Content to output</param>
-		void ProcessContents(IRailsEngineContext context, IController controller, String contents);
+		void ProcessPartial(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String partialName);
 	}
 }

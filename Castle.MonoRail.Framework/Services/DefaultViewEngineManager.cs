@@ -136,7 +136,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="context"></param>
 		/// <param name="controller"></param>
 		/// <param name="templateName"></param>
-		public void Process(IRailsEngineContext context, IController controller, string templateName)
+		public void Process(IHandlerContext context, IController controller, string templateName)
 		{
 			IViewEngine engine = ResolveEngine(templateName);
 
@@ -163,7 +163,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="context"></param>
 		/// <param name="controller"></param>
 		/// <param name="templateName"></param>
-		public void Process(TextWriter output, IRailsEngineContext context, IController controller, string templateName)
+		public void Process(TextWriter output, IHandlerContext context, IController controller, string templateName)
 		{
 			IViewEngine engine = ResolveEngine(templateName);
 
@@ -187,7 +187,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="partialName">The partial name.</param>
-		public void ProcessPartial(TextWriter output, IRailsEngineContext context, IController controller, string partialName)
+		public void ProcessPartial(TextWriter output, IHandlerContext context, IController controller, string partialName)
 		{
 
 			IViewEngine engine = ResolveEngine(partialName);
@@ -199,7 +199,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// Wraps the specified content in the layout using
 		/// the context to output the result.
 		/// </summary>
-		public void ProcessContents(IRailsEngineContext context, IController controller, String contents)
+		public void ProcessContents(IHandlerContext context, IController controller, String contents)
 		{
 			if (controller.LayoutName == null)
 			{

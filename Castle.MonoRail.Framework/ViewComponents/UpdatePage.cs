@@ -55,7 +55,7 @@ namespace Castle.MonoRail.Framework.ViewComponents
 		/// <returns></returns>
 		protected string GenerateJS()
 		{
-			object generator = Context.ViewEngine.CreateJSGenerator(RailsContext);
+			object generator = Context.ViewEngine.CreateJSGenerator(HandlerContext);
 
 			PropertyBag["page"] = generator;
 

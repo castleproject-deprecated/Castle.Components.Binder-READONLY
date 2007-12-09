@@ -29,13 +29,6 @@ namespace Castle.MonoRail.Framework
 		/// <returns><c>true</c> if it exists</returns>
 		bool HasTemplate(String templateName);
 
-		/// <summary>
-		/// Processes the view - using the templateName 
-		/// to obtain the correct template,
-		/// and using the context to output the result.
-		/// </summary>
-		void Process(IRailsEngineContext context, IController controller, String templateName);
-
 		///<summary>
 		/// Processes the view - using the templateName 
 		/// to obtain the correct template
@@ -44,23 +37,24 @@ namespace Castle.MonoRail.Framework
 		/// Please note that no layout is applied
 		/// </para>
 		/// </summary>
-		void Process(TextWriter output, IRailsEngineContext context, IController controller, String templateName);
+		void Process(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String templateName);
 
 		/// <summary>
 		/// Processes a partial view = using the partialName
-		/// to obtain the correct template and writes the 
+		/// to obtain the correct template and writes the
 		/// results to the System.TextWriter.
 		/// </summary>
 		/// <param name="output">The output.</param>
 		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="partialName">The partial name.</param>
-		void ProcessPartial(TextWriter output, IRailsEngineContext context, IController controller, String partialName);
+		void ProcessPartial(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String partialName);
 
 		/// <summary>
 		/// Wraps the specified content in the layout using 
 		/// the context to output the result.
 		/// </summary>
-		void ProcessContents(IRailsEngineContext context, IController controller, String contents);
+		void ProcessContents(IEngineContext context, IController controller, IControllerContext controllerContext, String contents);
 	}
 }

@@ -21,10 +21,13 @@ namespace Castle.MonoRail.Framework.Services
 
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Internal;
+	using Descriptors;
+	using Providers;
+	using Utils;
 
 	/// <summary>
 	/// Constructs and caches all collected information
-	/// about a <see cref="Controller"/> and its actions.
+	/// about a <see cref="IController"/> and its actions.
 	/// <seealso cref="ControllerMetaDescriptor"/>
 	/// </summary>
 	public class DefaultControllerDescriptorProvider : IControllerDescriptorProvider
@@ -46,13 +49,13 @@ namespace Castle.MonoRail.Framework.Services
 		private IResourceDescriptorProvider resourceDescriptorProvider;
 		private ITransformFilterDescriptorProvider transformFilterDescriptorProvider;
 
-		#region IServiceEnabledComponent implementation
+		#region IMRServiceEnabled implementation
 
 		/// <summary>
 		/// Services the specified service provider.
 		/// </summary>
 		/// <param name="serviceProvider">The service provider.</param>
-		public void Service(IServiceProvider serviceProvider)
+		public void Service(IMonoRailServices serviceProvider)
 		{
 			ILoggerFactory loggerFactory = (ILoggerFactory) serviceProvider.GetService(typeof(ILoggerFactory));
 			
@@ -89,7 +92,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// This implementation is also responsible for caching 
 		/// constructed meta descriptors.
 		/// </remarks>
-		public ControllerMetaDescriptor BuildDescriptor(Controller controller)
+		public ControllerMetaDescriptor BuildDescriptor(IController controller)
 		{
 			Type controllerType = controller.GetType();
 			
@@ -155,6 +158,8 @@ namespace Castle.MonoRail.Framework.Services
 
 			ControllerMetaDescriptor descriptor = new ControllerMetaDescriptor();
 
+			descriptor.ControllerDescriptor = ControllerInspectionUtil.Inspect(controllerType);
+
 			CollectClassLevelAttributes(controllerType, descriptor);
 			
 			CollectActions(controllerType, descriptor);
@@ -184,8 +189,8 @@ namespace Castle.MonoRail.Framework.Services
 				Type declaringType = method.DeclaringType;
 
 				if (declaringType == typeof(Object) || 
-					declaringType == typeof(Controller) || 
-					declaringType == typeof(SmartDispatcherController))
+					declaringType == typeof(IController))
+				// || declaringType == typeof(SmartDispatcherController))
 				{
 					continue;
 				}
@@ -353,8 +358,8 @@ namespace Castle.MonoRail.Framework.Services
 			{
 				controllerType = controllerType.BaseType;
 
-				if (controllerType == typeof(SmartDispatcherController) || 
-				    controllerType == typeof(Controller))
+				if (// controllerType == typeof(SmartDispatcherController) || 
+				    controllerType == typeof(IController))
 				{
 					// oops, it's a pure-proxy controller. just let it go.
 					controllerType = prev;

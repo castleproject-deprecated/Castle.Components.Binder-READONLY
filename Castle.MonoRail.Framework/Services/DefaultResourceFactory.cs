@@ -21,7 +21,8 @@ namespace Castle.MonoRail.Framework.Services
 	
 	using Castle.Core;
 	using Castle.Core.Logging;
-	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Resources;
+	using Castle.MonoRail.Framework.Descriptors;
 
 	/// <summary>
 	/// Standard implementation of <see cref="IResourceFactory" />
@@ -82,7 +83,6 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="resource"></param>
 		public void Release(IResource resource)
 		{
-			resource.Dispose();
 		}
 
 		/// <summary>
