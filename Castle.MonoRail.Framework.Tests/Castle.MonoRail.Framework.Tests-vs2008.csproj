@@ -120,107 +120,10 @@
     <None Include="App.config" />
     <None Include="Castle.MonoRail.Framework.Tests.build" />
     <None Include="contentinfs.vm" />
-    <EmbeddedResource Include="Content\contentinassembly.vm" />
-    <None Include="Content\notinassembly.vm" />
-    <Compile Include="AbstractTestCase.cs" />
-    <Compile Include="AccessibleThroughTestCase.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BasicFunctionalityTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Configuration\ViewEngineConfigTestCase.cs" />
-    <Compile Include="Controllers\Clients\ClientCartController.cs" />
-    <Compile Include="Controllers\Clients\ClientContactController.cs" />
-    <Compile Include="Controllers\Clients\ClientHomeController.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controllers\Clients\OtherController.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controllers\ContactController.cs" />
-    <Compile Include="Controllers\HomeController.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controllers\Products\CartController.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controllers\Products\ListController.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ControllerTreeTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DefaultUrlBuilderTestCase.cs" />
-    <Compile Include="DefaultViewComponentRegistryTests.cs" />
-    <Compile Include="Helpers\AbstractHelperTestCase.cs" />
-    <Compile Include="Helpers\ScriptaculousHelperTestCase.cs" />
-    <Compile Include="Helpers\TextHelperTestCase.cs" />
-    <Compile Include="Helpers\UrlForHelperTestCase.cs" />
-    <Compile Include="Helpers\Validations\FormValidationTestCase.cs" />
-    <Compile Include="Internal\ReflectionBasedDictionaryAdapterTestCase.cs" />
-    <Compile Include="PostBackTestCase.cs" />
-    <Compile Include="DefaultControllerFactoryTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DescriptorBuilderMultiThreadedTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="FileAssemblyViewSourceLoaderTestCase.cs" />
-    <Compile Include="FilterTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="FlashTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Helpers\AjaxHelper2TestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Helpers\DateFormatHelperTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Helpers\DictHelperTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Helpers\FormHelperCheckboxFieldListTestCase.cs" />
-    <Compile Include="Helpers\FormHelperSelectTestCase.cs" />
-    <Compile Include="Helpers\FormHelperSetOperation.cs" />
-    <Compile Include="Helpers\FormHelperTestCase.cs" />
-    <Compile Include="Helpers\HtmlHelperTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Helpers\PaginationHelperTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Helpers\ValidationHelperTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="LayoutTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="LocalizationTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="RescueTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Routing\PatternRuleTestCase.cs" />
-    <Compile Include="Routing\RegexRuleTestCase.cs" />
-    <Compile Include="Routing\RoutingEngineTestCase.cs" />
-    <Compile Include="ServerUtilityTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DefaultUrlTokenizerTestCase.cs" />
-    <Compile Include="TransformFilterTestCase.cs" />
-    <Compile Include="UrlPartsBuilderTestCase.cs" />
-    <Compile Include="ViewComponents\AuthenticatedContentTestCase.cs" />
-    <Compile Include="ViewComponents\DiggStylePaginationTestCase.cs" />
-    <Compile Include="ViewComponents\SelectStylePaginationTestCase.cs" />
-    <Compile Include="ViewComponents\SiteMapComponentTestCase.cs" />
-    <Compile Include="ViewComponents\TreeMakerComponentTestCase.cs" />
-    <Compile Include="ViewEngineBaseTestCase.cs" />
-    <Compile Include="WikiFormatterTestCase.cs" />
+    <Compile Include="DefaultActionSelectorTestCase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />

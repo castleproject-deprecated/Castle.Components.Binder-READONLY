@@ -12,27 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework
+namespace Castle.MonoRail.Framework.Providers
 {
-	using System.Web;
-	using System.Web.SessionState;
+	using System;
 
 	/// <summary>
-	/// Implements <see cref="IHttpHandler"/> to dispatch the web
-	/// requests. 
-	/// <seealso cref="MonoRailHttpHandlerFactory"/>
+	/// Pendent
 	/// </summary>
-	public class MonoRailHttpHandler : BaseHttpHandler, IRequiresSessionState
+	public interface IViewComponentDescriptorProvider : IProvider
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MonoRailHttpHandler"/> class.
+		/// Pendent
 		/// </summary>
-		/// <param name="engineContext">The engine context.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="context">The context.</param>
-		public MonoRailHttpHandler(IEngineContext engineContext, IController controller, IControllerContext context)
-			: base(engineContext, controller, context, false)
-		{
-		}
+		/// <param name="viewComponentType">Type of the view component.</param>
+		/// <returns></returns>
+		ViewComponentDescriptor Collect(Type viewComponentType);
 	}
 }

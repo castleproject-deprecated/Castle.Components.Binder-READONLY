@@ -123,32 +123,10 @@ namespace Castle.MonoRail.Framework.Services
 		public bool HasTemplate(String templateName)
 		{
 			IViewEngine engine = ResolveEngine(templateName, false);
-			if (engine == null)
-				return false;
+			
+			if (engine == null) return false;
+			
 			return engine.HasTemplate(templateName);
-		}
-
-		/// <summary>
-		/// Processes the view - using the templateName
-		/// to obtain the correct template,
-		/// and using the context to output the result.
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="controller"></param>
-		/// <param name="templateName"></param>
-		public void Process(IHandlerContext context, IController controller, string templateName)
-		{
-			IViewEngine engine = ResolveEngine(templateName);
-
-			ContextualizeViewEngine(engine);
-
-			if (engine.SupportsJSGeneration && engine.IsTemplateForJSGeneration(templateName))
-			{
-				engine.GenerateJS(context, controller, templateName);
-				return;
-			}
-
-			engine.Process(context, controller, templateName);
 		}
 
 		/// <summary>
@@ -162,8 +140,9 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="output"></param>
 		/// <param name="context"></param>
 		/// <param name="controller"></param>
+		/// <param name="controllerContext"></param>
 		/// <param name="templateName"></param>
-		public void Process(TextWriter output, IHandlerContext context, IController controller, string templateName)
+		public void Process(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, string templateName)
 		{
 			IViewEngine engine = ResolveEngine(templateName);
 
@@ -171,11 +150,12 @@ namespace Castle.MonoRail.Framework.Services
 
 			if (engine.SupportsJSGeneration && engine.IsTemplateForJSGeneration(templateName))
 			{
-				engine.GenerateJS(output, context, controller, templateName);
-				return;
+				engine.GenerateJS(output, context, controller, controllerContext, templateName);
 			}
-
-			engine.Process(output, context, controller, templateName);
+			else
+			{
+				engine.Process(output, context, controller, controllerContext, templateName);
+			}
 		}
 
 		/// <summary>
@@ -186,31 +166,31 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="output">The output.</param>
 		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="partialName">The partial name.</param>
-		public void ProcessPartial(TextWriter output, IHandlerContext context, IController controller, string partialName)
+		public void ProcessPartial(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, string partialName)
 		{
-
 			IViewEngine engine = ResolveEngine(partialName);
 
-			engine.ProcessPartial(output, context, controller, partialName);
+			engine.ProcessPartial(output, context, controller, controllerContext, partialName);
 		}
 
 		/// <summary>
 		/// Wraps the specified content in the layout using
 		/// the context to output the result.
 		/// </summary>
-		public void ProcessContents(IHandlerContext context, IController controller, String contents)
+		public void ProcessContents(IEngineContext context, IController controller, IControllerContext controllerContext, String contents)
 		{
-			if (controller.LayoutName == null)
+			if (controllerContext.LayoutName == null)
 			{
 				throw new MonoRailException("ProcessContents can only work with a layout");
 			}
 
-			String templateName = Path.Combine("layouts", controller.LayoutName);
+			String templateName = Path.Combine("layouts", controllerContext.LayoutName);
 
 			IViewEngine engine = ResolveEngine(templateName);
 
-			engine.ProcessContents(context, controller, contents);
+			engine.ProcessContents(context, controller, controllerContext, contents);
 		}
 
 		#endregion
@@ -221,7 +201,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="engine">The engine.</param>
 		private void ContextualizeViewEngine(IViewEngine engine)
 		{
-			MonoRailHttpHandler.CurrentContext.AddService(typeof(IViewEngine), engine);
+			MonoRailHttpHandlerFactory.CurrentEngineContext.AddService(typeof(IViewEngine), engine);
 		}
 
 		/// <summary>

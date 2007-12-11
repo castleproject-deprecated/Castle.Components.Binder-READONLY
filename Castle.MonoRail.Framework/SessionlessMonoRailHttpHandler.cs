@@ -22,9 +22,11 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SessionlessMonoRailHttpHandler"/> class.
 		/// </summary>
-		/// <param name="controller">The controller.</param>
 		/// <param name="engineContext">The engine context.</param>
-		public SessionlessMonoRailHttpHandler(IController controller, IEngineContext engineContext) : base(controller, engineContext, true)
+		/// <param name="controller">The controller.</param>
+		/// <param name="context">The context.</param>
+		public SessionlessMonoRailHttpHandler(IEngineContext engineContext, IController controller, IControllerContext context)
+			: base(engineContext, controller, context, true)
 		{
 		}
 	}

@@ -14,6 +14,7 @@
 
 namespace Castle.MonoRail.Framework
 {
+	using System;
 	using System.Web;
 
 	/// <summary>
@@ -22,21 +23,27 @@ namespace Castle.MonoRail.Framework
 	public abstract class BaseHttpHandler : IHttpHandler
 	{
 		private readonly IController controller;
+		private readonly IControllerContext controllerContext;
 		private readonly IEngineContext engineContext;
 		private readonly bool ignoreFlash;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BaseHttpHandler"/> class.
 		/// </summary>
-		/// <param name="controller">The controller.</param>
 		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="ignoreFlash">if set to <c>true</c> [ignore flash].</param>
-		protected BaseHttpHandler(IController controller, IEngineContext engineContext, bool ignoreFlash)
+		protected BaseHttpHandler(IEngineContext engineContext,
+		                          IController controller, IControllerContext controllerContext, bool ignoreFlash)
 		{
 			this.controller = controller;
+			this.controllerContext = controllerContext;
 			this.engineContext = engineContext;
 			this.ignoreFlash = ignoreFlash;
 		}
+
+		#region IHttpHandler
 
 		/// <summary>
 		/// Pendent
@@ -55,6 +62,8 @@ namespace Castle.MonoRail.Framework
 			get { return false; }
 		}
 
+		#endregion
+
 		/// <summary>
 		/// Performs the base work of MonoRail. Extracts
 		/// the information from the URL, obtain the controller
@@ -66,103 +75,51 @@ namespace Castle.MonoRail.Framework
 		{
 			context.Response.Output.WriteLine("Hello");
 
+			// items added to be used by the test context
+			context.Items["mr.controller"] = controller;
+			context.Items["mr.flash"] = engineContext.Flash;
+			context.Items["mr.propertybag"] = controllerContext.PropertyBag;
+			context.Items["mr.session"] = context.Session;
 
-//			ControllerLifecycleExecutor executor =
-//				(ControllerLifecycleExecutor)context.Items[ControllerLifecycleExecutor.ExecutorEntry];
-//
-//			DefaultEngineContext contextImpl = (DefaultEngineContext)context;
-//			contextImpl.ResolveRequestSession();
-//
-//			context.Items["mr.controller"] = executor.Controller;
-//			context.Items["mr.flash"] = executor.Controller.Flash;
-//			context.Items["mr.propertybag"] = executor.Controller.PropertyBag;
-//			context.Items["mr.session"] = context.Session;
-//
-//			// At this point, the before filters were executed. 
-//			// So we just need to perform the secondary initialization
-//			// and invoke the action
-//
-//			try
-//			{
-//				if (executor.HasError) // Some error happened
-//				{
-//					executor.PerformErrorHandling();
-//				}
-//				else
-//				{
-//					executor.ProcessSelectedAction();
-//				}
-//			}
-//			catch (Exception ex)
-//			{
-//				if (logger.IsErrorEnabled)
-//				{
-//					logger.Error("Error processing " + context.Url, ex);
-//				}
-//
-//				throw;
-//			}
-//			finally
-//			{
-//				try
-//				{
-//					executor.Dispose();
-//				}
-//				finally
-//				{
-//					IControllerFactory controllerFactory =
-//						(IControllerFactory)context.GetService(typeof(IControllerFactory));
-//
-//					controllerFactory.Release(executor.Controller);
-//				}
-//
-//				if (logger.IsDebugEnabled)
-//				{
-//					Controller controller = executor.Controller;
-//
-//					logger.DebugFormat("Ending request process for '{0}'/'{1}.{2}' Extension '{3}' with url '{4}'",
-//						controller.AreaName, controller.Name, controller.Action, context.UrlInfo.Extension, context.UrlInfo.UrlRaw);
-//				}
-//
-//				// Remove items from flash before leaving the page
-//				context.Flash.Sweep();
-//
-//				if (context.Flash.HasItemsToKeep)
-//				{
-//					context.Session[Flash.FlashKey] = context.Flash;
-//				}
-//				else if (context.Session.Contains(Flash.FlashKey))
-//				{
-//					context.Session.Remove(Flash.FlashKey);
-//				}
-//			}
+			try
+			{
+				controller.Process(engineContext, controllerContext);
+			}
+			catch(Exception ex)
+			{
+				throw new MonoRailException("Error processing action " +
+				                            controllerContext.Action + " on controller " + controllerContext.Name, ex);
+			}
+			finally
+			{
+				if (!ignoreFlash)
+				{
+					PersistFlashItems();
+				}
+
+				ReleaseController(controller);
+			}
 		}
 
-//		/// <summary>
-//		/// Can be overriden so new semantics can be supported.
-//		/// </summary>
-//		/// <param name="context"></param>
-//		/// <returns></returns>
-//		protected virtual UrlInfo ExtractUrlInfo(IHandlerContext context)
-//		{
-//			return context.UrlInfo;
-//		}
-//
-//		/// <summary>
-//		/// Gets the current context.
-//		/// </summary>
-//		/// <value>The current context.</value>
-//		public static IHandlerContext CurrentContext
-//		{
-//			get
-//			{
-//				HttpContext context = HttpContext.Current;
-//
-//				// Are we in a web request?
-//				if (context == null) return null;
-//
-//				return EngineContextModule.ObtainRailsEngineContext(context);
-//			}
-//		}
+		private void ReleaseController(IController controller)
+		{
+			engineContext.Services.ControllerFactory.Release(controller);
+		}
+
+		private void PersistFlashItems()
+		{
+			Flash currentFlash = engineContext.Flash;
+
+			currentFlash.Sweep();
+
+			if (currentFlash.HasItemsToKeep)
+			{
+				engineContext.Session[Flash.FlashKey] = currentFlash;
+			}
+			else if (engineContext.Session.Contains(Flash.FlashKey))
+			{
+				engineContext.Session.Remove(Flash.FlashKey);
+			}
+		}
 	}
 }

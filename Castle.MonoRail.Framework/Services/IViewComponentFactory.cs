@@ -14,25 +14,30 @@
 
 namespace Castle.MonoRail.Framework
 {
-	using System.Web;
-	using System.Web.SessionState;
+	using System;
 
 	/// <summary>
-	/// Implements <see cref="IHttpHandler"/> to dispatch the web
-	/// requests. 
-	/// <seealso cref="MonoRailHttpHandlerFactory"/>
+	/// Depicts the contract used by the view engine
+	/// to obtain implementations of <see cref="ViewComponent"/>.
 	/// </summary>
-	public class MonoRailHttpHandler : BaseHttpHandler, IRequiresSessionState
+	public interface IViewComponentFactory
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MonoRailHttpHandler"/> class.
+		/// Creates the specified name.
 		/// </summary>
-		/// <param name="engineContext">The engine context.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="context">The context.</param>
-		public MonoRailHttpHandler(IEngineContext engineContext, IController controller, IControllerContext context)
-			: base(engineContext, controller, context, false)
-		{
-		}
+		/// <param name="name">The name.</param>
+		/// <returns></returns>
+		ViewComponent Create(String name);
+
+		/// <summary>
+		/// Gets the registry.
+		/// </summary>
+		/// <remarks>
+		/// Exposing it here is a hack, and I really don't like the 
+		/// design of the viewcomponent factory and its relation with the registry. 
+		/// However, I can't refactor it now.
+		/// </remarks>
+		/// <value>The registry.</value>
+		IViewComponentRegistry Registry { get; }
 	}
 }

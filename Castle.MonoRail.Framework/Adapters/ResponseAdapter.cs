@@ -15,8 +15,6 @@
 namespace Castle.MonoRail.Framework.Adapters
 {
 	using System;
-	using System.Collections;
-	using System.Collections.Specialized;
 	using System.IO;
 	using System.Web;
 	using Castle.MonoRail.Framework;
@@ -29,7 +27,7 @@ namespace Castle.MonoRail.Framework.Adapters
 	{
 //		private readonly IHandlerContext context;
 		private readonly HttpResponse response;
-//		private bool redirected;
+		private bool redirected;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ResponseAdapter"/> class.
@@ -97,24 +95,24 @@ namespace Castle.MonoRail.Framework.Adapters
 			response.AppendHeader(name, headerValue);
 		}
 
-//		/// <summary>
-//		/// Gets the output.
-//		/// </summary>
-//		/// <value>The output.</value>
-//		public TextWriter Output
-//		{
-//			get { return response.Output; }
-//		}
-//
-//		/// <summary>
-//		/// Gets the output stream.
-//		/// </summary>
-//		/// <value>The output stream.</value>
-//		public Stream OutputStream
-//		{
-//			get { return response.OutputStream; }
-//		}
-//
+		/// <summary>
+		/// Gets the output.
+		/// </summary>
+		/// <value>The output.</value>
+		public TextWriter Output
+		{
+			get { return response.Output; }
+		}
+
+		/// <summary>
+		/// Gets the output stream.
+		/// </summary>
+		/// <value>The output stream.</value>
+		public Stream OutputStream
+		{
+			get { return response.OutputStream; }
+		}
+
 //		/// <summary>
 //		/// Writes the buffer to the browser
 //		/// </summary>
@@ -152,45 +150,45 @@ namespace Castle.MonoRail.Framework.Adapters
 //		{
 //			response.ClearContent();
 //		}
-//
-//		/// <summary>
-//		/// Writes the specified string.
-//		/// </summary>
-//		/// <param name="s">The string.</param>
-//		public void Write(String s)
-//		{
-//			response.Write(s);
-//		}
-//
-//		/// <summary>
-//		/// Writes the specified obj.
-//		/// </summary>
-//		/// <param name="obj">The obj.</param>
-//		public void Write(object obj)
-//		{
-//			response.Write(obj);
-//		}
-//
-//		/// <summary>
-//		/// Writes the specified char.
-//		/// </summary>
-//		/// <param name="ch">The char.</param>
-//		public void Write(char ch)
-//		{
-//			response.Write(ch);
-//		}
-//
-//		/// <summary>
-//		/// Writes the specified buffer.
-//		/// </summary>
-//		/// <param name="buffer">The buffer.</param>
-//		/// <param name="index">The index.</param>
-//		/// <param name="count">The count.</param>
-//		public void Write(char[] buffer, int index, int count)
-//		{
-//			response.Write(buffer, index, count);
-//		}
-//
+
+		/// <summary>
+		/// Writes the specified string.
+		/// </summary>
+		/// <param name="s">The string.</param>
+		public void Write(String s)
+		{
+			response.Write(s);
+		}
+
+		/// <summary>
+		/// Writes the specified obj.
+		/// </summary>
+		/// <param name="obj">The obj.</param>
+		public void Write(object obj)
+		{
+			response.Write(obj);
+		}
+
+		/// <summary>
+		/// Writes the specified char.
+		/// </summary>
+		/// <param name="ch">The char.</param>
+		public void Write(char ch)
+		{
+			response.Write(ch);
+		}
+
+		/// <summary>
+		/// Writes the specified buffer.
+		/// </summary>
+		/// <param name="buffer">The buffer.</param>
+		/// <param name="index">The index.</param>
+		/// <param name="count">The count.</param>
+		public void Write(char[] buffer, int index, int count)
+		{
+			response.Write(buffer, index, count);
+		}
+
 //		/// <summary>
 //		/// Writes the file.
 //		/// </summary>
@@ -199,30 +197,30 @@ namespace Castle.MonoRail.Framework.Adapters
 //		{
 //			response.WriteFile(fileName);
 //		}
-//
-//		/// <summary>
-//		/// Redirects the specified URL.
-//		/// </summary>
-//		/// <param name="url">The URL.</param>
-//		public void Redirect(String url)
-//		{
-//			redirected = true;
-//
-//			response.Redirect(url, false);
-//		}
-//
-//		/// <summary>
-//		/// Redirects the specified URL.
-//		/// </summary>
-//		/// <param name="url">The URL.</param>
-//		/// <param name="endProcess">if set to <c>true</c> [end process].</param>
-//		public void Redirect(String url, bool endProcess)
-//		{
-//			redirected = true;
-//
-//			response.Redirect(url, endProcess);
-//		}
-//
+
+		/// <summary>
+		/// Redirects the specified URL.
+		/// </summary>
+		/// <param name="url">The URL.</param>
+		public void RedirectToUrl(String url)
+		{
+			redirected = true;
+
+			response.Redirect(url, false);
+		}
+
+		/// <summary>
+		/// Redirects the specified URL.
+		/// </summary>
+		/// <param name="url">The URL.</param>
+		/// <param name="endProcess">if set to <c>true</c> [end process].</param>
+		public void RedirectToUrl(String url, bool endProcess)
+		{
+			redirected = true;
+
+			response.Redirect(url, endProcess);
+		}
+
 //		/// <summary>
 //		/// Redirects the specified controller.
 //		/// </summary>
@@ -313,27 +311,27 @@ namespace Castle.MonoRail.Framework.Adapters
 //
 //			response.Redirect(builder.BuildUrl(context.UrlInfo, area, controller, action, parameters), false);
 //		}
-//
-//		/// <summary>
-//		/// Gets a value indicating whether this instance is client connected.
-//		/// </summary>
-//		/// <value>
-//		/// 	<c>true</c> if this instance is client connected; otherwise, <c>false</c>.
-//		/// </value>
-//		public bool IsClientConnected
-//		{
-//			get { return response.IsClientConnected; }
-//		}
-//
-//		/// <summary>
-//		/// Gets a value indicating whether the response sent a redirect.
-//		/// </summary>
-//		/// <value><c>true</c> if was redirected; otherwise, <c>false</c>.</value>
-//		public bool WasRedirected
-//		{
-//			get { return redirected; }
-//		}
-//
+
+		/// <summary>
+		/// Gets a value indicating whether this instance is client connected.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is client connected; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsClientConnected
+		{
+			get { return response.IsClientConnected; }
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether the response sent a redirect.
+		/// </summary>
+		/// <value><c>true</c> if was redirected; otherwise, <c>false</c>.</value>
+		public bool WasRedirected
+		{
+			get { return redirected; }
+		}
+
 //		/// <summary>
 //		/// Creates the cookie.
 //		/// </summary>

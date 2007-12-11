@@ -56,6 +56,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="context">The MonoRail request context</param>
 		/// <param name="controller">The controller instance</param>
+		/// <param name="controllerContext">The controller context.</param>
 		protected virtual void OnAfterAction(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 		}
@@ -66,6 +67,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="context">The MonoRail request context</param>
 		/// <param name="controller">The controller instance</param>
+		/// <param name="controllerContext">The controller context.</param>
 		protected virtual void OnAfterRendering(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 		}
@@ -76,7 +78,10 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="context">The MonoRail request context</param>
 		/// <param name="controller">The controller instance</param>
-		/// <returns><c>true</c> if the request should proceed, otherwise <c>false</c></returns>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns>
+		/// 	<c>true</c> if the request should proceed, otherwise <c>false</c>
+		/// </returns>
 		protected virtual bool OnBeforeAction(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			return true;

@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework
 	using System.Collections;
 	using System.Collections.Generic;
 	using Castle.MonoRail.Framework.Resources;
+	using Descriptors;
 
 	/// <summary>
 	/// Pendent
@@ -79,5 +80,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The dynamic actions.</value>
 		IDictionary<string, IDynamicAction> DynamicActions { get; }
+
+		/// <summary>
+		/// Gets or sets the controller descriptor.
+		/// </summary>
+		/// <value>The controller descriptor.</value>
+		ControllerMetaDescriptor ControllerDescriptor { get; set; }
 	}
 }

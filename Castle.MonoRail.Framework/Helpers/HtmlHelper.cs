@@ -203,7 +203,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			return String.Format("<form action=\"{0}\" {1}>", action, GetAttributes(attributes));
 		}
-		
+
 		/// <summary>
 		/// Creates a <b>form</b> tag targeting a URL in the style of the <see cref="LinkTo(String, String)"/> methods.
 		/// </summary>
@@ -211,7 +211,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>HTML string with form opening tag.</returns>
 		public String FormTo(String action)
 		{
-			return FormTo(Controller.Name, action, null);
+			return FormTo(ControllerContext.Name, action, null);
 		}
 
 		/// <summary>
@@ -558,7 +558,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>HTML string with anchor that posts to the current controller</returns>
 		public String LinkToWithPost(String name, String action, object id)
 		{
-			return LinkToWithPost(name, Controller.Name, action, id);
+			return LinkToWithPost(name, ControllerContext.Name, action, id);
 		}
 
 		/// <summary>
@@ -571,7 +571,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>HTML string with anchor that posts to the current controller</returns>
 		public String LinkToWithPost(String name, String action, String confirm)
 		{
-			return LinkToWithPost(name, Controller.Name, action, confirm);
+			return LinkToWithPost(name, ControllerContext.Name, action, confirm);
 		}
 
 		/// <summary>
@@ -585,7 +585,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>HTML string with anchor that posts to the current controller</returns>
 		public String LinkToWithPost(String name, String action, object id, string confirm)
 		{
-			return LinkToWithPost(name, Controller.Name, action, id, confirm);
+			return LinkToWithPost(name, ControllerContext.Name, action, id, confirm);
 		}
 
 		/// <summary>
@@ -641,7 +641,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="confirm">Guards the form submission with a javascript confirm popup.</param>
 		/// <param name="attributes">Additional attributes for the <b>a</b> tag.</param>
 		/// <returns>HTML string with anchor that posts to the specified <paramref name="controller"/></returns>
-		public String LinkToWithPostAttributed(String name, String controller, String action, String confirm, IDictionary attributes)
+		public String LinkToWithPostAttributed(String name, String controller, String action, String confirm,
+		                                       IDictionary attributes)
 		{
 			return LinkToWithPostAttributed(name, controller, action, null, confirm, attributes);
 		}
@@ -658,7 +659,8 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="confirm">Guards the form submission with a javascript confirm popup.</param>
 		/// <param name="attributes">Additional attributes for the <b>a</b> tag.</param>
 		/// <returns>HTML string with anchor that posts to the specified <paramref name="controller"/></returns>
-		public String LinkToWithPostAttributed(String name, String controller, String action, object id, String confirm, IDictionary attributes)
+		public String LinkToWithPostAttributed(String name, String controller, String action, object id, String confirm,
+		                                       IDictionary attributes)
 		{
 			IDictionary formAttributes = DictHelper.Create("style=display:inline;margin:0;");
 
@@ -696,7 +698,7 @@ namespace Castle.MonoRail.Framework.Helpers
 			return stringBuilder.ToString();
 		}
 
-		#endregion 
+		#endregion
 
 		#region MapToVirtual
 
@@ -716,11 +718,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </example>
 		public String MapToVirtual(String target)
 		{
-			String appPath = Controller.Context.ApplicationPath.EndsWith("/")
-			                 	?
-			                 Controller.Context.ApplicationPath
-			                 	:
-			                 Controller.Context.ApplicationPath + "/";
+			String appPath = Context.ApplicationPath.EndsWith("/") ? Context.ApplicationPath : Context.ApplicationPath + "/";
 
 			String targetPath = target.StartsWith("/") ? target.Substring(1) : target;
 

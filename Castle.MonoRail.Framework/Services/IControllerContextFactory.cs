@@ -14,6 +14,8 @@
 
 namespace Castle.MonoRail.Framework
 {
+	using Castle.MonoRail.Framework.Descriptors;
+
 	/// <summary>
 	/// Pendent
 	/// </summary>
@@ -23,6 +25,6 @@ namespace Castle.MonoRail.Framework
 		/// Pendent
 		/// </summary>
 		/// <returns></returns>
-		IControllerContext Create(UrlInfo urlInfo);
+		IControllerContext Create(string area, string controller, string action, UrlInfo urlInfo, ControllerMetaDescriptor metaDescriptor);
 	}
 }

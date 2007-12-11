@@ -18,7 +18,7 @@ namespace Castle.MonoRail.Framework.Descriptors
 	using System.Collections;
 
 	/// <summary>
-	/// Holds the meta information for a specific action
+	/// Holds the meta information for an action
 	/// </summary>
 	[Serializable]
 	public class ActionMetaDescriptor : BaseMetaDescriptor

@@ -91,6 +91,6 @@ namespace Castle.MonoRail.Framework
 		/// </remarks>
 		/// <param name="context">The web request context.</param>
 		/// <returns>An array of steps</returns>
-		WizardStepPage[] GetSteps(IHandlerContext context);
+		WizardStepPage[] GetSteps(IEngineContext context);
 	}
 }

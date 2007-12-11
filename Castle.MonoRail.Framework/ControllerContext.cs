@@ -3,6 +3,7 @@
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Collections.Specialized;
+	using Descriptors;
 	using Resources;
 
 	/// <summary>
@@ -16,10 +17,33 @@
 		private string action;
 		private string selectedViewName;
 		private string viewFolder;
+		private ControllerMetaDescriptor metaDescriptor;
 		private IDictionary propertyBag = new HybridDictionary(true);
 		private IDictionary helpers = new HybridDictionary(true);
 		private IDictionary<string, IDynamicAction> dynamicActions = new Dictionary<string, IDynamicAction>();
-		private ResourceDictionary resources = new ResourceDictionary();
+		private readonly ResourceDictionary resources = new ResourceDictionary();
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ControllerContext"/> class.
+		/// </summary>
+		public ControllerContext()
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ControllerContext"/> class.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="areaName">Name of the area.</param>
+		/// <param name="action">The action.</param>
+		/// <param name="metaDescriptor">The meta descriptor.</param>
+		public ControllerContext(string name, string areaName, string action, ControllerMetaDescriptor metaDescriptor)
+		{
+			this.name = name;
+			this.areaName = areaName;
+			this.action = action;
+			this.metaDescriptor = metaDescriptor;
+		}
 
 		/// <summary>
 		/// Gets the property bag, which is used
@@ -121,6 +145,16 @@
 		public IDictionary<string, IDynamicAction> DynamicActions
 		{
 			get { return dynamicActions; }
+		}
+
+		/// <summary>
+		/// Gets or sets the controller descriptor.
+		/// </summary>
+		/// <value>The controller descriptor.</value>
+		public ControllerMetaDescriptor ControllerDescriptor
+		{
+			get { return metaDescriptor; }
+			set { metaDescriptor = value; }
 		}
 	}
 }

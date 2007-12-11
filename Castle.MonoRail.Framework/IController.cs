@@ -15,7 +15,6 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
-	using System.Collections;
 
 	/// <summary>
 	/// Represent the core functionality required out of a controller
@@ -32,9 +31,9 @@ namespace Castle.MonoRail.Framework
 		/// 5. Run the after filters<br/>
 		/// 6. Invoke the view engine<br/>
 		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
 		/// <param name="context">The controller context.</param>
-		/// <param name="extraActionArgs">Extra action arguments</param>
-		void Process(IControllerContext context, IDictionary extraActionArgs);
+		void Process(IEngineContext engineContext, IControllerContext context);
 
 		/// <summary>
 		/// Invoked by the view engine to perform

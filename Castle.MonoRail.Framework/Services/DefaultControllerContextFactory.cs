@@ -14,6 +14,9 @@
 
 namespace Castle.MonoRail.Framework.Services
 {
+	using System.IO;
+	using Descriptors;
+
 	/// <summary>
 	/// Pendent
 	/// </summary>
@@ -22,13 +25,53 @@ namespace Castle.MonoRail.Framework.Services
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <param name="urlInfo"></param>
+		/// <param name="area">The area.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		/// <param name="urlInfo">The URL info.</param>
+		/// <param name="metaDescriptor">The meta descriptor.</param>
 		/// <returns></returns>
-		public IControllerContext Create(UrlInfo urlInfo)
+		public IControllerContext Create(string area, string controller, string action,
+		                                 UrlInfo urlInfo, ControllerMetaDescriptor metaDescriptor)
 		{
-			ControllerContext context = new ControllerContext();
+			ControllerContext context = new ControllerContext(controller, area, action, metaDescriptor);
+
+			context.ViewFolder = ResolveViewFolder(context, area, controller, action);
+			context.SelectedViewName = ResolveDefaultViewSelection(context, area, controller, action);
 
 			return context;
+		}
+
+		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <param name="area">The area.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		/// <returns></returns>
+		protected virtual string ResolveViewFolder(ControllerContext context, string area, string controller, string action)
+		{
+			if (!string.IsNullOrEmpty(area))
+			{
+				return Path.Combine(area, controller);
+			}
+
+			return controller;
+		}
+
+		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <param name="area">The area.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		/// <returns></returns>
+		protected virtual string ResolveDefaultViewSelection(ControllerContext context, string area, string controller,
+		                                                     string action)
+		{
+			return Path.Combine(context.ViewFolder, action);
 		}
 	}
 }

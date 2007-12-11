@@ -51,18 +51,18 @@ namespace Castle.MonoRail.Framework
 //		/// Gets or sets the HTTP character set of the output stream.
 //		/// </summary>
 //		String Charset { get; set; }
-//
-//		/// <summary>
-//		/// Gets the output.
-//		/// </summary>
-//		/// <value>The output.</value>
-//		System.IO.TextWriter Output { get; }
-//
-//		/// <summary>
-//		/// Gets the output stream.
-//		/// </summary>
-//		/// <value>The output stream.</value>
-//		System.IO.Stream OutputStream { get; }
+
+		/// <summary>
+		/// Gets the output.
+		/// </summary>
+		/// <value>The output.</value>
+		System.IO.TextWriter Output { get; }
+
+		/// <summary>
+		/// Gets the output stream.
+		/// </summary>
+		/// <value>The output stream.</value>
+		System.IO.Stream OutputStream { get; }
 
 		/// <summary>
 		/// Appends the header.
@@ -92,33 +92,33 @@ namespace Castle.MonoRail.Framework
 //		/// Clears the response content (only works if buffered).
 //		/// </summary>
 //		void ClearContent();
-//
-//		/// <summary>
-//		/// Writes the specified string.
-//		/// </summary>
-//		/// <param name="s">The string.</param>
-//		void Write(String s);
-//
-//		/// <summary>
-//		/// Writes the specified obj.
-//		/// </summary>
-//		/// <param name="obj">The obj.</param>
-//		void Write(object obj);
-//
-//		/// <summary>
-//		/// Writes the specified char.
-//		/// </summary>
-//		/// <param name="ch">The char.</param>
-//		void Write(char ch);
-//
-//		/// <summary>
-//		/// Writes the specified buffer.
-//		/// </summary>
-//		/// <param name="buffer">The buffer.</param>
-//		/// <param name="index">The index.</param>
-//		/// <param name="count">The count.</param>
-//		void Write(char[] buffer, int index, int count);
-//
+
+		/// <summary>
+		/// Writes the specified string.
+		/// </summary>
+		/// <param name="s">The string.</param>
+		void Write(String s);
+
+		/// <summary>
+		/// Writes the specified obj.
+		/// </summary>
+		/// <param name="obj">The obj.</param>
+		void Write(object obj);
+
+		/// <summary>
+		/// Writes the specified char.
+		/// </summary>
+		/// <param name="ch">The char.</param>
+		void Write(char ch);
+
+		/// <summary>
+		/// Writes the specified buffer.
+		/// </summary>
+		/// <param name="buffer">The buffer.</param>
+		/// <param name="index">The index.</param>
+		/// <param name="count">The count.</param>
+		void Write(char[] buffer, int index, int count);
+
 //		/// <summary>
 //		/// Writes the file.
 //		/// </summary>
@@ -173,34 +173,34 @@ namespace Castle.MonoRail.Framework
 //		/// <param name="action">Action name</param>
 //		/// <param name="parameters">Key/value pairings</param>
 //		void Redirect(string area, string controller, string action, IDictionary parameters);
-//
-//		/// <summary>
-//		/// Redirects the specified URL.
-//		/// </summary>
-//		/// <param name="url">The URL.</param>
-//		void Redirect(String url);
-//
-//		/// <summary>
-//		/// Redirects the specified URL.
-//		/// </summary>
-//		/// <param name="url">The URL.</param>
-//		/// <param name="endProcess">if set to <c>true</c> [end process].</param>
-//		void Redirect(String url, bool endProcess);
-//
-//		/// <summary>
-//		/// Gets a value indicating whether the response sent a redirect.
-//		/// </summary>
-//		/// <value><c>true</c> if was redirected; otherwise, <c>false</c>.</value>
-//		bool WasRedirected { get; }
-//
-//		/// <summary>
-//		/// Gets a value indicating whether this instance is client connected.
-//		/// </summary>
-//		/// <value>
-//		/// 	<c>true</c> if this instance is client connected; otherwise, <c>false</c>.
-//		/// </value>
-//		bool IsClientConnected { get; }
-//
+
+		/// <summary>
+		/// Redirects the specified URL.
+		/// </summary>
+		/// <param name="url">The URL.</param>
+		void RedirectToUrl(String url);
+
+		/// <summary>
+		/// Redirects the specified URL.
+		/// </summary>
+		/// <param name="url">The URL.</param>
+		/// <param name="endProcess">if set to <c>true</c> [end process].</param>
+		void RedirectToUrl(String url, bool endProcess);
+
+		/// <summary>
+		/// Gets a value indicating whether the response sent a redirect.
+		/// </summary>
+		/// <value><c>true</c> if was redirected; otherwise, <c>false</c>.</value>
+		bool WasRedirected { get; }
+
+		/// <summary>
+		/// Gets a value indicating whether this instance is client connected.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is client connected; otherwise, <c>false</c>.
+		/// </value>
+		bool IsClientConnected { get; }
+
 //		/// <summary>
 //		/// Creates a cookie.
 //		/// </summary>

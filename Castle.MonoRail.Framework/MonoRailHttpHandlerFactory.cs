@@ -85,24 +85,25 @@ namespace Castle.MonoRail.Framework
 			IEngineContext engineContext = engineContextFactory.Create(mrContainer, urlInfo, context);
 			engineContext.AddService(typeof(IEngineContext), engineContext);
 
-			IControllerContext controllerContext = controllerContextFactory.Create(urlInfo);
 			IController controller = controllerFactory.CreateController(urlInfo);
 
 			// TODO: Identify requests for files (js files) and serve them directly bypassing the flow
+
+			ControllerMetaDescriptor controllerDesc = mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
+
+			IControllerContext controllerContext = controllerContextFactory.Create(urlInfo.Area, urlInfo.Controller, urlInfo.Action, urlInfo, controllerDesc);
 
 			context.Items[CurrentEngineContextKey] = engineContext;
 			context.Items[CurrentControllerKey] = controller;
 			context.Items[CurrentControllerContextContextKey] = controllerContext;
 
-			ControllerMetaDescriptor controllerDesc = mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
-
 			if (IgnoresSession(controllerDesc.ControllerDescriptor))
 			{
-				return new SessionlessMonoRailHttpHandler(controller, engineContext);
+				return new SessionlessMonoRailHttpHandler(engineContext, controller, controllerContext);
 			}
 			else
 			{
-				return new MonoRailHttpHandler(controller, engineContext);
+				return new MonoRailHttpHandler(engineContext, controller, controllerContext);
 			}
 		}
 

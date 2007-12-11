@@ -114,28 +114,7 @@ namespace Castle.MonoRail.Framework.Adapters
 //			get { return _url; }
 //			set { _url = value; }
 //		}
-//
-//		/// <summary>
-//		/// Gets the referring URL.
-//		/// </summary>
-//		/// <value></value>
-//		public String UrlReferrer
-//		{
-//			get
-//			{
-//				Uri referrer = _context.Request.UrlReferrer;
-//
-//				if (referrer != null)
-//				{
-//					return referrer.ToString();
-//				}
-//				else
-//				{
-//					return null;
-//				}
-//			}
-//		}
-//
+
 
 //
 //		/// <summary>

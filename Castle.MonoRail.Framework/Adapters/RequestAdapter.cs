@@ -45,6 +45,28 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return request.Headers["Accept"]; }
 		}
 
+		/// <summary>
+		/// Gets the referring URL.
+		/// </summary>
+		/// <value></value>
+		public String UrlReferrer
+		{
+			get
+			{
+				Uri referrer = request.UrlReferrer;
+
+				if (referrer != null)
+				{
+					return referrer.ToString();
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+
+
 //		/// <summary>
 //		/// Gets a value indicating whether this requeest is from a local address.
 //		/// </summary>

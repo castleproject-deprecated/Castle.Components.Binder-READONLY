@@ -14,25 +14,27 @@
 
 namespace Castle.MonoRail.Framework
 {
-	using System.Web;
-	using System.Web.SessionState;
+	using System;
+	using System.IO;
 
 	/// <summary>
-	/// Implements <see cref="IHttpHandler"/> to dispatch the web
-	/// requests. 
-	/// <seealso cref="MonoRailHttpHandlerFactory"/>
+	/// Depicts the contract used by the engine
+	/// to obtain implementations of <see cref="ITransformFilter"/>.
 	/// </summary>
-	public class MonoRailHttpHandler : BaseHttpHandler, IRequiresSessionState
+	public interface ITransformFilterFactory
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MonoRailHttpHandler"/> class.
+		/// Creates the specified transform filter type.
 		/// </summary>
-		/// <param name="engineContext">The engine context.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="context">The context.</param>
-		public MonoRailHttpHandler(IEngineContext engineContext, IController controller, IControllerContext context)
-			: base(engineContext, controller, context, false)
-		{
-		}
+		/// <param name="transformFilterType">Type of the transform filter.</param>
+		/// <param name="baseStream">The base stream.</param>
+		/// <returns></returns>
+		ITransformFilter Create(Type transformFilterType, Stream baseStream);
+
+		/// <summary>
+		/// Releases the specified transform filter.
+		/// </summary>
+		/// <param name="transformFilter">The transform filter.</param>
+		void Release(ITransformFilter transformFilter);
 	}
 }

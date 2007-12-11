@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,25 +14,30 @@
 
 namespace Castle.MonoRail.Framework
 {
-	using System.Web;
-	using System.Web.SessionState;
-
 	/// <summary>
-	/// Implements <see cref="IHttpHandler"/> to dispatch the web
-	/// requests. 
-	/// <seealso cref="MonoRailHttpHandlerFactory"/>
+	/// Pendent
 	/// </summary>
-	public class MonoRailHttpHandler : BaseHttpHandler, IRequiresSessionState
+	public interface IActionSelector
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MonoRailHttpHandler"/> class.
+		/// Registers the specified sub selector.
+		/// </summary>
+		/// <param name="subSelector">The sub selector.</param>
+		void Register(ISubActionSelector subSelector);
+
+		/// <summary>
+		/// Unregisters the specified sub selector.
+		/// </summary>
+		/// <param name="subSelector">The sub selector.</param>
+		void Unregister(ISubActionSelector subSelector);
+
+		/// <summary>
+		/// Selects the an action.
 		/// </summary>
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="context">The context.</param>
-		public MonoRailHttpHandler(IEngineContext engineContext, IController controller, IControllerContext context)
-			: base(engineContext, controller, context, false)
-		{
-		}
+		/// <returns></returns>
+		IExecutableAction Select(IEngineContext engineContext, IController controller, IControllerContext context);
 	}
 }

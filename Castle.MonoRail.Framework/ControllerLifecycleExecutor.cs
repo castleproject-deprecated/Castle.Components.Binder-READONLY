@@ -412,52 +412,6 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
-		/// Runs the start request filters.
-		/// </summary>
-		/// <returns><c>false</c> if the process should be stopped</returns>
-		public bool RunStartRequestFilters()
-		{
-			hasError = false;
-			exceptionToThrow = null;
-
-			try
-			{
-				// If we are supposed to run the filters...
-				if (!skipFilters)
-				{
-					// ...run them. If they fail...
-					if (!ProcessFilters(ExecuteEnum.StartRequest))
-					{
-						// Record that they failed.
-						return false;
-					}
-				}
-			}
-			catch(ThreadAbortException)
-			{
-				if (logger.IsErrorEnabled)
-				{
-					logger.Error("ThreadAbortException, process aborted");
-				}
-
-				hasError = true;
-			}
-			catch(Exception ex)
-			{
-				hasError = true;
-
-				if (logger.IsErrorEnabled)
-				{
-					logger.Error("Exception during filter process", ex);
-				}
-
-				exceptionToThrow = ex;
-			}
-
-			return ! hasError;
-		}
-
-		/// <summary>
 		/// Gets a value indicating whether an error has happened during controller processing
 		/// </summary>
 		/// <value>
@@ -653,20 +607,7 @@ namespace Castle.MonoRail.Framework
 			}
 		}
 
-		/// <summary>
-		/// Performs the additional helper initialization
-		/// checking if the helper instance implements <see cref="IServiceEnabledComponent"/>.
-		/// </summary>
-		/// <param name="helperInstance">The helper instance.</param>
-		private void PerformAdditionalHelperInitialization(object helperInstance)
-		{
-			IServiceEnabledComponent serviceEnabled = helperInstance as IServiceEnabledComponent;
-
-			if (serviceEnabled != null)
-			{
-				serviceEnabled.Service(serviceProvider);
-			}
-		}
+		
 
 		/// <summary>
 		/// Invokes the scaffold support if the controller
@@ -738,129 +679,7 @@ namespace Castle.MonoRail.Framework
 
 		#region Filters
 
-		/// <summary>
-		/// Identifies if no filter should run for the given action.
-		/// </summary>
-		/// <param name="method">The method.</param>
-		/// <returns></returns>
-		protected internal bool ShouldSkip(MethodInfo method)
-		{
-			if (method == null)
-			{
-				// Dynamic Action, run the filters if we have any
-				return (filters == null);
-			}
-
-			if (filters == null)
-			{
-				// No filters, so skip 
-				return true;
-			}
-
-			ActionMetaDescriptor actionMeta = metaDescriptor.GetAction(method);
-
-			if (actionMeta.SkipFilters.Count == 0)
-			{
-				// Nothing against filters declared for this action
-				return false;
-			}
-
-			foreach(SkipFilterAttribute skipfilter in actionMeta.SkipFilters)
-			{
-				// SkipAllFilters handling...
-				if (skipfilter.BlanketSkip)
-				{
-					return true;
-				}
-
-				filtersToSkip[skipfilter.FilterType] = String.Empty;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Clones all Filter descriptors, in order to get a writable copy.
-		/// </summary>
-		protected internal FilterDescriptor[] CopyFilterDescriptors()
-		{
-			FilterDescriptor[] clone = (FilterDescriptor[]) metaDescriptor.Filters.Clone();
-
-			for(int i = 0; i < clone.Length; i++)
-			{
-				clone[i] = (FilterDescriptor) clone[i].Clone();
-			}
-
-			return clone;
-		}
-
-		private bool ProcessFilters(ExecuteEnum when)
-		{
-			foreach(FilterDescriptor desc in filters)
-			{
-				if (filtersToSkip.Contains(desc.FilterType))
-				{
-					continue;
-				}
-
-				if ((desc.When & when) != 0)
-				{
-					if (!ProcessFilter(when, desc))
-					{
-						return false;
-					}
-				}
-			}
-
-			return true;
-		}
-
-		private bool ProcessFilter(ExecuteEnum when, FilterDescriptor desc)
-		{
-			if (desc.FilterInstance == null)
-			{
-				desc.FilterInstance = filterFactory.Create(desc.FilterType);
-
-				IFilterAttributeAware filterAttAware = desc.FilterInstance as IFilterAttributeAware;
-
-				if (filterAttAware != null)
-				{
-					filterAttAware.Filter = desc.Attribute;
-				}
-			}
-
-			try
-			{
-				if (logger.IsDebugEnabled)
-				{
-					logger.DebugFormat("Running filter {0}/{1}", when, desc.FilterType.FullName);
-				}
-
-				return desc.FilterInstance.Perform(when, context, controller);
-			}
-			catch(Exception ex)
-			{
-				if (logger.IsErrorEnabled)
-				{
-					logger.ErrorFormat("Error processing filter " + desc.FilterType.FullName, ex);
-				}
-
-				throw;
-			}
-		}
-
-		private void DisposeFilters()
-		{
-			if (filters == null) return;
-
-			foreach(FilterDescriptor desc in filters)
-			{
-				if (desc.FilterInstance != null)
-				{
-					filterFactory.Release(desc.FilterInstance);
-				}
-			}
-		}
+		
 
 		#endregion
 
@@ -1021,22 +840,5 @@ namespace Castle.MonoRail.Framework
 
 		#endregion
 
-		/// <summary>
-		/// The following lines were added to handle _default processing
-		/// if present look for and load _default action method
-		/// <seealso cref="DefaultActionAttribute"/>
-		/// <param name="methodArgs">Method arguments</param>
-		/// </summary>
-		private MethodInfo FindOutDefaultMethod(IDictionary methodArgs)
-		{
-			if (metaDescriptor.DefaultAction != null)
-			{
-				return controller.SelectMethod(
-					metaDescriptor.DefaultAction.DefaultAction,
-					metaDescriptor.Actions, context.Request, methodArgs);
-			}
-
-			return null;
-		}
 	}
 }

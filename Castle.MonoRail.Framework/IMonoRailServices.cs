@@ -14,9 +14,9 @@
 
 namespace Castle.MonoRail.Framework
 {
+	using Castle.Components.Validator;
 	using Castle.Core;
 	using Castle.MonoRail.Framework.Services;
-	using Providers;
 
 	/// <summary>
 	/// Pendent
@@ -82,5 +82,23 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The controller descriptor provider.</value>
 		IControllerDescriptorProvider ControllerDescriptorProvider { get; set; }
+
+		/// <summary>
+		/// Gets or sets the view engine manager.
+		/// </summary>
+		/// <value>The view engine manager.</value>
+		IViewEngineManager ViewEngineManager { get; set; }
+
+		/// <summary>
+		/// Gets or sets the validator registry.
+		/// </summary>
+		/// <value>The validator registry.</value>
+		IValidatorRegistry ValidatorRegistry { get; set; }
+
+		/// <summary>
+		/// Gets or sets the action selector.
+		/// </summary>
+		/// <value>The action selector.</value>
+		IActionSelector ActionSelector { get; set; }
 	}
 }

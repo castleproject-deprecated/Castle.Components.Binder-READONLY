@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Container
 {
 	using System;
+	using Castle.Components.Validator;
 	using Castle.Core;
 	using Castle.Core.Configuration;
 	using Castle.MonoRail.Framework.Services;
@@ -138,14 +139,14 @@ namespace Castle.MonoRail.Framework.Container
 //			/// The <see cref="ITransformFilterFactory"/> service
 //			/// </summary>
 //			TransformationFilterFactory,
-//			/// <summary>
-//			/// The <see cref="IViewEngineManager"/> service
-//			/// </summary>
-//			ViewEngineManager,
-//			/// <summary>
-//			/// The <see cref="IValidatorRegistry"/> service
-//			/// </summary>
-//			ValidatorRegistry,
+			/// <summary>
+			/// The <see cref="IViewEngineManager"/> service
+			/// </summary>
+			ViewEngineManager,
+			/// <summary>
+			/// The <see cref="IValidatorRegistry"/> service
+			/// </summary>
+			ValidatorRegistry,
 //			/// <summary>
 //			/// The <see cref="IAjaxProxyGenerator"/> service
 //			/// </summary>
@@ -164,6 +165,9 @@ namespace Castle.MonoRail.Framework.Container
 		private IViewSourceLoader viewSourceLoaderCached;
 		private IFilterFactory filterFactoryCached;
 		private IControllerDescriptorProvider controllerDescriptorProviderCached;
+		private IViewEngineManager viewEngineManagerCached;
+		private IValidatorRegistry validatorRegistryCached;
+		private IActionSelector actionSelectorCached;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultMonoRailContainer"/> class.
@@ -255,6 +259,18 @@ namespace Castle.MonoRail.Framework.Container
 			{
 				AddService(typeof(ITransformFilterDescriptorProvider), transformFilterDescriptorProvider);
 			}
+
+			IViewEngineManager viewEngManager = (IViewEngineManager) Parent.GetService(typeof(IViewEngineManager));
+			if (viewEngManager != null)
+			{
+				AddService(typeof(IViewEngineManager), viewEngManager);
+			}
+
+			IValidatorRegistry validatorRegistry = (IValidatorRegistry) Parent.GetService(typeof(IValidatorRegistry));
+			if (validatorRegistry != null)
+			{
+				AddService(typeof(IValidatorRegistry), validatorRegistry);
+			}
 		}
 
 		/// <summary>
@@ -329,6 +345,18 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<ITransformFilterDescriptorProvider>())
 			{
 				AddService<ITransformFilterDescriptorProvider>(CreateService<DefaultTransformFilterDescriptorProvider>());
+			}
+			if (!HasService<IViewEngineManager>())
+			{
+				AddService<IViewEngineManager>(CreateService<DefaultViewEngineManager>());
+			}
+			if (!HasService<IValidatorRegistry>())
+			{
+				AddService<IValidatorRegistry>(CreateService<CachedValidationRegistry>());
+			}
+			if (!HasService<IActionSelector>())
+			{
+				AddService<IActionSelector>(CreateService<DefaultActionSelector>());
 			}
 		}
 
@@ -556,6 +584,57 @@ namespace Castle.MonoRail.Framework.Container
 			set { controllerDescriptorProviderCached = value; }
 		}
 
+		/// <summary>
+		/// Gets or sets the view engine manager.
+		/// </summary>
+		/// <value>The view engine manager.</value>
+		public IViewEngineManager ViewEngineManager
+		{
+			get
+			{
+				if (viewEngineManagerCached == null)
+				{
+					viewEngineManagerCached = GetService<IViewEngineManager>();
+				}
+				return viewEngineManagerCached;
+			}
+			set { viewEngineManagerCached = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the validator registry.
+		/// </summary>
+		/// <value>The validator registry.</value>
+		public IValidatorRegistry ValidatorRegistry
+		{
+			get
+			{
+				if (validatorRegistryCached == null)
+				{
+					validatorRegistryCached = GetService<IValidatorRegistry>();
+				}
+				return validatorRegistryCached;
+			}
+			set { validatorRegistryCached = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the action selector.
+		/// </summary>
+		/// <value>The action selector.</value>
+		public IActionSelector ActionSelector
+		{
+			get
+			{
+				if (actionSelectorCached == null)
+				{
+					actionSelectorCached = GetService<IActionSelector>();
+				}
+				return actionSelectorCached;
+			}
+			set { actionSelectorCached = value; }
+		}
+
 		#endregion
 
 		private void RegisterServiceOverrideFromConfigurationNode(IConfiguration serviceConfig)
@@ -652,24 +731,24 @@ namespace Castle.MonoRail.Framework.Container
 					return typeof(IViewSourceLoader);
 				case ServiceIdentification.ResourceFactory:
 					return typeof(IResourceFactory);
+				case ServiceIdentification.ViewEngineManager:
+					return typeof(IViewEngineManager);
+				case ServiceIdentification.TransformFilterDescriptorProvider:
+					return typeof(ITransformFilterDescriptorProvider);
+				case ServiceIdentification.ValidatorRegistry:
+					return typeof(IValidatorRegistry);
 //				case ServiceIdentification.EmailSender:
 //					return typeof(IEmailSender);
 //				case ServiceIdentification.ViewComponentFactory:
 //					return typeof(IViewComponentFactory);
 //				case ServiceIdentification.ScaffoldingSupport:
 //					return typeof(IScaffoldingSupport);
-//				case ServiceIdentification.ViewEngineManager:
-//					return typeof(IViewEngineManager);
 //				case ServiceIdentification.EmailTemplateService:
 //					return typeof(IEmailTemplateService);
 //				case ServiceIdentification.ExecutorFactory:
 //					return typeof(IControllerLifecycleExecutorFactory);
 //				case ServiceIdentification.TransformationFilterFactory:
 //					return typeof(ITransformFilterFactory);
-				case ServiceIdentification.TransformFilterDescriptorProvider:
-					return typeof(ITransformFilterDescriptorProvider);
-//				case ServiceIdentification.ValidatorRegistry:
-//					return typeof(IValidatorRegistry);
 //				case ServiceIdentification.AjaxProxyGenerator:
 //					return typeof(IAjaxProxyGenerator);
 //				case ServiceIdentification.ViewComponentDescriptorProvider:

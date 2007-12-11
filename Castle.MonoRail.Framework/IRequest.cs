@@ -39,12 +39,12 @@ namespace Castle.MonoRail.Framework
 //		/// Gets the request URL.
 //		/// </summary>
 //		String Url { get; }
-//
-//		/// <summary>
-//		/// Gets the referring URL.
-//		/// </summary>
-//		String UrlReferrer { get; }
-//
+
+		/// <summary>
+		/// Gets the referring URL.
+		/// </summary>
+		String UrlReferrer { get; }
+
 //		/// <summary>
 //		/// Gets the <see cref="HttpPostedFile"/> per key.
 //		/// </summary>

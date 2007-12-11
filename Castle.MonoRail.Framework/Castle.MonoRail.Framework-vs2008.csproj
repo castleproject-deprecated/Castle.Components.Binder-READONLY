@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionMethodExecutor.cs" />
     <Compile Include="Adapters\DefaultEngineContext.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -149,6 +150,7 @@
     </Compile>
     <Compile Include="Container\DefaultMonoRailContainer.cs" />
     <Compile Include="Container\IMonoRailContainer.cs" />
+    <Compile Include="Controller.cs" />
     <Compile Include="ControllerContext.cs" />
     <Compile Include="ControllerException.cs">
       <SubType>Code</SubType>
@@ -156,13 +158,18 @@
     <Compile Include="ControllerNotFoundException.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DynamicActionExecutor.cs" />
+    <Compile Include="Filter.cs" />
     <Compile Include="Filters\AntiGoogleWebAcceleratorFilter.cs" />
     <Compile Include="Filters\LocalizationFilter.cs" />
     <Compile Include="Filters\RequestValidatorFilter.cs" />
     <Compile Include="Flash.cs" />
     <Compile Include="Helpers\AbstractHelper.cs" />
     <Compile Include="Helpers\AjaxHelper.cs" />
+    <Compile Include="Helpers\DictHelper.cs" />
+    <Compile Include="Helpers\HtmlHelper.cs" />
     <Compile Include="Helpers\ScriptaculousHelper.cs" />
+    <Compile Include="IActionSelector.cs" />
     <Compile Include="ICachePolicyConfigurer.cs" />
     <Compile Include="IContextAware.cs" />
     <Compile Include="IControllerAware.cs" />
@@ -170,6 +177,7 @@
     <Compile Include="IControllerDescriptorProvider.cs" />
     <Compile Include="IDynamicAction.cs" />
     <Compile Include="IDynamicActionProvider.cs" />
+    <Compile Include="IExecutableAction.cs" />
     <Compile Include="IMRServiceEnabled.cs" />
     <Compile Include="Descriptors\ActionMetaDescriptor.cs" />
     <Compile Include="Descriptors\BaseMetaDescriptor.cs" />
@@ -184,6 +192,7 @@
     <Compile Include="Descriptors\RescueDescriptor.cs" />
     <Compile Include="Descriptors\TransformFilterDescriptor.cs" />
     <Compile Include="IParameterBinder.cs" />
+    <Compile Include="ISubActionSelector.cs" />
     <Compile Include="Providers\DefaultFilterDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultHelperDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultLayoutDescriptorProvider.cs" />
@@ -251,6 +260,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Services\AjaxProxyGenerator\IAjaxProxyGenerator.cs" />
+    <Compile Include="Services\DefaultActionSelector.cs" />
     <Compile Include="Services\DefaultCacheProvider.cs" />
     <Compile Include="Services\DefaultControllerContextFactory.cs" />
     <Compile Include="Services\DefaultControllerDescriptorProvider.cs" />
@@ -262,6 +272,7 @@
     <Compile Include="Services\DefaultFilterFactory.cs" />
     <Compile Include="Services\DefaultResourceFactory.cs" />
     <Compile Include="Services\DefaultUrlBuilder.cs" />
+    <Compile Include="Services\DefaultViewEngineManager.cs" />
     <Compile Include="Services\IControllerContextFactory.cs" />
     <Compile Include="Services\IControllerFactory.cs">
       <SubType>Code</SubType>
@@ -324,6 +335,11 @@
     </Compile>
     <Compile Include="Services\Utils\ControllerInspectionUtil.cs" />
     <Compile Include="SessionlessMonoRailHttpHandler.cs" />
+    <Compile Include="TransformFilter.cs" />
+    <Compile Include="TransformFilters\Formatters\WikiFormatter.cs" />
+    <Compile Include="TransformFilters\LowerCaseTransformFilter.cs" />
+    <Compile Include="TransformFilters\UpperCaseTransformFilter.cs" />
+    <Compile Include="TransformFilters\WikiTransformFilter.cs" />
     <Compile Include="Views\Aspx\Contents.cs" />
     <Compile Include="Views\Aspx\EventUtil.cs" />
     <Compile Include="Views\Aspx\MasterPageBase.cs">

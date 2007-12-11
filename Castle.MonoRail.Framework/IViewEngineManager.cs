@@ -40,7 +40,7 @@ namespace Castle.MonoRail.Framework
 		void Process(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String templateName);
 
 		/// <summary>
-		/// Processes a partial view = using the partialName
+		/// Processes a partial view using the partialName
 		/// to obtain the correct template and writes the
 		/// results to the System.TextWriter.
 		/// </summary>

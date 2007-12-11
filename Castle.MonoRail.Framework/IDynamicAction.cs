@@ -31,6 +31,6 @@ namespace Castle.MonoRail.Framework
 		/// Implementors should perform the action 
 		/// upon this invocation
 		/// </summary>
-		void Execute(IController controller, IControllerContext controllerContext);
+		void Execute(IEngineContext engineContext, IController controller, IControllerContext controllerContext);
 	}
 }
