@@ -15,7 +15,10 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.Collections;
 	using System.Web;
+	using System.Web.SessionState;
+	using Adapters;
 
 	/// <summary>
 	/// Pendent
@@ -25,7 +28,7 @@ namespace Castle.MonoRail.Framework
 		private readonly IController controller;
 		private readonly IControllerContext controllerContext;
 		private readonly IEngineContext engineContext;
-		private readonly bool ignoreFlash;
+		private readonly bool sessionless;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BaseHttpHandler"/> class.
@@ -33,14 +36,14 @@ namespace Castle.MonoRail.Framework
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
-		/// <param name="ignoreFlash">if set to <c>true</c> [ignore flash].</param>
+		/// <param name="sessionless">if set to <c>true</c> then we wont have a session to work.</param>
 		protected BaseHttpHandler(IEngineContext engineContext,
-		                          IController controller, IControllerContext controllerContext, bool ignoreFlash)
+								  IController controller, IControllerContext controllerContext, bool sessionless)
 		{
 			this.controller = controller;
 			this.controllerContext = controllerContext;
 			this.engineContext = engineContext;
-			this.ignoreFlash = ignoreFlash;
+			this.sessionless = sessionless;
 		}
 
 		#region IHttpHandler
@@ -73,7 +76,11 @@ namespace Castle.MonoRail.Framework
 		/// <param name="context">The context.</param>
 		public virtual void Process(HttpContext context)
 		{
-			context.Response.Output.WriteLine("Hello");
+			if (!sessionless)
+			{
+				// Now we have a session
+				engineContext.Session = ResolveSession(context);
+			}
 
 			// items added to be used by the test context
 			context.Items["mr.controller"] = controller;
@@ -92,13 +99,43 @@ namespace Castle.MonoRail.Framework
 			}
 			finally
 			{
-				if (!ignoreFlash)
+				if (!sessionless)
 				{
 					PersistFlashItems();
 				}
 
 				ReleaseController(controller);
 			}
+		}
+
+		/// <summary>
+		/// Resolves the session.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <returns></returns>
+		protected virtual IDictionary ResolveSession(HttpContext context)
+		{
+			object session;
+
+			if (context.Items["AspSession"] != null)
+			{
+				// Windows and Testing
+				session = context.Items["AspSession"];
+			}
+			else
+			{
+				// Mono
+				session = context.Session;
+			}
+
+			if (session is HttpSessionState)
+			{
+				return new SessionAdapter(session as HttpSessionState);
+			}
+			else
+			{
+				return (IDictionary)session;
+			}	
 		}
 
 		private void ReleaseController(IController controller)
@@ -109,6 +146,8 @@ namespace Castle.MonoRail.Framework
 		private void PersistFlashItems()
 		{
 			Flash currentFlash = engineContext.Flash;
+
+			if (currentFlash == null) return;
 
 			currentFlash.Sweep();
 

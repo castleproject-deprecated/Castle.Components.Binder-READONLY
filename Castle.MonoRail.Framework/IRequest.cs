@@ -74,12 +74,12 @@ namespace Castle.MonoRail.Framework
 		/// <value>The Http headers.</value>
 		NameValueCollection Headers { get; }
 
-//		/// <summary>
-//		/// Gets a value indicating whether this requeest is from a local address.
-//		/// </summary>
-//		/// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
-//		bool IsLocal { get; }
-//
+		/// <summary>
+		/// Gets a value indicating whether this requeest is from a local address.
+		/// </summary>
+		/// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
+		bool IsLocal { get; }
+
 //		/// <summary>
 //		/// Gets additional path information for 
 //		/// a resource with a URL extension.

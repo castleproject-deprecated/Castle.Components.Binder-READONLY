@@ -46,7 +46,7 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Access the session objects.
 		/// </summary>
-		IDictionary Session { get; }
+		IDictionary Session { get; set; }
 
 		/// <summary>
 		/// Gets the request object.

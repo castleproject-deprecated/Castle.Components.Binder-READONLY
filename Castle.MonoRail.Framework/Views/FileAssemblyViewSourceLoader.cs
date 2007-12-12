@@ -17,7 +17,6 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.IO;
-	using Castle.Core;
 	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Views;
 
@@ -56,7 +55,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="provider">The provider.</param>
 		public void Service(IMonoRailServices provider)
 		{
-			MonoRailConfiguration config = (MonoRailConfiguration) provider.GetService(typeof(MonoRailConfiguration));
+			IMonoRailConfiguration config = (IMonoRailConfiguration) provider.GetService(typeof(IMonoRailConfiguration));
 
 			if (config != null)
 			{

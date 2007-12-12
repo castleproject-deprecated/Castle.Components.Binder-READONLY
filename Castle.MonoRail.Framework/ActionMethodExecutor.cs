@@ -10,7 +10,13 @@
 	/// </summary>
 	public class ActionMethodExecutor : IExecutableAction
 	{
+		/// <summary>
+		/// Pendent
+		/// </summary>
 		protected readonly MethodInfo actionMethod;
+		/// <summary>
+		/// Pendent
+		/// </summary>
 		protected readonly ActionMetaDescriptor metaDescriptor;
 
 		/// <summary>
@@ -48,7 +54,7 @@
 		/// <value><c>true</c> if they should be skipped; otherwise, <c>false</c>.</value>
 		public bool ShouldSkipAllFilters
 		{
-			get { throw new NotImplementedException(); }
+			get { return false; }
 		}
 
 		/// <summary>
@@ -58,7 +64,7 @@
 		/// <returns></returns>
 		public bool ShouldSkipFilter(Type filterType)
 		{
-			throw new NotImplementedException();
+			return false;
 		}
 
 		/// <summary>
@@ -67,7 +73,7 @@
 		/// <value>The layout override.</value>
 		public string LayoutOverride
 		{
-			get { throw new NotImplementedException(); }
+			get { return null; }
 		}
 
 		/// <summary>
@@ -76,7 +82,7 @@
 		/// <value>The accessible through verb.</value>
 		public string AccessibleThroughVerb
 		{
-			get { throw new NotImplementedException(); }
+			get { return null; }
 		}
 
 		/// <summary>
@@ -87,6 +93,7 @@
 		/// <param name="context">The context.</param>
 		public virtual void Execute(IEngineContext engineContext, Controller controller, IControllerContext context)
 		{
+			actionMethod.Invoke(controller, null);
 		}
 	}
 
@@ -113,6 +120,12 @@
 			this.invoke = invoke;
 		}
 
+		/// <summary>
+		/// Executes the action this instance represents.
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="context">The context.</param>
 		public override void Execute(IEngineContext engineContext, Controller controller, IControllerContext context)
 		{
 			invoke(actionMethod, engineContext.Request, null);

@@ -29,7 +29,7 @@ namespace Castle.MonoRail.Framework.Services
 	/// </summary>
 	public class DefaultViewEngineManager : IViewEngineManager, IServiceEnabledComponent, IInitializable
 	{
-		private MonoRailConfiguration config;
+		private IMonoRailConfiguration config;
 		private IServiceProvider provider;
 		private IDictionary ext2ViewEngine;
 		private IDictionary viewEnginesFastLookup;
@@ -52,39 +52,41 @@ namespace Castle.MonoRail.Framework.Services
 		/// </summary>
 		public void Initialize()
 		{
-			foreach (ViewEngineInfo info in config.ViewEngineConfig.ViewEngines)
+			foreach(ViewEngineInfo info in config.ViewEngineConfig.ViewEngines)
 			{
+				IViewEngine engine;
+
 				try
 				{
-					IViewEngine engine = (IViewEngine)Activator.CreateInstance(info.Engine);
-
-					RegisterEngineForView(engine);
-
-					RegisterEngineForExtesionLookup(engine);
-
-					engine.XHtmlRendering = info.XhtmlRendering;
-
-					IServiceEnabledComponent serviceEnabled = engine as IServiceEnabledComponent;
-
-					if (serviceEnabled != null)
-					{
-						serviceEnabled.Service(provider);
-					}
-
-					IInitializable initializable = engine as IInitializable;
-
-					if (initializable != null)
-					{
-						initializable.Initialize();
-					}
+					engine = (IViewEngine) Activator.CreateInstance(info.Engine);
 				}
-				catch (InvalidCastException)
+				catch(InvalidCastException)
 				{
 					throw new MonoRailException("Type " + info.Engine.FullName + " does not implement IViewEngine");
 				}
-				catch (Exception ex)
+				catch(Exception ex)
 				{
 					throw new MonoRailException("Could not create view engine instance: " + info.Engine, ex);
+				}
+
+				RegisterEngineForView(engine);
+
+				RegisterEngineForExtesionLookup(engine);
+
+				engine.XHtmlRendering = info.XhtmlRendering;
+
+				IServiceEnabledComponent serviceEnabled = engine as IServiceEnabledComponent;
+
+				if (serviceEnabled != null)
+				{
+					serviceEnabled.Service(provider);
+				}
+
+				IInitializable initializable = engine as IInitializable;
+
+				if (initializable != null)
+				{
+					initializable.Initialize();
 				}
 			}
 
@@ -108,7 +110,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			provider = serviceProvider;
 
-			config = (MonoRailConfiguration)provider.GetService(typeof(MonoRailConfiguration));
+			config = (IMonoRailConfiguration) provider.GetService(typeof(IMonoRailConfiguration));
 		}
 
 		#endregion
@@ -123,9 +125,9 @@ namespace Castle.MonoRail.Framework.Services
 		public bool HasTemplate(String templateName)
 		{
 			IViewEngine engine = ResolveEngine(templateName, false);
-			
+
 			if (engine == null) return false;
-			
+
 			return engine.HasTemplate(templateName);
 		}
 
@@ -142,7 +144,8 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="controller"></param>
 		/// <param name="controllerContext"></param>
 		/// <param name="templateName"></param>
-		public void Process(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, string templateName)
+		public void Process(string templateName, TextWriter output, IEngineContext context, IController controller,
+		                    IControllerContext controllerContext)
 		{
 			IViewEngine engine = ResolveEngine(templateName);
 
@@ -150,11 +153,11 @@ namespace Castle.MonoRail.Framework.Services
 
 			if (engine.SupportsJSGeneration && engine.IsTemplateForJSGeneration(templateName))
 			{
-				engine.GenerateJS(output, context, controller, controllerContext, templateName);
+				engine.GenerateJS(templateName, output, context, controller, controllerContext);
 			}
 			else
 			{
-				engine.Process(output, context, controller, controllerContext, templateName);
+				engine.Process(templateName, output, context, controller, controllerContext);
 			}
 		}
 
@@ -168,29 +171,31 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="partialName">The partial name.</param>
-		public void ProcessPartial(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, string partialName)
+		public void ProcessPartial(string partialName, TextWriter output, IEngineContext context, IController controller,
+		                           IControllerContext controllerContext)
 		{
 			IViewEngine engine = ResolveEngine(partialName);
 
-			engine.ProcessPartial(output, context, controller, controllerContext, partialName);
+			engine.ProcessPartial(partialName, output, context, controller, controllerContext);
 		}
 
 		/// <summary>
 		/// Wraps the specified content in the layout using
 		/// the context to output the result.
 		/// </summary>
-		public void ProcessContents(IEngineContext context, IController controller, IControllerContext controllerContext, String contents)
+		public void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller,
+		                                     IControllerContext controllerContext)
 		{
 			if (controllerContext.LayoutName == null)
 			{
-				throw new MonoRailException("ProcessContents can only work with a layout");
+				throw new MonoRailException("RenderStaticWithinLayout can only work with a layout");
 			}
 
 			String templateName = Path.Combine("layouts", controllerContext.LayoutName);
 
 			IViewEngine engine = ResolveEngine(templateName);
 
-			engine.ProcessContents(context, controller, controllerContext, contents);
+			engine.RenderStaticWithinLayout(contents, context, controller, controllerContext);
 		}
 
 		#endregion
@@ -239,13 +244,14 @@ namespace Castle.MonoRail.Framework.Services
 			{
 				if (engine.HasTemplate(templateName)) return engine;
 			}
-					
+
 			if (throwIfNotFound)
 			{
 				throw new MonoRailException(string.Format(
-@"MonoRail could not resolve a view engine instance for the template '{0}'
-There are two possible reasons: either the template does not exist, or the view engine " + 
-"that handles an specific file extension has not been configured correctly web.config (section monorail, node viewEngines).", templateName));
+				                            	@"MonoRail could not resolve a view engine instance for the template '{0}'
+There are two possible reasons: either the template does not exist, or the view engine " +
+				                            	"that handles an specific file extension has not been configured correctly web.config (section monorail, node viewEngines).",
+				                            	templateName));
 			}
 
 			return null;
@@ -259,7 +265,7 @@ There are two possible reasons: either the template does not exist, or the view 
 		{
 			if (ext2ViewEngine.Contains(engine.ViewFileExtension))
 			{
-				IViewEngine existing = (IViewEngine)ext2ViewEngine[engine.ViewFileExtension];
+				IViewEngine existing = (IViewEngine) ext2ViewEngine[engine.ViewFileExtension];
 
 				throw new MonoRailException(
 					"At least two view engines are handling the same file extension. " +
@@ -269,14 +275,14 @@ There are two possible reasons: either the template does not exist, or the view 
 			}
 
 			String extension = engine.ViewFileExtension.StartsWith(".")
-								? engine.ViewFileExtension
-								: "." + engine.ViewFileExtension;
+			                   	? engine.ViewFileExtension
+			                   	: "." + engine.ViewFileExtension;
 
 			ext2ViewEngine[extension] = engine;
 
 			if (engine.SupportsJSGeneration && ext2ViewEngine.Contains(engine.JSGeneratorFileExtension))
 			{
-				IViewEngine existing = (IViewEngine)ext2ViewEngine[engine.JSGeneratorFileExtension];
+				IViewEngine existing = (IViewEngine) ext2ViewEngine[engine.JSGeneratorFileExtension];
 
 				throw new MonoRailException(
 					"At least two view engines are handling the same file extension. " +
@@ -288,8 +294,8 @@ There are two possible reasons: either the template does not exist, or the view 
 			if (engine.SupportsJSGeneration)
 			{
 				extension = engine.JSGeneratorFileExtension.StartsWith(".")
-								? engine.JSGeneratorFileExtension
-								: "." + engine.JSGeneratorFileExtension;
+				            	? engine.JSGeneratorFileExtension
+				            	: "." + engine.JSGeneratorFileExtension;
 
 				ext2ViewEngine[extension] = engine;
 				jsgFastLookup[extension] = engine;

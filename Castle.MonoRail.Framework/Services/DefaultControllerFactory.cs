@@ -82,7 +82,7 @@ namespace Castle.MonoRail.Framework.Services
 				logger = loggerFactory.Create(typeof(AbstractControllerFactory));
 			}
 			
-			MonoRailConfiguration config = (MonoRailConfiguration) provider.GetService(typeof(MonoRailConfiguration));
+			IMonoRailConfiguration config = (IMonoRailConfiguration) provider.GetService(typeof(IMonoRailConfiguration));
 			
 			if (config != null)
 			{

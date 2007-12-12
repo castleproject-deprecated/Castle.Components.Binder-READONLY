@@ -66,15 +66,14 @@ namespace Castle.MonoRail.Framework.Adapters
 			}
 		}
 
-
-//		/// <summary>
-//		/// Gets a value indicating whether this requeest is from a local address.
-//		/// </summary>
-//		/// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
-//		public bool IsLocal
-//		{
-//			get { return request.Url.IsLoopback; }
-//		}
+		/// <summary>
+		/// Gets a value indicating whether this requeest is from a local address.
+		/// </summary>
+		/// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
+		public bool IsLocal
+		{
+			get { return request.Url.IsLoopback; }
+		}
 
 		/// <summary>
 		/// Gets the HTTP method.

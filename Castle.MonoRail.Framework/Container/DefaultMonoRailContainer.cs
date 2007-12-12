@@ -314,10 +314,6 @@ namespace Castle.MonoRail.Framework.Container
 			{
 				AddService<IFilterFactory>(CreateService<DefaultFilterFactory>());
 			}
-			if (!HasService<IControllerDescriptorProvider>())
-			{
-				AddService<IControllerDescriptorProvider>(CreateService<DefaultControllerDescriptorProvider>());
-			}
 			if (!HasService<IResourceDescriptorProvider>())
 			{
 				AddService<IResourceDescriptorProvider>(CreateService<DefaultResourceDescriptorProvider>());
@@ -345,6 +341,10 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<ITransformFilterDescriptorProvider>())
 			{
 				AddService<ITransformFilterDescriptorProvider>(CreateService<DefaultTransformFilterDescriptorProvider>());
+			}
+			if (!HasService<IControllerDescriptorProvider>())
+			{
+				AddService<IControllerDescriptorProvider>(CreateService<DefaultControllerDescriptorProvider>());
 			}
 			if (!HasService<IViewEngineManager>())
 			{

@@ -51,7 +51,7 @@ namespace Castle.MonoRail.Framework
 		private IViewEngineManager viewEngineManager;
 		private IActionSelector actionSelector;
 		private ValidatorRunner validator;
-		private FilterDescriptor[] filters;
+		private FilterDescriptor[] filters = new FilterDescriptor[0];
 		private IDictionary filtersToSkip = new HybridDictionary();
 //		private ValidatorRunner validatorRunner;
 
@@ -438,7 +438,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="name">The name of the view to process.</param>
 		public void InPlaceRenderView(TextWriter output, string name)
 		{
-			viewEngineManager.Process(output, Context, this, context, Path.Combine(ViewFolder, name));
+			viewEngineManager.Process(Path.Combine(ViewFolder, name), output, Context, this, context);
 		}
 
 		/// <summary>
@@ -474,7 +474,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="name">The name of the view to process.</param>
 		public void InPlaceRenderSharedView(TextWriter output, string name)
 		{
-			viewEngineManager.Process(output, Context, this, context, name);
+			viewEngineManager.Process(name, output, Context, this, context);
 		}
 
 		/// <summary>
@@ -538,7 +538,7 @@ namespace Castle.MonoRail.Framework
 
 			directRenderInvoked = true;
 
-			viewEngineManager.ProcessContents(engineContext, this, context, contents);
+			viewEngineManager.RenderStaticWithinLayout(contents, engineContext, this, context);
 		}
 
 		/// <summary>
@@ -879,12 +879,17 @@ namespace Castle.MonoRail.Framework
 			}
 			else
 			{
-				ProcessRescue();
+				ProcessRescue(action, actionException);
 			}
 
 			RunAfterRenderingFilters(action);
 		}
 
+		/// <summary>
+		/// Selects the appropriate action.
+		/// </summary>
+		/// <param name="action">The action name.</param>
+		/// <returns></returns>
 		protected virtual IExecutableAction SelectAction(string action)
 		{
 			// For backward compatibility purposes
@@ -973,7 +978,7 @@ namespace Castle.MonoRail.Framework
 		{
 			if (context.SelectedViewName != null)
 			{
-				viewEngineManager.Process(engineContext.Response.Output, engineContext, this, context, context.SelectedViewName);
+				viewEngineManager.Process(context.SelectedViewName, engineContext.Response.Output, engineContext, this, context);
 			}
 		}
 
@@ -1248,11 +1253,13 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Performs the rescue.
 		/// </summary>
-		/// <param name="method">The action (can be null in the case of dynamic actions).</param>
+		/// <param name="action">The action (can be null in the case of dynamic actions).</param>
 		/// <param name="ex">The exception.</param>
 		/// <returns></returns>
-		protected bool PerformRescue(MethodInfo method, Exception ex)
+		protected bool ProcessRescue(IExecutableAction action, Exception ex)
 		{
+			return false;
+
 //			context.LastException = (ex is TargetInvocationException) ? ex.InnerException : ex;
 //
 //			Type exceptionType = context.LastException.GetType();
@@ -1332,7 +1339,7 @@ namespace Castle.MonoRail.Framework
 
 			RescueDescriptor bestCandidate = null;
 
-			foreach (RescueDescriptor rescue in rescues)
+			foreach(RescueDescriptor rescue in rescues)
 			{
 				if (rescue.ExceptionType == exceptionType)
 				{
@@ -1353,8 +1360,10 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <param name="action"></param>
-		/// <param name="actions"></param>
+		/// <param name="action">The action.</param>
+		/// <param name="actions">The actions.</param>
+		/// <param name="request">The request.</param>
+		/// <param name="actionArgs">The action args.</param>
 		/// <returns></returns>
 		protected virtual MethodInfo SelectMethod(string action, IDictionary actions,
 												  IRequest request, IDictionary actionArgs)
@@ -1365,8 +1374,9 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <param name="method"></param>
-		/// <param name="methodArgs"></param>
+		/// <param name="method">The method.</param>
+		/// <param name="request">The request.</param>
+		/// <param name="methodArgs">The method args.</param>
 		protected virtual void InvokeMethod(MethodInfo method, IRequest request, IDictionary methodArgs)
 		{
 			method.Invoke(this, new object[0]);

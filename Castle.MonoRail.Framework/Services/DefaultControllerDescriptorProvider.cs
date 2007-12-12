@@ -64,23 +64,12 @@ namespace Castle.MonoRail.Framework.Services
 				logger = loggerFactory.Create(typeof(DefaultControllerDescriptorProvider));
 			}
 
-			helperDescriptorProvider = (IHelperDescriptorProvider) 
-				serviceProvider.GetService(typeof(IHelperDescriptorProvider));
-
-			filterDescriptorProvider = (IFilterDescriptorProvider)
-				serviceProvider.GetService(typeof(IFilterDescriptorProvider));
-
-			layoutDescriptorProvider = (ILayoutDescriptorProvider)
-				serviceProvider.GetService(typeof(ILayoutDescriptorProvider));
-
-			rescueDescriptorProvider = (IRescueDescriptorProvider)
-				serviceProvider.GetService(typeof(IRescueDescriptorProvider));
-		
-			resourceDescriptorProvider = (IResourceDescriptorProvider)
-				serviceProvider.GetService(typeof(IResourceDescriptorProvider));
-			
-			transformFilterDescriptorProvider = (ITransformFilterDescriptorProvider)
-				serviceProvider.GetService(typeof(ITransformFilterDescriptorProvider));
+			helperDescriptorProvider = serviceProvider.GetService<IHelperDescriptorProvider>();
+			filterDescriptorProvider = serviceProvider.GetService<IFilterDescriptorProvider>();
+			layoutDescriptorProvider = serviceProvider.GetService<ILayoutDescriptorProvider>();
+			rescueDescriptorProvider = serviceProvider.GetService<IRescueDescriptorProvider>();
+			resourceDescriptorProvider = serviceProvider.GetService<IResourceDescriptorProvider>();
+			transformFilterDescriptorProvider = serviceProvider.GetService<ITransformFilterDescriptorProvider>();
 		}
 
 		#endregion

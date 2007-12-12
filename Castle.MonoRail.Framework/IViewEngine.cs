@@ -63,7 +63,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="templateName">Name of the template.</param>
-		void GenerateJS(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String templateName);
+		void GenerateJS(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the view engine should set the
@@ -90,7 +90,7 @@ namespace Castle.MonoRail.Framework
 		/// and writes the results to the <see cref="TextWriter"/>. 
 		/// No layout is applied!
 		/// </summary>
-		void Process(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String templateName);
+		void Process(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Wraps the specified content in the layout using
@@ -99,8 +99,8 @@ namespace Castle.MonoRail.Framework
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
-		/// <param name="contents">Content to output</param>
-		void ProcessContents(IEngineContext context, IController controller, IControllerContext controllerContext, String contents);
+		/// <param name="contents">Static content to output within the layout</param>
+		void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Should process the specified partial. The partial name must contains
@@ -111,6 +111,6 @@ namespace Castle.MonoRail.Framework
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="partialName">The partial name.</param>
-		void ProcessPartial(TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext, String partialName);
+		void ProcessPartial(String partialName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
 	}
 }

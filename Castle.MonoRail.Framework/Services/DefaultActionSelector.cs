@@ -58,7 +58,8 @@
 
 			if (executableAction == null)
 			{
-				throw new ControllerException(string.Format("Unable to find action '{0}' on controller '{1}'.", actionName, Name));
+				throw new ControllerException(string.Format(
+					"Unable to find action '{0}' on controller '{1}'.", actionName, context.Name));
 			}
 
 			return executableAction;
@@ -82,11 +83,25 @@
 			subSelectors.Remove(subSelector);
 		}
 
+		/// <summary>
+		/// Selects the action method.
+		/// </summary>
+		/// <param name="controller">The controller.</param>
+		/// <param name="context">The context.</param>
+		/// <param name="name">The name.</param>
+		/// <returns></returns>
 		protected virtual MethodInfo SelectActionMethod(IController controller, IControllerContext context, string name)
 		{
 			return context.ControllerDescriptor.Actions[name] as MethodInfo;
 		}
 
+		/// <summary>
+		/// Runs the sub selectors.
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="context">The context.</param>
+		/// <returns></returns>
 		protected virtual IExecutableAction RunSubSelectors(IEngineContext engineContext, IController controller, IControllerContext context)
 		{
 			foreach(ISubActionSelector selector in subSelectors)

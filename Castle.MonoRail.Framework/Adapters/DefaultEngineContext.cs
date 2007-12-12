@@ -32,11 +32,11 @@ namespace Castle.MonoRail.Framework.Adapters
 		private readonly IServerUtility server;
 		private readonly IRequest request;
 		private readonly IResponse response;
+		private readonly Flash flash;
 		private IDictionary session;
 //		private TraceAdapter _trace;
 //		private Exception _lastException;
 //		private IDictionary _session;
-		private Flash flash;
 //		private String _url;
 //		private ICacheProvider _cache;
 //		private IServiceProvider container;
@@ -54,8 +54,10 @@ namespace Castle.MonoRail.Framework.Adapters
 		/// <param name="request">The request.</param>
 		/// <param name="response">The response.</param>
 		/// <param name="session">The session.</param>
-		public DefaultEngineContext(IMonoRailContainer container, UrlInfo urlInfo, 
-			HttpContext context, IServerUtility server, IRequest request, IResponse response, IDictionary session)
+		/// <param name="flash">The flash.</param>
+		public DefaultEngineContext(IMonoRailContainer container, UrlInfo urlInfo,
+		                            HttpContext context, IServerUtility server, IRequest request, IResponse response,
+		                            IDictionary session, Flash flash)
 			: base(container)
 		{
 			this.container = container;
@@ -65,6 +67,7 @@ namespace Castle.MonoRail.Framework.Adapters
 			this.response = response;
 			this.session = session;
 			this.server = server;
+			this.flash = flash;
 		}
 
 		/// <summary>
@@ -188,14 +191,7 @@ namespace Castle.MonoRail.Framework.Adapters
 		/// <value></value>
 		public Flash Flash
 		{
-			get
-			{
-				if (flash == null && Session != null)
-				{
-					flash = new Flash((Flash) Session[Flash.FlashKey]);
-				}
-				return flash;
-			}
+			get { return flash; }
 		}
 
 //		/// <summary>

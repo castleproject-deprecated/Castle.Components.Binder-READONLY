@@ -136,6 +136,12 @@ namespace Castle.MonoRail.Framework.Configuration
 			{
 				viewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, viewPathRoot);
 			}
+
+			if (!Directory.Exists(viewPathRoot))
+			{
+				throw new MonoRailException("View folder configured could not be found. " +
+					"Check (or add) a viewPathRoot attribute to the viewEngines node on the MonoRail configuration (web.config)");
+			}
 		}
 
 		/// <summary>
@@ -143,8 +149,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// </summary>
 		private void ConfigureDefaultViewEngine()
 		{
-			viewPathRoot = "views";
-
 			Type engineType = typeof(Castle.MonoRail.Framework.Views.Aspx.WebFormsViewEngine);
 
 			viewEngines = new ViewEngineInfo[] {new ViewEngineInfo(engineType, false)};

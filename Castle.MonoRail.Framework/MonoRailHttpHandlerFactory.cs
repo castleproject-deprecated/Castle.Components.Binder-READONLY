@@ -28,10 +28,10 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	public class MonoRailHttpHandlerFactory : IHttpHandlerFactory
 	{
+		private readonly static string CurrentEngineContextKey = "currentmrengineinstance";
+		private readonly static string CurrentControllerKey = "currentmrcontroller";
+		private readonly static string CurrentControllerContextKey = "currentmrcontrollercontext";
 		private readonly object locker = new object();
-		private readonly string CurrentEngineContextKey = "currentmrengineinstance";
-		private readonly string CurrentControllerKey = "currentmrcontroller";
-		private readonly string CurrentControllerContextContextKey = "currentmrcontrollercontext";
 
 		private IMonoRailConfiguration configuration;
 		private IMonoRailContainer mrContainer;
@@ -95,7 +95,7 @@ namespace Castle.MonoRail.Framework
 
 			context.Items[CurrentEngineContextKey] = engineContext;
 			context.Items[CurrentControllerKey] = controller;
-			context.Items[CurrentControllerContextContextKey] = controllerContext;
+			context.Items[CurrentControllerContextKey] = controllerContext;
 
 			if (IgnoresSession(controllerDesc.ControllerDescriptor))
 			{
@@ -179,7 +179,7 @@ namespace Castle.MonoRail.Framework
 		/// <value>The current engine context.</value>
 		public static IEngineContext CurrentEngineContext
 		{
-			get { return HttpContext.Current.Items[CurrentEngineContext] as IEngineContext; }
+			get { return HttpContext.Current.Items[CurrentEngineContextKey] as IEngineContext; }
 		}
 
 		/// <summary>
@@ -188,7 +188,7 @@ namespace Castle.MonoRail.Framework
 		/// <value>The current controller.</value>
 		public static IController CurrentController
 		{
-			get { return HttpContext.Current.Items[CurrentController] as IController; }
+			get { return HttpContext.Current.Items[CurrentControllerKey] as IController; }
 		}
 
 		/// <summary>
@@ -197,7 +197,7 @@ namespace Castle.MonoRail.Framework
 		/// <value>The current controller context.</value>
 		public static IControllerContext CurrentControllerContext
 		{
-			get { return HttpContext.Current.Items[CurrentControllerContext] as IControllerContext; }
+			get { return HttpContext.Current.Items[CurrentControllerContextKey] as IControllerContext; }
 		}
 
 		#endregion

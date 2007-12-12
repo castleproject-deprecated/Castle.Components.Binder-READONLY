@@ -36,39 +36,29 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			IDictionary session = ResolveRequestSession(container, urlInfo, context);
 
+			Flash flash = null;
+
+			if (session != null)
+			{
+				flash = new Flash((Flash) session[Flash.FlashKey]);
+			}
+			else
+			{
+				flash = new Flash();
+			}
+
 			return new DefaultEngineContext(container, urlInfo, context,
 			                                new ServerUtilityAdapter(context.Server),
 			                                new RequestAdapter(context.Request),
-			                                new ResponseAdapter(context.Response), session);
+			                                new ResponseAdapter(context.Response), session, flash);
 		}
-
 
 		/// <summary>
 		/// Resolves the request session.
 		/// </summary>
 		protected virtual IDictionary ResolveRequestSession(IMonoRailContainer container, UrlInfo urlInfo, HttpContext context)
 		{
-			object session;
-
-			if (context.Items["AspSession"] != null)
-			{
-				// Windows and Testing
-				session = context.Items["AspSession"];
-			}
-			else
-			{
-				// Mono
-				session = context.Session;
-			}
-
-			if (session is HttpSessionState)
-			{
-				return new SessionAdapter(session as HttpSessionState);
-			}
-			else
-			{
-				return (IDictionary) session;
-			}	
+			return null;
 		}
 	}
 }

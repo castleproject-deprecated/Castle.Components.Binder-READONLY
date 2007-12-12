@@ -64,7 +64,7 @@ namespace Castle.MonoRail.Framework.Providers
 
 			ArrayList descriptors = new ArrayList();
 
-			while(type != typeof(IController))
+			while(type != typeof(object))
 			{
 				object[] attributes = type.GetCustomAttributes(typeof(IRescueDescriptorBuilder), false);
 

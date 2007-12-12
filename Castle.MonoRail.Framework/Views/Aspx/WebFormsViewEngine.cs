@@ -87,8 +87,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// Obtains the aspx Page from the view name dispatch
 		/// its execution using the standard ASP.Net API.
 		/// </summary>
-		public override void Process(TextWriter output, IEngineContext context, IController controller,
-		                             IControllerContext controllerContext, String viewName)
+		public override void Process(String viewName, TextWriter output, IEngineContext context, IController controller,
+		                             IControllerContext controllerContext)
 		{
 			AdjustContentType(context);
 
@@ -126,9 +126,10 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="partialName">The partial name.</param>
-		public override void ProcessPartial(TextWriter output, IEngineContext context, IController controller,
-		                                    IControllerContext controllerContext,
-		                                    string partialName)
+		public override void ProcessPartial(string partialName, TextWriter output, 
+			IEngineContext context, IController controller,
+		                                    IControllerContext controllerContext
+		                                    )
 		{
 			throw new NotImplementedException();
 		}
@@ -151,8 +152,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="templateName">Name of the template.</param>
-		public override void GenerateJS(TextWriter output, IEngineContext context, IController controller,
-		                                IControllerContext controllerContext, string templateName)
+		public override void GenerateJS(string templateName, TextWriter output, IEngineContext context, IController controller,
+		                                IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -165,8 +166,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="contents">The contents.</param>
-		public override void ProcessContents(IEngineContext context, IController controller,
-		                                     IControllerContext controllerContext, String contents)
+		public override void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller,
+		                                     IControllerContext controllerContext)
 		{
 			AdjustContentType(context);
 
@@ -266,11 +267,11 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		{
 			viewName += ".aspx";
 
-			//TODO: There needs to be a more efficient way to do this than two replace operations
+			// TODO: There must be a more efficient way to do this than two replace operations
 			return
-				Path.Combine(ViewSourceLoader.ViewRootDir, viewName).Replace('/', Path.DirectorySeparatorChar).Replace('\\',
-				                                                                                                       Path.
-				                                                                                                       	DirectorySeparatorChar);
+				Path.Combine(ViewSourceLoader.ViewRootDir, viewName).
+				Replace('/', Path.DirectorySeparatorChar).
+				Replace('\\', Path.DirectorySeparatorChar);
 		}
 
 		private String MapViewToVirtualPath(String viewName, ref string physicalPath, HttpContext httpContext)

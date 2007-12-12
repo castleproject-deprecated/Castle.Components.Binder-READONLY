@@ -23,8 +23,8 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	using System.IO;
 	using System.Collections;
 	using Castle.Core;
-	using Castle.MonoRail.Framework.Helpers;
-	using Castle.MonoRail.Framework.Views.NVelocity.JSGeneration;
+	using Castle.MonoRail.Framework.JSGeneration;
+//	using Castle.MonoRail.Framework.Views.NVelocity.JSGeneration;
 	using Commons.Collections;
 
 	/// <summary>
@@ -58,17 +58,17 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		{
 			ExtendedProperties props = new ExtendedProperties();
 
-			if (ViewSourceLoader.HasTemplate("nvelocity.properties"))
+			if (ViewSourceLoader.HasSource("nvelocity.properties"))
 			{
-				using (Stream stream = ViewSourceLoader.GetViewSource("nvelocity.properties").OpenViewStream())
+				using(Stream stream = ViewSourceLoader.GetViewSource("nvelocity.properties").OpenViewStream())
 				{
 					props.Load(stream);
 				}
 			}
 
 			// Set up a custom directive manager
-			props.SetProperty("directive.manager",
-							  "Castle.MonoRail.Framework.Views.NVelocity.CustomDirectiveManager; Castle.MonoRail.Framework.Views.NVelocity");
+//			props.SetProperty("directive.manager",
+//			                  "Castle.MonoRail.Framework.Views.NVelocity.CustomDirectiveManager; Castle.MonoRail.Framework.Views.NVelocity");
 
 			InitializeVelocityProperties(props);
 
@@ -123,20 +123,23 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		}
 
 		/// <summary>
-		/// Processes the specified context.
+		/// Pendent.
 		/// </summary>
+		/// <param name="output">The output.</param>
 		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="viewName">Name of the view.</param>
-		public override void Process(IRailsEngineContext context, IController controller, String viewName)
+		public override void Process(String viewName, TextWriter output, IEngineContext context,
+		                             IController controller, IControllerContext controllerContext)
 		{
-			IContext ctx = CreateContext(context, controller);
+			IContext ctx = CreateContext(context, controller, controllerContext);
 
 			try
 			{
 				AdjustContentType(context);
 
-				bool hasLayout = controller.LayoutName != null;
+				bool hasLayout = controllerContext.LayoutName != null;
 
 				TextWriter writer;
 
@@ -165,7 +168,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 				if (hasLayout)
 				{
 					String contents = (writer as StringWriter).GetStringBuilder().ToString();
-					ProcessLayout(contents, controller, ctx, context);
+					ProcessLayout(contents, controller, controllerContext, ctx, context);
 				}
 			}
 			catch(Exception ex)
@@ -183,36 +186,35 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		/// Processes the view - using the templateName to obtain the correct template
 		/// and writes the results to the System.TextWriter. No layout is applied!
 		/// </summary>
-		public override void Process(TextWriter output, IRailsEngineContext context, IController controller, String viewName)
+//		public override void Process(TextWriter output, IEngineContext context, IController controller, String viewName)
+//		{
+//			IContext ctx = CreateContext(context, controller);
+//
+//			AdjustContentType(context);
+//
+//			String view = ResolveTemplateName(viewName);
+//
+//			try
+//			{
+//				Template template = velocity.GetTemplate(view);
+//
+//				BeforeMerge(velocity, template, ctx);
+//				template.Merge(ctx, output);
+//			}
+//			catch (Exception ex)
+//			{
+//				if (Logger.IsErrorEnabled)
+//				{
+//					Logger.Error("Could not render view", ex);
+//				}
+//
+//				throw new MonoRailException("Could not render view: " + view, ex);
+//			}
+//		}
+		public override void ProcessPartial(String partialName, TextWriter output, IEngineContext context,
+		                                    IController controller, IControllerContext controllerContext)
 		{
-			IContext ctx = CreateContext(context, controller);
-
-			AdjustContentType(context);
-
-			String view = ResolveTemplateName(viewName);
-
-			try
-			{
-				Template template = velocity.GetTemplate(view);
-
-				BeforeMerge(velocity, template, ctx);
-				template.Merge(ctx, output);
-			}
-			catch (Exception ex)
-			{
-				if (Logger.IsErrorEnabled)
-				{
-					Logger.Error("Could not render view", ex);
-				}
-
-				throw new MonoRailException("Could not render view: " + view, ex);
-			}
-		}
-
-		public override void ProcessPartial(TextWriter output, IRailsEngineContext context,
-											IController controller, string partialName)
-		{
-			IContext ctx = CreateContext(context, controller);
+			IContext ctx = CreateContext(context, controller, controllerContext);
 			String view = ResolveTemplateName(partialName);
 
 			try
@@ -220,7 +222,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 				Template template = velocity.GetTemplate(view);
 				template.Merge(ctx, output);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				if (Logger.IsErrorEnabled)
 				{
@@ -231,15 +233,15 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 		}
 
-		public override object CreateJSGenerator(IRailsEngineContext context)
+		public override IJSGenerator CreateJSGenerator(IEngineContext context)
 		{
-			return new JSGeneratorDuck(new PrototypeHelper.JSGenerator(context));
+			return null;
+//			return new JSGeneratorDuck(new PrototypeHelper.JSGenerator(context));
 		}
 
-		public override void GenerateJS(TextWriter output, IRailsEngineContext context, IController controller,
-										string templateName)
+		public override void GenerateJS(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
-			IContext ctx = CreateContext(context, controller);
+			IContext ctx = CreateContext(context, controller, controllerContext);
 
 			object generator = CreateJSGenerator(context);
 
@@ -259,7 +261,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 				output.WriteLine(generator);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				if (Logger.IsErrorEnabled)
 				{
@@ -270,16 +272,17 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 		}
 
-		public override void ProcessContents(IRailsEngineContext context, IController controller, String contents)
+		public override void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller,
+		                                     IControllerContext controllerContext)
 		{
-			IContext ctx = CreateContext(context, controller);
+			IContext ctx = CreateContext(context, controller, controllerContext);
 			AdjustContentType(context);
 
-			bool hasLayout = controller.LayoutName != null;
+			bool hasLayout = controllerContext.LayoutName != null;
 
 			if (hasLayout)
 			{
-				ProcessLayout(contents, controller, ctx, context);
+				ProcessLayout(contents, controller, controllerContext, ctx, context);
 			}
 			else
 			{
@@ -297,7 +300,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		protected virtual void InitializeVelocityProperties(ExtendedProperties props)
 		{
 			velocity.SetApplicationAttribute(RuntimeConstants.RESOURCE_MANAGER_CLASS,
-											 new CustomResourceManager(ViewSourceLoader));
+			                                 new CustomResourceManager(ViewSourceLoader));
 
 			LoadMacros(props);
 		}
@@ -316,8 +319,8 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			else
 			{
 				return String.Format("{0}{1}{2}",
-									TemplateKeys.LayoutPath, Path.DirectorySeparatorChar,
-									ResolveTemplateName(templateName));
+				                     TemplateKeys.LayoutPath, Path.DirectorySeparatorChar,
+				                     ResolveTemplateName(templateName));
 			}
 		}
 
@@ -325,9 +328,10 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		{
 		}
 
-		private void ProcessLayout(String contents, IController controller, IContext ctx, IRailsEngineContext context)
+		private void ProcessLayout(String contents, IController controller, IControllerContext controllerContext, IContext ctx,
+		                           IEngineContext context)
 		{
-			String layout = ResolveLayoutTemplateName(controller.LayoutName);
+			String layout = ResolveLayoutTemplateName(controllerContext.LayoutName);
 
 			BeforeApplyingLayout(layout, ref contents, controller, ctx, context);
 
@@ -335,11 +339,12 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		}
 
 		protected virtual void BeforeApplyingLayout(string layout, ref string contents,
-			IController controller, IContext ctx, IRailsEngineContext context)
+		                                            IController controller, IContext ctx, IEngineContext context)
 		{
 		}
 
-		protected void RenderLayout(string layoutName, string contents, IContext ctx, IRailsEngineContext context, TextWriter output)
+		protected void RenderLayout(string layoutName, string contents, IContext ctx, IEngineContext context,
+		                            TextWriter output)
 		{
 			try
 			{
@@ -351,7 +356,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 				template.Merge(ctx, output);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				if (context.Request.IsLocal)
 				{
@@ -359,13 +364,16 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 				}
 				else
 				{
-					throw new MonoRailException("Error processing layout. Maybe the layout file does not exists? File: " + layoutName, ex);
+					throw new MonoRailException("Error processing layout. Maybe the layout file does not exists? File: " + layoutName,
+					                            ex);
 				}
 			}
 		}
 
-		private IContext CreateContext(IRailsEngineContext context, IController controller)
+		private IContext CreateContext(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
+			IRequest request = context.Request;
+
 			Hashtable innerContext = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 
 			innerContext.Add(TemplateKeys.Controller, controller);
@@ -374,25 +382,25 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			innerContext.Add(TemplateKeys.Response, context.Response);
 			innerContext.Add(TemplateKeys.Session, context.Session);
 
-			if (controller.Resources != null)
+			if (controllerContext.Resources != null)
 			{
-				foreach (String key in controller.Resources.Keys)
+				foreach(String key in controllerContext.Resources.Keys)
 				{
-					innerContext[key] = controller.Resources[key];
+					innerContext[key] = controllerContext.Resources[key];
 				}
 			}
 
-			foreach(String key in context.Request.QueryString.AllKeys)
+			foreach(String key in request.QueryString.AllKeys)
 			{
 				if (key == null) continue; // Nasty bug?
-				object value = context.Params[key];
+				object value = request.QueryString[key];
 				if (value == null) continue;
 				innerContext[key] = value;
 			}
-			foreach(String key in context.Request.Form.AllKeys)
+			foreach(String key in request.Form.AllKeys)
 			{
 				if (key == null) continue; // Nasty bug?
-				object value = context.Params[key];
+				object value = request.Form[key];
 				if (value == null) continue;
 				innerContext[key] = value;
 			}
@@ -424,11 +432,11 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 				innerContext[helper.GetType().GetGenericArguments()[0].Name] = helper;
 			}
 
-			if (controller.Helpers != null)
+			if (controllerContext.Helpers != null)
 			{
-				foreach (object key in controller.Helpers.Keys)
+				foreach(object key in controllerContext.Helpers.Keys)
 				{
-					innerContext[key] = controller.Helpers[key];
+					innerContext[key] = controllerContext.Helpers[key];
 				}
 			}
 
@@ -438,16 +446,16 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			{
 				innerContext[Flash.FlashKey] = context.Flash;
 
-				foreach (DictionaryEntry entry in context.Flash)
+				foreach(DictionaryEntry entry in context.Flash)
 				{
 					if (entry.Value == null) continue;
 					innerContext[entry.Key] = entry.Value;
 				}
 			}
 
-			if (controller.PropertyBag != null)
+			if (controllerContext.PropertyBag != null)
 			{
-				foreach (DictionaryEntry entry in controller.PropertyBag)
+				foreach(DictionaryEntry entry in controllerContext.PropertyBag)
 				{
 					if (entry.Value == null) continue;
 					innerContext[entry.Key] = entry.Value;
@@ -478,7 +486,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 				if (libPropValue is ICollection)
 				{
-					macroList.AddRange((ICollection)libPropValue);
+					macroList.AddRange((ICollection) libPropValue);
 				}
 				else if (libPropValue is string)
 				{
