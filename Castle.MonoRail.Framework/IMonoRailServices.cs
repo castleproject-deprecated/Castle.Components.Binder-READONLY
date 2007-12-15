@@ -100,5 +100,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The action selector.</value>
 		IActionSelector ActionSelector { get; set; }
+
+		/// <summary>
+		/// Gets or sets the scaffold support.
+		/// </summary>
+		/// <value>The scaffold support.</value>
+		IScaffoldingSupport ScaffoldSupport { get; set; }
 	}
 }

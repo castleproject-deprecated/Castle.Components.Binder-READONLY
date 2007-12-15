@@ -14,8 +14,8 @@
 
 namespace Castle.MonoRail.Framework.Test
 {
-	using System.Collections.Specialized;
-	using Framework;
+	using System.IO;
+	using Castle.MonoRail.Framework;
 
 	/// <summary>
 	/// Exposes methods on top of <see cref="IResponse"/>
@@ -30,9 +30,15 @@ namespace Castle.MonoRail.Framework.Test
 		string RedirectedTo { get; }
 
 		/// <summary>
-		/// Gets the http headers.
+		/// Sets the output.
 		/// </summary>
-		/// <value>The headers.</value>
-		NameValueCollection Headers { get; }
+		/// <value>The output.</value>
+		new TextWriter Output { set; }
+
+//		/// <summary>
+//		/// Gets the http headers.
+//		/// </summary>
+//		/// <value>The headers.</value>
+//		NameValueCollection Headers { get; }
 	}
 }

@@ -35,7 +35,7 @@ namespace Castle.MonoRail.Framework.Adapters
 		private readonly Flash flash;
 		private IDictionary session;
 //		private TraceAdapter _trace;
-//		private Exception _lastException;
+		private Exception lastException;
 //		private IDictionary _session;
 //		private String _url;
 //		private ICacheProvider _cache;
@@ -88,17 +88,17 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return container; }
 		}
 
-//		/// <summary>
-//		/// Gets the last exception raised during
-//		/// the execution of an action.
-//		/// </summary>
-//		/// <value></value>
-//		public Exception LastException
-//		{
-//			get { return _lastException; }
-//			set { _lastException = value; }
-//		}
-//
+		/// <summary>
+		/// Gets the last exception raised during
+		/// the execution of an action.
+		/// </summary>
+		/// <value></value>
+		public Exception LastException
+		{
+			get { return lastException; }
+			set { lastException = value; }
+		}
+
 //		/// <summary>
 //		/// Gets the request type (GET, POST, etc)
 //		/// </summary>

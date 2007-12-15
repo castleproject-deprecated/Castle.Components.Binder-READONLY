@@ -129,6 +129,15 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
+		/// Evaluates whether the specified template exists.
+		/// </summary>
+		/// <returns><c>true</c> if it exists</returns>
+		public virtual bool HasJsGenerationTemplate(String templateName)
+		{
+			return ViewSourceLoader.HasSource(templateName);
+		}
+
+		/// <summary>
 		/// Evaluates whether the specified template can be used to generate js.
 		/// </summary>
 		/// <returns><c>true</c> if it exists and has the correct file extension</returns>
@@ -137,8 +146,8 @@ namespace Castle.MonoRail.Framework
 			string resolvedTemplateName = ResolveJSTemplateName(templateName);
 
 			return 
-				string.Compare(Path.GetExtension(resolvedTemplateName), JSGeneratorFileExtension, true) == 0 && 
-					HasTemplate(resolvedTemplateName);
+				string.Compare(Path.GetExtension(resolvedTemplateName), JSGeneratorFileExtension, true) == 0 &&
+					HasJsGenerationTemplate(resolvedTemplateName);
 		}
 
 		///<summary>

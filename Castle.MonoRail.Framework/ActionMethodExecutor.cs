@@ -1,88 +1,41 @@
-﻿namespace Castle.MonoRail.Framework
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace Castle.MonoRail.Framework
 {
-	using System;
 	using System.Collections;
 	using System.Reflection;
-	using Descriptors;
+	using Castle.MonoRail.Framework.Descriptors;
 
 	/// <summary>
 	/// Pendent
 	/// </summary>
-	public class ActionMethodExecutor : IExecutableAction
+	public class ActionMethodExecutor : BaseExecutableAction
 	{
 		/// <summary>
 		/// Pendent
 		/// </summary>
 		protected readonly MethodInfo actionMethod;
-		/// <summary>
-		/// Pendent
-		/// </summary>
-		protected readonly ActionMetaDescriptor metaDescriptor;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ActionMethodExecutor"/> class.
 		/// </summary>
 		/// <param name="actionMethod">The action method.</param>
 		/// <param name="metaDescriptor">The meta descriptor.</param>
-		public ActionMethodExecutor(MethodInfo actionMethod, ActionMetaDescriptor metaDescriptor)
+		public ActionMethodExecutor(MethodInfo actionMethod, ActionMetaDescriptor metaDescriptor) : base(metaDescriptor)
 		{
 			this.actionMethod = actionMethod;
-			this.metaDescriptor = metaDescriptor;
-
-//				string layoutName = null;
-//
-//				// Overrides the current layout, if the action specifies one
-//				if (actionDesc.Layout != null)
-//				{
-//					layoutName = actionDesc.Layout.LayoutName;
-//				}
-
-//				if (actionDesc.AccessibleThrough != null)
-//				{
-//					if (!actionDesc.AccessibleThrough.ForHttpMethod(engineContext.Request.HttpMethod))
-//					{
-//						throw new ControllerException(string.Format("Access to the action [{0}] " +
-//																	"on controller [{1}] is not allowed by the http verb [{2}].",
-//																	actionName, Name, engineContext.Request.HttpMethod));
-//					}
-//				}
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether no filter should run before execute the action.
-		/// </summary>
-		/// <value><c>true</c> if they should be skipped; otherwise, <c>false</c>.</value>
-		public bool ShouldSkipAllFilters
-		{
-			get { return false; }
-		}
-
-		/// <summary>
-		/// Pendent
-		/// </summary>
-		/// <param name="filterType">Type of the filter.</param>
-		/// <returns></returns>
-		public bool ShouldSkipFilter(Type filterType)
-		{
-			return false;
-		}
-
-		/// <summary>
-		/// Gets the layout override.
-		/// </summary>
-		/// <value>The layout override.</value>
-		public string LayoutOverride
-		{
-			get { return null; }
-		}
-
-		/// <summary>
-		/// Gets the http method that the action requires before being executed.
-		/// </summary>
-		/// <value>The accessible through verb.</value>
-		public string AccessibleThroughVerb
-		{
-			get { return null; }
 		}
 
 		/// <summary>
@@ -91,9 +44,9 @@
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="context">The context.</param>
-		public virtual void Execute(IEngineContext engineContext, Controller controller, IControllerContext context)
+		public override object Execute(IEngineContext engineContext, Controller controller, IControllerContext context)
 		{
-			actionMethod.Invoke(controller, null);
+			return actionMethod.Invoke(controller, null);
 		}
 	}
 
@@ -107,7 +60,7 @@
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		public delegate void InvokeOnController(MethodInfo method, IRequest request, IDictionary methodArgs);
+		public delegate object InvokeOnController(MethodInfo method, IRequest request, IDictionary methodArgs);
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ActionMethodExecutorCompatible"/> class.
@@ -126,9 +79,9 @@
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="context">The context.</param>
-		public override void Execute(IEngineContext engineContext, Controller controller, IControllerContext context)
+		public override object Execute(IEngineContext engineContext, Controller controller, IControllerContext context)
 		{
-			invoke(actionMethod, engineContext.Request, null);
+			return invoke(actionMethod, engineContext.Request, null);
 		}
 	}
 }

@@ -17,10 +17,26 @@ namespace Castle.MonoRail.Framework
 	using System;
 
 	/// <summary>
+	/// Pendent
+	/// </summary>
+	public delegate void ControllerHandler(IExecutableAction action, IEngineContext engineContext,
+	                                       IController controller, IControllerContext controllerContext);
+
+	/// <summary>
 	/// Represent the core functionality required out of a controller
 	/// </summary>
 	public interface IController : IDisposable
 	{
+		/// <summary>
+		/// Occurs just before the action execution.
+		/// </summary>
+		event ControllerHandler BeforeAction;
+
+		/// <summary>
+		/// Occurs just after the action execution.
+		/// </summary>
+		event ControllerHandler AfterAction;
+
 		/// <summary>
 		/// Performs the specified action, which means:
 		/// <br/>

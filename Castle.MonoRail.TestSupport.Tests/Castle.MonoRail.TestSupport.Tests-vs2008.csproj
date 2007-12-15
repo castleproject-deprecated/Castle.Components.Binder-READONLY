@@ -47,13 +47,13 @@
     <Compile Include="Controllers\BugsController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Castle.MonoRail.Framework\Castle.MonoRail.Framework-vs2005.csproj">
+    <ProjectReference Include="..\Castle.MonoRail.Framework\Castle.MonoRail.Framework-vs2008.csproj">
       <Project>{EC393863-333E-49CE-94A6-654B9F323954}</Project>
-      <Name>Castle.MonoRail.Framework-vs2005</Name>
+      <Name>Castle.MonoRail.Framework-vs2008</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Castle.MonoRail.TestSupport\Castle.MonoRail.TestSupport-vs2005.csproj">
+    <ProjectReference Include="..\Castle.MonoRail.TestSupport\Castle.MonoRail.TestSupport-vs2008.csproj">
       <Project>{E572DC59-2A96-482F-BE39-E938AB47EA9D}</Project>
-      <Name>Castle.MonoRail.TestSupport-vs2005</Name>
+      <Name>Castle.MonoRail.TestSupport-vs2008</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -34,8 +34,8 @@ namespace Castle.MonoRail.Framework.Providers
 		/// and return descriptors instances, or an empty array if none 
 		/// was found.
 		/// </summary>
-		/// <param name="memberInfo">The action (MethodInfo)</param>
+		/// <param name="methodInfo">The action (MethodInfo)</param>
 		/// <returns>An array of <see cref="TransformFilterDescriptor"/></returns>
-		TransformFilterDescriptor[] CollectFilters(MemberInfo memberInfo);
+		TransformFilterDescriptor[] CollectFilters(MethodInfo methodInfo);
 	}
 }

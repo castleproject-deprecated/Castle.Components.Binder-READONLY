@@ -47,7 +47,7 @@ namespace Castle.MonoRail.Framework.Configuration
 			else
 			{
 				// Backward compatibility
-				
+
 				ConfigureSingleViewEngine(section);
 			}
 
@@ -90,14 +90,14 @@ namespace Castle.MonoRail.Framework.Configuration
 		{
 			viewPathRoot = engines.GetAttribute("viewPathRoot");
 
-			if (viewPathRoot == null || viewPathRoot == String.Empty)
+			if (string.IsNullOrEmpty(viewPathRoot))
 			{
 				viewPathRoot = "views";
 			}
 
 			ArrayList viewEnginesList = new ArrayList();
 
-			foreach (XmlElement addNode in engines.SelectNodes("add"))
+			foreach(XmlElement addNode in engines.SelectNodes("add"))
 			{
 				string typeName = addNode.GetAttribute("type");
 				string xhtmlVal = addNode.GetAttribute("xhtml");
@@ -140,7 +140,7 @@ namespace Castle.MonoRail.Framework.Configuration
 			if (!Directory.Exists(viewPathRoot))
 			{
 				throw new MonoRailException("View folder configured could not be found. " +
-					"Check (or add) a viewPathRoot attribute to the viewEngines node on the MonoRail configuration (web.config)");
+				                            "Check (or add) a viewPathRoot attribute to the viewEngines node on the MonoRail configuration (web.config)");
 			}
 		}
 
@@ -203,7 +203,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			}
 
 			viewEngines = new ViewEngineInfo[] {new ViewEngineInfo(engineType, enableXhtmlRendering)};
-
 		}
 
 		private void LoadAdditionalSources(XmlNode section)

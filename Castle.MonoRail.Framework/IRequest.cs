@@ -17,7 +17,6 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
-	using System.Web;
 
 	/// <summary>
 	/// Represents the request data

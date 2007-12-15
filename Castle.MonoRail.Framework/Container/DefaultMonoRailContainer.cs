@@ -168,6 +168,7 @@ namespace Castle.MonoRail.Framework.Container
 		private IViewEngineManager viewEngineManagerCached;
 		private IValidatorRegistry validatorRegistryCached;
 		private IActionSelector actionSelectorCached;
+		private IScaffoldingSupport scaffoldSupportCached;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultMonoRailContainer"/> class.
@@ -633,6 +634,23 @@ namespace Castle.MonoRail.Framework.Container
 				return actionSelectorCached;
 			}
 			set { actionSelectorCached = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the scaffold support.
+		/// </summary>
+		/// <value>The scaffold support.</value>
+		public IScaffoldingSupport ScaffoldSupport
+		{
+			get
+			{
+				if (scaffoldSupportCached == null)
+				{
+					scaffoldSupportCached = GetService<IScaffoldingSupport>();
+				}
+				return scaffoldSupportCached;
+			}
+			set { scaffoldSupportCached = value; }
 		}
 
 		#endregion

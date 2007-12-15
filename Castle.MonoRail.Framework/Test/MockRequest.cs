@@ -28,18 +28,19 @@ namespace Castle.MonoRail.Framework.Test
 		private NameValueCollection headers = new NameValueCollection();
 		private NameValueCollection queryString = new NameValueCollection();
 		private NameValueCollection @params = new NameValueCollection();
+		private string urlReferrer;
 		private IDictionary cookies;
-		private IDictionary files = new Hashtable();
-
+//		private IDictionary files = new Hashtable();
 		private bool isLocal = true;
-		private string rawUrl = null;
 		private string httpMethod = "GET";
-		private string filePath = null;
-		private Uri uri = null;
-
 		private string[] userLanguages = new string[] { "en-ES", "pt-BR" };
-		private string userHostAddress = "127.0.0.1";
-		private string pathInfo;
+
+//		private string rawUrl = null;
+//		private string filePath = null;
+//		private Uri uri = null;
+//
+//		private string userHostAddress = "127.0.0.1";
+//		private string pathInfo;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MockRequest"/> class.
@@ -51,14 +52,41 @@ namespace Castle.MonoRail.Framework.Test
 		}
 
 		/// <summary>
-		/// Reads the request data as a byte array.
+		/// Initializes a new instance of the <see cref="MockRequest"/> class.
 		/// </summary>
-		/// <param name="count">How many bytes.</param>
-		/// <returns></returns>
-		public virtual byte[] BinaryRead(int count)
+		public MockRequest() : this(new Hashtable())
 		{
-			throw new NotImplementedException();
 		}
+
+		/// <summary>
+		/// Gets or sets the accept header.
+		/// </summary>
+		/// <value>The accept header.</value>
+		public string AcceptHeader
+		{
+			get { return headers["Accept"]; }
+			set { headers["Accept"] = value; }
+		}
+
+		/// <summary>
+		/// Gets the referring URL.
+		/// </summary>
+		/// <value></value>
+		public string UrlReferrer
+		{
+			get { return urlReferrer; }
+			set { urlReferrer = value; }
+		}
+
+//		/// <summary>
+//		/// Reads the request data as a byte array.
+//		/// </summary>
+//		/// <param name="count">How many bytes.</param>
+//		/// <returns></returns>
+//		public virtual byte[] BinaryRead(int count)
+//		{
+//			throw new NotImplementedException();
+//		}
 
 		/// <summary>
 		/// Reads the cookie.
@@ -86,23 +114,14 @@ namespace Castle.MonoRail.Framework.Test
 			get { return headers; }
 		}
 
-		/// <summary>
-		/// Gets the <see cref="HttpPostedFile"/> per key.
-		/// </summary>
-		/// <value></value>
-		public virtual IDictionary Files
-		{
-			get { return files; }
-		}
-
-		/// <summary>
-		/// Gets the params which accumulates headers, post, querystring and cookies.
-		/// </summary>
-		/// <value>The params.</value>
-		public virtual NameValueCollection Params
-		{
-			get { return @params; }
-		}
+//		/// <summary>
+//		/// Gets the <see cref="HttpPostedFile"/> per key.
+//		/// </summary>
+//		/// <value></value>
+//		public virtual IDictionary Files
+//		{
+//			get { return files; }
+//		}
 
 		/// <summary>
 		/// Gets a value indicating whether this requeest is from a local address.
@@ -114,36 +133,36 @@ namespace Castle.MonoRail.Framework.Test
 			set { isLocal = value; }
 		}
 
-		/// <summary>
-		/// Gets additional path information for
-		/// a resource with a URL extension.
-		/// </summary>
-		/// <value>The path info.</value>
-		public virtual string PathInfo
-		{
-			get { return pathInfo; }
-			set { pathInfo = value; }
-		}
-
-		/// <summary>
-		/// Gets the raw URL.
-		/// </summary>
-		/// <value>The raw URL.</value>
-		public virtual string RawUrl
-		{
-			get { return rawUrl; }
-			set { rawUrl = value; }
-		}
-
-		/// <summary>
-		/// Gets the URI.
-		/// </summary>
-		/// <value>The URI.</value>
-		public virtual Uri Uri
-		{
-			get { return uri; }
-			set { uri = value; }
-		}
+//		/// <summary>
+//		/// Gets additional path information for
+//		/// a resource with a URL extension.
+//		/// </summary>
+//		/// <value>The path info.</value>
+//		public virtual string PathInfo
+//		{
+//			get { return pathInfo; }
+//			set { pathInfo = value; }
+//		}
+//
+//		/// <summary>
+//		/// Gets the raw URL.
+//		/// </summary>
+//		/// <value>The raw URL.</value>
+//		public virtual string RawUrl
+//		{
+//			get { return rawUrl; }
+//			set { rawUrl = value; }
+//		}
+//
+//		/// <summary>
+//		/// Gets the URI.
+//		/// </summary>
+//		/// <value>The URI.</value>
+//		public virtual Uri Uri
+//		{
+//			get { return uri; }
+//			set { uri = value; }
+//		}
 
 		/// <summary>
 		/// Gets the HTTP method.
@@ -155,23 +174,32 @@ namespace Castle.MonoRail.Framework.Test
 			set { httpMethod = value; }
 		}
 
-		/// <summary>
-		/// Gets the file path.
-		/// </summary>
-		/// <value>The file path.</value>
-		public virtual string FilePath
-		{
-			get { return filePath; }
-			set { filePath = value; }
-		}
+//		/// <summary>
+//		/// Gets the file path.
+//		/// </summary>
+//		/// <value>The file path.</value>
+//		public virtual string FilePath
+//		{
+//			get { return filePath; }
+//			set { filePath = value; }
+//		}
+//
+//		/// <summary>
+//		/// Gets the param with the specified key.
+//		/// </summary>
+//		/// <value></value>
+//		public virtual string this[string key]
+//		{
+//			get { return @params[key]; }
+//		}
 
 		/// <summary>
-		/// Gets the param with the specified key.
+		/// Gets the params which accumulates headers, post, querystring and cookies.
 		/// </summary>
-		/// <value></value>
-		public virtual string this[string key]
+		/// <value>The params.</value>
+		public virtual NameValueCollection Params
 		{
-			get { return @params[key]; }
+			get { return @params; }
 		}
 
 		/// <summary>
@@ -201,15 +229,15 @@ namespace Castle.MonoRail.Framework.Test
 			get { return userLanguages; }
 			set { userLanguages = value; }
 		}
-
-		/// <summary>
-		/// Gets the IP host address of the remote client.
-		/// </summary>
-		/// <value>The IP address of the remote client.</value>
-		public virtual string UserHostAddress
-		{
-			get { return userHostAddress; }
-			set { userHostAddress = value; }
-		}
+//
+//		/// <summary>
+//		/// Gets the IP host address of the remote client.
+//		/// </summary>
+//		/// <value>The IP address of the remote client.</value>
+//		public virtual string UserHostAddress
+//		{
+//			get { return userHostAddress; }
+//			set { userHostAddress = value; }
+//		}
 	}
 }

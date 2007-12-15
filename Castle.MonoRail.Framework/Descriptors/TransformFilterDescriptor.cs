@@ -25,7 +25,7 @@ namespace Castle.MonoRail.Framework.Descriptors
 	{
 		private readonly Type transformFilterType;
 		private readonly int executionOrder;
-		private TransformFilterAttribute attribute;
+//		private TransformFilterAttribute attribute;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TransformFilterDescriptor"/> class.
@@ -36,18 +36,18 @@ namespace Castle.MonoRail.Framework.Descriptors
 		public TransformFilterDescriptor(Type transformFilterType, int executionOrder, TransformFilterAttribute attribute)
 		{
 			this.transformFilterType = transformFilterType;
-			this.attribute = attribute;
+//			this.attribute = attribute;
 			this.executionOrder = executionOrder;
 		}
 
-		/// <summary>
-		/// Gets the attribute.
-		/// </summary>
-		/// <value>The attribute.</value>
-		public TransformFilterAttribute Attribute
-		{
-			get { return attribute; }
-		}
+//		/// <summary>
+//		/// Gets the attribute.
+//		/// </summary>
+//		/// <value>The attribute.</value>
+//		public TransformFilterAttribute Attribute
+//		{
+//			get { return attribute; }
+//		}
 
 		/// <summary>
 		/// Gets the type of the transform filter.

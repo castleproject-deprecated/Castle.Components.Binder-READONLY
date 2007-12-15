@@ -33,8 +33,8 @@ namespace Castle.MonoRail.Framework.Descriptors
 		private HelperDescriptor[] helpers;
 		private FilterDescriptor[] filters;
 		private TransformFilterDescriptor[] transformFilters;
-		private Dictionary<MethodInfo, ActionMetaDescriptor> actionMetaDescriptors = new Dictionary<MethodInfo, ActionMetaDescriptor>();
-		private IList scaffoldings = new ArrayList();
+		private Dictionary<object, ActionMetaDescriptor> actionMetaDescriptors = new Dictionary<object, ActionMetaDescriptor>();
+		private IList<ScaffoldingAttribute> scaffoldings = new List<ScaffoldingAttribute>();
 		private IList<Type> actionProviders = new List<Type>();
 		private IList<MethodInfo> ajaxActions = new List<MethodInfo>();
 		private IDictionary actions = new HybridDictionary(true);
@@ -53,6 +53,8 @@ namespace Castle.MonoRail.Framework.Descriptors
 		/// <returns></returns>
 		public ActionMetaDescriptor GetAction(MethodInfo actionMethod)
 		{
+			if (actionMethod == null) throw new ArgumentNullException("actionMethod");
+
 			ActionMetaDescriptor desc;
 
 			if (!actionMetaDescriptors.TryGetValue(actionMethod, out desc))
@@ -62,6 +64,19 @@ namespace Castle.MonoRail.Framework.Descriptors
 			}
 
 			return desc;
+		}
+
+		/// <summary>
+		/// Adds the action.
+		/// </summary>
+		/// <param name="action">The action.</param>
+		/// <param name="metaDescriptor">The meta descriptor.</param>
+		public void AddAction(object action, ActionMetaDescriptor metaDescriptor)
+		{
+			if (action == null) throw new ArgumentNullException("action");
+			if (metaDescriptor == null) throw new ArgumentNullException("metaDescriptor");
+
+			actionMetaDescriptors[action] = metaDescriptor;
 		}
 
 		/// <summary>
@@ -126,7 +141,7 @@ namespace Castle.MonoRail.Framework.Descriptors
 		/// Gets the scaffoldings.
 		/// </summary>
 		/// <value>The scaffoldings.</value>
-		public IList Scaffoldings
+		public IList<ScaffoldingAttribute> Scaffoldings
 		{
 			get { return scaffoldings; }
 		}

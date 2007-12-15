@@ -29,15 +29,15 @@ namespace Castle.MonoRail.Framework.Test
 		private readonly IDictionary cookies;
 		private int statusCode = 400;
 		private string contentType = "text/html";
-		private string cacheControlHeader = null;
-		private string charset = "ISO-8859-1";
+//		private string cacheControlHeader = null;
+//		private string charset = "ISO-8859-1";
 		private string redirectedTo;
 		private bool wasRedirected = false;
 		private bool isClientConnected = false;
 		private TextWriter output = new StringWriter();
 		private Stream outputStream = new MemoryStream();
 		private TextWriter outputStreamWriter;
-		private HttpCachePolicy cachePolicy = null;
+//		private HttpCachePolicy cachePolicy = null;
 		private NameValueCollection headers = new NameValueCollection();
 
 		/// <summary>
@@ -51,6 +51,13 @@ namespace Castle.MonoRail.Framework.Test
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the <see cref="MockResponse"/> class.
+		/// </summary>
+		public MockResponse() : this(new Hashtable())
+		{
+		}
+
+		/// <summary>
 		/// Gets the urls the request was redirected to.
 		/// </summary>
 		/// <value>The redirected to.</value>
@@ -59,14 +66,14 @@ namespace Castle.MonoRail.Framework.Test
 			get { return redirectedTo; }
 		}
 
-		/// <summary>
-		/// Gets the http headers.
-		/// </summary>
-		/// <value>The headers.</value>
-		public virtual NameValueCollection Headers
-		{
-			get { return headers; }
-		}
+//		/// <summary>
+//		/// Gets the http headers.
+//		/// </summary>
+//		/// <value>The headers.</value>
+//		public virtual NameValueCollection Headers
+//		{
+//			get { return headers; }
+//		}
 
 		#region IResponse Related
 
@@ -80,43 +87,43 @@ namespace Castle.MonoRail.Framework.Test
 			headers[name] = value;
 		}
 
-		/// <summary>
-		/// Writes the buffer to the browser
-		/// </summary>
-		/// <param name="buffer">The buffer.</param>
-		public virtual void BinaryWrite(byte[] buffer)
-		{
-			outputStream.Write(buffer, 0, buffer.Length);
-		}
-
-		/// <summary>
-		/// Writes the stream to the browser
-		/// </summary>
-		/// <param name="stream">The stream.</param>
-		public virtual void BinaryWrite(Stream stream)
-		{
-			byte[] buffer = new byte[stream.Length];
-
-			stream.Read(buffer, 0, buffer.Length);
-
-			BinaryWrite(buffer);
-		}
-
-		/// <summary>
-		/// Clears the response (only works if buffered)
-		/// </summary>
-		public virtual void Clear()
-		{
-			outputStream.SetLength(0);
-		}
-
-		/// <summary>
-		/// Clears the response content (only works if buffered).
-		/// </summary>
-		public virtual void ClearContent()
-		{
-			outputStreamWriter.Flush();
-		}
+//		/// <summary>
+//		/// Writes the buffer to the browser
+//		/// </summary>
+//		/// <param name="buffer">The buffer.</param>
+//		public virtual void BinaryWrite(byte[] buffer)
+//		{
+//			outputStream.Write(buffer, 0, buffer.Length);
+//		}
+//
+//		/// <summary>
+//		/// Writes the stream to the browser
+//		/// </summary>
+//		/// <param name="stream">The stream.</param>
+//		public virtual void BinaryWrite(Stream stream)
+//		{
+//			byte[] buffer = new byte[stream.Length];
+//
+//			stream.Read(buffer, 0, buffer.Length);
+//
+//			BinaryWrite(buffer);
+//		}
+//
+//		/// <summary>
+//		/// Clears the response (only works if buffered)
+//		/// </summary>
+//		public virtual void Clear()
+//		{
+//			outputStream.SetLength(0);
+//		}
+//
+//		/// <summary>
+//		/// Clears the response content (only works if buffered).
+//		/// </summary>
+//		public virtual void ClearContent()
+//		{
+//			outputStreamWriter.Flush();
+//		}
 
 		/// <summary>
 		/// Writes the specified string.
@@ -156,87 +163,87 @@ namespace Castle.MonoRail.Framework.Test
 			outputStreamWriter.Write(buffer, index, count);
 		}
 
-		/// <summary>
-		/// Writes the file.
-		/// </summary>
-		/// <param name="fileName">Name of the file.</param>
-		public virtual void WriteFile(string fileName)
-		{
-			throw new NotImplementedException();
-		}
+//		/// <summary>
+//		/// Writes the file.
+//		/// </summary>
+//		/// <param name="fileName">Name of the file.</param>
+//		public virtual void WriteFile(string fileName)
+//		{
+//			throw new NotImplementedException();
+//		}
 
 		/// <summary>
 		/// Redirects the specified controller.
 		/// </summary>
 		/// <param name="controller">The controller.</param>
 		/// <param name="action">The action.</param>
-		public virtual void Redirect(string controller, string action)
+		public virtual void RedirectToUrl(string controller, string action)
 		{
-			Redirect(BuildMockUrl(null, controller, action));
+			RedirectToUrl(BuildMockUrl(null, controller, action));
 		}
 
-		/// <summary>
-		/// Redirects the specified area.
-		/// </summary>
-		/// <param name="area">The area.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="action">The action.</param>
-		public virtual void Redirect(string area, string controller, string action)
-		{
-			Redirect(BuildMockUrl(area, controller, action));
-		}
-
-		/// <summary>
-		/// Redirects to another controller and action with the specified paramters.
-		/// </summary>
-		/// <param name="controller">Controller name</param>
-		/// <param name="action">Action name</param>
-		/// <param name="parameters">Key/value pairings</param>
-		public void Redirect(string controller, string action, NameValueCollection parameters)
-		{
-			Redirect(BuildMockUrl(controller, action, parameters));
-		}
-
-		/// <summary>
-		/// Redirects to another controller and action with the specified paramters.
-		/// </summary>
-		/// <param name="area">Area name</param>
-		/// <param name="controller">Controller name</param>
-		/// <param name="action">Action name</param>
-		/// <param name="parameters">Key/value pairings</param>
-		public void Redirect(string area, string controller, string action, NameValueCollection parameters)
-		{
-			Redirect(BuildMockUrl(area, controller, action, parameters));
-		}
-
-		/// <summary>
-		/// Redirects to another controller and action with the specified paramters.
-		/// </summary>
-		/// <param name="controller">Controller name</param>
-		/// <param name="action">Action name</param>
-		/// <param name="parameters">Key/value pairings</param>
-		public void Redirect(string controller, string action, IDictionary parameters)
-		{
-			Redirect(BuildMockUrl(controller, action, parameters));
-		}
-
-		/// <summary>
-		/// Redirects to another controller and action with the specified paramters.
-		/// </summary>
-		/// <param name="area">Area name</param>
-		/// <param name="controller">Controller name</param>
-		/// <param name="action">Action name</param>
-		/// <param name="parameters">Key/value pairings</param>
-		public void Redirect(string area, string controller, string action, IDictionary parameters)
-		{
-			Redirect(BuildMockUrl(area, controller, action, parameters));
-		}
+//		/// <summary>
+//		/// Redirects the specified area.
+//		/// </summary>
+//		/// <param name="area">The area.</param>
+//		/// <param name="controller">The controller.</param>
+//		/// <param name="action">The action.</param>
+//		public virtual void Redirect(string area, string controller, string action)
+//		{
+//			Redirect(BuildMockUrl(area, controller, action));
+//		}
+//
+//		/// <summary>
+//		/// Redirects to another controller and action with the specified paramters.
+//		/// </summary>
+//		/// <param name="controller">Controller name</param>
+//		/// <param name="action">Action name</param>
+//		/// <param name="parameters">Key/value pairings</param>
+//		public void Redirect(string controller, string action, NameValueCollection parameters)
+//		{
+//			Redirect(BuildMockUrl(controller, action, parameters));
+//		}
+//
+//		/// <summary>
+//		/// Redirects to another controller and action with the specified paramters.
+//		/// </summary>
+//		/// <param name="area">Area name</param>
+//		/// <param name="controller">Controller name</param>
+//		/// <param name="action">Action name</param>
+//		/// <param name="parameters">Key/value pairings</param>
+//		public void Redirect(string area, string controller, string action, NameValueCollection parameters)
+//		{
+//			Redirect(BuildMockUrl(area, controller, action, parameters));
+//		}
+//
+//		/// <summary>
+//		/// Redirects to another controller and action with the specified paramters.
+//		/// </summary>
+//		/// <param name="controller">Controller name</param>
+//		/// <param name="action">Action name</param>
+//		/// <param name="parameters">Key/value pairings</param>
+//		public void Redirect(string controller, string action, IDictionary parameters)
+//		{
+//			Redirect(BuildMockUrl(controller, action, parameters));
+//		}
+//
+//		/// <summary>
+//		/// Redirects to another controller and action with the specified paramters.
+//		/// </summary>
+//		/// <param name="area">Area name</param>
+//		/// <param name="controller">Controller name</param>
+//		/// <param name="action">Action name</param>
+//		/// <param name="parameters">Key/value pairings</param>
+//		public void Redirect(string area, string controller, string action, IDictionary parameters)
+//		{
+//			Redirect(BuildMockUrl(area, controller, action, parameters));
+//		}
 
 		/// <summary>
 		/// Redirects the specified URL.
 		/// </summary>
 		/// <param name="url">The URL.</param>
-		public virtual void Redirect(string url)
+		public virtual void RedirectToUrl(string url)
 		{
 			wasRedirected = true;
 			redirectedTo = url;
@@ -247,49 +254,49 @@ namespace Castle.MonoRail.Framework.Test
 		/// </summary>
 		/// <param name="url">The URL.</param>
 		/// <param name="endProcess">if set to <c>true</c> [end process].</param>
-		public virtual void Redirect(string url, bool endProcess)
+		public virtual void RedirectToUrl(string url, bool endProcess)
 		{
-			Redirect(url);
+			RedirectToUrl(url);
 		}
 
-		/// <summary>
-		/// Creates a cookie.
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <param name="value">The value.</param>
-		public virtual void CreateCookie(string name, string value)
-		{
-			cookies.Add(name, value);
-		}
-
-		/// <summary>
-		/// Creates a cookie.
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <param name="value">The value.</param>
-		/// <param name="expiration">The expiration.</param>
-		public virtual void CreateCookie(string name, string value, DateTime expiration)
-		{
-			CreateCookie(name, value);
-		}
-
-		/// <summary>
-		/// Creates a cookie.
-		/// </summary>
-		/// <param name="cookie">The cookie.</param>
-		public virtual void CreateCookie(HttpCookie cookie)
-		{
-			throw new NotSupportedException();
-		}
-
-		/// <summary>
-		/// Removes a cookie.
-		/// </summary>
-		/// <param name="name">The name.</param>
-		public virtual void RemoveCookie(string name)
-		{
-			cookies.Remove(name);
-		}
+//		/// <summary>
+//		/// Creates a cookie.
+//		/// </summary>
+//		/// <param name="name">The name.</param>
+//		/// <param name="value">The value.</param>
+//		public virtual void CreateCookie(string name, string value)
+//		{
+//			cookies.Add(name, value);
+//		}
+//
+//		/// <summary>
+//		/// Creates a cookie.
+//		/// </summary>
+//		/// <param name="name">The name.</param>
+//		/// <param name="value">The value.</param>
+//		/// <param name="expiration">The expiration.</param>
+//		public virtual void CreateCookie(string name, string value, DateTime expiration)
+//		{
+//			CreateCookie(name, value);
+//		}
+//
+//		/// <summary>
+//		/// Creates a cookie.
+//		/// </summary>
+//		/// <param name="cookie">The cookie.</param>
+//		public virtual void CreateCookie(HttpCookie cookie)
+//		{
+//			throw new NotSupportedException();
+//		}
+//
+//		/// <summary>
+//		/// Removes a cookie.
+//		/// </summary>
+//		/// <param name="name">The name.</param>
+//		public virtual void RemoveCookie(string name)
+//		{
+//			cookies.Remove(name);
+//		}
 
 		/// <summary>
 		/// Gets or sets the status code.
@@ -311,35 +318,35 @@ namespace Castle.MonoRail.Framework.Test
 			set { contentType = value; }
 		}
 
-		/// <summary>
-		/// Gets the caching policy (expiration time, privacy,
-		/// vary clauses) of a Web page.
-		/// </summary>
-		/// <value></value>
-		public HttpCachePolicy CachePolicy
-		{
-			get { return cachePolicy; }
-		}
-
-		/// <summary>
-		/// Sets the Cache-Control HTTP header to Public or Private.
-		/// </summary>
-		/// <value></value>
-		public string CacheControlHeader
-		{
-			get { return cacheControlHeader; }
-			set { cacheControlHeader = value; }
-		}
-
-		/// <summary>
-		/// Gets or sets the HTTP character set of the output stream.
-		/// </summary>
-		/// <value></value>
-		public string Charset
-		{
-			get { return charset; }
-			set { charset = value; }
-		}
+//		/// <summary>
+//		/// Gets the caching policy (expiration time, privacy,
+//		/// vary clauses) of a Web page.
+//		/// </summary>
+//		/// <value></value>
+//		public HttpCachePolicy CachePolicy
+//		{
+//			get { return cachePolicy; }
+//		}
+//
+//		/// <summary>
+//		/// Sets the Cache-Control HTTP header to Public or Private.
+//		/// </summary>
+//		/// <value></value>
+//		public string CacheControlHeader
+//		{
+//			get { return cacheControlHeader; }
+//			set { cacheControlHeader = value; }
+//		}
+//
+//		/// <summary>
+//		/// Gets or sets the HTTP character set of the output stream.
+//		/// </summary>
+//		/// <value></value>
+//		public string Charset
+//		{
+//			get { return charset; }
+//			set { charset = value; }
+//		}
 
 		/// <summary>
 		/// Gets the output.
@@ -348,6 +355,7 @@ namespace Castle.MonoRail.Framework.Test
 		public virtual TextWriter Output
 		{
 			get { return output; }
+			set { output = value; }
 		}
 
 		/// <summary>
@@ -405,25 +413,25 @@ namespace Castle.MonoRail.Framework.Test
 			return BuildMockUrl(area, controller, action, (string) null);
 		}
 
-		private static string BuildMockUrl(string area, string controller, string action, IDictionary parameters)
-		{
-			return BuildMockUrl(area, controller, action, ToQueryString(parameters));
-		}
-
-		private static string BuildMockUrl(string controller, string action, IDictionary parameters)
-		{
-			return BuildMockUrl(controller, action, ToQueryString(parameters));
-		}
-
-		private static string BuildMockUrl(string area, string controller, string action, NameValueCollection parameters)
-		{
-			return BuildMockUrl(area, controller, action, ToQueryString(parameters));
-		}
-
-		private static string BuildMockUrl(string controller, string action, NameValueCollection parameters)
-		{
-			return BuildMockUrl(controller, action, ToQueryString(parameters));
-		}
+//		private static string BuildMockUrl(string area, string controller, string action, IDictionary parameters)
+//		{
+//			return BuildMockUrl(area, controller, action, ToQueryString(parameters));
+//		}
+//
+//		private static string BuildMockUrl(string controller, string action, IDictionary parameters)
+//		{
+//			return BuildMockUrl(controller, action, ToQueryString(parameters));
+//		}
+//
+//		private static string BuildMockUrl(string area, string controller, string action, NameValueCollection parameters)
+//		{
+//			return BuildMockUrl(area, controller, action, ToQueryString(parameters));
+//		}
+//
+//		private static string BuildMockUrl(string controller, string action, NameValueCollection parameters)
+//		{
+//			return BuildMockUrl(controller, action, ToQueryString(parameters));
+//		}
 
 		/// <summary>
 		/// Creates a querystring string representation of the namevalue collection.

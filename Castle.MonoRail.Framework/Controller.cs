@@ -44,15 +44,16 @@ namespace Castle.MonoRail.Framework
 		/// True if any Controller.Send operation was called.
 		/// </summary>
 		private bool resetIsPostBack;
+
 		private bool directRenderInvoked;
 
 		private IUrlBuilder urlBuilder;
 		private IFilterFactory filterFactory;
 		private IViewEngineManager viewEngineManager;
 		private IActionSelector actionSelector;
+		private IScaffoldingSupport scaffoldSupport;
 		private ValidatorRunner validator;
 		private FilterDescriptor[] filters = new FilterDescriptor[0];
-		private IDictionary filtersToSkip = new HybridDictionary();
 //		private ValidatorRunner validatorRunner;
 
 		#region Useful Properties
@@ -814,6 +815,16 @@ namespace Castle.MonoRail.Framework
 		#region IController
 
 		/// <summary>
+		/// Occurs just before the action execution.
+		/// </summary>
+		public event ControllerHandler BeforeAction;
+
+		/// <summary>
+		/// Occurs just after the action execution.
+		/// </summary>
+		public event ControllerHandler AfterAction;
+
+		/// <summary>
 		/// Performs the specified action, which means:
 		/// <br/>
 		/// 1. Define the default view name<br/>
@@ -830,80 +841,21 @@ namespace Castle.MonoRail.Framework
 			this.engineContext = engineContext;
 			this.context = context;
 
-			urlBuilder = engineContext.Services.UrlBuilder;
-			filterFactory = engineContext.Services.FilterFactory;
-			viewEngineManager = engineContext.Services.ViewEngineManager;
-			actionSelector = engineContext.Services.ActionSelector;
+			urlBuilder = engineContext.Services.UrlBuilder; // should not be null (affects redirects)
+			filterFactory = engineContext.Services.FilterFactory; // should not be null
+			viewEngineManager = engineContext.Services.ViewEngineManager; // should not be null
+			actionSelector = engineContext.Services.ActionSelector; // should not be null
+			scaffoldSupport = engineContext.Services.ScaffoldSupport; // might be null
 //			validatorRunner = CreateValidatorRunner(engineContext.Services.ValidatorRegistry);
 
 			ResetIsPostback();
 			context.LayoutName = ObtainDefaultLayoutName();
 			CreateAndInitializeHelpers();
 			CreateFiltersDescriptors();
-			// ProcessScaffoldIfPresent();
+			ProcessScaffoldIfAvailable();
 			// ActionProviderUtil.RegisterActions(controller);
-
 			Initialize();
-
 			RunActionAndRenderView();
-		}
-
-		private void RunActionAndRenderView()
-		{
-			IExecutableAction action = SelectAction(Action);
-
-			bool cancel;
-			RunBeforeActionFilters(action, out cancel);
-			if (cancel) return;
-
-			Exception actionException = null;
-
-			try
-			{
-				action.Execute(engineContext, this, context);
-			}
-			catch(Exception ex)
-			{
-				actionException = ex;
-			}
-
-			RunAfterActionFilters(action, out cancel);
-			if (cancel) return;
-
-			if (actionException == null)
-			{
-				if (context.SelectedViewName != null)
-				{
-					ProcessView();
-				}
-			}
-			else
-			{
-				ProcessRescue(action, actionException);
-			}
-
-			RunAfterRenderingFilters(action);
-		}
-
-		/// <summary>
-		/// Selects the appropriate action.
-		/// </summary>
-		/// <param name="action">The action name.</param>
-		/// <returns></returns>
-		protected virtual IExecutableAction SelectAction(string action)
-		{
-			// For backward compatibility purposes
-			MethodInfo method = SelectMethod(action, MetaDescriptor.Actions, engineContext.Request, null);
-
-			if (method != null)
-			{
-				ActionMetaDescriptor actionMeta = MetaDescriptor.GetAction(method);
-
-				return new ActionMethodExecutorCompatible(method, actionMeta, InvokeMethod);
-			}
-
-			// New supported way
-			return actionSelector.Select(engineContext, this, context);
 		}
 
 		/// <summary>
@@ -945,6 +897,135 @@ namespace Castle.MonoRail.Framework
 		}
 
 		#endregion
+
+		private void RunActionAndRenderView()
+		{
+			IExecutableAction action = SelectAction(Action);
+
+			EnsureActionIsAccessibleWithCurrentHttpVerb(action);
+
+			bool cancel;
+			RunBeforeActionFilters(action, out cancel);
+			if (cancel) return;
+
+			Exception actionException = null;
+
+			try
+			{
+				if (BeforeAction != null)
+				{
+					BeforeAction(action, engineContext, this, context);
+				}
+
+				action.Execute(engineContext, this, context);
+			}
+			catch(Exception ex)
+			{
+				actionException = (ex is TargetInvocationException) ? ex.InnerException : ex;
+				engineContext.LastException = actionException;
+			}
+			finally
+			{
+				// Always executed
+
+				if (AfterAction != null)
+				{
+					AfterAction(action, engineContext, this, context);
+				}
+			}
+
+			RunAfterActionFilters(action, out cancel);
+			if (cancel) return;
+
+			if (engineContext.Response.WasRedirected) // No need to process view or rescue in this case
+			{
+				return;
+			}
+
+			if (actionException == null)
+			{
+				if (context.SelectedViewName != null)
+				{
+					ProcessView();
+
+					RunAfterRenderingFilters(action);
+				}
+			}
+			else
+			{
+				if (!ProcessRescue(action, actionException))
+				{
+					throw actionException;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Selects the appropriate action.
+		/// </summary>
+		/// <param name="action">The action name.</param>
+		/// <returns></returns>
+		protected virtual IExecutableAction SelectAction(string action)
+		{
+			// For backward compatibility purposes
+			MethodInfo method = SelectMethod(action, MetaDescriptor.Actions, engineContext.Request, null);
+
+			if (method != null)
+			{
+				ActionMetaDescriptor actionMeta = MetaDescriptor.GetAction(method);
+
+				return new ActionMethodExecutorCompatible(method, actionMeta, InvokeMethod);
+			}
+
+			// New supported way
+			return actionSelector.Select(engineContext, this, context);
+		}
+
+		/// <summary>
+		/// Invokes the scaffold support if the controller
+		/// is associated with a scaffold
+		/// </summary>
+		protected virtual void ProcessScaffoldIfAvailable()
+		{
+			if (MetaDescriptor.Scaffoldings.Count != 0)
+			{
+				if (scaffoldSupport == null)
+				{
+					String message = "You must enable scaffolding support on the " +
+					                 "configuration file, or, to use the standard ActiveRecord support " +
+					                 "copy the necessary assemblies to the bin folder.";
+
+					throw new MonoRailException(message);
+				}
+
+				scaffoldSupport.Process(engineContext, this, context);
+			}
+		}
+
+		/// <summary>
+		/// Ensures the action is accessible with current HTTP verb.
+		/// </summary>
+		/// <param name="action">The action.</param>
+		protected virtual void EnsureActionIsAccessibleWithCurrentHttpVerb(IExecutableAction action)
+		{
+			Verb allowedVerbs = action.AccessibleThroughVerb;
+
+			if (allowedVerbs == Verb.Undefined)
+			{
+				return;
+			}
+
+			string method = engineContext.Request.HttpMethod;
+
+			Verb currentVerb = (Verb) Enum.Parse(typeof(Verb), method, true);
+
+			if ((allowedVerbs & currentVerb) != currentVerb)
+			{
+				throw new ControllerException(string.Format("Access to the action [{0}] " +
+				                                            "on controller [{1}] is not allowed by the http verb [{2}].",
+				                                            Action, Name, method));
+			}
+		}
 
 		#region Views and Layout
 
@@ -1254,39 +1335,34 @@ namespace Castle.MonoRail.Framework
 		/// Performs the rescue.
 		/// </summary>
 		/// <param name="action">The action (can be null in the case of dynamic actions).</param>
-		/// <param name="ex">The exception.</param>
+		/// <param name="actionException">The exception.</param>
 		/// <returns></returns>
-		protected bool ProcessRescue(IExecutableAction action, Exception ex)
+		protected bool ProcessRescue(IExecutableAction action, Exception actionException)
 		{
-			return false;
+			if (action.ShouldSkipRescues)
+			{
+				return false;
+			}
 
-//			context.LastException = (ex is TargetInvocationException) ? ex.InnerException : ex;
-//
-//			Type exceptionType = context.LastException.GetType();
-//
-//			RescueDescriptor att = null;
-//
-//			if (method != null)
-//			{
-//				ActionMetaDescriptor actionMeta = metaDescriptor.GetAction(method);
-//
-//				if (actionMeta.SkipRescue != null) return false;
-//
-//				att = GetRescueFor(actionMeta.Rescues, exceptionType);
-//			}
-//
-//			if (att == null)
-//			{
-//				att = GetRescueFor(metaDescriptor.Rescues, exceptionType);
-//
-//				if (att == null) return false;
-//			}
-//
-//			try
-//			{
-//				if (att.RescueController != null)
-//				{
-//					Controller rescueController = (Controller)Activator.CreateInstance(att.RescueController);
+			Type exceptionType = actionException.GetType();
+
+			RescueDescriptor desc = action.GetRescueFor(exceptionType);
+
+			if (desc == null)
+			{
+				desc = GetControllerRescueFor(exceptionType);
+			}
+
+			try
+			{
+				if (engineContext.Response.StatusCode == 200)
+				{
+					engineContext.Response.StatusCode = 500;
+				}
+
+				if (desc.RescueController != null)
+				{
+//					Controller rescueController = (Controller) Activator.CreateInstance(desc.RescueController);
 //
 //					using (ControllerLifecycleExecutor rescueExecutor = new ControllerLifecycleExecutor(rescueController, context))
 //					{
@@ -1303,28 +1379,49 @@ namespace Castle.MonoRail.Framework
 //
 //						rescueExecutor.ProcessSelectedAction(args);
 //					}
-//				}
-//				else
-//				{
-//					controller._selectedViewName = Path.Combine("rescues", att.ViewName);
-//					ProcessView();
-//				}
-//
-//				return true;
-//			}
-//			catch (Exception exception)
-//			{
-//				// In this situation, the rescue view could not be found
-//				// So we're back to the default error exibition
-//
-//				if (logger.IsFatalEnabled)
-//				{
-//					logger.FatalFormat("Failed to process rescue view. View name " +
-//									   controller._selectedViewName, exception);
-//				}
-//			}
-//
-//			return false;
+				}
+				else
+				{
+					context.SelectedViewName = Path.Combine("rescues", desc.ViewName);
+					
+					ProcessView();
+				}
+
+				return true;
+			}
+			catch(Exception exception)
+			{
+				// In this situation, the rescue view could not be found
+				// So we're back to the default error exibition
+
+				if (logger.IsFatalEnabled)
+				{
+					logger.FatalFormat("Failed to process rescue view. View name " +
+					                   context.SelectedViewName, exception);
+				}
+			}
+
+			return false;
+		}
+
+		private RescueDescriptor GetControllerRescueFor(Type exceptionType)
+		{
+			RescueDescriptor bestCandidate = null;
+
+			foreach(RescueDescriptor rescue in MetaDescriptor.Rescues)
+			{
+				if (rescue.ExceptionType == exceptionType)
+				{
+					return rescue;
+				}
+				else if (rescue.ExceptionType != null &&
+				         rescue.ExceptionType.IsAssignableFrom(exceptionType))
+				{
+					bestCandidate = rescue;
+				}
+			}
+
+			return bestCandidate;
 		}
 
 		/// <summary>
@@ -1346,7 +1443,7 @@ namespace Castle.MonoRail.Framework
 					return rescue;
 				}
 				else if (rescue.ExceptionType != null &&
-						 rescue.ExceptionType.IsAssignableFrom(exceptionType))
+				         rescue.ExceptionType.IsAssignableFrom(exceptionType))
 				{
 					bestCandidate = rescue;
 				}
@@ -1366,7 +1463,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="actionArgs">The action args.</param>
 		/// <returns></returns>
 		protected virtual MethodInfo SelectMethod(string action, IDictionary actions,
-												  IRequest request, IDictionary actionArgs)
+		                                          IRequest request, IDictionary actionArgs)
 		{
 			return null;
 		}
@@ -1377,9 +1474,9 @@ namespace Castle.MonoRail.Framework
 		/// <param name="method">The method.</param>
 		/// <param name="request">The request.</param>
 		/// <param name="methodArgs">The method args.</param>
-		protected virtual void InvokeMethod(MethodInfo method, IRequest request, IDictionary methodArgs)
+		protected virtual object InvokeMethod(MethodInfo method, IRequest request, IDictionary methodArgs)
 		{
-			method.Invoke(this, new object[0]);
+			return method.Invoke(this, new object[0]);
 		}
 
 //		/// <summary>

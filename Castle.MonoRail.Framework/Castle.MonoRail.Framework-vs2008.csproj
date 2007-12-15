@@ -124,6 +124,7 @@
     <Compile Include="Attributes\SkipFilterAttribute.cs" />
     <Compile Include="Attributes\SkipRescueAttribute.cs" />
     <Compile Include="Attributes\TransformFilterAttribute.cs" />
+    <Compile Include="BaseExecutableAction.cs" />
     <Compile Include="BaseHttpHandler.cs" />
     <Compile Include="CacheKey.cs" />
     <Compile Include="Configuration\ControllersConfig.cs" />
@@ -191,8 +192,10 @@
     <Compile Include="Descriptors\LayoutDescriptor.cs" />
     <Compile Include="Descriptors\RescueDescriptor.cs" />
     <Compile Include="Descriptors\TransformFilterDescriptor.cs" />
+    <Compile Include="Internal\Test\TestContextHolder.cs" />
     <Compile Include="IParameterBinder.cs" />
     <Compile Include="ISubActionSelector.cs" />
+    <Compile Include="ITrace.cs" />
     <Compile Include="Providers\DefaultFilterDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultHelperDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultLayoutDescriptorProvider.cs" />
@@ -256,6 +259,7 @@
     <Compile Include="IViewSourceLoader.cs" />
     <Compile Include="Routing\IRoutingRule.cs" />
     <Compile Include="Routing\RouteMatch.cs" />
+    <Compile Include="ServiceContainerAccessor.cs" />
     <Compile Include="Services\AbstractControllerFactory.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -335,6 +339,22 @@
     </Compile>
     <Compile Include="Services\Utils\ControllerInspectionUtil.cs" />
     <Compile Include="SessionlessMonoRailHttpHandler.cs" />
+    <Compile Include="Test\IMockRequest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Test\IMockResponse.cs" />
+    <Compile Include="Test\MockEngineContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Test\MockRequest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Test\MockResponse.cs" />
+    <Compile Include="Test\MockServerUtility.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Test\MockServices.cs" />
+    <Compile Include="Test\ViewEngineManagerStub.cs" />
     <Compile Include="TransformFilter.cs" />
     <Compile Include="TransformFilters\Formatters\WikiFormatter.cs" />
     <Compile Include="TransformFilters\LowerCaseTransformFilter.cs" />
@@ -362,13 +382,13 @@
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Components\Binder\Castle.Components.Binder\Castle.Components.Binder-vs2005.csproj">
+    <ProjectReference Include="..\..\Components\Binder\Castle.Components.Binder\Castle.Components.Binder-vs2008.csproj">
       <Project>{98F19522-C9B8-400D-8A12-DABB3DA9411D}</Project>
-      <Name>Castle.Components.Binder-vs2005</Name>
+      <Name>Castle.Components.Binder-vs2008</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Components\Validator\Castle.Components.Validator\Castle.Components.Validator-vs2008.csproj">
       <Project>{4C945D49-02E9-43F2-9202-E7A6E7C56E77}</Project>
-      <Name>Castle.Components.Validator</Name>
+      <Name>Castle.Components.Validator-vs2008</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Core\Castle.Core\Castle.Core-vs2008.csproj">
       <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>

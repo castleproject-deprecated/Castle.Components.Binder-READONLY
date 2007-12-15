@@ -82,12 +82,23 @@ namespace Castle.MonoRail.Framework
 
 			UrlInfo urlInfo = urlTokenizer.TokenizeUrl(req.FilePath, req.PathInfo, req.Url, req.IsLocal, req.ApplicationPath);
 
+			// TODO: Identify requests for files (js files) and serve them directly bypassing the flow
+
 			IEngineContext engineContext = engineContextFactory.Create(mrContainer, urlInfo, context);
 			engineContext.AddService(typeof(IEngineContext), engineContext);
 
-			IController controller = controllerFactory.CreateController(urlInfo);
+			IController controller = null;
 
-			// TODO: Identify requests for files (js files) and serve them directly bypassing the flow
+//			try
+			{
+				controller = controllerFactory.CreateController(urlInfo);
+			}
+//			catch(ControllerNotFoundException)
+//			{
+//				// TODO: Process 404 if available
+//
+//				throw;
+//			}
 
 			ControllerMetaDescriptor controllerDesc = mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
 

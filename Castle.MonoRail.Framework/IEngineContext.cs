@@ -85,13 +85,13 @@ namespace Castle.MonoRail.Framework
 //		/// Gets or sets the current user.
 //		/// </summary>
 //		IPrincipal CurrentUser { get; set; }
-//
-//		/// <summary>
-//		/// Gets the last exception raised during
-//		/// the execution of an action.
-//		/// </summary>
-//		Exception LastException { get; set; }
-//
+
+		/// <summary>
+		/// Gets the last exception raised during
+		/// the execution of an action.
+		/// </summary>
+		Exception LastException { get; set; }
+
 		/// <summary>
 		/// Returns the application path.
 		/// </summary>

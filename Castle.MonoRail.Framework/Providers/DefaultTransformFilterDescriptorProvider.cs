@@ -14,7 +14,7 @@
 
 namespace Castle.MonoRail.Framework.Providers
 {
-	using System.Collections;
+	using System.Collections.Generic;
 	using System.Reflection;
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Descriptors;
@@ -39,7 +39,7 @@ namespace Castle.MonoRail.Framework.Providers
 		/// <param name="provider">The service proviver</param>
 		public void Service(IMonoRailServices provider)
 		{
-			ILoggerFactory loggerFactory = (ILoggerFactory)provider.GetService(typeof(ILoggerFactory));
+			ILoggerFactory loggerFactory = (ILoggerFactory) provider.GetService(typeof(ILoggerFactory));
 
 			if (loggerFactory != null)
 			{
@@ -54,37 +54,37 @@ namespace Castle.MonoRail.Framework.Providers
 		/// and return descriptors instances, or an empty array if none
 		/// was found.
 		/// </summary>
-		/// <param name="memberInfo">The action (MethodInfo)</param>
+		/// <param name="methodInfo">The action (MethodInfo)</param>
 		/// <returns>
 		/// An array of <see cref="TransformFilterDescriptor"/>
 		/// </returns>
-		public TransformFilterDescriptor[] CollectFilters(MemberInfo memberInfo)
+		public TransformFilterDescriptor[] CollectFilters(MethodInfo methodInfo)
 		{
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Collecting filters for {0}", memberInfo.Name);
+				logger.DebugFormat("Collecting transform filters for {0}", methodInfo.Name);
 			}
 
-			object[] attributes = memberInfo.GetCustomAttributes(typeof(ITransformFilterDescriptorBuilder), true);
+			object[] attributes = methodInfo.GetCustomAttributes(typeof(ITransformFilterDescriptorBuilder), true);
 
-			ArrayList filters = new ArrayList();
+			List<TransformFilterDescriptor> filters = new List<TransformFilterDescriptor>();
 
-			foreach (ITransformFilterDescriptorBuilder builder in attributes)
+			foreach(ITransformFilterDescriptorBuilder builder in attributes)
 			{
 				TransformFilterDescriptor[] descs = builder.BuildTransformFilterDescriptors();
 
 				if (logger.IsDebugEnabled)
 				{
-					foreach (TransformFilterDescriptor desc in descs)
+					foreach(TransformFilterDescriptor desc in descs)
 					{
-						logger.DebugFormat("Collected filter {0} to execute in order {1}",desc.TransformFilterType, desc.ExecutionOrder);
+						logger.DebugFormat("Collected transform filter {0} to execute in order {1}", desc.TransformFilterType, desc.ExecutionOrder);
 					}
 				}
 
 				filters.AddRange(descs);
 			}
 
-			return (TransformFilterDescriptor[])filters.ToArray(typeof(TransformFilterDescriptor));
+			return filters.ToArray();
 		}
 	}
 }

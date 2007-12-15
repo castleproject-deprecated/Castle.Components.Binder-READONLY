@@ -38,19 +38,11 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	{
 		internal const String TemplateExtension = ".vm";
 		internal const String JsTemplateExtension = ".njs";
-
 		internal const String ServiceProvider = "service.provider";
 
+		protected readonly VelocityEngine velocity = new VelocityEngine();
+
 		private IServiceProvider provider;
-
-		protected VelocityEngine velocity = new VelocityEngine();
-
-		/// <summary>
-		/// Creates a new <see cref="NVelocityViewEngine"/> instance.
-		/// </summary>
-		public NVelocityViewEngine()
-		{
-		}
 
 		#region IInitializable implementation
 
@@ -182,35 +174,6 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 		}
 
-		/// <summary>
-		/// Processes the view - using the templateName to obtain the correct template
-		/// and writes the results to the System.TextWriter. No layout is applied!
-		/// </summary>
-//		public override void Process(TextWriter output, IEngineContext context, IController controller, String viewName)
-//		{
-//			IContext ctx = CreateContext(context, controller);
-//
-//			AdjustContentType(context);
-//
-//			String view = ResolveTemplateName(viewName);
-//
-//			try
-//			{
-//				Template template = velocity.GetTemplate(view);
-//
-//				BeforeMerge(velocity, template, ctx);
-//				template.Merge(ctx, output);
-//			}
-//			catch (Exception ex)
-//			{
-//				if (Logger.IsErrorEnabled)
-//				{
-//					Logger.Error("Could not render view", ex);
-//				}
-//
-//				throw new MonoRailException("Could not render view: " + view, ex);
-//			}
-//		}
 		public override void ProcessPartial(String partialName, TextWriter output, IEngineContext context,
 		                                    IController controller, IControllerContext controllerContext)
 		{
@@ -392,14 +355,14 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 			foreach(String key in request.QueryString.AllKeys)
 			{
-				if (key == null) continue; // Nasty bug?
+				if (key == null) continue;
 				object value = request.QueryString[key];
 				if (value == null) continue;
 				innerContext[key] = value;
 			}
 			foreach(String key in request.Form.AllKeys)
 			{
-				if (key == null) continue; // Nasty bug?
+				if (key == null) continue;
 				object value = request.Form[key];
 				if (value == null) continue;
 				innerContext[key] = value;
