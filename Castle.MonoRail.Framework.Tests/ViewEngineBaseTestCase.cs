@@ -19,6 +19,7 @@ namespace Castle.MonoRail.Framework.Tests
 	using System;
 	using System.Collections;
 	using System.IO;
+	using JSGeneration;
 	using NUnit.Framework;
 
 	[TestFixture]
@@ -79,11 +80,15 @@ namespace Castle.MonoRail.Framework.Tests
 		/// </summary>
 		/// <param name="templateName">The template name</param>
 		/// <returns><c>true</c> if it exists</returns>
-		public bool HasTemplate(string templateName)
+		public bool HasSource(string templateName)
 		{
 			foreach (string view in views)
+			{
 				if (view.Equals(templateName, StringComparison.InvariantCultureIgnoreCase))
+				{
 					return true;
+				}
+			}
 			return false;
 		}
 
@@ -213,18 +218,7 @@ namespace Castle.MonoRail.Framework.Tests
 		/// to obtain the correct template,
 		/// and using the context to output the result.
 		/// </summary>
-		public override void Process(IRailsEngineContext context, IController controller, string templateName)
-		{
-			throw new NotImplementedException();
-		}
-
-		///<summary>
-		/// Processes the view - using the templateName 
-		/// to obtain the correct template
-		/// and writes the results to the System.IO.TextWriter.
-		/// </summary>
-		public override void Process(TextWriter output, IRailsEngineContext context, IController controller,
-		                             string templateName)
+		public override void Process(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -233,12 +227,7 @@ namespace Castle.MonoRail.Framework.Tests
 		/// Should process the specified partial. The partial name must contains
 		/// the path relative to the views folder.
 		/// </summary>
-		/// <param name="output">The output.</param>
-		/// <param name="context">The request context.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="partialName">The partial name.</param>
-		public override void ProcessPartial(TextWriter output, IRailsEngineContext context, IController controller,
-		                                    string partialName)
+		public override void ProcessPartial(String partialName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -249,22 +238,13 @@ namespace Castle.MonoRail.Framework.Tests
 		/// </summary>
 		/// <param name="context">The request context.</param>
 		/// <returns>A JS generator instance</returns>
-		public override object CreateJSGenerator(IRailsEngineContext context)
+		public override IJSGenerator CreateJSGenerator(IEngineContext context)
 		{
 			throw new NotImplementedException();
 		}
 
-		/// <summary>
-		/// Processes the js generation view template - using the templateName
-		/// to obtain the correct template, and using the specified <see cref="TextWriter"/>
-		/// to output the result.
-		/// </summary>
-		/// <param name="output">The output.</param>
-		/// <param name="context">The request context.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="templateName">Name of the template.</param>
-		public override void GenerateJS(TextWriter output, IRailsEngineContext context, IController controller,
-		                                string templateName)
+		public override void GenerateJS(string templateName, TextWriter output, IEngineContext context, IController controller,
+		                                IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -273,7 +253,7 @@ namespace Castle.MonoRail.Framework.Tests
 		/// Wraps the specified content in the layout using the 
 		/// context to output the result.
 		/// </summary>
-		public override void ProcessContents(IRailsEngineContext context, IController controller, string contents)
+		public override void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}

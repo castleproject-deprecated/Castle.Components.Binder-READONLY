@@ -18,8 +18,9 @@ namespace Castle.MonoRail.Framework.Tests
 	using System.Threading;
 
 	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Providers;
 	using Castle.MonoRail.Framework.Services;
-	
+	using Descriptors;
 	using NUnit.Framework;
 
 
@@ -123,7 +124,7 @@ namespace Castle.MonoRail.Framework.Tests
 
 	internal class MyFilter : IFilter
 	{
-		public bool Perform(ExecuteEnum exec, IRailsEngineContext context, IController controller)
+		public bool Perform(ExecuteEnum exec, IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			return true;
 		}

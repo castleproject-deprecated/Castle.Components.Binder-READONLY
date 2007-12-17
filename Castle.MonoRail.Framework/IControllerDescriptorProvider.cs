@@ -19,12 +19,53 @@ namespace Castle.MonoRail.Framework
 	using Castle.MonoRail.Framework.Providers;
 
 	/// <summary>
+	/// Creator delegate
+	/// </summary>
+	public delegate ControllerMetaDescriptor MetaCreatorHandler();
+
+	/// <summary>
+	/// ControllerMetaDescriptor delegate
+	/// </summary>
+	/// <returns></returns>
+	public delegate void ControllerMetaDescriptorHandler(ControllerMetaDescriptor metaDesc);
+
+	/// <summary>
+	/// Action meta creator delegate
+	/// </summary>
+	public delegate ActionMetaDescriptor ActionMetaCreatorHandler();
+
+	/// <summary>
+	/// ActionMetaDescriptor delegate
+	/// </summary>
+	public delegate void ActionMetaDescriptorHandler(ActionMetaDescriptor actionMetaDesc);
+
+	/// <summary>
 	/// Defines the contract for implementations that should
 	/// collect from one or more sources the meta information that
 	/// dictates the <see cref="IController"/> behavior and the actions it exposes.
 	/// </summary>
 	public interface IControllerDescriptorProvider : IProvider
 	{
+		/// <summary>
+		/// Occurs when the providers needs to create a <see cref="ControllerMetaDescriptor" />.
+		/// </summary>
+		event MetaCreatorHandler Create;
+
+		/// <summary>
+		/// Occurs when the meta descriptor is about to the returned to the caller.
+		/// </summary>
+		event ControllerMetaDescriptorHandler AfterProcess;
+
+		/// <summary>
+		/// Occurs when the providers needs to create a <see cref="ActionMetaDescriptor" />.
+		/// </summary>
+		event ActionMetaCreatorHandler ActionCreate;
+
+		/// <summary>
+		/// Occurs when the meta descriptor is about to be included on the <see cref="ControllerMetaDescriptor"/>.
+		/// </summary>
+		event ActionMetaDescriptorHandler AfterActionProcess;
+
 		/// <summary>
 		/// Builds the descriptor.
 		/// </summary>

@@ -51,17 +51,13 @@ namespace Castle.MonoRail.Framework.Descriptors
 		/// </summary>
 		/// <param name="actionMethod">The action method.</param>
 		/// <returns></returns>
-		public ActionMetaDescriptor GetAction(MethodInfo actionMethod)
+		public ActionMetaDescriptor GetAction(object actionMethod)
 		{
 			if (actionMethod == null) throw new ArgumentNullException("actionMethod");
 
 			ActionMetaDescriptor desc;
 
-			if (!actionMetaDescriptors.TryGetValue(actionMethod, out desc))
-			{
-				desc = new ActionMetaDescriptor();
-				actionMetaDescriptors[actionMethod] = desc;
-			}
+			actionMetaDescriptors.TryGetValue(actionMethod, out desc);
 
 			return desc;
 		}

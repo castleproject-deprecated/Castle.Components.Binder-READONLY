@@ -16,8 +16,9 @@ namespace Castle.MonoRail.Framework.Tests
 {
 	using System.IO;
 	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Providers;
 	using Castle.MonoRail.Framework.Services;
-
+	using Container;
 	using NUnit.Framework;
 
 	
@@ -31,14 +32,14 @@ namespace Castle.MonoRail.Framework.Tests
 		{
 			loader = new FileAssemblyViewSourceLoader();
 			loader.ViewRootDir = Path.GetFullPath(System.Configuration.ConfigurationManager.AppSettings["tests.src"]);
-			loader.Service(new TestServiceContainer());
+//			loader.Service(new TestServiceContainer());
 		}
 
 		[Test]
 		public void LoadFromFileSystem()
 		{
-			Assert.IsFalse(loader.HasTemplate("contentinfs2.vm"));
-			Assert.IsTrue(loader.HasTemplate("contentinfs.vm"));
+			Assert.IsFalse(loader.HasSource("contentinfs2.vm"));
+			Assert.IsTrue(loader.HasSource("contentinfs.vm"));
 			Assert.IsNotNull(loader.GetViewSource("contentinfs.vm"));
 		}
 
@@ -47,12 +48,12 @@ namespace Castle.MonoRail.Framework.Tests
 		{
 			loader.AddAssemblySource(new AssemblySourceInfo("Castle.MonoRail.Framework.Tests", "Castle.MonoRail.Framework.Tests"));
 
-			Assert.IsFalse(loader.HasTemplate("Content/contentinassembly2.vm"));
-			Assert.IsTrue(loader.HasTemplate("Content/contentinassembly.vm"));
+			Assert.IsFalse(loader.HasSource("Content/contentinassembly2.vm"));
+			Assert.IsTrue(loader.HasSource("Content/contentinassembly.vm"));
 			Assert.IsNotNull(loader.GetViewSource("Content/contentinassembly.vm"));
 
-			Assert.IsFalse(loader.HasTemplate("Content\\contentinassembly2.vm"));
-			Assert.IsTrue(loader.HasTemplate("Content\\contentinassembly.vm"));
+			Assert.IsFalse(loader.HasSource("Content\\contentinassembly2.vm"));
+			Assert.IsTrue(loader.HasSource("Content\\contentinassembly.vm"));
 			Assert.IsNotNull(loader.GetViewSource("Content\\contentinassembly.vm"));
 		}
 
@@ -71,7 +72,7 @@ namespace Castle.MonoRail.Framework.Tests
 
 			foreach(string view in views)
 			{
-				Assert.IsTrue(loader.HasTemplate(view));
+				Assert.IsTrue(loader.HasSource(view));
 				Assert.IsNotNull(loader.GetViewSource(view));
 			}
 		}
@@ -87,7 +88,7 @@ namespace Castle.MonoRail.Framework.Tests
 		{
 			loader = new FileAssemblyViewSourceLoader();
 			loader.ViewRootDir = Path.GetFullPath(@"c:\idontexist");
-			loader.Service(new TestServiceContainer());
+//			loader.Service(new TestServiceContainer());
 		}
 
 		[Test]
@@ -104,12 +105,12 @@ namespace Castle.MonoRail.Framework.Tests
 		{
 			loader.AddAssemblySource(new AssemblySourceInfo("Castle.MonoRail.Framework.Tests", "Castle.MonoRail.Framework.Tests"));
 
-			Assert.IsFalse(loader.HasTemplate("Content/contentinassembly2.vm"));
-			Assert.IsTrue(loader.HasTemplate("Content/contentinassembly.vm"));
+			Assert.IsFalse(loader.HasSource("Content/contentinassembly2.vm"));
+			Assert.IsTrue(loader.HasSource("Content/contentinassembly.vm"));
 			Assert.IsNotNull(loader.GetViewSource("Content/contentinassembly.vm"));
 
-			Assert.IsFalse(loader.HasTemplate("Content\\contentinassembly2.vm"));
-			Assert.IsTrue(loader.HasTemplate("Content\\contentinassembly.vm"));
+			Assert.IsFalse(loader.HasSource("Content\\contentinassembly2.vm"));
+			Assert.IsTrue(loader.HasSource("Content\\contentinassembly.vm"));
 			Assert.IsNotNull(loader.GetViewSource("Content\\contentinassembly.vm"));
 		}
 
@@ -128,7 +129,7 @@ namespace Castle.MonoRail.Framework.Tests
 
 			foreach (string view in views)
 			{
-				Assert.IsTrue(loader.HasTemplate(view));
+				Assert.IsTrue(loader.HasSource(view));
 				Assert.IsNotNull(loader.GetViewSource(view));
 			}
 		}

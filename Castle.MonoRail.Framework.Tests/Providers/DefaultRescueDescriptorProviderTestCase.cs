@@ -24,7 +24,7 @@
 		[Test]
 		public void CanCollectLayoutFromMethod()
 		{
-			RescueDescriptor[] descs = provider.CollectRescues(typeof(RescueOnActionController).GetMethod("Action"));
+			RescueDescriptor[] descs = provider.CollectRescues(typeof(RescueOnActionController).GetMethod("Action1"));
 
 			Assert.IsNotNull(descs);
 			Assert.AreEqual(1, descs.Length);
@@ -42,7 +42,7 @@
 		public class RescueOnActionController : Controller
 		{
 			[Rescue("action", typeof(ArgumentNullException))]
-			public void Action()
+			public void Action1()
 			{
 			}
 		}

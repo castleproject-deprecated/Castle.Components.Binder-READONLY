@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.Services
+namespace Castle.MonoRail.Framework.Providers
 {
 	using System;
 	using System.Collections;
 	using System.Reflection;
 	using System.Threading;
-
 	using Castle.Core.Logging;
-	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Services.Utils;
 	using Descriptors;
 	using Providers;
-	using Utils;
 
 	/// <summary>
 	/// Constructs and caches all collected information
@@ -41,6 +39,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// Used to lock the cache
 		/// </summary>
 		private ReaderWriterLock locker = new ReaderWriterLock();
+
 		private Hashtable descriptorRepository = new Hashtable();
 		private IHelperDescriptorProvider helperDescriptorProvider;
 		private IFilterDescriptorProvider filterDescriptorProvider;
@@ -48,6 +47,37 @@ namespace Castle.MonoRail.Framework.Services
 		private IRescueDescriptorProvider rescueDescriptorProvider;
 		private IResourceDescriptorProvider resourceDescriptorProvider;
 		private ITransformFilterDescriptorProvider transformFilterDescriptorProvider;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultControllerDescriptorProvider"/> class.
+		/// </summary>
+		public DefaultControllerDescriptorProvider()
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultControllerDescriptorProvider"/> class.
+		/// </summary>
+		/// <param name="helperDescriptorProvider">The helper descriptor provider.</param>
+		/// <param name="filterDescriptorProvider">The filter descriptor provider.</param>
+		/// <param name="layoutDescriptorProvider">The layout descriptor provider.</param>
+		/// <param name="rescueDescriptorProvider">The rescue descriptor provider.</param>
+		/// <param name="resourceDescriptorProvider">The resource descriptor provider.</param>
+		/// <param name="transformFilterDescriptorProvider">The transform filter descriptor provider.</param>
+		public DefaultControllerDescriptorProvider(IHelperDescriptorProvider helperDescriptorProvider,
+		                                           IFilterDescriptorProvider filterDescriptorProvider,
+		                                           ILayoutDescriptorProvider layoutDescriptorProvider,
+		                                           IRescueDescriptorProvider rescueDescriptorProvider,
+		                                           IResourceDescriptorProvider resourceDescriptorProvider,
+		                                           ITransformFilterDescriptorProvider transformFilterDescriptorProvider)
+		{
+			this.helperDescriptorProvider = helperDescriptorProvider;
+			this.filterDescriptorProvider = filterDescriptorProvider;
+			this.layoutDescriptorProvider = layoutDescriptorProvider;
+			this.rescueDescriptorProvider = rescueDescriptorProvider;
+			this.resourceDescriptorProvider = resourceDescriptorProvider;
+			this.transformFilterDescriptorProvider = transformFilterDescriptorProvider;
+		}
 
 		#region IMRServiceEnabled implementation
 
@@ -58,7 +88,7 @@ namespace Castle.MonoRail.Framework.Services
 		public void Service(IMonoRailServices serviceProvider)
 		{
 			ILoggerFactory loggerFactory = (ILoggerFactory) serviceProvider.GetService(typeof(ILoggerFactory));
-			
+
 			if (loggerFactory != null)
 			{
 				logger = loggerFactory.Create(typeof(DefaultControllerDescriptorProvider));
@@ -75,6 +105,26 @@ namespace Castle.MonoRail.Framework.Services
 		#endregion
 
 		/// <summary>
+		/// Occurs when the providers needs to create a <see cref="ControllerMetaDescriptor"/>.
+		/// </summary>
+		public event MetaCreatorHandler Create;
+
+		/// <summary>
+		/// Occurs when the meta descriptor is about to the returned to the caller.
+		/// </summary>
+		public event ControllerMetaDescriptorHandler AfterProcess;
+
+		/// <summary>
+		/// Occurs when the providers needs to create a <see cref="ActionMetaDescriptor"/>.
+		/// </summary>
+		public event ActionMetaCreatorHandler ActionCreate;
+
+		/// <summary>
+		/// Occurs when the meta descriptor is about to be included on the <see cref="ControllerMetaDescriptor"/>.
+		/// </summary>
+		public event ActionMetaDescriptorHandler AfterActionProcess;
+
+		/// <summary>
 		/// Constructs and populates a <see cref="ControllerMetaDescriptor"/>.
 		/// </summary>
 		/// <remarks>
@@ -84,7 +134,7 @@ namespace Castle.MonoRail.Framework.Services
 		public ControllerMetaDescriptor BuildDescriptor(IController controller)
 		{
 			Type controllerType = controller.GetType();
-			
+
 			return BuildDescriptor(controllerType);
 		}
 
@@ -120,7 +170,7 @@ namespace Castle.MonoRail.Framework.Services
 				{
 					return desc;
 				}
-				
+
 				desc = InternalBuildDescriptor(controllerType);
 
 				descriptorRepository[controllerType] = desc;
@@ -145,16 +195,21 @@ namespace Castle.MonoRail.Framework.Services
 				logger.DebugFormat("Building controller descriptor for {0}", controllerType);
 			}
 
-			ControllerMetaDescriptor descriptor = new ControllerMetaDescriptor();
+			ControllerMetaDescriptor descriptor = CreateMetaDescriptor();
 
 			descriptor.ControllerDescriptor = ControllerInspectionUtil.Inspect(controllerType);
 
 			CollectClassLevelAttributes(controllerType, descriptor);
-			
+
 			CollectActions(controllerType, descriptor);
 
 			CollectActionLevelAttributes(descriptor);
-			
+
+			if (AfterProcess != null)
+			{
+				AfterProcess(descriptor);
+			}
+
 			return descriptor;
 		}
 
@@ -177,9 +232,11 @@ namespace Castle.MonoRail.Framework.Services
 			{
 				Type declaringType = method.DeclaringType;
 
-				if (declaringType == typeof(Object) || 
-					declaringType == typeof(IController))
-				// || declaringType == typeof(SmartDispatcherController))
+				if (method.IsSpecialName) continue;
+
+				if (declaringType == typeof(Object) ||
+					declaringType == typeof(IController) || declaringType == typeof(Controller))
+					// || declaringType == typeof(SmartDispatcherController))
 				{
 					continue;
 				}
@@ -241,6 +298,13 @@ namespace Castle.MonoRail.Framework.Services
 
 			ActionMetaDescriptor actionDescriptor = descriptor.GetAction(method);
 
+			if (actionDescriptor == null)
+			{
+				actionDescriptor = CreateActionDescriptor();
+
+				descriptor.AddAction(method, actionDescriptor);
+			}
+
 			CollectResources(actionDescriptor, method);
 			CollectSkipFilter(actionDescriptor, method);
 			CollectRescues(actionDescriptor, method);
@@ -249,7 +313,7 @@ namespace Castle.MonoRail.Framework.Services
 			CollectLayout(actionDescriptor, method);
 			CollectCacheConfigures(actionDescriptor, method);
 			CollectTransformFilter(actionDescriptor, method);
-			
+
 			if (method.IsDefined(typeof(AjaxActionAttribute), true))
 			{
 				descriptor.AjaxActions.Add(method);
@@ -259,9 +323,16 @@ namespace Castle.MonoRail.Framework.Services
 			{
 				if (descriptor.DefaultAction != null)
 				{
-					throw new MonoRailException("Cannot resolve a default action for {0}, DefaultActionAttribute was declared more than once.", method.DeclaringType.FullName);
+					throw new MonoRailException(
+						"Cannot resolve a default action for {0}, DefaultActionAttribute was declared more than once.",
+						method.DeclaringType.FullName);
 				}
 				descriptor.DefaultAction = new DefaultActionAttribute(method.Name);
+			}
+
+			if (AfterActionProcess != null)
+			{
+				AfterActionProcess(actionDescriptor);
 			}
 		}
 
@@ -273,7 +344,7 @@ namespace Castle.MonoRail.Framework.Services
 		private void CollectSkipRescue(ActionMetaDescriptor actionDescriptor, MethodInfo method)
 		{
 			object[] attributes = method.GetCustomAttributes(typeof(SkipRescueAttribute), true);
-			
+
 			if (attributes.Length != 0)
 			{
 				actionDescriptor.SkipRescue = (SkipRescueAttribute) attributes[0];
@@ -288,7 +359,7 @@ namespace Castle.MonoRail.Framework.Services
 		private void CollectAccessibleThrough(ActionMetaDescriptor actionDescriptor, MethodInfo method)
 		{
 			object[] attributes = method.GetCustomAttributes(typeof(AccessibleThroughAttribute), true);
-			
+
 			if (attributes.Length != 0)
 			{
 				actionDescriptor.AccessibleThrough = (AccessibleThroughAttribute) attributes[0];
@@ -303,7 +374,7 @@ namespace Castle.MonoRail.Framework.Services
 		private void CollectSkipFilter(ActionMetaDescriptor actionDescriptor, MethodInfo method)
 		{
 			object[] attributes = method.GetCustomAttributes(typeof(SkipFilterAttribute), true);
-			
+
 			foreach(SkipFilterAttribute attr in attributes)
 			{
 				actionDescriptor.SkipFilters.Add(attr);
@@ -330,7 +401,7 @@ namespace Castle.MonoRail.Framework.Services
 			actionDescriptor.TransformFilters = transformFilterDescriptorProvider.CollectFilters((method));
 			Array.Sort(actionDescriptor.TransformFilters, TransformFilterDescriptorComparer.Instance);
 		}
-		
+
 		/// <summary>
 		/// Gets the real controller type, instead of the proxy type.
 		/// </summary>
@@ -342,13 +413,13 @@ namespace Castle.MonoRail.Framework.Services
 			Type prev = controllerType;
 
 			// try to get the first non-proxy type
-			while(controllerType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2") || 
-				  controllerType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen"))
+			while(controllerType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2") ||
+			      controllerType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen"))
 			{
 				controllerType = controllerType.BaseType;
 
-				if (// controllerType == typeof(SmartDispatcherController) || 
-				    controllerType == typeof(IController))
+				if ( // controllerType == typeof(SmartDispatcherController) || 
+					controllerType == typeof(IController))
 				{
 					// oops, it's a pure-proxy controller. just let it go.
 					controllerType = prev;
@@ -503,11 +574,35 @@ namespace Castle.MonoRail.Framework.Services
 
 		#endregion
 
+		private ControllerMetaDescriptor CreateMetaDescriptor()
+		{
+			if (Create != null)
+			{
+				return Create();
+			}
+			else
+			{
+				return new ControllerMetaDescriptor();
+			}
+		}
+
+		private ActionMetaDescriptor CreateActionDescriptor()
+		{
+			if (ActionCreate != null)
+			{
+				return ActionCreate();
+			}
+			else
+			{
+				return new ActionMetaDescriptor();
+			}
+		}
+
 		/// <summary>
 		/// This <see cref="IComparer"/> implementation
 		/// is used to sort the filters based on their Execution Order.
 		/// </summary>
-		class FilterDescriptorComparer : IComparer
+		private class FilterDescriptorComparer : IComparer
 		{
 			private static readonly FilterDescriptorComparer instance = new FilterDescriptorComparer();
 
@@ -543,7 +638,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// This <see cref="IComparer"/> implementation
 		/// is used to sort the transformfilters based on their Execution Order.
 		/// </summary>
-		class TransformFilterDescriptorComparer : IComparer
+		private class TransformFilterDescriptorComparer : IComparer
 		{
 			private static readonly TransformFilterDescriptorComparer instance = new TransformFilterDescriptorComparer();
 
@@ -571,7 +666,7 @@ namespace Castle.MonoRail.Framework.Services
 			/// <returns></returns>
 			public int Compare(object left, object right)
 			{
-				return ((TransformFilterDescriptor)right).ExecutionOrder - ((TransformFilterDescriptor)left).ExecutionOrder;
+				return ((TransformFilterDescriptor) right).ExecutionOrder - ((TransformFilterDescriptor) left).ExecutionOrder;
 			}
 		}
 	}

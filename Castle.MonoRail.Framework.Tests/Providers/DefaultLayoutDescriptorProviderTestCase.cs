@@ -21,7 +21,7 @@
 		[Test]
 		public void CanCollectLayoutFromMethod()
 		{
-			LayoutDescriptor desc = provider.CollectLayout(typeof(LayoutOnActionController).GetMethod("Action"));
+			LayoutDescriptor desc = provider.CollectLayout(typeof(LayoutOnActionController).GetMethod("Action1"));
 
 			Assert.IsNotNull(desc);
 			Assert.AreEqual("action", desc.LayoutName);
@@ -37,7 +37,7 @@
 		public class LayoutOnActionController : Controller
 		{
 			[Layout("action")]
-			public void Action()
+			public void Action1()
 			{
 			}
 		}

@@ -267,7 +267,7 @@
     <Compile Include="Services\DefaultActionSelector.cs" />
     <Compile Include="Services\DefaultCacheProvider.cs" />
     <Compile Include="Services\DefaultControllerContextFactory.cs" />
-    <Compile Include="Services\DefaultControllerDescriptorProvider.cs" />
+    <Compile Include="Providers\DefaultControllerDescriptorProvider.cs" />
     <Compile Include="Services\DefaultControllerFactory.cs" />
     <Compile Include="Services\DefaultControllerTree.cs">
       <SubType>Code</SubType>
@@ -394,10 +394,6 @@
       <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
       <Name>Castle.Core-vs2008</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Internal\Descriptors\" />
-    <Folder Include="Internal\Providers\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

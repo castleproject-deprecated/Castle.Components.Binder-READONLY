@@ -27,7 +27,7 @@ namespace Castle.MonoRail.Framework.Tests.Providers
 		[Test]
 		public void CanCollectTransformationFiltersFromMethod()
 		{
-			TransformFilterDescriptor[] descs = provider.CollectFilters(typeof(TransformOnActionController).GetMethod("Action"));
+			TransformFilterDescriptor[] descs = provider.CollectFilters(typeof(TransformOnActionController).GetMethod("Action1"));
 
 			Assert.IsNotNull(descs);
 			Assert.AreEqual(1, descs.Length);
@@ -39,7 +39,7 @@ namespace Castle.MonoRail.Framework.Tests.Providers
 		public class TransformOnActionController : Controller
 		{
 			[TransformFilter(typeof(DummyTransFilter))]
-			public void Action()
+			public void Action1()
 			{
 			}
 		}
