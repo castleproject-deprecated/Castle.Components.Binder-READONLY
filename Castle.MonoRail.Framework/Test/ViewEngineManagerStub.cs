@@ -1,5 +1,21 @@
-﻿namespace Castle.MonoRail.Framework.Test
+﻿// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace Castle.MonoRail.Framework.Test
 {
+	using System;
+	using System.Collections.Generic;
 	using System.IO;
 
 	/// <summary>
@@ -7,6 +23,47 @@
 	/// </summary>
 	public class ViewEngineManagerStub : IViewEngineManager
 	{
+		private readonly List<string> templates = new List<string>();
+		private string templateRendered;
+		private string partialRendered;
+		private string contentWithinLayoutRendered;
+
+		/// <summary>
+		/// Gets the name of the template rendered by the controller.
+		/// </summary>
+		/// <value>The template rendered.</value>
+		public string TemplateRendered
+		{
+			get { return templateRendered; }
+		}
+
+		/// <summary>
+		/// Gets the name of the partial template rendered.
+		/// </summary>
+		/// <value>The partial rendered.</value>
+		public string PartialRendered
+		{
+			get { return partialRendered; }
+		}
+
+		/// <summary>
+		/// Gets the static content rendered from the controller.
+		/// </summary>
+		/// <value>The content within layout rendered.</value>
+		public string ContentWithinLayoutRendered
+		{
+			get { return contentWithinLayoutRendered; }
+		}
+
+		/// <summary>
+		/// Registers the template.
+		/// </summary>
+		/// <param name="template">The template.</param>
+		public void RegisterTemplate(string template)
+		{
+			templates.Add(template);
+		}
+
 		/// <summary>
 		/// Evaluates whether the specified template exists.
 		/// </summary>
@@ -14,7 +71,11 @@
 		/// <returns><c>true</c> if it exists</returns>
 		public bool HasTemplate(string templateName)
 		{
-			throw new System.NotImplementedException();
+			return templates.Exists(
+				delegate(string item)
+            	{
+            		return item.Equals(templateName, StringComparison.InvariantCultureIgnoreCase);
+            	});
 		}
 
 		/// <summary>
@@ -28,7 +89,7 @@
 		public void Process(string templateName, TextWriter output, IEngineContext context, IController controller,
 		                    IControllerContext controllerContext)
 		{
-			throw new System.NotImplementedException();
+			templateRendered = templateName;
 		}
 
 		/// <summary>
@@ -39,7 +100,7 @@
 		public void ProcessPartial(string partialName, TextWriter output, IEngineContext context, IController controller,
 		                           IControllerContext controllerContext)
 		{
-			throw new System.NotImplementedException();
+			partialRendered = partialName;
 		}
 
 		/// <summary>
@@ -49,7 +110,7 @@
 		public void RenderStaticWithinLayout(string contents, IEngineContext context, IController controller,
 		                                     IControllerContext controllerContext)
 		{
-			throw new System.NotImplementedException();
+			contentWithinLayoutRendered = contents;
 		}
 	}
 }

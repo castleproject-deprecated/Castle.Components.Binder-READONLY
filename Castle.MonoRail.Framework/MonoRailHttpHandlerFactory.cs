@@ -95,14 +95,14 @@ namespace Castle.MonoRail.Framework
 			}
 //			catch(ControllerNotFoundException)
 //			{
-//				// TODO: Process 404 if available
+//				// TODO: Set the status code to 404 and Process 404 view/controller if available
 //
 //				throw;
 //			}
 
 			ControllerMetaDescriptor controllerDesc = mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
 
-			IControllerContext controllerContext = controllerContextFactory.Create(urlInfo.Area, urlInfo.Controller, urlInfo.Action, urlInfo, controllerDesc);
+			IControllerContext controllerContext = controllerContextFactory.Create(urlInfo.Area, urlInfo.Controller, urlInfo.Action, controllerDesc);
 
 			context.Items[CurrentEngineContextKey] = engineContext;
 			context.Items[CurrentControllerKey] = controller;

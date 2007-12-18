@@ -30,9 +30,9 @@ namespace Castle.MonoRail.Framework.Descriptors
 	{
 		private ControllerDescriptor controllerDescriptor;
 		private DefaultActionAttribute defaultAction;
-		private HelperDescriptor[] helpers;
-		private FilterDescriptor[] filters;
-		private TransformFilterDescriptor[] transformFilters;
+		private HelperDescriptor[] helpers = new HelperDescriptor[0];
+		private FilterDescriptor[] filters = new FilterDescriptor[0];
+		private TransformFilterDescriptor[] transformFilters = new TransformFilterDescriptor[0];
 		private Dictionary<object, ActionMetaDescriptor> actionMetaDescriptors = new Dictionary<object, ActionMetaDescriptor>();
 		private IList<ScaffoldingAttribute> scaffoldings = new List<ScaffoldingAttribute>();
 		private IList<Type> actionProviders = new List<Type>();

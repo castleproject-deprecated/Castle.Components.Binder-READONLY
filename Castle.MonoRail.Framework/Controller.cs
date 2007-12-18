@@ -902,6 +902,11 @@ namespace Castle.MonoRail.Framework
 		{
 			IExecutableAction action = SelectAction(Action);
 
+			if (action == null)
+			{
+				// Couldn't find action status code: 404 and throw exception
+			}
+
 			EnsureActionIsAccessibleWithCurrentHttpVerb(action);
 
 			bool cancel;

@@ -47,9 +47,20 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ControllerContext"/> class.
 		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <param name="areaName">Name of the area.</param>
-		/// <param name="action">The action.</param>
+		/// <param name="name">The controller name.</param>
+		/// <param name="action">The action name.</param>
+		/// <param name="metaDescriptor">The meta descriptor.</param>
+		public ControllerContext(string name, string action, ControllerMetaDescriptor metaDescriptor) : 
+			this(name, string.Empty, action, metaDescriptor)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ControllerContext"/> class.
+		/// </summary>
+		/// <param name="name">The controller name.</param>
+		/// <param name="areaName">The area name.</param>
+		/// <param name="action">The action name.</param>
 		/// <param name="metaDescriptor">The meta descriptor.</param>
 		public ControllerContext(string name, string areaName, string action, ControllerMetaDescriptor metaDescriptor)
 		{

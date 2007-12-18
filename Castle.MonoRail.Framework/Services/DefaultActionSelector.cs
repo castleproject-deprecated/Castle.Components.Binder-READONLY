@@ -44,7 +44,7 @@
 			{
 				ActionMetaDescriptor actionDesc = context.ControllerDescriptor.GetAction(actionMethod);
 
-				return new ActionMethodExecutor(actionMethod, actionDesc);
+				return new ActionMethodExecutor(actionMethod, actionDesc ?? new ActionMetaDescriptor());
 			}
 
 			IExecutableAction executableAction = RunSubSelectors(engineContext, controller, context);
@@ -92,7 +92,14 @@
 		/// <returns></returns>
 		protected virtual MethodInfo SelectActionMethod(IController controller, IControllerContext context, string name)
 		{
-			return context.ControllerDescriptor.Actions[name] as MethodInfo;
+			MethodInfo methodInfo = context.ControllerDescriptor.Actions[name] as MethodInfo;
+
+			if (methodInfo != null)
+			{
+				return methodInfo;
+			}
+
+			return controller.GetType().GetMethod(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
 		}
 
 		/// <summary>
@@ -134,7 +141,7 @@
 				{
 					ActionMetaDescriptor actionDesc = context.ControllerDescriptor.GetAction(method);
 
-					return new ActionMethodExecutor(method, actionDesc);
+					return new ActionMethodExecutor(method, actionDesc ?? new ActionMetaDescriptor());
 				}
 			}
 

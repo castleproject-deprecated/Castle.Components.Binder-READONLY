@@ -25,6 +25,6 @@ namespace Castle.MonoRail.Framework
 		/// Pendent
 		/// </summary>
 		/// <returns></returns>
-		IControllerContext Create(string area, string controller, string action, UrlInfo urlInfo, ControllerMetaDescriptor metaDescriptor);
+		IControllerContext Create(string area, string controller, string action, ControllerMetaDescriptor metaDescriptor);
 	}
 }

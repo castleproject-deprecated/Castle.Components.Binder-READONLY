@@ -124,6 +124,8 @@
     <None Include="App.config" />
     <None Include="Castle.MonoRail.Framework.Tests.build" />
     <None Include="contentinfs.vm" />
+    <EmbeddedResource Include="Content\contentinassembly.vm" />
+    <None Include="Content\notinassembly.vm" />
     <Compile Include="Actions\ActionMethodExecutorCompatibleTestCase.cs" />
     <Compile Include="Actions\ActionMethodExecutorTestCase.cs" />
     <Compile Include="Actions\DynamicActionExecutorTestCase.cs" />
@@ -131,6 +133,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Actions\DefaultActionSelectorTestCase.cs" />
+    <Compile Include="Controllers\Clients\ClientCartController.cs" />
+    <Compile Include="Controllers\Clients\ClientContactController.cs" />
+    <Compile Include="Controllers\Clients\ClientHomeController.cs" />
+    <Compile Include="Controllers\Clients\OtherController.cs" />
+    <Compile Include="Controllers\ContactController.cs" />
+    <Compile Include="Controllers\ControllerTestCase.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\Products\CartController.cs" />
+    <Compile Include="Controllers\Products\ListController.cs" />
     <Compile Include="Services\DefaultControllerFactoryTestCase.cs" />
     <Compile Include="Services\FileAssemblyViewSourceLoaderTestCase.cs" />
     <Compile Include="Services\DefaultUrlTokenizerTestCase.cs" />

@@ -17,7 +17,6 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Text;
 	using System.Runtime.Serialization;
-	using Castle.MonoRail.Framework.Internal;
 
 	/// <summary>
 	/// Thrown when a controller is not found.

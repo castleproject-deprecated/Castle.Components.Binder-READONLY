@@ -30,6 +30,11 @@ namespace Castle.MonoRail.Framework
 		/// <param name="actionMetaDescriptor">The action meta descriptor.</param>
 		protected BaseExecutableAction(ActionMetaDescriptor actionMetaDescriptor)
 		{
+			if (actionMetaDescriptor == null)
+			{
+				throw new ArgumentNullException("actionMetaDescriptor");
+			}
+
 			this.actionMetaDescriptor = actionMetaDescriptor;
 		}
 

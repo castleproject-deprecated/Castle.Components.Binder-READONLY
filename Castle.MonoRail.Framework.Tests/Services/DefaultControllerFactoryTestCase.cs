@@ -38,7 +38,8 @@ namespace Castle.MonoRail.Framework.Tests
 		[Test]
 		public void EmptyArea()
 		{
-			IController controller = factory.CreateController(new UrlInfo("domain", "sub", "", "http://", 80, "", "", "home", "", extension, null));
+			IController controller = factory.CreateController(
+				new UrlInfo("domain", "sub", "", "http://", 80, "", "", "home", "", extension, null));
 
 			Assert.IsNotNull(controller);
 			Assert.AreEqual("Castle.MonoRail.Framework.Tests.Controllers.HomeController",
@@ -49,7 +50,8 @@ namespace Castle.MonoRail.Framework.Tests
 		public void OneLevelArea()
 		{
 			IController controller =
-				factory.CreateController(new UrlInfo("domain", "sub", "", "http://", 80, "", "clients", "home", "", extension, null));
+				factory.CreateController(
+					new UrlInfo("domain", "sub", "", "http://", 80, "", "clients", "home", "", extension, null));
 
 			Assert.IsNotNull(controller);
 			Assert.AreEqual("Castle.MonoRail.Framework.Tests.Controllers.Clients.ClientHomeController",

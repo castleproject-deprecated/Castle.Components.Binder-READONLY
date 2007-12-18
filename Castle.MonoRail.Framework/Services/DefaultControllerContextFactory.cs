@@ -28,11 +28,10 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="area">The area.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="action">The action.</param>
-		/// <param name="urlInfo">The URL info.</param>
 		/// <param name="metaDescriptor">The meta descriptor.</param>
 		/// <returns></returns>
 		public IControllerContext Create(string area, string controller, string action,
-		                                 UrlInfo urlInfo, ControllerMetaDescriptor metaDescriptor)
+		                                 ControllerMetaDescriptor metaDescriptor)
 		{
 			ControllerContext context = new ControllerContext(controller, area, action, metaDescriptor);
 
