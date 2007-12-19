@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.Reflection;
 	using System.Web;
 	using Castle.Core;
 	using Castle.MonoRail.Framework.Container;
@@ -47,7 +48,6 @@ namespace Castle.MonoRail.Framework
 		public MonoRailHttpHandlerFactory()
 		{
 			serviceProviderLocator = ServiceProviderLocator.Instance;
-			configuration = MonoRailConfiguration.GetConfig();
 		}
 
 		/// <summary>
@@ -70,6 +70,8 @@ namespace Castle.MonoRail.Framework
 			{
 				if (mrContainer == null)
 				{
+					configuration = ObtainConfiguration(context.ApplicationInstance);
+
 					IServiceProviderEx userServiceProvider = serviceProviderLocator.LocateProvider();
 
 					mrContainer = CreateDefaultMonoRailContainer(userServiceProvider);
@@ -212,6 +214,41 @@ namespace Castle.MonoRail.Framework
 		}
 
 		#endregion
+
+		private IMonoRailConfiguration ObtainConfiguration(HttpApplication appInstance)
+		{
+			IMonoRailConfiguration config = MonoRailConfiguration.GetConfig();
+
+			if (config == null)
+			{
+				MethodInfo mrConfigurer = appInstance.GetType().GetMethod("MonoRail_Configure");
+
+				if (mrConfigurer != null)
+				{
+					config = new MonoRailConfiguration();
+
+					if (mrConfigurer.IsStatic)
+					{
+						mrConfigurer.Invoke(null, new object[] { config });
+					}
+					else
+					{
+						mrConfigurer.Invoke(appInstance, new object[] { config });
+					}
+				}
+			}
+
+			if (config == null)
+			{
+				throw new ApplicationException("You have to provide a small configuration to use " +
+											   "MonoRail. This can be done using the web.config or " +
+											   "your global asax (your class that extends HttpApplication) " +
+											   "through the method MonoRail_Configure(IMonoRailConfiguration config). " +
+											   "Check the samples or the documentation");
+			}
+
+			return config;
+		}
 
 		private void EnsureServices()
 		{

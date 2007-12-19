@@ -109,12 +109,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		bool ExcludeAppPath { get; }
 
 		/// <summary>
-		/// Gets the configuration section.
-		/// </summary>
-		/// <value>The configuration section.</value>
-		XmlNode ConfigurationSection { get; }
-
-		/// <summary>
 		/// Gets the default urls.
 		/// </summary>
 		/// <value>The default urls.</value>
@@ -125,5 +119,11 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// </summary>
 		/// <value>The services config.</value>
 		IConfiguration ServicesConfig { get; }
+
+		/// <summary>
+		/// Gets the configuration section.
+		/// </summary>
+		/// <value>The configuration section.</value>
+		XmlNode ConfigurationSection { get; }
 	}
 }

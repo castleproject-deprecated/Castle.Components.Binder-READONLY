@@ -79,20 +79,15 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// <returns></returns>
 		public static MonoRailConfiguration GetConfig()
 		{
-			MonoRailConfiguration config =
+			MonoRailConfiguration config = 
 				ConfigurationManager.GetSection(SectionName) as MonoRailConfiguration;
 
 			if (config == null)
 			{
-				config =
-					ConfigurationManager.GetSection(AlternativeSectionName) as MonoRailConfiguration;
+				config = ConfigurationManager.GetSection(AlternativeSectionName) as MonoRailConfiguration;
 			}
 
-			if (config == null)
-			{
-				throw new ApplicationException("You have to provide a small configuration to use " +
-				                               "MonoRail. Check the samples or the documentation");
-			}
+			
 
 			return config;
 		}

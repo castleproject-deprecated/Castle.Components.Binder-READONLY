@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Services
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Reflection;
 	
 	using Castle.Core;
@@ -35,7 +36,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// </summary>
 		private ILogger logger = NullLogger.Instance;
 
-		private string[] assemblies;
+		private List<string> assemblies;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultControllerFactory"/> class.
@@ -88,7 +89,7 @@ namespace Castle.MonoRail.Framework.Services
 			{
 				assemblies = config.ControllersConfig.Assemblies;
 				
-				if (assemblies == null || assemblies.Length == 0)
+				if (assemblies.Count == 0)
 				{
 					throw new System.Configuration.ConfigurationErrorsException("No assembly was informed on the configuration file. " +
 						"Unfortunatelly this cannot be inferred (we tried)");

@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework.Configuration
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.Configuration;
 	using System.IO;
 	using System.Xml;
@@ -27,8 +28,8 @@ namespace Castle.MonoRail.Framework.Configuration
 	public class ViewEngineConfig : ISerializedConfig
 	{
 		private String viewPathRoot;
-		private AssemblySourceInfo[] sources = new AssemblySourceInfo[0];
-		private ViewEngineInfo[] viewEngines = new ViewEngineInfo[0];
+		private List<AssemblySourceInfo> sources = new List<AssemblySourceInfo>();
+		private List<ViewEngineInfo> viewEngines = new List<ViewEngineInfo>();
 
 		#region ISerializedConfig implementation
 
@@ -71,7 +72,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// Gets the view engines.
 		/// </summary>
 		/// <value>The view engines.</value>
-		public ViewEngineInfo[] ViewEngines
+		public List<ViewEngineInfo> ViewEngines
 		{
 			get { return viewEngines; }
 		}
@@ -80,7 +81,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// Gets or sets the additional assembly sources.
 		/// </summary>
 		/// <value>The sources.</value>
-		public AssemblySourceInfo[] Sources
+		public List<AssemblySourceInfo> Sources
 		{
 			get { return sources; }
 			set { sources = value; }
@@ -123,11 +124,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			{
 				ConfigureDefaultViewEngine();
 			}
-			else
-			{
-				viewEngines = new ViewEngineInfo[viewEnginesList.Count];
-				viewEnginesList.CopyTo(viewEngines);
-			}
 		}
 
 		private void ResolveViewPath()
@@ -147,11 +143,11 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// <summary>
 		/// Configures the default view engine.
 		/// </summary>
-		private void ConfigureDefaultViewEngine()
+		public void ConfigureDefaultViewEngine()
 		{
 			Type engineType = typeof(Castle.MonoRail.Framework.Views.Aspx.WebFormsViewEngine);
 
-			viewEngines = new ViewEngineInfo[] {new ViewEngineInfo(engineType, false)};
+			viewEngines.Add(new ViewEngineInfo(engineType, false));
 		}
 
 		private void ConfigureSingleViewEngine(XmlNode section)
@@ -202,22 +198,18 @@ namespace Castle.MonoRail.Framework.Configuration
 				engineType = TypeLoadUtil.GetType(customEngineAtt.Value);
 			}
 
-			viewEngines = new ViewEngineInfo[] {new ViewEngineInfo(engineType, enableXhtmlRendering)};
+			viewEngines.Add(new ViewEngineInfo(engineType, enableXhtmlRendering));
 		}
 
 		private void LoadAdditionalSources(XmlNode section)
 		{
-			ArrayList items = new ArrayList();
-
 			foreach(XmlElement assemblyNode in section.SelectNodes("/monorail/*/additionalSources/assembly"))
 			{
 				String assemblyName = assemblyNode.GetAttribute("name");
 				String ns = assemblyNode.GetAttribute("namespace");
 
-				items.Add(new AssemblySourceInfo(assemblyName, ns));
+				sources.Add(new AssemblySourceInfo(assemblyName, ns));
 			}
-
-			sources = (AssemblySourceInfo[]) items.ToArray(typeof(AssemblySourceInfo));
 		}
 	}
 }
