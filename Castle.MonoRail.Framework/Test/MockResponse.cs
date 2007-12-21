@@ -177,22 +177,22 @@ namespace Castle.MonoRail.Framework.Test
 		/// </summary>
 		/// <param name="controller">The controller.</param>
 		/// <param name="action">The action.</param>
-		public virtual void RedirectToUrl(string controller, string action)
+		public virtual void Redirect(string controller, string action)
 		{
 			RedirectToUrl(BuildMockUrl(null, controller, action));
 		}
 
-//		/// <summary>
-//		/// Redirects the specified area.
-//		/// </summary>
-//		/// <param name="area">The area.</param>
-//		/// <param name="controller">The controller.</param>
-//		/// <param name="action">The action.</param>
-//		public virtual void Redirect(string area, string controller, string action)
-//		{
-//			Redirect(BuildMockUrl(area, controller, action));
-//		}
-//
+		/// <summary>
+		/// Redirects the specified area.
+		/// </summary>
+		/// <param name="area">The area.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		public virtual void Redirect(string area, string controller, string action)
+		{
+			RedirectToUrl(BuildMockUrl(area, controller, action));
+		}
+
 //		/// <summary>
 //		/// Redirects to another controller and action with the specified paramters.
 //		/// </summary>

@@ -45,6 +45,14 @@ namespace Castle.MonoRail.Framework.Services
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultControllerFactory"/> class.
+		/// </summary>
+		/// <param name="tree">The tree.</param>
+		public DefaultControllerFactory(IControllerTree tree) : base(tree)
+		{
+		}
+
 		#region IInitializable implementation
 		
 		/// <summary>

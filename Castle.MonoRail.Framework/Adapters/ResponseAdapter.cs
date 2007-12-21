@@ -18,6 +18,7 @@ namespace Castle.MonoRail.Framework.Adapters
 	using System.IO;
 	using System.Web;
 	using Castle.MonoRail.Framework;
+	using Services;
 
 	/// <summary>
 	/// Adapts the <see cref="IResponse"/> to
@@ -27,15 +28,21 @@ namespace Castle.MonoRail.Framework.Adapters
 	{
 //		private readonly IHandlerContext context;
 		private readonly HttpResponse response;
+		private readonly UrlInfo currentUrl;
+		private readonly IUrlBuilder urlBuilder;
 		private bool redirected;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ResponseAdapter"/> class.
 		/// </summary>
 		/// <param name="response">The response.</param>
-		public ResponseAdapter(HttpResponse response)
+		/// <param name="currentUrl">The current URL.</param>
+		/// <param name="urlBuilder">The URL builder.</param>
+		public ResponseAdapter(HttpResponse response, UrlInfo currentUrl, IUrlBuilder urlBuilder)
 		{
 			this.response = response;
+			this.currentUrl = currentUrl;
+			this.urlBuilder = urlBuilder;
 		}
 
 //		/// <summary>
@@ -221,35 +228,31 @@ namespace Castle.MonoRail.Framework.Adapters
 			response.Redirect(url, endProcess);
 		}
 
-//		/// <summary>
-//		/// Redirects the specified controller.
-//		/// </summary>
-//		/// <param name="controller">The controller.</param>
-//		/// <param name="action">The action.</param>
-//		public void Redirect(String controller, String action)
-//		{
-//			redirected = true;
-//
-//			IUrlBuilder builder = (IUrlBuilder) context.GetService(typeof(IUrlBuilder));
-//
-//			response.Redirect(builder.BuildUrl(context.UrlInfo, controller, action), false);
-//		}
-//
-//		/// <summary>
-//		/// Redirects the specified area.
-//		/// </summary>
-//		/// <param name="area">The area.</param>
-//		/// <param name="controller">The controller.</param>
-//		/// <param name="action">The action.</param>
-//		public void Redirect(String area, String controller, String action)
-//		{
-//			redirected = true;
-//
-//			IUrlBuilder builder = (IUrlBuilder) context.GetService(typeof(IUrlBuilder));
-//
-//			response.Redirect(builder.BuildUrl(context.UrlInfo, area, controller, action), false);
-//		}
-//
+		/// <summary>
+		/// Redirects the specified controller.
+		/// </summary>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		public void Redirect(String controller, String action)
+		{
+			redirected = true;
+
+			response.Redirect(urlBuilder.BuildUrl(currentUrl, controller, action), false);
+		}
+
+		/// <summary>
+		/// Redirects the specified area.
+		/// </summary>
+		/// <param name="area">The area.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		public void Redirect(String area, String controller, String action)
+		{
+			redirected = true;
+
+			response.Redirect(urlBuilder.BuildUrl(currentUrl, area, controller, action), false);
+		}
+
 //		/// <summary>
 //		/// Redirects to another controller and action with the specified paramters.
 //		/// </summary>

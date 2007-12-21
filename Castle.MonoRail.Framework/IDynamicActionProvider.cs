@@ -31,8 +31,9 @@ namespace Castle.MonoRail.Framework
 		/// Implementors should register their dynamics
 		/// actions into the controller
 		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
 		/// <param name="controller">The target controller</param>
 		/// <param name="controllerContext">The controller context.</param>
-		void IncludeActions(IController controller, IControllerContext controllerContext);
+		void IncludeActions(IEngineContext engineContext, IController controller, IControllerContext controllerContext);
 	}
 }

@@ -45,9 +45,17 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MonoRailHttpHandlerFactory"/> class.
 		/// </summary>
-		public MonoRailHttpHandlerFactory()
+		public MonoRailHttpHandlerFactory() : this(ServiceProviderLocator.Instance)
 		{
-			serviceProviderLocator = ServiceProviderLocator.Instance;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MonoRailHttpHandlerFactory"/> class.
+		/// </summary>
+		/// <param name="serviceLocator">The service locator.</param>
+		public MonoRailHttpHandlerFactory(IServiceProviderLocator serviceLocator)
+		{
+			serviceProviderLocator = serviceLocator;
 		}
 
 		/// <summary>
@@ -70,7 +78,10 @@ namespace Castle.MonoRail.Framework
 			{
 				if (mrContainer == null)
 				{
-					configuration = ObtainConfiguration(context.ApplicationInstance);
+					if (configuration == null)
+					{
+						configuration = ObtainConfiguration(context.ApplicationInstance);
+					}
 
 					IServiceProviderEx userServiceProvider = serviceProviderLocator.LocateProvider();
 
@@ -93,7 +104,7 @@ namespace Castle.MonoRail.Framework
 
 //			try
 			{
-				controller = controllerFactory.CreateController(urlInfo);
+				controller = controllerFactory.CreateController(urlInfo.Area, urlInfo.Controller);
 			}
 //			catch(ControllerNotFoundException)
 //			{
@@ -102,9 +113,11 @@ namespace Castle.MonoRail.Framework
 //				throw;
 //			}
 
-			ControllerMetaDescriptor controllerDesc = mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
+			ControllerMetaDescriptor controllerDesc = 
+				mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
 
-			IControllerContext controllerContext = controllerContextFactory.Create(urlInfo.Area, urlInfo.Controller, urlInfo.Action, controllerDesc);
+			IControllerContext controllerContext = 
+				controllerContextFactory.Create(urlInfo.Area, urlInfo.Controller, urlInfo.Action, controllerDesc);
 
 			context.Items[CurrentEngineContextKey] = engineContext;
 			context.Items[CurrentControllerKey] = controller;
@@ -156,6 +169,46 @@ namespace Castle.MonoRail.Framework
 		{
 			get { return serviceProviderLocator; }
 			set { serviceProviderLocator = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the URL tokenizer.
+		/// </summary>
+		/// <value>The URL tokenizer.</value>
+		public IUrlTokenizer UrlTokenizer
+		{
+			get { return urlTokenizer; }
+			set { urlTokenizer = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the engine context factory.
+		/// </summary>
+		/// <value>The engine context factory.</value>
+		public IEngineContextFactory EngineContextFactory
+		{
+			get { return engineContextFactory; }
+			set { engineContextFactory = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the controller factory.
+		/// </summary>
+		/// <value>The controller factory.</value>
+		public IControllerFactory ControllerFactory
+		{
+			get { return controllerFactory; }
+			set { controllerFactory = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the controller context factory.
+		/// </summary>
+		/// <value>The controller context factory.</value>
+		public IControllerContextFactory ControllerContextFactory
+		{
+			get { return controllerContextFactory; }
+			set { controllerContextFactory = value; }
 		}
 
 		/// <summary>

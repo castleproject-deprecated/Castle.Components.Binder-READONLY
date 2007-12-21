@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Castle.MonoRail.Framework;
-
 namespace Castle.MonoRail.Framework.Test
 {
 	using System;
@@ -22,7 +20,6 @@ namespace Castle.MonoRail.Framework.Test
 	using System.Collections.Specialized;
 	using System.Security.Principal;
 	using System.Web;
-	using Castle.Components.Common.EmailSender;
 	using Castle.Components.Validator;
 	using Castle.MonoRail.Framework.Internal;
 	using Castle.MonoRail.Framework.Services;
@@ -41,7 +38,7 @@ namespace Castle.MonoRail.Framework.Test
 		private readonly Flash flash = new Flash();
 //		private readonly ICacheProvider cacheProvider = new MockCacheProvider();
 		private readonly IServerUtility serverUtility = new MockServerUtility();
-//		private readonly IDictionary contextItems = new HybridDictionary(true);
+		private readonly IDictionary contextItems = new HybridDictionary(true);
 //		private readonly List<RenderedEmailTemplate> renderedEmailTemplates = new List<RenderedEmailTemplate>();
 //		private readonly List<Message> messagesSent = new List<Message>();
 //		private IServiceProvider container;
@@ -241,14 +238,14 @@ namespace Castle.MonoRail.Framework.Test
 			get { return serverUtility; }
 		}
 
-//		/// <summary>
-//		/// Returns the Items collection from the current HttpContext.
-//		/// </summary>
-//		/// <value></value>
-//		public virtual IDictionary Items
-//		{
-//			get { return contextItems; }
-//		}
+		/// <summary>
+		/// Returns the Items collection from the current HttpContext.
+		/// </summary>
+		/// <value></value>
+		public virtual IDictionary Items
+		{
+			get { return contextItems; }
+		}
 
 		/// <summary>
 		/// Gets or sets the current controller.

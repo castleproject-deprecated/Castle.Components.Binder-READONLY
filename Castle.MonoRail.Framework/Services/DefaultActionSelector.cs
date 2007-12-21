@@ -139,7 +139,7 @@
 
 				if (method != null)
 				{
-					ActionMetaDescriptor actionDesc = context.ControllerDescriptor.GetAction(method);
+					ActionMetaDescriptor actionDesc = controllerDesc.GetAction(method);
 
 					return new ActionMethodExecutor(method, actionDesc ?? new ActionMetaDescriptor());
 				}

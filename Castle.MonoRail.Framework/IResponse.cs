@@ -124,22 +124,22 @@ namespace Castle.MonoRail.Framework
 //		/// </summary>
 //		/// <param name="fileName">Name of the file.</param>
 //		void WriteFile(String fileName);
-//
-//		/// <summary>
-//		/// Redirects the specified controller.
-//		/// </summary>
-//		/// <param name="controller">The controller.</param>
-//		/// <param name="action">The action.</param>
-//		void Redirect(String controller, String action);
-//
-//		/// <summary>
-//		/// Redirects the specified area.
-//		/// </summary>
-//		/// <param name="area">The area.</param>
-//		/// <param name="controller">The controller.</param>
-//		/// <param name="action">The action.</param>
-//		void Redirect(String area, String controller, String action);
-//
+
+		/// <summary>
+		/// Redirects the specified controller.
+		/// </summary>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		void Redirect(String controller, String action);
+
+		/// <summary>
+		/// Redirects the specified area.
+		/// </summary>
+		/// <param name="area">The area.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		void Redirect(String area, String controller, String action);
+
 //		/// <summary>
 //		/// Redirects to another controller and action with the specified paramters.
 //		/// </summary>

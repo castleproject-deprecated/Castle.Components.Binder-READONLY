@@ -273,14 +273,14 @@ namespace Castle.MonoRail.Framework.Adapters
 //			}
 //		}
 
-//		/// <summary>
-//		/// Returns the Items collection from the current HttpContext.
-//		/// </summary>
-//		/// <value></value>
-//		public IDictionary Items
-//		{
-//			get { return UnderlyingContext.Items; }
-//		}
+		/// <summary>
+		/// Returns the Items collection from the current HttpContext.
+		/// </summary>
+		/// <value></value>
+		public IDictionary Items
+		{
+			get { return UnderlyingContext.Items; }
+		}
 
 		/// <summary>
 		/// Gets or sets the current controller.

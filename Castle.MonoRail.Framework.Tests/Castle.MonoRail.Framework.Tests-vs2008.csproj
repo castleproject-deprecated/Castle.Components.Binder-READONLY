@@ -133,6 +133,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Actions\DefaultActionSelectorTestCase.cs" />
+    <Compile Include="Configuration\ViewEngineConfigTestCase.cs" />
     <Compile Include="Controllers\Clients\ClientCartController.cs" />
     <Compile Include="Controllers\Clients\ClientContactController.cs" />
     <Compile Include="Controllers\Clients\ClientHomeController.cs" />
@@ -142,6 +143,9 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Products\CartController.cs" />
     <Compile Include="Controllers\Products\ListController.cs" />
+    <Compile Include="FlashTestCase.cs" />
+    <Compile Include="Services\ControllerTreeTestCase.cs" />
+    <Compile Include="Handlers\MRHandlerFactoryTestCase.cs" />
     <Compile Include="Services\DefaultControllerFactoryTestCase.cs" />
     <Compile Include="Services\FileAssemblyViewSourceLoaderTestCase.cs" />
     <Compile Include="Services\DefaultUrlTokenizerTestCase.cs" />
@@ -152,10 +156,15 @@
     <Compile Include="Providers\DefaultRescueDescriptorProviderTestCase.cs" />
     <Compile Include="Providers\DefaultResourceDescriptorProviderTestCase.cs" />
     <Compile Include="Providers\DefaultTransformFilterDescriptorProviderTestCase.cs" />
-    <Compile Include="ViewEngineBaseTestCase.cs" />
+    <Compile Include="UrlPartsBuilderTestCase.cs" />
+    <Compile Include="ViewEngines\ViewEngineBaseTestCase.cs" />
+    <Compile Include="WikiFormatterTestCase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Handlers\Files\simplerequest.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

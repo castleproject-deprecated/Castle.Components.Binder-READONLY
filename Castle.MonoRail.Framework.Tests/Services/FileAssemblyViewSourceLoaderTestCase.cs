@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.Tests
+namespace Castle.MonoRail.Framework.Tests.Services
 {
 	using System.IO;
-	using Castle.MonoRail.Framework.Internal;
 	using Castle.MonoRail.Framework.Providers;
 	using Castle.MonoRail.Framework.Services;
 	using Container;
 	using NUnit.Framework;
-
 	
 	[TestFixture]
 	public class FileAssemblyViewSourceLoaderTestCase

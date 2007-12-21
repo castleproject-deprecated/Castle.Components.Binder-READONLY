@@ -14,9 +14,10 @@
 
 namespace Castle.MonoRail.Framework.Tests.Controllers
 {
+	using Castle.MonoRail.Framework.Providers;
+	using Castle.MonoRail.Framework.Services;
 	using Descriptors;
 	using NUnit.Framework;
-	using Services;
 	using Test;
 
 	[TestFixture]
@@ -87,9 +88,51 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 			Assert.IsNull(viewEngStub.TemplateRendered);
 		}
 
+		[Test]
+		public void DefaultActionIsRun_AttributeOnMethod()
+		{
+			DefaultControllerDescriptorProvider provider = BuildProvider();
+
+			ControllerWithDefMethodOnAction controller = new ControllerWithDefMethodOnAction();
+
+			IControllerContext context = new DefaultControllerContextFactory().
+				Create("", "home", "index", provider.BuildDescriptor(controller));
+
+			controller.Process(engineContext, context);
+
+			Assert.IsTrue(controller.DefExecuted);
+			Assert.AreEqual("home\\index", viewEngStub.TemplateRendered);
+		}
+
+		[Test]
+		public void DefaultActionIsRun_AttributeOnClass()
+		{
+			DefaultControllerDescriptorProvider provider = BuildProvider();
+
+			ControllerWithDefaultActionAttribute controller = new ControllerWithDefaultActionAttribute();
+
+			IControllerContext context = new DefaultControllerContextFactory().
+				Create("", "home", "index", provider.BuildDescriptor(controller));
+
+			controller.Process(engineContext, context);
+
+			Assert.IsTrue(controller.DefExecuted);
+			Assert.AreEqual("home\\index", viewEngStub.TemplateRendered);
+		}
+
+		private DefaultControllerDescriptorProvider BuildProvider()
+		{
+			return new DefaultControllerDescriptorProvider(new DefaultHelperDescriptorProvider(),
+														   new DefaultFilterDescriptorProvider(),
+														   new DefaultLayoutDescriptorProvider(),
+														   new DefaultRescueDescriptorProvider(),
+														   new DefaultResourceDescriptorProvider(),
+														   new DefaultTransformFilterDescriptorProvider());
+		}
+
 		#region Controllers
 
-		class ControllerWithInitialize : Controller
+		private class ControllerWithInitialize : Controller
 		{
 			private bool initialized;
 
@@ -108,7 +151,7 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 			}
 		}
 
-		class ControllerAndViews : Controller
+		private class ControllerAndViews : Controller
 		{
 			public void EmptyAction()
 			{
@@ -122,6 +165,42 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 			public void CancelsTheView()
 			{
 				CancelView();
+			}
+		}
+
+		private class ControllerWithDefMethodOnAction : Controller
+		{
+			private bool defExecuted;
+
+			public void EmptyAction()
+			{
+			}
+
+			[DefaultAction]
+			public void Default()
+			{
+				defExecuted = true;
+			}
+
+			public bool DefExecuted
+			{
+				get { return defExecuted; }
+			}
+		}
+
+		[DefaultAction("Default")]
+		class ControllerWithDefaultActionAttribute : Controller
+		{
+			private bool defExecuted;
+
+			public void Default()
+			{
+				defExecuted = true;
+			}
+
+			public bool DefExecuted
+			{
+				get { return defExecuted; }
 			}
 		}
 

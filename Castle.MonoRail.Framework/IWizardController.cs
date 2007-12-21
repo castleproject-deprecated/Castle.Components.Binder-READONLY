@@ -72,7 +72,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="stepName">Name of the step.</param>
 		/// <param name="step">The step instance.</param>
 		/// <returns><c>true</c> if the process should proceed, otherwise, <c>false</c></returns>
-		bool OnBeforeStep(String wizardName, String stepName, WizardStepPage step);
+		bool OnBeforeStep(string wizardName, string stepName, IWizardStepPage step);
 		
 		/// <summary>
 		/// Called after processing a step.
@@ -80,7 +80,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="wizardName">Name of the wizard.</param>
 		/// <param name="stepName">Name of the step.</param>
 		/// <param name="step">The step instance.</param>
-		void OnAfterStep(String wizardName, String stepName, WizardStepPage step);
+		void OnAfterStep(string wizardName, string stepName, IWizardStepPage step);
 
 		/// <summary>
 		/// Implementors should return an array of steps that compose the wizard. 
@@ -91,6 +91,6 @@ namespace Castle.MonoRail.Framework
 		/// </remarks>
 		/// <param name="context">The web request context.</param>
 		/// <returns>An array of steps</returns>
-		WizardStepPage[] GetSteps(IEngineContext context);
+		IWizardStepPage[] GetSteps(IEngineContext context);
 	}
 }

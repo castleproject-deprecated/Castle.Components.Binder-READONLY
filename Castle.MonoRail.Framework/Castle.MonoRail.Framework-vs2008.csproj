@@ -110,6 +110,7 @@
     <Compile Include="Attributes\ControllerDetailsAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Attributes\DataBindAttribute.cs" />
     <Compile Include="Attributes\DefaultActionAttribute.cs" />
     <Compile Include="Attributes\DynamicActionProviderAttribute.cs" />
     <Compile Include="Attributes\FilterAttribute.cs">
@@ -159,6 +160,7 @@
     <Compile Include="ControllerNotFoundException.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DelegateDynamicAction.cs" />
     <Compile Include="DynamicActionExecutor.cs" />
     <Compile Include="Filter.cs" />
     <Compile Include="Filters\AntiGoogleWebAcceleratorFilter.cs" />
@@ -167,9 +169,23 @@
     <Compile Include="Flash.cs" />
     <Compile Include="Helpers\AbstractHelper.cs" />
     <Compile Include="Helpers\AjaxHelper.cs" />
+    <Compile Include="Helpers\BehaviourHelper.cs" />
+    <Compile Include="Helpers\DateFormatHelper.cs" />
     <Compile Include="Helpers\DictHelper.cs" />
+    <Compile Include="Helpers\Effects2Helper.cs" />
+    <Compile Include="Helpers\EffectsFatHelper.cs" />
     <Compile Include="Helpers\HtmlHelper.cs" />
+    <Compile Include="Helpers\IPaginatedPage.cs" />
+    <Compile Include="Helpers\PaginationHelper.cs" />
     <Compile Include="Helpers\ScriptaculousHelper.cs" />
+    <Compile Include="Helpers\TextHelper.cs" />
+    <Compile Include="Helpers\ValidationHelper.cs" />
+    <Compile Include="Helpers\ValidationStrategy\FValidateValidator.cs" />
+    <Compile Include="Helpers\ValidationStrategy\IBrowserValidatorProvider.cs" />
+    <Compile Include="Helpers\ValidationStrategy\PrototypeWebValidator.cs" />
+    <Compile Include="Helpers\ValidationStrategy\ZebdaWebValidator.cs" />
+    <Compile Include="Helpers\WizardHelper.cs" />
+    <Compile Include="Helpers\ZebdaHelper.cs" />
     <Compile Include="IActionSelector.cs" />
     <Compile Include="ICachePolicyConfigurer.cs" />
     <Compile Include="IContextAware.cs" />
@@ -192,10 +208,14 @@
     <Compile Include="Descriptors\LayoutDescriptor.cs" />
     <Compile Include="Descriptors\RescueDescriptor.cs" />
     <Compile Include="Descriptors\TransformFilterDescriptor.cs" />
+    <Compile Include="Internal\ActionProviderUtil.cs" />
     <Compile Include="Internal\Test\TestContextHolder.cs" />
+    <Compile Include="Internal\WizardUtils.cs" />
     <Compile Include="IParameterBinder.cs" />
     <Compile Include="ISubActionSelector.cs" />
     <Compile Include="ITrace.cs" />
+    <Compile Include="IWizardController.cs" />
+    <Compile Include="IWizardStepPage.cs" />
     <Compile Include="Providers\DefaultFilterDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultHelperDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultLayoutDescriptorProvider.cs" />
@@ -339,6 +359,7 @@
     </Compile>
     <Compile Include="Services\Utils\ControllerInspectionUtil.cs" />
     <Compile Include="SessionlessMonoRailHttpHandler.cs" />
+    <Compile Include="SmartDispatcherController.cs" />
     <Compile Include="Test\IMockRequest.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -371,6 +392,8 @@
     <Compile Include="Views\FileAssemblyViewSourceLoader.cs" />
     <Compile Include="Views\FileViewSource.cs" />
     <Compile Include="Views\ViewEngineBase.cs" />
+    <Compile Include="WizardActionProvider.cs" />
+    <Compile Include="WizardStepPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\CastleKey.snk">

@@ -15,16 +15,18 @@
 namespace Castle.MonoRail.Framework.Adapters
 {
 	using System;
-	using System.Collections;
 	using System.Collections.Specialized;
 	using System.Web;
+	using Castle.Components.Binder;
 
 	/// <summary>
 	/// This class adapts the <c>HttpRequest</c> to a MonoRail <c>IRequest</c>.
 	/// </summary>
 	public class RequestAdapter : IRequest
 	{
+		private TreeBuilder treeBuilder = new TreeBuilder();
 		private HttpRequest request;
+		private CompositeNode paramsNode, formNode, queryStringNode;
 //		private FileDictionaryAdapter files;
 
 		/// <summary>
@@ -84,15 +86,15 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return request.HttpMethod; }
 		}
 
-//		/// <summary>
-//		/// Gets the URI.
-//		/// </summary>
-//		/// <value>The URI.</value>
-//		public Uri Uri
-//		{
-//			get { return request.Url; }
-//		}
-//
+		/// <summary>
+		/// Gets the URI.
+		/// </summary>
+		/// <value>The URI.</value>
+		public Uri Uri
+		{
+			get { return request.Url; }
+		}
+
 //		/// <summary>
 //		/// Gets additional path information for 
 //		/// a resource with a URL extension.
@@ -111,15 +113,15 @@ namespace Castle.MonoRail.Framework.Adapters
 //		{
 //			get { return request.RawUrl; }
 //		}
-//
-//		/// <summary>
-//		/// Gets the file path.
-//		/// </summary>
-//		/// <value>The file path.</value>
-//		public String FilePath
-//		{
-//			get { return request.FilePath; }
-//		}
+
+		/// <summary>
+		/// Gets the file path.
+		/// </summary>
+		/// <value>The file path.</value>
+		public String FilePath
+		{
+			get { return request.FilePath; }
+		}
 
 		/// <summary>
 		/// Gets the Http headers.
@@ -223,6 +225,78 @@ namespace Castle.MonoRail.Framework.Adapters
 				return null;
 			}
 			return cookie.Value;
+		}
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical 
+		/// representation of the flat data on <see cref="Controller.Params"/>
+		/// </summary>
+		public CompositeNode ParamsNode
+		{
+			get
+			{
+				if (paramsNode == null)
+				{
+					paramsNode = treeBuilder.BuildSourceNode(Params);
+					treeBuilder.PopulateTree(paramsNode, request.Files);
+				}
+
+				return paramsNode;
+			}
+		}
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical 
+		/// representation of the flat data on <see cref="IRequest.Form"/>
+		/// </summary>
+		public CompositeNode FormNode
+		{
+			get
+			{
+				if (formNode == null)
+				{
+					formNode = treeBuilder.BuildSourceNode(Form);
+					treeBuilder.PopulateTree(formNode, request.Files);
+				}
+
+				return formNode;
+			}
+		}
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical 
+		/// representation of the flat data on <see cref="IRequest.QueryString"/>
+		/// </summary>
+		public CompositeNode QueryStringNode
+		{
+			get
+			{
+				if (queryStringNode == null)
+				{
+					queryStringNode = treeBuilder.BuildSourceNode(QueryString);
+					treeBuilder.PopulateTree(queryStringNode, request.Files);
+				}
+
+				return queryStringNode;
+			}
+		}
+
+		/// <summary>
+		/// This method is for internal use only
+		/// </summary>
+		/// <param name="from"></param>
+		/// <returns></returns>
+		public CompositeNode ObtainParamsNode(ParamStore from)
+		{
+			switch (from)
+			{
+				case ParamStore.Form:
+					return FormNode;
+				case ParamStore.QueryString:
+					return QueryStringNode;
+				default:
+					return ParamsNode;
+			}
 		}
 
 		/// <summary>

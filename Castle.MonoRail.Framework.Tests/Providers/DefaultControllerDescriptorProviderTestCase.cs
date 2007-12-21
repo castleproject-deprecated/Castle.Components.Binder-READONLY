@@ -203,7 +203,7 @@ namespace Castle.MonoRail.Framework.Tests.Providers
 
 		public class DummyDynActionProvider : IDynamicActionProvider
 		{
-			public void IncludeActions(IController controller, IControllerContext controllerContext)
+			public void IncludeActions(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 			{
 			}
 		}

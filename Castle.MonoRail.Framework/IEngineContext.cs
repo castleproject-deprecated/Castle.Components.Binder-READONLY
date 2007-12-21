@@ -20,6 +20,7 @@ namespace Castle.MonoRail.Framework
 	using System.Security.Principal;
 	using System.Collections;
 	using System.Collections.Specialized;
+	using Castle.Components.Binder;
 
 	/// <summary>
 	/// Represents an abstraction between the MonoRail API
@@ -106,12 +107,11 @@ namespace Castle.MonoRail.Framework
 		/// Returns the <see cref="UrlInfo"/> of the the current request.
 		/// </summary>
 		UrlInfo UrlInfo { get; }
-//
-//
-//		/// <summary>
-//		/// Returns the Items collection from the current HttpContext.
-//		/// </summary>
-//		IDictionary Items { get; }
+
+		/// <summary>
+		/// Returns the Items collection from the current HttpContext.
+		/// </summary>
+		IDictionary Items { get; }
 
 		/// <summary>
 		/// Gets or sets the current controller.

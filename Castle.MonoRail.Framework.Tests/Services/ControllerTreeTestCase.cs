@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.Tests
+namespace Castle.MonoRail.Framework.Tests.Services
 {
 	using System;
 	using Castle.MonoRail.Framework.Services;
-	using Castle.MonoRail.Framework.Tests.Controllers;
 	using Castle.MonoRail.Framework.Tests.Controllers.Clients;
 	using Castle.MonoRail.Framework.Tests.Controllers.Products;
+	using Controllers;
 	using NUnit.Framework;
 
 	[TestFixture]

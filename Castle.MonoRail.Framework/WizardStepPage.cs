@@ -62,11 +62,12 @@ namespace Castle.MonoRail.Framework
 	/// steps.
 	/// </para>
 	/// </remarks>
-	public abstract class WizardStepPage : SmartDispatcherController
+	public abstract class WizardStepPage : SmartDispatcherController, IWizardStepPage
 	{
 		#region Fields
 
-		private Controller _wizardcontroller;
+		private IController wizardParentController;
+		private IControllerContext wizardcontrollerContext;
 
 		#endregion
 
@@ -95,28 +96,31 @@ namespace Castle.MonoRail.Framework
 		/// Gets the wizard controller.
 		/// </summary>
 		/// <value>The wizard controller.</value>
-		public Controller WizardController
+		public IController WizardController
 		{
-			get { return _wizardcontroller; }
+			get { return wizardParentController; }
 		}
 
 		#endregion
 
 		#region Core Lifecycle methods
-		
+
 		/// <summary>
-		/// Invoked by <see cref="WizardActionProvider"/>. 
+		/// Invoked by <see cref="WizardActionProvider"/>.
 		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="wizardController">The wizard controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <remarks>
-		/// This can be overriden but it's important to invoke the base 
+		/// This can be overriden but it's important to invoke the base
 		/// implementation.
 		/// </remarks>
-		/// <param name="wizardController"></param>
-		protected internal virtual void Initialize(Controller wizardController)
+		protected internal virtual void Initialize(IEngineContext engineContext, IController wizardController, IControllerContext controllerContext)
 		{
-			_wizardcontroller = wizardController;
+			wizardParentController = wizardController;
+			wizardcontrollerContext = controllerContext;
 
-			PropertyBag = wizardController.PropertyBag;
+			PropertyBag = controllerContext.PropertyBag;
 		}
 
 		/// <summary>
@@ -124,7 +128,7 @@ namespace Castle.MonoRail.Framework
 		/// action. Implementors should perform session clean up (if 
 		/// they actually use the session) to avoid stale data on forms.
 		/// </summary>
-		protected internal virtual void Reset()
+		public virtual void Reset()
 		{
 		}
 
@@ -164,7 +168,7 @@ namespace Castle.MonoRail.Framework
 		/// before doing that you must send a redirect.
 		/// </summary>
 		/// <returns></returns>
-		protected internal virtual bool IsPreConditionSatisfied(IHandlerContext context)
+		public virtual bool IsPreConditionSatisfied(IEngineContext context)
 		{
 			return true;
 		}
@@ -178,7 +182,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="request">The request instance</param>
 		/// <param name="actionArgs">The custom arguments for the action</param>
 		/// <returns></returns>
-		protected internal override MethodInfo SelectMethod(String action, IDictionary actions, IRequest request, IDictionary actionArgs)
+		protected override MethodInfo SelectMethod(string action, IDictionary actions, IRequest request, IDictionary actionArgs)
 		{
 			if (action == "RenderWizardView")
 			{
@@ -309,7 +313,7 @@ namespace Castle.MonoRail.Framework
 		/// <exception cref="MonoRailException">if no further step exists</exception>
 		protected void RedirectToNextStep(IDictionary queryStringParameters)
 		{
-			String wizardName = WizardUtils.ConstructWizardNamespace(_wizardcontroller);
+			String wizardName = WizardUtils.ConstructWizardNamespace(ControllerContext);
 
 			int currentIndex = (int) Context.Session[wizardName + "currentstepindex"];
 			
@@ -321,9 +325,9 @@ namespace Castle.MonoRail.Framework
 
 				String nextStep = (String) stepList[nextStepIndex];
 
-				WizardUtils.RegisterCurrentStepInfo(_wizardcontroller, nextStepIndex, nextStep);
-				
-				InternalRedirectToStep(nextStepIndex, nextStep, queryStringParameters);
+				WizardUtils.RegisterCurrentStepInfo(Context, wizardParentController, ControllerContext, nextStepIndex, nextStep);
+
+				InternalRedirectToStep(Context, nextStepIndex, nextStep, queryStringParameters);
 			}
 			else
 			{
@@ -358,7 +362,7 @@ namespace Castle.MonoRail.Framework
 		/// if no previous step exists (ie. already in the first one)</exception>
 		protected void RedirectToPreviousStep(IDictionary queryStringParameters)
 		{
-			String wizardName = WizardUtils.ConstructWizardNamespace(_wizardcontroller);
+			String wizardName = WizardUtils.ConstructWizardNamespace(wizardcontrollerContext);
 
 			int currentIndex = (int) Context.Session[wizardName + "currentstepindex"];
 			
@@ -370,7 +374,7 @@ namespace Castle.MonoRail.Framework
 
 				String prevStep = (String) stepList[prevStepIndex];
 
-				InternalRedirectToStep(prevStepIndex, prevStep, queryStringParameters);
+				InternalRedirectToStep(Context, prevStepIndex, prevStep, queryStringParameters);
 			}
 			else
 			{
@@ -403,7 +407,7 @@ namespace Castle.MonoRail.Framework
 
 			String firstStep = (String) stepList[0];
 
-			InternalRedirectToStep(0, firstStep, queryStringParameters);
+			InternalRedirectToStep(Context, 0, firstStep, queryStringParameters);
 		}
 
 		/// <summary>
@@ -435,7 +439,7 @@ namespace Castle.MonoRail.Framework
 
 				if (curStep == stepName)
 				{
-					InternalRedirectToStep(index, stepName, queryStringParameters);
+					InternalRedirectToStep(Context, index, stepName, queryStringParameters);
 					return true;
 				}
 			}
@@ -455,26 +459,26 @@ namespace Castle.MonoRail.Framework
 			return base.TransformActionName(ActionName + "-" + action);
 		}
 
-		private void InternalRedirectToStep(int stepIndex, String step, IDictionary queryStringParameters)
+		private void InternalRedirectToStep(IEngineContext engineContext, int stepIndex, String step, IDictionary queryStringParameters)
 		{
-			WizardUtils.RegisterCurrentStepInfo(_wizardcontroller, stepIndex, step);
+			WizardUtils.RegisterCurrentStepInfo(engineContext, wizardParentController, wizardcontrollerContext, stepIndex, step);
 	
 			if (queryStringParameters != null && queryStringParameters.Count != 0)
 			{
-				Redirect(_wizardcontroller.Name, step, queryStringParameters);
+				Redirect(wizardcontrollerContext.Name, step, queryStringParameters);
 			}
 			else if (Context.Request.QueryString.HasKeys())
 			{
 				// We need to preserve any attribute from the QueryString
 				// for example in case the url has an Id
 
-				string url = UrlBuilder.BuildUrl(Context.UrlInfo, _wizardcontroller.Name, step) + Context.Request.Uri.Query;
+				string url = UrlBuilder.BuildUrl(Context.UrlInfo, wizardcontrollerContext.Name, step) + engineContext.Request.Uri.Query;
 				
-				Context.Response.Redirect(url);
+				Context.Response.RedirectToUrl(url);
 			}
 			else
 			{
-				Context.Response.Redirect(_wizardcontroller.Name, step);
+				Context.Response.Redirect(wizardcontrollerContext.Name, step);
 			}
 		}
 

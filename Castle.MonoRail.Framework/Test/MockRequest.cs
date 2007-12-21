@@ -18,6 +18,7 @@ namespace Castle.MonoRail.Framework.Test
 	using System.Collections;
 	using System.Collections.Specialized;
 	using System.Web;
+	using Castle.Components.Binder;
 
 	/// <summary>
 	/// Represents a mock implementation of <see cref="IRequest"/> for unit test purposes.
@@ -36,8 +37,8 @@ namespace Castle.MonoRail.Framework.Test
 		private string[] userLanguages = new string[] { "en-ES", "pt-BR" };
 
 //		private string rawUrl = null;
-//		private string filePath = null;
-//		private Uri uri = null;
+		private string filePath = null;
+		private Uri uri = null;
 //
 //		private string userHostAddress = "127.0.0.1";
 //		private string pathInfo;
@@ -153,16 +154,16 @@ namespace Castle.MonoRail.Framework.Test
 //			get { return rawUrl; }
 //			set { rawUrl = value; }
 //		}
-//
-//		/// <summary>
-//		/// Gets the URI.
-//		/// </summary>
-//		/// <value>The URI.</value>
-//		public virtual Uri Uri
-//		{
-//			get { return uri; }
-//			set { uri = value; }
-//		}
+
+		/// <summary>
+		/// Gets the URI.
+		/// </summary>
+		/// <value>The URI.</value>
+		public virtual Uri Uri
+		{
+			get { return uri; }
+			set { uri = value; }
+		}
 
 		/// <summary>
 		/// Gets the HTTP method.
@@ -174,16 +175,16 @@ namespace Castle.MonoRail.Framework.Test
 			set { httpMethod = value; }
 		}
 
-//		/// <summary>
-//		/// Gets the file path.
-//		/// </summary>
-//		/// <value>The file path.</value>
-//		public virtual string FilePath
-//		{
-//			get { return filePath; }
-//			set { filePath = value; }
-//		}
-//
+		/// <summary>
+		/// Gets the file path.
+		/// </summary>
+		/// <value>The file path.</value>
+		public virtual string FilePath
+		{
+			get { return filePath; }
+			set { filePath = value; }
+		}
+
 //		/// <summary>
 //		/// Gets the param with the specified key.
 //		/// </summary>
@@ -229,7 +230,55 @@ namespace Castle.MonoRail.Framework.Test
 			get { return userLanguages; }
 			set { userLanguages = value; }
 		}
-//
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical
+		/// representation of the flat data on <see cref="Controller.Params"/>
+		/// </summary>
+		/// <value></value>
+		public CompositeNode ParamsNode
+		{
+			get { return new TreeBuilder().BuildSourceNode(Params); }
+		}
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical
+		/// representation of the flat data on <see cref="IRequest.Form"/>
+		/// </summary>
+		/// <value></value>
+		public CompositeNode FormNode
+		{
+			get { return new TreeBuilder().BuildSourceNode(Form); }
+		}
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical
+		/// representation of the flat data on <see cref="IRequest.QueryString"/>
+		/// </summary>
+		/// <value>The query string node.</value>
+		public CompositeNode QueryStringNode
+		{
+			get { return new TreeBuilder().BuildSourceNode(QueryString); }
+		}
+
+		/// <summary>
+		/// Obtains the params node.
+		/// </summary>
+		/// <param name="from">From.</param>
+		/// <returns></returns>
+		public CompositeNode ObtainParamsNode(ParamStore from)
+		{
+			switch(from)
+			{
+				case ParamStore.Form:
+					return FormNode;
+				case ParamStore.Params:
+					return ParamsNode;
+				default:
+					return QueryStringNode;
+			}
+		}
+
 //		/// <summary>
 //		/// Gets the IP host address of the remote client.
 //		/// </summary>

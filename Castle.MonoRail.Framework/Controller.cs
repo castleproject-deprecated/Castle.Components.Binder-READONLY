@@ -59,6 +59,15 @@ namespace Castle.MonoRail.Framework
 		#region Useful Properties
 
 		/// <summary>
+		/// Gets the controller context.
+		/// </summary>
+		/// <value>The controller context.</value>
+		public IControllerContext ControllerContext
+		{
+			get { return context; }
+		}
+
+		/// <summary>
 		/// Gets the view folder -- (areaname + 
 		/// controllername) or just controller name -- that this controller 
 		/// will use by default.
@@ -853,7 +862,7 @@ namespace Castle.MonoRail.Framework
 			CreateAndInitializeHelpers();
 			CreateFiltersDescriptors();
 			ProcessScaffoldIfAvailable();
-			// ActionProviderUtil.RegisterActions(controller);
+			ActionProviderUtil.RegisterActions(engineContext, this, context);
 			Initialize();
 			RunActionAndRenderView();
 		}
@@ -979,7 +988,7 @@ namespace Castle.MonoRail.Framework
 			{
 				ActionMetaDescriptor actionMeta = MetaDescriptor.GetAction(method);
 
-				return new ActionMethodExecutorCompatible(method, actionMeta, InvokeMethod);
+				return new ActionMethodExecutorCompatible(method, actionMeta ?? new ActionMetaDescriptor(), InvokeMethod);
 			}
 
 			// New supported way

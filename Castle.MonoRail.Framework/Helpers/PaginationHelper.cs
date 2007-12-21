@@ -131,7 +131,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>An anchor tag</returns>
 		public String CreatePageLinkWithCurrentQueryString(int page, String text, IDictionary htmlAttributes)
 		{
-			NameValueCollection queryStringParams = Controller.Request.QueryString;
+			NameValueCollection queryStringParams = Context.Request.QueryString;
 			IDictionary dictionary = null;
 			if (queryStringParams != null && queryStringParams.Count > 0)
 			{
@@ -314,7 +314,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		private static ICacheProvider GetCache(Controller controller)
 		{
-			return controller.Context.Cache;
+			return controller.Context.Services.CacheProvider;
 		}
 
 		private static int GetCurrentPageFromRequest(Controller controller)

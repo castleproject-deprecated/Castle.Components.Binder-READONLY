@@ -47,10 +47,12 @@ namespace Castle.MonoRail.Framework.Services
 				flash = new Flash();
 			}
 
+			IUrlBuilder urlBuilder = container.UrlBuilder;
+
 			return new DefaultEngineContext(container, urlInfo, context,
 			                                new ServerUtilityAdapter(context.Server),
 			                                new RequestAdapter(context.Request),
-			                                new ResponseAdapter(context.Response), session, flash);
+											new ResponseAdapter(context.Response, urlInfo, urlBuilder), session, flash);
 		}
 
 		/// <summary>

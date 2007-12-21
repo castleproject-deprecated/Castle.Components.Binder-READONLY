@@ -22,14 +22,15 @@ namespace Castle.MonoRail.Framework
 	public interface IControllerFactory
 	{
 		/// <summary>
-		/// Implementors should perform their logic to 
+		/// Implementors should perform their logic to
 		/// return a instance of <see cref="IController"/>.
 		/// If the <see cref="IController"/> can not be found,
 		/// it should return <c>null</c>.
 		/// </summary>
-		/// <param name="urlInfo"></param>
+		/// <param name="area">The area.</param>
+		/// <param name="controller">The controller.</param>
 		/// <returns></returns>
-		IController CreateController(UrlInfo urlInfo);
+		IController CreateController(string area, string controller);
 
 		/// <summary>
 		/// Implementors should perform their logic 

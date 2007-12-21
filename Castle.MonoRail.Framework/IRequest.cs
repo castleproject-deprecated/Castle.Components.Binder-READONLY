@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
+	using Castle.Components.Binder;
 
 	/// <summary>
 	/// Represents the request data
@@ -91,12 +92,12 @@ namespace Castle.MonoRail.Framework
 //		/// </summary>
 //		/// <value>The raw URL.</value>
 //		String RawUrl { get; }
-//
-//		/// <summary>
-//		/// Gets the URI.
-//		/// </summary>
-//		/// <value>The URI.</value>
-//		Uri Uri { get; }
+
+		/// <summary>
+		/// Gets the URI.
+		/// </summary>
+		/// <value>The URI.</value>
+		Uri Uri { get; }
 
 		/// <summary>
 		/// Gets the HTTP method.
@@ -104,12 +105,12 @@ namespace Castle.MonoRail.Framework
 		/// <value>The HTTP method.</value>
 		String HttpMethod { get; }
 
-//		/// <summary>
-//		/// Gets the file path.
-//		/// </summary>
-//		/// <value>The file path.</value>
-//		String FilePath { get; }
-//
+		/// <summary>
+		/// Gets the file path.
+		/// </summary>
+		/// <value>The file path.</value>
+		String FilePath { get; }
+
 //		/// <summary>
 //		/// Reads the request data as a byte array.
 //		/// </summary>
@@ -141,6 +142,32 @@ namespace Castle.MonoRail.Framework
 //		/// </summary>
 //		/// <value>The IP address of the remote client.</value>
 //		string UserHostAddress { get; }
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical 
+		/// representation of the flat data on <see cref="Controller.Params"/>
+		/// </summary>
+		CompositeNode ParamsNode { get; }
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical 
+		/// representation of the flat data on <see cref="IRequest.Form"/>
+		/// </summary>
+		CompositeNode FormNode { get; }
+
+		/// <summary>
+		/// Lazy initialized property with a hierarchical 
+		/// representation of the flat data on <see cref="IRequest.QueryString"/>
+		/// </summary>
+		/// <value>The query string node.</value>
+		CompositeNode QueryStringNode { get; }
+
+		/// <summary>
+		/// Obtains the params node.
+		/// </summary>
+		/// <param name="from">From.</param>
+		/// <returns></returns>
+		CompositeNode ObtainParamsNode(ParamStore from);
 
 		/// <summary>
 		/// Validates the input.

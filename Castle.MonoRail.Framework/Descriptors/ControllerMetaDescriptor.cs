@@ -95,6 +95,16 @@ namespace Castle.MonoRail.Framework.Descriptors
 		}
 
 		/// <summary>
+		/// Gets the action descriptors dictionary. 
+		/// They key is an action (might be a method or something else).
+		/// </summary>
+		/// <value>The action descriptors.</value>
+		public Dictionary<object, ActionMetaDescriptor> ActionDescriptors
+		{
+			get { return actionMetaDescriptors; }
+		}
+
+		/// <summary>
 		/// Gets the ajax actions.
 		/// </summary>
 		/// <value>The ajax actions.</value>

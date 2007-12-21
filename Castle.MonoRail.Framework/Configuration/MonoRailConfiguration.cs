@@ -87,8 +87,6 @@ namespace Castle.MonoRail.Framework.Configuration
 				config = ConfigurationManager.GetSection(AlternativeSectionName) as MonoRailConfiguration;
 			}
 
-			
-
 			return config;
 		}
 

@@ -20,25 +20,6 @@ namespace Castle.MonoRail.Framework
 	using Castle.Components.Binder;
 
 	/// <summary>
-	/// Defines where the parameters should be obtained from
-	/// </summary>
-	public enum ParamStore
-	{
-		/// <summary>
-		/// Query string
-		/// </summary>
-		QueryString,
-		/// <summary>
-		/// Only from the Form
-		/// </summary>
-		Form,
-		/// <summary>
-		/// From QueryString, Form and Environment variables.
-		/// </summary>
-		Params
-	}
-
-	/// <summary>
 	/// The DataBind Attribute is used to indicate that an Action methods parameter 
 	/// is to be intercepted and handled by the <see cref="Castle.Components.Binder.DataBinder"/>.
 	/// </summary>
@@ -139,7 +120,7 @@ namespace Castle.MonoRail.Framework
 		/// </returns>
 		public int CalculateParamPoints(IEngineContext context, IController controller, IControllerContext controllerContext, ParameterInfo parameterInfo)
 		{
-			CompositeNode node = controller.ObtainParamsNode(From);
+			CompositeNode node = context.Request.ObtainParamsNode(From);
 
 			IDataBinder binder = CreateBinder();
 
@@ -160,14 +141,14 @@ namespace Castle.MonoRail.Framework
 		{
 			IDataBinder binder = CreateBinder();
 
-			ConfigureValidator(controller, binder);
+//			ConfigureValidator(controller, binder);
 
-			CompositeNode node = controller.ObtainParamsNode(From);
+			CompositeNode node = context.Request.ObtainParamsNode(From);
 
 			object instance = binder.BindObject(parameterInfo.ParameterType, prefix, exclude, allow, node);
 
-			BindInstanceErrors(controller, binder, instance);
-			PopulateValidatorErrorSummary(controller, binder, instance);
+//			BindInstanceErrors(controller, binder, instance);
+//			PopulateValidatorErrorSummary(controller, binder, instance);
 
 			return instance;
 		}
@@ -181,49 +162,49 @@ namespace Castle.MonoRail.Framework
 			return new DataBinder();
 		}
 
-		/// <summary>
-		/// Configures the validator.
-		/// </summary>
-		/// <param name="controller">The controller.</param>
-		/// <param name="binder">The binder.</param>
-		protected void ConfigureValidator(SmartDispatcherController controller, IDataBinder binder)
-		{
-			if (validate)
-			{
-				binder.Validator = controller.Validator;
-			}
-			else
-			{
-				binder.Validator = null;
-			}
-		}
+//		/// <summary>
+//		/// Configures the validator.
+//		/// </summary>
+//		/// <param name="controller">The controller.</param>
+//		/// <param name="binder">The binder.</param>
+//		protected void ConfigureValidator(SmartDispatcherController controller, IDataBinder binder)
+//		{
+//			if (validate)
+//			{
+//				binder.Validator = controller.Validator;
+//			}
+//			else
+//			{
+//				binder.Validator = null;
+//			}
+//		}
 
-		/// <summary>
-		/// Populates the validator error summary.
-		/// </summary>
-		/// <param name="controller">The controller.</param>
-		/// <param name="binder">The binder.</param>
-		/// <param name="instance">The instance.</param>
-		protected void PopulateValidatorErrorSummary(SmartDispatcherController controller, IDataBinder binder, object instance)
-		{
-			if (validate)
-			{
-				controller.PopulateValidatorErrorSummary(instance, binder);
-			}
-		}
+//		/// <summary>
+//		/// Populates the validator error summary.
+//		/// </summary>
+//		/// <param name="controller">The controller.</param>
+//		/// <param name="binder">The binder.</param>
+//		/// <param name="instance">The instance.</param>
+//		protected void PopulateValidatorErrorSummary(SmartDispatcherController controller, IDataBinder binder, object instance)
+//		{
+//			if (validate)
+//			{
+//				controller.PopulateValidatorErrorSummary(instance, binder);
+//			}
+//		}
 
-		/// <summary>
-		/// Binds the instance errors.
-		/// </summary>
-		/// <param name="controller">The controller.</param>
-		/// <param name="binder">The binder.</param>
-		/// <param name="instance">The instance.</param>
-		protected void BindInstanceErrors(SmartDispatcherController controller, IDataBinder binder, object instance)
-		{
-			if (instance != null)
-			{
-				controller.BoundInstanceErrors[instance] = binder.ErrorList;
-			}
-		}
+//		/// <summary>
+//		/// Binds the instance errors.
+//		/// </summary>
+//		/// <param name="controller">The controller.</param>
+//		/// <param name="binder">The binder.</param>
+//		/// <param name="instance">The instance.</param>
+//		protected void BindInstanceErrors(SmartDispatcherController controller, IDataBinder binder, object instance)
+//		{
+//			if (instance != null)
+//			{
+//				controller.BoundInstanceErrors[instance] = binder.ErrorList;
+//			}
+//		}
 	}
 }

@@ -41,8 +41,17 @@ namespace Castle.MonoRail.Framework.Services
 		/// <summary>
 		/// Initializes an <c>AbstractControllerFactory</c> instance
 		/// </summary>
-		public AbstractControllerFactory()
+		protected AbstractControllerFactory()
 		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AbstractControllerFactory"/> class.
+		/// </summary>
+		/// <param name="tree">The tree.</param>
+		protected AbstractControllerFactory(IControllerTree tree)
+		{
+			this.tree = tree;
 		}
 
 		#region IInitializable implementation
@@ -84,14 +93,12 @@ namespace Castle.MonoRail.Framework.Services
 		/// If the <see cref="IController"/> can not be found,
 		/// it should return <c>null</c>.
 		/// </summary>
-		/// <param name="urlInfo"></param>
 		/// <returns></returns>
-		public virtual IController CreateController(UrlInfo urlInfo)
+		public virtual IController CreateController(string area, string controller)
 		{
-			String area = urlInfo.Area ?? String.Empty;
-			String name = urlInfo.Controller;
+			area = area ?? String.Empty;
 			
-			return CreateControllerInstance(area, name);
+			return CreateControllerInstance(area, controller);
 		}
 
 		/// <summary>
@@ -117,6 +124,7 @@ namespace Castle.MonoRail.Framework.Services
 		public IControllerTree Tree
 		{
 			get { return tree; }
+			set { tree = value; }
 		}
 
 		/// <summary>

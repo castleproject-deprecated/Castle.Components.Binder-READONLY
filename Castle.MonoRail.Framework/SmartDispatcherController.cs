@@ -19,9 +19,27 @@ namespace Castle.MonoRail.Framework
 	using System.Reflection;
 	using System.Collections;
 	using System.Collections.Specialized;
-
 	using Castle.Components.Binder;
 	using Castle.Components.Validator;
+
+	/// <summary>
+	/// Defines where the parameters should be obtained from
+	/// </summary>
+	public enum ParamStore
+	{
+		/// <summary>
+		/// Query string
+		/// </summary>
+		QueryString,
+		/// <summary>
+		/// Only from the Form
+		/// </summary>
+		Form,
+		/// <summary>
+		/// From QueryString, Form and Environment variables.
+		/// </summary>
+		Params
+	}
 
 	/// <summary>
 	/// Specialization of <see cref="Controller"/> that tries
@@ -36,8 +54,6 @@ namespace Castle.MonoRail.Framework
 	public abstract class SmartDispatcherController : Controller
 	{
 		private IDataBinder binder;
-		private TreeBuilder treeBuilder = new TreeBuilder();
-		private CompositeNode paramsNode, formNode, queryStringNode;
 		private IDictionary<object, ErrorSummary> validationSummaryPerInstance = new Dictionary<object, ErrorSummary>();
 
 		/// <summary>
@@ -146,14 +162,15 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="method">The method.</param>
 		/// <param name="request">The request.</param>
-		/// <param name="actionArgs">The action args.</param>
-		protected internal override void InvokeMethod(MethodInfo method, IRequest request, IDictionary actionArgs)
+		/// <param name="extraArgs">The extra args.</param>
+		/// <returns></returns>
+		protected override object InvokeMethod(MethodInfo method, IRequest request, IDictionary extraArgs)
 		{
 			ParameterInfo[] parameters = method.GetParameters();
 
-			object[] methodArgs = BuildMethodArguments(parameters, request, actionArgs);
+			object[] methodArgs = BuildMethodArguments(parameters, request, extraArgs);
 
-			method.Invoke(this, methodArgs);
+			return method.Invoke(this, methodArgs);
 		}
 
 		/// <summary>
@@ -165,8 +182,8 @@ namespace Castle.MonoRail.Framework
 		/// <param name="request">The request instance</param>
 		/// <param name="actionArgs">The custom arguments for the action</param>
 		/// <returns></returns>
-		protected internal override MethodInfo SelectMethod(String action, IDictionary actions,
-		                                                    IRequest request, IDictionary actionArgs)
+		protected override MethodInfo SelectMethod(string action, IDictionary actions,
+		                                           IRequest request, IDictionary actionArgs)
 		{
 			object methods = actions[action];
 
@@ -248,7 +265,7 @@ namespace Castle.MonoRail.Framework
 				//
 				// If the param is decorated with an attribute that implements IParameterBinder
 				//
-				
+
 				object[] attributes = param.GetCustomAttributes(false);
 
 				String requestParameterName = null;
@@ -258,24 +275,24 @@ namespace Castle.MonoRail.Framework
 				foreach(object attr in attributes)
 				{
 					IParameterBinder actionParam = attr as IParameterBinder;
-					
+
 					if (actionParam == null) continue;
 
-					points += actionParam.CalculateParamPoints(this, param);
+					points += actionParam.CalculateParamPoints(Context, this, ControllerContext, param);
 					calculated = true;
 				}
 
 				if (calculated) continue;
 
 				requestParameterName = GetRequestParameterName(param);
-				
+
 				//
 				// Otherwise
 				//
-				
+
 				Type parameterType = param.ParameterType;
-				
-				if (binder.CanBindParameter(parameterType, requestParameterName, ParamsNode))
+
+				if (binder.CanBindParameter(parameterType, requestParameterName, Request.ParamsNode))
 				{
 					points += 10;
 					matchCount++;
@@ -284,22 +301,22 @@ namespace Castle.MonoRail.Framework
 				// I'm not sure about the following. Seems to be
 				// be fragile regarding the web parameters and the actionArgs array
 				//
-				else if ((actionArgs != null) && actionArgs.Contains(requestParameterName))
-				{
-					object actionArg = actionArgs[requestParameterName];
-					
-					bool exactMatch;
-					
-					if (binder.Converter.CanConvert(parameterType, actionArg.GetType(), actionArg, out exactMatch))
-					{
-						points += 10;
-
-						// Give extra weight to exact matches.
-						if (exactMatch) points += 5;
-						
-						matchCount++;
-					}
-				}
+//				else if ((actionArgs != null) && actionArgs.Contains(requestParameterName))
+//				{
+//					object actionArg = actionArgs[requestParameterName];
+//
+//					bool exactMatch;
+//
+//					if (binder.Converter.CanConvert(parameterType, actionArg.GetType(), actionArg, out exactMatch))
+//					{
+//						points += 10;
+//
+//						// Give extra weight to exact matches.
+//						if (exactMatch) points += 5;
+//
+//						matchCount++;
+//					}
+//				}
 			}
 
 			// the bonus should be nice only for disambiguation.
@@ -331,7 +348,7 @@ namespace Castle.MonoRail.Framework
 			object[] args = new object[parameters.Length];
 			String paramName = String.Empty;
 			String value = String.Empty;
-			
+
 			try
 			{
 				for(int argIndex = 0; argIndex < args.Length; argIndex++)
@@ -341,7 +358,7 @@ namespace Castle.MonoRail.Framework
 					// that implements IParameterBinder, it's up to it
 					// to convert itself
 					//
-					
+
 					ParameterInfo param = parameters[argIndex];
 					paramName = GetRequestParameterName(param);
 
@@ -355,13 +372,12 @@ namespace Castle.MonoRail.Framework
 
 						if (paramBinder != null)
 						{
-							args[argIndex] = paramBinder.Bind(this, param);
-
+							args[argIndex] = paramBinder.Bind(Context, this, ControllerContext, param);
 							handled = true;
 							break;
 						}
 					}
-					
+
 					//
 					// Otherwise we handle it
 					//
@@ -370,18 +386,18 @@ namespace Castle.MonoRail.Framework
 					{
 						object convertedVal;
 						bool conversionSucceeded;
-						
-						convertedVal = binder.BindParameter(param.ParameterType, paramName, ParamsNode);
-						
+
+						convertedVal = binder.BindParameter(param.ParameterType, paramName, Request.ParamsNode);
+
 						if (convertedVal == null && (actionArgs != null) && actionArgs.Contains(paramName))
 						{
 							object actionArg = actionArgs[paramName];
-							
+
 							Type actionArgType = (actionArg != null) ? actionArg.GetType() : param.ParameterType;
-							
+
 							convertedVal = binder.Converter.Convert(param.ParameterType, actionArgType, actionArg, out conversionSucceeded);
 						}
-						
+
 						args[argIndex] = convertedVal;
 					}
 				}
@@ -390,13 +406,13 @@ namespace Castle.MonoRail.Framework
 			{
 				throw new MonoRailException(
 					String.Format("Could not convert {0} to request type. " +
-						"Argument value is '{1}'", paramName, Params.Get(paramName)), ex);
+					              "Argument value is '{1}'", paramName, Params.Get(paramName)), ex);
 			}
 			catch(Exception ex)
 			{
 				throw new MonoRailException(
 					String.Format("Error building method arguments. " +
-						"Last param analyzed was {0} with value '{1}'", paramName, value), ex);
+					              "Last param analyzed was {0} with value '{1}'", paramName, value), ex);
 			}
 
 			return args;
@@ -436,9 +452,10 @@ namespace Castle.MonoRail.Framework
 		/// <param name="excludedProperties">The excluded properties, comma separated list.</param>
 		/// <param name="allowedProperties">The allowed properties, comma separated list.</param>
 		/// <returns></returns>
-		protected object BindObject(ParamStore from, Type targetType, String prefix, String excludedProperties, String allowedProperties)
+		protected object BindObject(ParamStore from, Type targetType, String prefix, String excludedProperties,
+		                            String allowedProperties)
 		{
-			CompositeNode node = ObtainParamsNode(from);
+			CompositeNode node = Request.ObtainParamsNode(from);
 
 			object instance = binder.BindObject(targetType, prefix, excludedProperties, allowedProperties, node);
 
@@ -467,7 +484,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="prefix">The prefix.</param>
 		protected void BindObjectInstance(object instance, ParamStore from, String prefix)
 		{
-			CompositeNode node = ObtainParamsNode(from);
+			CompositeNode node = Request.ObtainParamsNode(from);
 
 			binder.BindObjectInstance(instance, prefix, node);
 
@@ -513,77 +530,7 @@ namespace Castle.MonoRail.Framework
 		{
 			return (T) BindObject(from, typeof(T), prefix, excludedProperties, allowedProperties);
 		}
+
 		
-		/// <summary>
-		/// Lazy initialized property with a hierarchical 
-		/// representation of the flat data on <see cref="Controller.Params"/>
-		/// </summary>
-		protected virtual internal CompositeNode ParamsNode
-		{
-			get
-			{
-				if (paramsNode == null)
-				{
-					paramsNode = treeBuilder.BuildSourceNode(Params);
-					treeBuilder.PopulateTree(paramsNode, HttpContext.Request.Files);
-				}
-				
-				return paramsNode;
-			}
-		}
-
-		/// <summary>
-		/// Lazy initialized property with a hierarchical 
-		/// representation of the flat data on <see cref="IRequest.Form"/>
-		/// </summary>
-		protected virtual internal CompositeNode FormNode
-		{
-			get
-			{
-				if (formNode == null)
-				{
-					formNode = treeBuilder.BuildSourceNode(Request.Form);
-					treeBuilder.PopulateTree(formNode, HttpContext.Request.Files);
-				}
-				
-				return formNode;
-			}
-		}
-
-		/// <summary>
-		/// Lazy initialized property with a hierarchical 
-		/// representation of the flat data on <see cref="IRequest.QueryString"/>
-		/// </summary>
-		protected virtual internal CompositeNode QueryStringNode
-		{
-			get
-			{
-				if (queryStringNode == null)
-				{
-					queryStringNode = treeBuilder.BuildSourceNode(Request.QueryString);
-					treeBuilder.PopulateTree(queryStringNode, HttpContext.Request.Files);
-				}
-				
-				return queryStringNode;
-			}
-		}
-
-		/// <summary>
-		/// This method is for internal use only
-		/// </summary>
-		/// <param name="from"></param>
-		/// <returns></returns>
-		public CompositeNode ObtainParamsNode(ParamStore from)
-		{
-			switch(from)
-			{
-				case ParamStore.Form:
-					return FormNode;
-				case ParamStore.QueryString:
-					return QueryStringNode;
-				default:
-					return ParamsNode;
-			}
-		}
 	}
 }
