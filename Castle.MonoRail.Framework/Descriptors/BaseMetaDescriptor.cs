@@ -26,6 +26,7 @@ namespace Castle.MonoRail.Framework.Descriptors
 		private LayoutDescriptor layout;
 		private RescueDescriptor[] rescues = new RescueDescriptor[0];
 		private ResourceDescriptor[] resources = new ResourceDescriptor[0];
+		private ICachePolicyConfigurer cacheConfigurer;
 
 		/// <summary>
 		/// Gets or sets the layout descriptor.
@@ -55,6 +56,16 @@ namespace Castle.MonoRail.Framework.Descriptors
 		{
 			get { return resources; }
 			set { resources = value; }
+		}
+
+		/// <summary>
+		/// Gets the cache configurer associated with this action.
+		/// </summary>
+		/// <value>The cache configurers.</value>
+		public ICachePolicyConfigurer CacheConfigurer
+		{
+			get { return cacheConfigurer; }
+			set { cacheConfigurer = value; }
 		}
 	}
 }

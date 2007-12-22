@@ -100,6 +100,15 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
+		/// Gets the cache policy configurer.
+		/// </summary>
+		/// <value>The cache policy configurer.</value>
+		public ICachePolicyConfigurer CachePolicyConfigurer
+		{
+			get { return null; }
+		}
+
+		/// <summary>
 		/// Executes the action this instance represents.
 		/// </summary>
 		/// <param name="engineContext">The engine context.</param>

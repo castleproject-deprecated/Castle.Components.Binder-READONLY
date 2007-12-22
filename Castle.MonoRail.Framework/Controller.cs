@@ -932,6 +932,13 @@ namespace Castle.MonoRail.Framework
 				}
 
 				action.Execute(engineContext, this, context);
+
+				// Action executed successfully, so it's safe to process the cache configurer
+				if ((MetaDescriptor.CacheConfigurer != null || action.CachePolicyConfigurer != null) && 
+					!Response.WasRedirected && Response.StatusCode == 200)
+				{
+					ConfigureCachePolicy(action);
+				}
 			}
 			catch(Exception ex)
 			{
@@ -972,6 +979,17 @@ namespace Castle.MonoRail.Framework
 					throw actionException;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Configures the cache policy.
+		/// </summary>
+		/// <param name="action">The action.</param>
+		protected virtual void ConfigureCachePolicy(IExecutableAction action)
+		{
+			ICachePolicyConfigurer configurer = action.CachePolicyConfigurer ?? MetaDescriptor.CacheConfigurer;
+
+			configurer.Configure(Response.CachePolicy);
 		}
 
 		/// <summary>

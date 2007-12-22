@@ -69,6 +69,12 @@ namespace Castle.MonoRail.Framework
 		ResourceDescriptor[] Resources { get; }
 
 		/// <summary>
+		/// Gets the cache policy configurer.
+		/// </summary>
+		/// <value>The cache policy configurer.</value>
+		ICachePolicyConfigurer CachePolicyConfigurer { get; }
+
+		/// <summary>
 		/// Executes the action this instance represents.
 		/// </summary>
 		/// <param name="engineContext">The engine context.</param>

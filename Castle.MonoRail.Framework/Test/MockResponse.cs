@@ -37,7 +37,7 @@ namespace Castle.MonoRail.Framework.Test
 		private TextWriter output = new StringWriter();
 		private Stream outputStream = new MemoryStream();
 		private TextWriter outputStreamWriter;
-//		private HttpCachePolicy cachePolicy = null;
+		private HttpCachePolicy cachePolicy;
 		private NameValueCollection headers = new NameValueCollection();
 
 		/// <summary>
@@ -318,16 +318,16 @@ namespace Castle.MonoRail.Framework.Test
 			set { contentType = value; }
 		}
 
-//		/// <summary>
-//		/// Gets the caching policy (expiration time, privacy,
-//		/// vary clauses) of a Web page.
-//		/// </summary>
-//		/// <value></value>
-//		public HttpCachePolicy CachePolicy
-//		{
-//			get { return cachePolicy; }
-//		}
-//
+		/// <summary>
+		/// Gets the caching policy (expiration time, privacy,
+		/// vary clauses) of a Web page.
+		/// </summary>
+		/// <value></value>
+		public HttpCachePolicy CachePolicy
+		{
+			get { return cachePolicy; }
+		}
+
 //		/// <summary>
 //		/// Sets the Cache-Control HTTP header to Public or Private.
 //		/// </summary>

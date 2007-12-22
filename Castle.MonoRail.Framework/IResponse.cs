@@ -36,12 +36,12 @@ namespace Castle.MonoRail.Framework
 		/// <value>The type of the content.</value>
 		String ContentType { get; set; }
 
-//		/// <summary>
-//		/// Gets the caching policy (expiration time, privacy, 
-//		/// vary clauses) of a Web page.
-//		/// </summary>
-//		HttpCachePolicy CachePolicy  { get; }
-//
+		/// <summary>
+		/// Gets the caching policy (expiration time, privacy, 
+		/// vary clauses) of a Web page.
+		/// </summary>
+		HttpCachePolicy CachePolicy  { get; }
+
 //		/// <summary>
 //		/// Sets the Cache-Control HTTP header to Public or Private.
 //		/// </summary>

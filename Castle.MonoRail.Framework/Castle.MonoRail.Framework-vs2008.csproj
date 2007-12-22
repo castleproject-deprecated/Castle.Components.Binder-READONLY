@@ -110,6 +110,7 @@
     </Compile>
     <Compile Include="Attributes\AccessibleThroughAttribute.cs" />
     <Compile Include="Attributes\AjaxActionAttribute.cs" />
+    <Compile Include="Attributes\CacheAttribute.cs" />
     <Compile Include="Attributes\ControllerDetailsAttribute.cs">
       <SubType>Code</SubType>
     </Compile>

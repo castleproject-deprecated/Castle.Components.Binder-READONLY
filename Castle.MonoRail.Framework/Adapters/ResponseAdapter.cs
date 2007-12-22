@@ -45,15 +45,15 @@ namespace Castle.MonoRail.Framework.Adapters
 			this.urlBuilder = urlBuilder;
 		}
 
-//		/// <summary>
-//		/// Gets the caching policy (expiration time, privacy, 
-//		/// vary clauses) of a Web page.
-//		/// </summary>
-//		public HttpCachePolicy CachePolicy
-//		{
-//			get { return response.Cache; }
-//		}
-//
+		/// <summary>
+		/// Gets the caching policy (expiration time, privacy, 
+		/// vary clauses) of a Web page.
+		/// </summary>
+		public HttpCachePolicy CachePolicy
+		{
+			get { return response.Cache; }
+		}
+
 //		/// <summary>
 //		/// Sets the Cache-Control HTTP header to Public or Private.
 //		/// </summary>

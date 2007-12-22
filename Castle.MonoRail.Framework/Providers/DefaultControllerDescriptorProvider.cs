@@ -311,7 +311,7 @@ namespace Castle.MonoRail.Framework.Providers
 			CollectAccessibleThrough(actionDescriptor, method);
 			CollectSkipRescue(actionDescriptor, method);
 			CollectLayout(actionDescriptor, method);
-			CollectCacheConfigures(actionDescriptor, method);
+			CollectCacheConfigure(actionDescriptor, method);
 			CollectTransformFilter(actionDescriptor, method);
 
 			if (method.IsDefined(typeof(AjaxActionAttribute), true))
@@ -449,6 +449,7 @@ namespace Castle.MonoRail.Framework.Providers
 			CollectDefaultAction(descriptor, controllerType);
 			CollectScaffolding(descriptor, controllerType);
 			CollectDynamicAction(descriptor, controllerType);
+			CollectCacheConfigure(descriptor, controllerType);
 		}
 
 		/// <summary>
@@ -559,16 +560,13 @@ namespace Castle.MonoRail.Framework.Providers
 		/// </summary>
 		/// <param name="descriptor">The descriptor.</param>
 		/// <param name="memberInfo">The member info.</param>
-		private void CollectCacheConfigures(ActionMetaDescriptor descriptor, MemberInfo memberInfo)
+		private void CollectCacheConfigure(BaseMetaDescriptor descriptor, MemberInfo memberInfo)
 		{
 			object[] configurers = memberInfo.GetCustomAttributes(typeof(ICachePolicyConfigurer), true);
 
 			if (configurers.Length != 0)
 			{
-				foreach(ICachePolicyConfigurer cacheConfigurer in configurers)
-				{
-					descriptor.CacheConfigurers.Add(cacheConfigurer);
-				}
+				descriptor.CacheConfigurer = (ICachePolicyConfigurer) configurers[0];
 			}
 		}
 

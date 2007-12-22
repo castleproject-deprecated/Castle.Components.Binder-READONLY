@@ -26,8 +26,7 @@ namespace Castle.MonoRail.Framework.Descriptors
 		private SkipRescueAttribute skipRescue;
 		private AccessibleThroughAttribute accessibleThrough;
 		private IList<SkipFilterAttribute> skipFilters = new List<SkipFilterAttribute>();
-		private IList<ICachePolicyConfigurer> cacheConfigurers = new List<ICachePolicyConfigurer>();
-		private TransformFilterDescriptor[] transformFilters = new TransformFilterDescriptor[] {};
+		private TransformFilterDescriptor[] transformFilters = new TransformFilterDescriptor[0];
 
 		/// <summary>
 		/// Gets or sets the skip rescue associated with this action.
@@ -56,15 +55,6 @@ namespace Castle.MonoRail.Framework.Descriptors
 		public IList<SkipFilterAttribute> SkipFilters
 		{
 			get { return skipFilters; }
-		}
-
-		/// <summary>
-		/// Gets the cache configurers associated with this action.
-		/// </summary>
-		/// <value>The cache configurers.</value>
-		public IList<ICachePolicyConfigurer> CacheConfigurers
-		{
-			get { return cacheConfigurers; }
 		}
 
 		/// <summary>
