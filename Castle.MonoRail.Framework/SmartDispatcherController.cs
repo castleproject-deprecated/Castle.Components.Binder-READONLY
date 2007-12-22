@@ -23,25 +23,6 @@ namespace Castle.MonoRail.Framework
 	using Castle.Components.Validator;
 
 	/// <summary>
-	/// Defines where the parameters should be obtained from
-	/// </summary>
-	public enum ParamStore
-	{
-		/// <summary>
-		/// Query string
-		/// </summary>
-		QueryString,
-		/// <summary>
-		/// Only from the Form
-		/// </summary>
-		Form,
-		/// <summary>
-		/// From QueryString, Form and Environment variables.
-		/// </summary>
-		Params
-	}
-
-	/// <summary>
 	/// Specialization of <see cref="Controller"/> that tries
 	/// to match the request params to method arguments.
 	/// </summary>
@@ -530,7 +511,5 @@ namespace Castle.MonoRail.Framework
 		{
 			return (T) BindObject(from, typeof(T), prefix, excludedProperties, allowedProperties);
 		}
-
-		
 	}
 }

@@ -27,6 +27,7 @@
     </UpgradeBackupLocation>
     <SignAssembly>true</SignAssembly>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\temp\</OutputPath>
@@ -35,7 +36,7 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DEBUG;NET;ALLOWTEST</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET</DefineConstants>
     <DocumentationFile>..\bin\temp\Castle.MonoRail.Framework.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
@@ -45,7 +46,7 @@
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -72,14 +73,17 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Components.Common.EmailSender">
-      <Name>Castle.Components.Common.EmailSender</Name>
-      <HintPath>..\..\build\net-2.0\debug\Castle.Components.Common.EmailSender.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\net\3.5\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
     <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
@@ -88,7 +92,6 @@
     <Reference Include="System.Web">
       <Name>System.Web</Name>
     </Reference>
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
@@ -110,13 +113,18 @@
     <Compile Include="Attributes\ControllerDetailsAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Attributes\DataBindAttribute.cs" />
+    <Compile Include="Attributes\DataBindAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Attributes\DefaultActionAttribute.cs" />
     <Compile Include="Attributes\DynamicActionProviderAttribute.cs" />
     <Compile Include="Attributes\FilterAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Attributes\HelperAttribute.cs" />
+    <Compile Include="Attributes\JSONBinderAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Attributes\LayoutAttribute.cs" />
     <Compile Include="Attributes\LocalizationFilterAttribute.cs" />
     <Compile Include="Attributes\RescueAttribute.cs" />
@@ -174,17 +182,22 @@
     <Compile Include="Helpers\DictHelper.cs" />
     <Compile Include="Helpers\Effects2Helper.cs" />
     <Compile Include="Helpers\EffectsFatHelper.cs" />
+    <Compile Include="Helpers\FormHelper.cs" />
     <Compile Include="Helpers\HtmlHelper.cs" />
     <Compile Include="Helpers\IPaginatedPage.cs" />
+    <Compile Include="Helpers\JSONHelper.cs" />
     <Compile Include="Helpers\PaginationHelper.cs" />
     <Compile Include="Helpers\ScriptaculousHelper.cs" />
+    <Compile Include="Helpers\SetOperation.cs" />
     <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Helpers\ValidationStrategy\FValidateValidator.cs" />
     <Compile Include="Helpers\ValidationStrategy\IBrowserValidatorProvider.cs" />
     <Compile Include="Helpers\ValidationStrategy\PrototypeWebValidator.cs" />
     <Compile Include="Helpers\ValidationStrategy\ZebdaWebValidator.cs" />
-    <Compile Include="Helpers\WizardHelper.cs" />
+    <Compile Include="Helpers\WizardHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Helpers\ZebdaHelper.cs" />
     <Compile Include="IActionSelector.cs" />
     <Compile Include="ICachePolicyConfigurer.cs" />
@@ -209,13 +222,18 @@
     <Compile Include="Descriptors\RescueDescriptor.cs" />
     <Compile Include="Descriptors\TransformFilterDescriptor.cs" />
     <Compile Include="Internal\ActionProviderUtil.cs" />
+    <Compile Include="Internal\RescueUtils.cs" />
     <Compile Include="Internal\Test\TestContextHolder.cs" />
     <Compile Include="Internal\WizardUtils.cs" />
     <Compile Include="IParameterBinder.cs" />
     <Compile Include="ISubActionSelector.cs" />
     <Compile Include="ITrace.cs" />
-    <Compile Include="IWizardController.cs" />
-    <Compile Include="IWizardStepPage.cs" />
+    <Compile Include="IWizardController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IWizardStepPage.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Providers\DefaultFilterDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultHelperDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultLayoutDescriptorProvider.cs" />
@@ -305,9 +323,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Services\IFilterFactory.cs" />
+    <Compile Include="Services\IJSONSerializer.cs" />
     <Compile Include="Services\IViewComponentRegistry.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Services\NewtonsoftJSONSerializer.cs" />
     <Compile Include="Services\UrlTokenizerException.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -359,7 +379,9 @@
     </Compile>
     <Compile Include="Services\Utils\ControllerInspectionUtil.cs" />
     <Compile Include="SessionlessMonoRailHttpHandler.cs" />
-    <Compile Include="SmartDispatcherController.cs" />
+    <Compile Include="SmartDispatcherController.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Test\IMockRequest.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -392,8 +414,12 @@
     <Compile Include="Views\FileAssemblyViewSourceLoader.cs" />
     <Compile Include="Views\FileViewSource.cs" />
     <Compile Include="Views\ViewEngineBase.cs" />
-    <Compile Include="WizardActionProvider.cs" />
-    <Compile Include="WizardStepPage.cs" />
+    <Compile Include="WizardActionProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WizardStepPage.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\CastleKey.snk">
@@ -408,6 +434,10 @@
     <ProjectReference Include="..\..\Components\Binder\Castle.Components.Binder\Castle.Components.Binder-vs2008.csproj">
       <Project>{98F19522-C9B8-400D-8A12-DABB3DA9411D}</Project>
       <Name>Castle.Components.Binder-vs2008</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Components\EmailSender\Castle.Components.Common.EmailSender\Castle.Components.Common.EmailSender-vs2008.csproj">
+      <Project>{CFF1D57F-9FEB-4941-B8FE-8E28F4A8AAC7}</Project>
+      <Name>Castle.Components.Common.EmailSender-vs2008</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Components\Validator\Castle.Components.Validator\Castle.Components.Validator-vs2008.csproj">
       <Project>{4C945D49-02E9-43F2-9202-E7A6E7C56E77}</Project>

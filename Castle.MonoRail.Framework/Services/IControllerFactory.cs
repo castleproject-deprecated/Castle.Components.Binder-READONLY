@@ -14,6 +14,8 @@
 
 namespace Castle.MonoRail.Framework
 {
+	using System;
+
 	/// <summary>
 	/// Depicts the contract the engine has 
 	/// to perform the creation and disposal of
@@ -31,6 +33,13 @@ namespace Castle.MonoRail.Framework
 		/// <param name="controller">The controller.</param>
 		/// <returns></returns>
 		IController CreateController(string area, string controller);
+
+		/// <summary>
+		/// Creates the controller.
+		/// </summary>
+		/// <param name="controllerType">Type of the controller.</param>
+		/// <returns></returns>
+		IController CreateController(Type controllerType);
 
 		/// <summary>
 		/// Implementors should perform their logic 

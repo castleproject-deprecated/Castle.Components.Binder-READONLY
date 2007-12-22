@@ -25,13 +25,14 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 	{
 		private MockEngineContext engineContext;
 		private ViewEngineManagerStub viewEngStub;
+		private MockServices services;
 
 		[SetUp]
 		public void Init()
 		{
 			MockRequest request = new MockRequest();
 			MockResponse response = new MockResponse();
-			MockServices services = new MockServices();
+			services = new MockServices();
 			viewEngStub = new ViewEngineManagerStub();
 			services.ViewEngineManager = viewEngStub;
 			engineContext = new MockEngineContext(request, response, services, null);
@@ -91,12 +92,10 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		[Test]
 		public void DefaultActionIsRun_AttributeOnMethod()
 		{
-			DefaultControllerDescriptorProvider provider = BuildProvider();
-
 			ControllerWithDefMethodOnAction controller = new ControllerWithDefMethodOnAction();
 
 			IControllerContext context = new DefaultControllerContextFactory().
-				Create("", "home", "index", provider.BuildDescriptor(controller));
+				Create("", "home", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
 
 			controller.Process(engineContext, context);
 
@@ -107,27 +106,15 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		[Test]
 		public void DefaultActionIsRun_AttributeOnClass()
 		{
-			DefaultControllerDescriptorProvider provider = BuildProvider();
-
 			ControllerWithDefaultActionAttribute controller = new ControllerWithDefaultActionAttribute();
 
 			IControllerContext context = new DefaultControllerContextFactory().
-				Create("", "home", "index", provider.BuildDescriptor(controller));
+				Create("", "home", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
 
 			controller.Process(engineContext, context);
 
 			Assert.IsTrue(controller.DefExecuted);
 			Assert.AreEqual("home\\index", viewEngStub.TemplateRendered);
-		}
-
-		private DefaultControllerDescriptorProvider BuildProvider()
-		{
-			return new DefaultControllerDescriptorProvider(new DefaultHelperDescriptorProvider(),
-														   new DefaultFilterDescriptorProvider(),
-														   new DefaultLayoutDescriptorProvider(),
-														   new DefaultRescueDescriptorProvider(),
-														   new DefaultResourceDescriptorProvider(),
-														   new DefaultTransformFilterDescriptorProvider());
 		}
 
 		#region Controllers

@@ -106,5 +106,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The scaffold support.</value>
 		IScaffoldingSupport ScaffoldSupport { get; set; }
+
+		/// <summary>
+		/// Gets or sets the JSON serializer.
+		/// </summary>
+		/// <value>The JSON serializer.</value>
+		IJSONSerializer JSONSerializer { get; set; }
 	}
 }

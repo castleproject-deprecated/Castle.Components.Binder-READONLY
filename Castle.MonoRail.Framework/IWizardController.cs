@@ -20,8 +20,8 @@ namespace Castle.MonoRail.Framework
 	/// Depicts the contract for wizard controllers. 
 	/// </summary>
 	/// 
-	/// <seealso cref="WizardActionProvider"/>
-	/// <seealso cref="WizardStepPage"/>
+	/// <seealso xref="WizardActionProvider"/>
+	/// <seealso xref="WizardStepPage"/>
 	/// 
 	/// <example>
 	/// The following code shows how to create a simple wizard with two pages.
@@ -73,7 +73,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="step">The step instance.</param>
 		/// <returns><c>true</c> if the process should proceed, otherwise, <c>false</c></returns>
 		bool OnBeforeStep(string wizardName, string stepName, IWizardStepPage step);
-		
+
 		/// <summary>
 		/// Called after processing a step.
 		/// </summary>

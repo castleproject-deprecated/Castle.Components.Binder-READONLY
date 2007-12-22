@@ -110,7 +110,6 @@ namespace Castle.MonoRail.Framework
 				throw new ArgumentException(string.Format("{0} does not inherit from the Controller class", rescueController.Name));
 			}
 
-
 			this.rescueController = rescueController;
 			this.exceptionType = exceptionType;
 			this.rescueMethod = (rescueMethod != null ? rescueController.GetMethod(rescueMethod) : null);

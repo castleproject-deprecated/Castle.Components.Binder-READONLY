@@ -102,6 +102,25 @@ namespace Castle.MonoRail.Framework.Services
 		}
 
 		/// <summary>
+		/// Creates the controller.
+		/// </summary>
+		/// <param name="controllerType">Type of the controller.</param>
+		/// <returns></returns>
+		public IController CreateController(Type controllerType)
+		{
+			try
+			{
+				return (IController) Activator.CreateInstance(controllerType);
+			}
+			catch (Exception ex)
+			{
+				logger.Error("Could not create controller instance. Activation failed.", ex);
+
+				throw;
+			}
+		}
+
+		/// <summary>
 		/// Implementors should perform their logic
 		/// to release the <see cref="IController"/> instance
 		/// and its resources.
@@ -162,16 +181,7 @@ namespace Castle.MonoRail.Framework.Services
 				throw new ControllerNotFoundException(area, name);
 			}
 
-			try
-			{
-				return (IController) Activator.CreateInstance(type);
-			}
-			catch(Exception ex)
-			{
-				logger.Error("Could not create controller instance. Activation failed.", ex);
-				
-				throw;
-			}
+			return CreateController(type);
 		}
 	}
 }

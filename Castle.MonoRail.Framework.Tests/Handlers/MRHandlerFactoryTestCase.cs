@@ -46,6 +46,13 @@ namespace Castle.MonoRail.Framework.Tests.Handlers
 			controllerDescriptorProviderMock = mockRepository.CreateMock<IControllerDescriptorProvider>();
 			controllerContextFactoryMock = mockRepository.CreateMock<IControllerContextFactory>();
 
+			SetupResult.For(container.UrlTokenizer).Return(new DefaultUrlTokenizer());
+			SetupResult.For(container.UrlBuilder).Return(new DefaultUrlBuilder());
+			SetupResult.For(container.EngineContextFactory).Return(new DefaultEngineContextFactory());
+			SetupResult.For(container.ControllerFactory).Return(controllerFactoryMock);
+			SetupResult.For(container.ControllerContextFactory).Return(controllerContextFactoryMock);
+			SetupResult.For(container.ControllerDescriptorProvider).Return(controllerDescriptorProviderMock);
+
 			handlerFactory = new MonoRailHttpHandlerFactory(serviceProviderLocatorMock);
 			handlerFactory.Configuration = new MonoRailConfiguration();
 			handlerFactory.Container = container;
@@ -66,12 +73,7 @@ namespace Castle.MonoRail.Framework.Tests.Handlers
 				ControllerMetaDescriptor controllerDesc = new ControllerMetaDescriptor();
 				controllerDesc.ControllerDescriptor = new ControllerDescriptor(typeof(Controller), "home", "", false);
 
-				Expect.Call(container.UrlTokenizer).Return(new DefaultUrlTokenizer());
-				Expect.Call(container.EngineContextFactory).Return(new DefaultEngineContextFactory());
-				Expect.Call(container.ControllerFactory).Return(controllerFactoryMock);
-				Expect.Call(container.ControllerContextFactory).Return(controllerContextFactoryMock);
 				Expect.Call(controllerFactoryMock.CreateController("", "home")).IgnoreArguments().Return(controllerMock);
-				Expect.Call(container.ControllerDescriptorProvider).Return(controllerDescriptorProviderMock);
 				Expect.Call(controllerDescriptorProviderMock.BuildDescriptor(controllerMock)).Return(controllerDesc);
 				Expect.Call(controllerContextFactoryMock.Create("", "home", "something", controllerDesc)).
 					Return(new ControllerContext());
@@ -101,12 +103,7 @@ namespace Castle.MonoRail.Framework.Tests.Handlers
 				ControllerMetaDescriptor controllerDesc = new ControllerMetaDescriptor();
 				controllerDesc.ControllerDescriptor = new ControllerDescriptor(typeof(Controller), "home", "", true);
 
-				Expect.Call(container.UrlTokenizer).Return(new DefaultUrlTokenizer());
-				Expect.Call(container.EngineContextFactory).Return(new DefaultEngineContextFactory());
-				Expect.Call(container.ControllerFactory).Return(controllerFactoryMock);
-				Expect.Call(container.ControllerContextFactory).Return(controllerContextFactoryMock);
 				Expect.Call(controllerFactoryMock.CreateController("", "home")).IgnoreArguments().Return(controllerMock);
-				Expect.Call(container.ControllerDescriptorProvider).Return(controllerDescriptorProviderMock);
 				Expect.Call(controllerDescriptorProviderMock.BuildDescriptor(controllerMock)).Return(controllerDesc);
 				Expect.Call(controllerContextFactoryMock.Create("", "home", "something", controllerDesc)).
 					Return(new ControllerContext());

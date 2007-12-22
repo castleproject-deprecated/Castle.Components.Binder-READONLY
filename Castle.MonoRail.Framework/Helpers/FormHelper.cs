@@ -71,8 +71,7 @@ namespace Castle.MonoRail.Framework.Helpers
 	/// allows you do to a bi-directional binding -- if used properly.
 	/// </summary>
 	/// 
-	/// <seealso cref="DataBindAttribute"/>
-	/// <seealso cref="Castle.Components.Common"/>
+	/// <seealso xref="DataBindAttribute"/>
 	/// 
 	/// <example>
 	/// Using simple values:
@@ -256,8 +255,19 @@ namespace Castle.MonoRail.Framework.Helpers
 		private string currentFormId;
 		private bool isValidationDisabled;
 		private readonly Stack objectStack = new Stack();
-		private IBrowserValidatorProvider validatorProvider = new PrototypeWebValidator();
 		private BrowserValidationConfiguration validationConfig;
+		private IBrowserValidatorProvider validatorProvider = new PrototypeWebValidator();
+		private IValidatorRegistry validatorRegistry;
+		private ValidatorRunner validatorRunner;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FormHelper"/> class.
+		/// </summary>
+		public FormHelper()
+		{
+			validatorRegistry = new CachedValidationRegistry();
+			validatorRunner = new ValidatorRunner(false, validatorRegistry);
+		}
 
 		/// <summary>
 		/// Logger instance
@@ -287,9 +297,40 @@ namespace Castle.MonoRail.Framework.Helpers
 			{
 				validatorProvider = validatorProv;
 			}
+
+			validatorRegistry = (IValidatorRegistry) provider.GetService(typeof(IValidatorRegistry));
+
+			if (validatorRegistry != null)
+			{
+				validatorRunner = new ValidatorRunner(false, validatorRegistry);
+			}
+			else
+			{
+				validatorRunner = new ValidatorRunner(false, new CachedValidationRegistry());
+			}
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Gets or sets the validator provider.
+		/// </summary>
+		/// <value>The validator provider.</value>
+		public IBrowserValidatorProvider ValidatorProvider
+		{
+			get { return validatorProvider; }
+			set { validatorProvider = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the validator runner.
+		/// </summary>
+		/// <value>The validator runner.</value>
+		public ValidatorRunner ValidatorRunner
+		{
+			get { return validatorRunner; }
+			set { validatorRunner = value; }
+		}
 
 		/// <summary>
 		/// Renders a Javascript library inside a single script tag.
@@ -2045,7 +2086,7 @@ namespace Castle.MonoRail.Framework.Helpers
 				return;
 			}
 
-			if (Controller.Validator == null || validationConfig == null)
+			if (validatorRegistry == null || validationConfig == null)
 			{
 				return;
 			}
@@ -2074,7 +2115,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			ObtainTargetProperty(requestContext, target, delegate(PropertyInfo property)
 			{
-				validators.AddRange(Controller.Validator.GetValidators(property.DeclaringType, property));
+				validators.AddRange(validatorRegistry.GetValidators(ValidatorRunner, property.DeclaringType, property, RunWhen.Everytime));
 			});
 
 			return validators.ToArray();
@@ -2273,23 +2314,23 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (context == RequestContext.All || context == RequestContext.PropertyBag)
 			{
-				rootInstance = Controller.PropertyBag[target];
+				rootInstance = ControllerContext.PropertyBag[target];
 			}
 			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Flash))
 			{
-				rootInstance = Controller.Context.Flash[target];
+				rootInstance = Context.Flash[target];
 			}
 			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Session))
 			{
-				rootInstance = Controller.Context.Session[target];
+				rootInstance = Context.Session[target];
 			}
 			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Params))
 			{
-				rootInstance = Controller.Params[target];
+				rootInstance = Context.Request.Params[target];
 			}
 			if (rootInstance == null && (context == RequestContext.All || context == RequestContext.Request))
 			{
-				rootInstance = Controller.Context.Items[target];
+				rootInstance = Context.Items[target];
 			}
 
 			return rootInstance;
@@ -2347,7 +2388,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			pieces = target.Split(new char[] { '.' });
 
-			Type foundType = (Type) Controller.PropertyBag[pieces[0] + "type"];
+			Type foundType = (Type) ControllerContext.PropertyBag[pieces[0] + "type"];
 
 			if (foundType == null)
 			{
@@ -2694,7 +2735,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		private string SafeHtmlEncode(string content)
 		{
-			if (Controller.Context != null)
+			if (Context != null)
 			{
 				return HtmlEncode(content);
 			}

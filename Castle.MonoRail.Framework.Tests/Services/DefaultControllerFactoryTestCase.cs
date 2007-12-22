@@ -23,8 +23,6 @@ namespace Castle.MonoRail.Framework.Tests.Services
 	[TestFixture]
 	public class DefaultControllerFactoryTestCase
 	{
-		private readonly String extension = "rails";
-
 		private DefaultControllerFactory factory;
 
 		[TestFixtureSetUp]
@@ -48,8 +46,7 @@ namespace Castle.MonoRail.Framework.Tests.Services
 		[Test]
 		public void OneLevelArea()
 		{
-			IController controller =
-				factory.CreateController("", "home");
+			IController controller = factory.CreateController("clients", "home");
 
 			Assert.IsNotNull(controller);
 			Assert.AreEqual("Castle.MonoRail.Framework.Tests.Controllers.Clients.ClientHomeController",
@@ -61,15 +58,13 @@ namespace Castle.MonoRail.Framework.Tests.Services
 			Assert.AreEqual("Castle.MonoRail.Framework.Tests.Controllers.Clients.OtherController",
 			                controller.GetType().FullName);
 
-			controller =
-				factory.CreateController("ourproducts", "shoppingcart");
+			controller = factory.CreateController("ourproducts", "shoppingcart");
 
 			Assert.IsNotNull(controller);
 			Assert.AreEqual("Castle.MonoRail.Framework.Tests.Controllers.Products.CartController",
 			                controller.GetType().FullName);
 
-			controller =
-				factory.CreateController("ourproducts", "lista");
+			controller = factory.CreateController("ourproducts", "lista");
 
 			Assert.IsNotNull(controller);
 			Assert.AreEqual("Castle.MonoRail.Framework.Tests.Controllers.Products.ListController",

@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Monorail.JSONSupport
+namespace Castle.MonoRail.Framework.Helpers
 {
-	using Castle.MonoRail.Framework.Helpers;
-	using Newtonsoft.Json;
+	using Services;
 
 	/// <summary>
 	/// Provides utilities methods to work with JSON.
@@ -28,7 +27,7 @@ namespace Castle.Monorail.JSONSupport
 		/// <param name="model">The model.</param>
 		/// <returns>The JSON representation of the model.</returns>
 		/// <example>
-		/// You've constructed a car object instance, like this one:
+		/// Suppose you have a car object instance, like this one:
 		/// <code>
 		/// Car car = new Car();
 		/// 
@@ -38,7 +37,7 @@ namespace Castle.Monorail.JSONSupport
 		/// </code>
 		/// And to transform it to JSON, you must invoke the method passing the instance.
 		/// <code>
-		/// helper.ToJSON(car)
+		/// $helper.ToJSON(car)
 		/// </code>
 		/// Which will generate the JSON string:
 		/// <code>
@@ -47,7 +46,14 @@ namespace Castle.Monorail.JSONSupport
 		/// </example>
 		public string ToJSON(object model)
 		{
-			return JavaScriptConvert.SerializeObject(model);
+			IJSONSerializer serializer = Context.Services.JSONSerializer;
+
+			if (serializer == null)
+			{
+				throw new MonoRailException("Attempt to serialize object failed because the serializer is not available");
+			}
+
+			return serializer.Serialize(model);
 		}
 	}
 }

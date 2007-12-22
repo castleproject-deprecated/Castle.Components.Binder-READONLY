@@ -1117,13 +1117,13 @@ namespace Castle.MonoRail.Framework
 			AbstractHelper[] builtInHelpers =
 				new AbstractHelper[]
 					{
-						new AjaxHelper(), //  new BehaviourHelper(),
-						new UrlHelper(), // new TextHelper(), 
-						// new EffectsFatHelper(), new ScriptaculousHelper(), 
-						// new DateFormatHelper(), new HtmlHelper(),
-						// new ValidationHelper(), new DictHelper(),
-						// new PaginationHelper(), new FormHelper(),
-						// new ZebdaHelper()
+						new AjaxHelper(), new BehaviourHelper(),
+						new UrlHelper(), new TextHelper(), 
+						new EffectsFatHelper(), new ScriptaculousHelper(), 
+						new DateFormatHelper(), new HtmlHelper(),
+						new ValidationHelper(), new DictHelper(),
+						new PaginationHelper(), new FormHelper(),
+						new JSONHelper(), new ZebdaHelper()
 					};
 
 			foreach(AbstractHelper helper in builtInHelpers)
@@ -1376,23 +1376,7 @@ namespace Castle.MonoRail.Framework
 
 				if (desc.RescueController != null)
 				{
-//					Controller rescueController = (Controller) Activator.CreateInstance(desc.RescueController);
-//
-//					using (ControllerLifecycleExecutor rescueExecutor = new ControllerLifecycleExecutor(rescueController, context))
-//					{
-//						rescueExecutor.Service(provider);
-//						ControllerDescriptor rescueDescriptor = ControllerInspectionUtil.Inspect(att.RescueController);
-//						rescueExecutor.InitializeController(rescueDescriptor.Area, rescueDescriptor.Name, att.RescueMethod.Name);
-//						rescueExecutor.SelectAction(att.RescueMethod.Name, rescueDescriptor.Name);
-//
-//						IDictionary args = new Hashtable();
-//						IDictionary propertyBag = rescueController.PropertyBag;
-//						args["exception"] = propertyBag["exception"] = ex;
-//						args["controller"] = propertyBag["controller"] = controller;
-//						args["method"] = propertyBag["method"] = method;
-//
-//						rescueExecutor.ProcessSelectedAction(args);
-//					}
+					CreateAndProcessRescueController(desc, actionException);
 				}
 				else
 				{
@@ -1418,52 +1402,34 @@ namespace Castle.MonoRail.Framework
 			return false;
 		}
 
-		private RescueDescriptor GetControllerRescueFor(Type exceptionType)
-		{
-			RescueDescriptor bestCandidate = null;
-
-			foreach(RescueDescriptor rescue in MetaDescriptor.Rescues)
-			{
-				if (rescue.ExceptionType == exceptionType)
-				{
-					return rescue;
-				}
-				else if (rescue.ExceptionType != null &&
-				         rescue.ExceptionType.IsAssignableFrom(exceptionType))
-				{
-					bestCandidate = rescue;
-				}
-			}
-
-			return bestCandidate;
-		}
-
 		/// <summary>
-		/// Gets the rescue for the specified exception type.
+		/// Gets the best rescue that matches the exception type
 		/// </summary>
-		/// <param name="rescues">The rescues.</param>
 		/// <param name="exceptionType">Type of the exception.</param>
 		/// <returns></returns>
-		protected RescueDescriptor GetRescueFor(IList rescues, Type exceptionType)
+		protected virtual RescueDescriptor GetControllerRescueFor(Type exceptionType)
 		{
-			if (rescues == null || rescues.Count == 0) return null;
+			return RescueUtils.SelectBest(MetaDescriptor.Rescues, exceptionType);
+		}
 
-			RescueDescriptor bestCandidate = null;
+		private void CreateAndProcessRescueController(RescueDescriptor desc, Exception actionException)
+		{
+			IController rescueController = engineContext.Services.ControllerFactory.CreateController(desc.RescueController);
 
-			foreach(RescueDescriptor rescue in rescues)
-			{
-				if (rescue.ExceptionType == exceptionType)
-				{
-					return rescue;
-				}
-				else if (rescue.ExceptionType != null &&
-				         rescue.ExceptionType.IsAssignableFrom(exceptionType))
-				{
-					bestCandidate = rescue;
-				}
-			}
+			ControllerMetaDescriptor rescueControllerMeta =
+				engineContext.Services.ControllerDescriptorProvider.BuildDescriptor(rescueController);
 
-			return bestCandidate;
+			ControllerDescriptor rescueControllerDesc = rescueControllerMeta.ControllerDescriptor;
+
+			IControllerContext rescueControllerContext = engineContext.Services.ControllerContextFactory.Create(
+				 rescueControllerDesc.Area, rescueControllerDesc.Name, desc.RescueMethod.Name,
+				 rescueControllerMeta);
+
+			rescueControllerContext.CustomActionParameters["exception"] = actionException;
+			rescueControllerContext.CustomActionParameters["controller"] = this;
+			rescueControllerContext.CustomActionParameters["controllerContext"] = ControllerContext;
+
+			rescueController.Process(engineContext, rescueControllerContext);
 		}
 
 		#endregion

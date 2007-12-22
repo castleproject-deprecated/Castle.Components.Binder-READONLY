@@ -19,7 +19,7 @@ namespace Castle.MonoRail.Framework
 	using System.Collections.Generic;
 	using Castle.MonoRail.Framework.Helpers;
 	using Castle.MonoRail.Framework.Internal;
-	using Descriptors;
+	using Castle.MonoRail.Framework.Descriptors;
 
 	/// <summary>
 	/// Provide easy to use Wizard-like support.

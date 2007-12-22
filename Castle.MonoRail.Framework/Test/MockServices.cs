@@ -3,6 +3,7 @@
 	using System;
 	using System.Collections.Generic;
 	using Castle.Components.Validator;
+	using Providers;
 	using Services;
 
 	/// <summary>
@@ -24,12 +25,16 @@
 		private IValidatorRegistry validatorRegistry;
 		private IActionSelector actionSelector;
 		private IScaffoldingSupport scaffoldSupport;
-		private Dictionary<Type, object> service2Impl = new Dictionary<Type, object>();
+		private IJSONSerializer jsonSerializer;
+		private readonly Dictionary<Type, object> service2Impl = new Dictionary<Type, object>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MockServices"/> class with default mock services.
 		/// </summary>
-		public MockServices() : this(new DefaultUrlBuilder(), new DefaultFilterFactory(), new ViewEngineManagerStub(), new DefaultActionSelector())
+		public MockServices() : this(new DefaultUrlBuilder(),
+		                             new DefaultFilterFactory(),
+		                             new ViewEngineManagerStub(),
+		                             new DefaultActionSelector())
 		{
 		}
 
@@ -40,12 +45,26 @@
 		/// <param name="filterFactory">The filter factory.</param>
 		/// <param name="viewEngineManager">The view engine manager.</param>
 		/// <param name="actionSelector">The action selector.</param>
-		public MockServices(IUrlBuilder urlBuilder, IFilterFactory filterFactory, IViewEngineManager viewEngineManager, IActionSelector actionSelector)
+		public MockServices(IUrlBuilder urlBuilder, IFilterFactory filterFactory, IViewEngineManager viewEngineManager,
+		                    IActionSelector actionSelector)
 		{
 			this.urlBuilder = urlBuilder;
 			this.filterFactory = filterFactory;
 			this.viewEngineManager = viewEngineManager;
 			this.actionSelector = actionSelector;
+
+			controllerTree = new DefaultControllerTree();
+			controllerFactory = new DefaultControllerFactory(controllerTree);
+
+			controllerContextFactory = new DefaultControllerContextFactory();
+
+			controllerDescriptorProvider = new DefaultControllerDescriptorProvider(
+				new DefaultHelperDescriptorProvider(),
+				new DefaultFilterDescriptorProvider(),
+				new DefaultLayoutDescriptorProvider(),
+				new DefaultRescueDescriptorProvider(),
+				new DefaultResourceDescriptorProvider(),
+				new DefaultTransformFilterDescriptorProvider());
 		}
 
 		/// <summary>
@@ -186,6 +205,16 @@
 		{
 			get { return scaffoldSupport; }
 			set { scaffoldSupport = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the JSON serializer.
+		/// </summary>
+		/// <value>The JSON serializer.</value>
+		public IJSONSerializer JSONSerializer
+		{
+			get { return jsonSerializer; }
+			set { jsonSerializer = value; }
 		}
 
 		/// <summary>

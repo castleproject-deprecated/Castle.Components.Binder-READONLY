@@ -14,6 +14,7 @@
 
 namespace Castle.MonoRail.Framework
 {
+	using System;
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Collections.Specialized;
@@ -32,6 +33,7 @@ namespace Castle.MonoRail.Framework
 		private string selectedViewName;
 		private string viewFolder;
 		private ControllerMetaDescriptor metaDescriptor;
+		private IDictionary<string, object> customActionParameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
 		private IDictionary propertyBag = new HybridDictionary(true);
 		private IDictionary helpers = new HybridDictionary(true);
 		private IDictionary<string, IDynamicAction> dynamicActions = new Dictionary<string, IDynamicAction>();
@@ -68,6 +70,16 @@ namespace Castle.MonoRail.Framework
 			this.areaName = areaName;
 			this.action = action;
 			this.metaDescriptor = metaDescriptor;
+		}
+
+		/// <summary>
+		/// Gets or sets the custom action parameters.
+		/// </summary>
+		/// <value>The custom action parameters.</value>
+		public IDictionary<string, object> CustomActionParameters
+		{
+			get { return customActionParameters; }
+			set { customActionParameters = value; }
 		}
 
 		/// <summary>

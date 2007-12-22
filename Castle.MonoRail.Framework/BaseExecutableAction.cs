@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework
 {
 	using System;
 	using Descriptors;
+	using Internal;
 
 	/// <summary>
 	/// 
@@ -137,22 +138,7 @@ namespace Castle.MonoRail.Framework
 		/// <returns></returns>
 		public RescueDescriptor GetRescueFor(Type exceptionType)
 		{
-			RescueDescriptor bestCandidate = null;
-
-			foreach(RescueDescriptor rescue in actionMetaDescriptor.Rescues)
-			{
-				if (rescue.ExceptionType == exceptionType)
-				{
-					return rescue;
-				}
-				else if (rescue.ExceptionType != null &&
-						 rescue.ExceptionType.IsAssignableFrom(exceptionType))
-				{
-					bestCandidate = rescue;
-				}
-			}
-
-			return bestCandidate;
+			return RescueUtils.SelectBest(actionMetaDescriptor.Rescues, exceptionType);
 		}
 
 		/// <summary>

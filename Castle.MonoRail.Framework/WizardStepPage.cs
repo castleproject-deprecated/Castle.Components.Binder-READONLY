@@ -17,7 +17,6 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.Reflection;
-
 	using Castle.Components.Binder;
 	using Castle.MonoRail.Framework.Helpers;
 	using Castle.MonoRail.Framework.Internal;
@@ -27,8 +26,8 @@ namespace Castle.MonoRail.Framework
 	/// See the remarks for more information.
 	/// </summary>
 	/// 
-	/// <seealso cref="WizardActionProvider"/>
-	/// <seealso cref="IWizardController"/>
+	/// <seealso xref="WizardActionProvider"/>
+	/// <seealso xref="IWizardController"/>
 	/// 
 	/// <remarks>
 	/// Implementors can optionally override <see cref="WizardStepPage.ActionName"/>
@@ -77,7 +76,7 @@ namespace Castle.MonoRail.Framework
 		/// Initializes a new instance of the <see cref="WizardStepPage"/> class.
 		/// </summary>
 		public WizardStepPage()
-		{			
+		{
 		}
 
 		/// <summary>
@@ -85,7 +84,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="binder">The binder.</param>
 		public WizardStepPage(IDataBinder binder) : base(binder)
-		{			
+		{
 		}
 
 		#endregion
@@ -106,7 +105,7 @@ namespace Castle.MonoRail.Framework
 		#region Core Lifecycle methods
 
 		/// <summary>
-		/// Invoked by <see cref="WizardActionProvider"/>.
+		/// Invoked by <see xref="WizardActionProvider"/>.
 		/// </summary>
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="wizardController">The wizard controller.</param>
@@ -115,7 +114,8 @@ namespace Castle.MonoRail.Framework
 		/// This can be overriden but it's important to invoke the base
 		/// implementation.
 		/// </remarks>
-		protected internal virtual void Initialize(IEngineContext engineContext, IController wizardController, IControllerContext controllerContext)
+		protected internal virtual void Initialize(IEngineContext engineContext, IController wizardController,
+		                                           IControllerContext controllerContext)
 		{
 			wizardParentController = wizardController;
 			wizardcontrollerContext = controllerContext;
@@ -141,14 +141,14 @@ namespace Castle.MonoRail.Framework
 			get
 			{
 				Type thisType = GetType();
-				
+
 				// Hack fix for "dynamic proxied" controllers
 				if (thisType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen") ||
-					thisType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2"))
+				    thisType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2"))
 				{
 					return thisType.BaseType.Name;
 				}
-				
+
 				return GetType().Name;
 			}
 		}
@@ -182,11 +182,12 @@ namespace Castle.MonoRail.Framework
 		/// <param name="request">The request instance</param>
 		/// <param name="actionArgs">The custom arguments for the action</param>
 		/// <returns></returns>
-		protected override MethodInfo SelectMethod(string action, IDictionary actions, IRequest request, IDictionary actionArgs)
+		protected override MethodInfo SelectMethod(string action, IDictionary actions, IRequest request,
+		                                           IDictionary actionArgs)
 		{
 			if (action == "RenderWizardView")
 			{
-				return typeof(WizardStepPage).GetMethod("RenderWizardView", BindingFlags.Instance|BindingFlags.NonPublic);
+				return typeof(WizardStepPage).GetMethod("RenderWizardView", BindingFlags.Instance | BindingFlags.NonPublic);
 			}
 			else
 			{
@@ -219,7 +220,7 @@ namespace Castle.MonoRail.Framework
 		{
 			DoNavigate((IDictionary) null);
 		}
-		
+
 		/// <summary>
 		/// Navigates within the wizard steps using optionally a form parameter 
 		/// to dictate to where it should go.
@@ -242,7 +243,7 @@ namespace Castle.MonoRail.Framework
 		{
 			DoNavigate(DictHelper.Create(queryStringParameters));
 		}
-		
+
 		/// <summary>
 		/// Navigates within the wizard steps using optionally a form parameter 
 		/// to dictate to where it should go.
@@ -288,7 +289,7 @@ namespace Castle.MonoRail.Framework
 				RedirectToStep(navigateTo, queryStringParameters);
 			}
 		}
-		
+
 		/// <summary>
 		/// Sends a redirect to the next wizard step (if it exists)
 		/// </summary>
@@ -306,7 +307,7 @@ namespace Castle.MonoRail.Framework
 		{
 			RedirectToNextStep(DictHelper.Create(queryStringParameters));
 		}
-		
+
 		/// <summary>
 		/// Sends a redirect to the next wizard step (if it exists)
 		/// </summary>
@@ -316,7 +317,7 @@ namespace Castle.MonoRail.Framework
 			String wizardName = WizardUtils.ConstructWizardNamespace(ControllerContext);
 
 			int currentIndex = (int) Context.Session[wizardName + "currentstepindex"];
-			
+
 			IList stepList = (IList) Context.Items["wizard.step.list"];
 
 			if ((currentIndex + 1) < stepList.Count)
@@ -344,7 +345,7 @@ namespace Castle.MonoRail.Framework
 		{
 			RedirectToPreviousStep((IDictionary) null);
 		}
-		
+
 		/// <summary>
 		/// Sends a redirect to the previous wizard step
 		/// </summary>
@@ -354,7 +355,7 @@ namespace Castle.MonoRail.Framework
 		{
 			RedirectToPreviousStep(DictHelper.Create(queryStringParameters));
 		}
-		
+
 		/// <summary>
 		/// Sends a redirect to the previous wizard step
 		/// </summary>
@@ -365,7 +366,7 @@ namespace Castle.MonoRail.Framework
 			String wizardName = WizardUtils.ConstructWizardNamespace(wizardcontrollerContext);
 
 			int currentIndex = (int) Context.Session[wizardName + "currentstepindex"];
-			
+
 			IList stepList = (IList) Context.Items["wizard.step.list"];
 
 			if ((currentIndex - 1) >= 0)
@@ -389,7 +390,7 @@ namespace Castle.MonoRail.Framework
 		{
 			RedirectToFirstStep((IDictionary) null);
 		}
-		
+
 		/// <summary>
 		/// Sends a redirect to the first wizard step
 		/// </summary>
@@ -397,7 +398,7 @@ namespace Castle.MonoRail.Framework
 		{
 			RedirectToFirstStep(DictHelper.Create(queryStringParameters));
 		}
-		
+
 		/// <summary>
 		/// Sends a redirect to the first wizard step
 		/// </summary>
@@ -417,7 +418,7 @@ namespace Castle.MonoRail.Framework
 		{
 			return RedirectToStep(stepName, (IDictionary) null);
 		}
-		
+
 		/// <summary>
 		/// Sends a redirect to a custom step (that must exists)
 		/// </summary>
@@ -425,7 +426,7 @@ namespace Castle.MonoRail.Framework
 		{
 			return RedirectToStep(stepName, DictHelper.Create(queryStringParameters));
 		}
-		
+
 		/// <summary>
 		/// Sends a redirect to a custom step (that must exists)
 		/// </summary>
@@ -459,10 +460,11 @@ namespace Castle.MonoRail.Framework
 			return base.TransformActionName(ActionName + "-" + action);
 		}
 
-		private void InternalRedirectToStep(IEngineContext engineContext, int stepIndex, String step, IDictionary queryStringParameters)
+		private void InternalRedirectToStep(IEngineContext engineContext, int stepIndex, String step,
+		                                    IDictionary queryStringParameters)
 		{
 			WizardUtils.RegisterCurrentStepInfo(engineContext, wizardParentController, wizardcontrollerContext, stepIndex, step);
-	
+
 			if (queryStringParameters != null && queryStringParameters.Count != 0)
 			{
 				Redirect(wizardcontrollerContext.Name, step, queryStringParameters);
@@ -472,8 +474,9 @@ namespace Castle.MonoRail.Framework
 				// We need to preserve any attribute from the QueryString
 				// for example in case the url has an Id
 
-				string url = UrlBuilder.BuildUrl(Context.UrlInfo, wizardcontrollerContext.Name, step) + engineContext.Request.Uri.Query;
-				
+				string url = UrlBuilder.BuildUrl(Context.UrlInfo, wizardcontrollerContext.Name, step) +
+				             engineContext.Request.Uri.Query;
+
 				Context.Response.RedirectToUrl(url);
 			}
 			else

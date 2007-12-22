@@ -20,6 +20,25 @@ namespace Castle.MonoRail.Framework
 	using Castle.Components.Binder;
 
 	/// <summary>
+	/// Defines where the parameters should be obtained from
+	/// </summary>
+	public enum ParamStore
+	{
+		/// <summary>
+		/// Query string
+		/// </summary>
+		QueryString,
+		/// <summary>
+		/// Only from the Form
+		/// </summary>
+		Form,
+		/// <summary>
+		/// From QueryString, Form and Environment variables.
+		/// </summary>
+		Params
+	}
+
+	/// <summary>
 	/// Represents the request data
 	/// </summary>
 	public interface IRequest

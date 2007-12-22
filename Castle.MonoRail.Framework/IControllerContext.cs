@@ -25,6 +25,12 @@ namespace Castle.MonoRail.Framework
 	public interface IControllerContext
 	{
 		/// <summary>
+		/// Gets or sets the custom action parameters.
+		/// </summary>
+		/// <value>The custom action parameters.</value>
+		IDictionary<string, object> CustomActionParameters { get; set; }
+
+		/// <summary>
 		/// Gets the property bag, which is used
 		/// to pass variables to the view.
 		/// </summary>

@@ -12,18 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Monorail.JSONSupport.Tests
+namespace Castle.MonoRail.Framework.Tests.JSON
 {
+	using Castle.MonoRail.Framework.Helpers;
+	using Castle.MonoRail.Framework.Services;
+	using Castle.MonoRail.Framework.Test;
 	using NUnit.Framework;
 
 	[TestFixture]
 	public class JsonHelperTestCase
 	{
+		private JSONHelper helper;
+
+		[SetUp]
+		public void Init()
+		{
+			helper = new JSONHelper();
+
+			MockServices services = new MockServices();
+			services.JSONSerializer = new NewtonsoftJSONSerializer();
+			helper.SetContext(new MockEngineContext(null, null, services, null));
+		}
+
 		[Test]
 		public void Serialize()
 		{
 			Person p = new Person("Json", 23);
-			JSONHelper helper = new JSONHelper();
 			Assert.AreEqual("{\"Name\":\"Json\",\"Age\":23}", helper.ToJSON(p));
 		}
 	}

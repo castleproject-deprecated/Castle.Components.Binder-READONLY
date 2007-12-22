@@ -169,6 +169,7 @@ namespace Castle.MonoRail.Framework.Container
 		private IValidatorRegistry validatorRegistryCached;
 		private IActionSelector actionSelectorCached;
 		private IScaffoldingSupport scaffoldSupportCached;
+		private IJSONSerializer jsonSerializerCached;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultMonoRailContainer"/> class.
@@ -272,6 +273,12 @@ namespace Castle.MonoRail.Framework.Container
 			{
 				AddService(typeof(IValidatorRegistry), validatorRegistry);
 			}
+
+			IJSONSerializer jsonSerializer = (IJSONSerializer) Parent.GetService(typeof(IJSONSerializer));
+			if (jsonSerializer != null)
+			{
+				AddService(typeof(IJSONSerializer), jsonSerializer);
+			}
 		}
 
 		/// <summary>
@@ -358,6 +365,10 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<IActionSelector>())
 			{
 				AddService<IActionSelector>(CreateService<DefaultActionSelector>());
+			}
+			if (!HasService<IJSONSerializer>())
+			{
+				AddService<IJSONSerializer>(CreateService<NewtonsoftJSONSerializer>());
 			}
 		}
 
@@ -651,6 +662,23 @@ namespace Castle.MonoRail.Framework.Container
 				return scaffoldSupportCached;
 			}
 			set { scaffoldSupportCached = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the JSON serializer.
+		/// </summary>
+		/// <value>The JSON serializer.</value>
+		public IJSONSerializer JSONSerializer
+		{
+			get
+			{
+				if (jsonSerializerCached == null)
+				{
+					jsonSerializerCached = GetService<IJSONSerializer>();
+				}
+				return jsonSerializerCached;
+			}
+			set { jsonSerializerCached = value; }
 		}
 
 		#endregion

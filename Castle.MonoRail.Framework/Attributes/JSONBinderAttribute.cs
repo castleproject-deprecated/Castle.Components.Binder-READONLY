@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Monorail.JSONSupport
+namespace Castle.MonoRail.Framework
 {
 	using System;
 	using System.Reflection;
 	using Castle.MonoRail.Framework;
-	using Newtonsoft.Json;
+	using Castle.MonoRail.Framework.Services;
 
 	/// <summary>
-	/// Extends <see cref="DataBindAttribute"/> with  the <see cref="JavaScriptConvert"/> functionality. 
-	/// In other words, enable biding of JSON formatted values on POCO objects.
+	/// Enables binding of JSON formatted values on POCO objects.
 	/// </summary>
 	/// <example>
 	/// <para>
@@ -64,15 +63,20 @@ namespace Castle.Monorail.JSONSupport
 	/// public void MyAction([JSONBinder("car")] Car car)
 	/// </code>
 	/// </example>
-	[AttributeUsage(AttributeTargets.Parameter)]
+	[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
 	public class JSONBinderAttribute : Attribute, IParameterBinder
 	{
-		private readonly string entryKey;
+		private string entryKey;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="JSONBinderAttribute"/> class.
-		/// For use with <see cref="Castle.MonoRail.Framework.Helpers.AjaxHelper.GenerateJSProxy(string)" />,
-		/// make sure you are using Prototype 1.5.1 or later.
+		/// </summary>
+		public JSONBinderAttribute()
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="JSONBinderAttribute"/> class.
 		/// </summary>
 		/// <param name="entryKey">The entry key, which is the form or 
 		/// querystring key that identifies the JSON persisted content</param>
@@ -84,52 +88,50 @@ namespace Castle.Monorail.JSONSupport
 		}
 
 		/// <summary>
-		/// Gets the entry key.
-		/// </summary>
-		/// <remarks>
-		/// The entry key, which is the form or  querystring key that identifies the JSON persisted content.
-		/// </remarks>
-		/// <value>The entry key.</value>
-		public string EntryKey
-		{
-			get { return this.entryKey; }
-		}
-
-		/// <summary>
 		/// Calculates the param points. Implementors should return value equals or greater than
 		/// zero indicating whether the parameter can be bound successfully. The greater the value (points)
 		/// the more successful the implementation indicates to the framework
 		/// </summary>
+		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="parameterInfo">The parameter info.</param>
 		/// <returns></returns>
-		public int CalculateParamPoints(SmartDispatcherController controller, ParameterInfo parameterInfo)
+		public int CalculateParamPoints(IEngineContext context, IController controller, 
+			IControllerContext controllerContext, ParameterInfo parameterInfo)
 		{
-			return controller.Params[entryKey] != null ? 1 : 0; 
+			EnsureValidEntryKey(parameterInfo.Name);
+
+			return context.Request.Params[entryKey] != null ? 1 : 0; 
 		}
 
 		/// <summary>
 		/// Binds the specified parameter for the action.
 		/// </summary>
+		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="parameterInfo">The parameter info.</param>
-		/// <returns>A instance based on the JSON values present in the <see cref="EntryKey"/>.</returns>
-		public object Bind(SmartDispatcherController controller, ParameterInfo parameterInfo)
+		/// <returns>
+		/// A instance based on the JSON values present in the <c>EntryKey</c> or the parameter name.
+		/// </returns>
+		public object Bind(IEngineContext context, IController controller, IControllerContext controllerContext, ParameterInfo parameterInfo)
 		{
-			string entryValue = controller.Params[entryKey];
+			EnsureValidEntryKey(parameterInfo.Name);
 
-			return Bind(entryValue, parameterInfo.ParameterType);
+			string entryValue = context.Request.Params[entryKey];
+
+			IJSONSerializer serializer = context.Services.JSONSerializer;
+
+			return serializer.Deserialize(entryValue, parameterInfo.ParameterType);
 		}
 
-		/// <summary>
-		/// Binds the specified entry value to a instance of a given Type(<paramref name="parameterType"/>).
-		/// </summary>
-		/// <param name="entryValue">The entry value containing the JSON formatted content.</param>
-		/// <param name="parameterType">Type of the binded object.</param>
-		/// <returns>A instance based on the JSON values present in the <paramref name="entryValue"/>.</returns>
-		public static object Bind(string entryValue, Type parameterType)
+		private void EnsureValidEntryKey(string name)
 		{
-			return JavaScriptConvert.DeserializeObject(entryValue, parameterType);
+			if (entryKey == null)
+			{
+				entryKey = name;
+			}
 		}
 	}
 }
