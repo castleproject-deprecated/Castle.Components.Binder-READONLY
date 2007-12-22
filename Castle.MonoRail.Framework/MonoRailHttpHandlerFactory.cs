@@ -21,6 +21,7 @@ namespace Castle.MonoRail.Framework
 	using Castle.MonoRail.Framework.Container;
 	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Descriptors;
+	using Services;
 
 	/// <summary>
 	/// Coordinates the creation of new <see cref="MonoRailHttpHandler"/> 
@@ -41,6 +42,7 @@ namespace Castle.MonoRail.Framework
 		private IServiceProviderLocator serviceProviderLocator;
 		private IControllerFactory controllerFactory;
 		private IControllerContextFactory controllerContextFactory;
+		private IStaticResourceRegistry staticResourceRegistry;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MonoRailHttpHandlerFactory"/> class.
@@ -94,6 +96,11 @@ namespace Castle.MonoRail.Framework
 			HttpRequest req = context.Request;
 
 			UrlInfo urlInfo = urlTokenizer.TokenizeUrl(req.FilePath, req.PathInfo, req.Url, req.IsLocal, req.ApplicationPath);
+
+			if (urlInfo.Area == "MonoRail" && urlInfo.Controller == "Files")
+			{
+				return new ResourceFileHandler(urlInfo, new DefaultStaticResourceRegistry());
+			}
 
 			// TODO: Identify requests for files (js files) and serve them directly bypassing the flow
 
@@ -320,6 +327,10 @@ namespace Castle.MonoRail.Framework
 			if (controllerContextFactory == null)
 			{
 				controllerContextFactory = mrContainer.ControllerContextFactory;
+			}
+			if (staticResourceRegistry == null)
+			{
+				staticResourceRegistry = mrContainer.StaticResourceRegistry;
 			}
 		}
 	}

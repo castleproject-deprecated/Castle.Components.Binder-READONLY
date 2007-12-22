@@ -112,5 +112,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The JSON serializer.</value>
 		IJSONSerializer JSONSerializer { get; set; }
+
+		/// <summary>
+		/// Gets or sets the static resource registry service.
+		/// </summary>
+		/// <value>The static resource registry.</value>
+		IStaticResourceRegistry StaticResourceRegistry { get; set; }
 	}
 }

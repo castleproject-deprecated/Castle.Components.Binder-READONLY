@@ -296,6 +296,7 @@
     <Compile Include="IViewEngine.cs" />
     <Compile Include="IViewSource.cs" />
     <Compile Include="IViewSourceLoader.cs" />
+    <Compile Include="ResourceFileHandler.cs" />
     <Compile Include="Routing\IRoutingRule.cs" />
     <Compile Include="Routing\RouteMatch.cs" />
     <Compile Include="ServiceContainerAccessor.cs" />
@@ -314,6 +315,7 @@
     <Compile Include="Services\DefaultEngineContextFactory.cs" />
     <Compile Include="Services\DefaultFilterFactory.cs" />
     <Compile Include="Services\DefaultResourceFactory.cs" />
+    <Compile Include="Services\DefaultStaticResourceRegistry.cs" />
     <Compile Include="Services\DefaultUrlBuilder.cs" />
     <Compile Include="Services\DefaultViewEngineManager.cs" />
     <Compile Include="Services\IControllerContextFactory.cs" />
@@ -325,6 +327,7 @@
     </Compile>
     <Compile Include="Services\IFilterFactory.cs" />
     <Compile Include="Services\IJSONSerializer.cs" />
+    <Compile Include="Services\IStaticResourceRegistry.cs" />
     <Compile Include="Services\IViewComponentRegistry.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -448,6 +451,38 @@
       <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
       <Name>Castle.Core-vs2008</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="JSResources\Ajax.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\Behaviour.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\Effects2.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\EffectsFat.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\FormHelper.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\Validation.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\ValidationLang.pt-BR.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\ValidationLang.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\ValidationLang.zh-tw.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSResources\ZebdaValidation.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

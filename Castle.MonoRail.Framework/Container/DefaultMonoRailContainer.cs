@@ -170,6 +170,7 @@ namespace Castle.MonoRail.Framework.Container
 		private IActionSelector actionSelectorCached;
 		private IScaffoldingSupport scaffoldSupportCached;
 		private IJSONSerializer jsonSerializerCached;
+		private IStaticResourceRegistry staticResourceRegCached;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultMonoRailContainer"/> class.
@@ -279,6 +280,12 @@ namespace Castle.MonoRail.Framework.Container
 			{
 				AddService(typeof(IJSONSerializer), jsonSerializer);
 			}
+
+			IStaticResourceRegistry staticResourceRegistry = (IStaticResourceRegistry) Parent.GetService(typeof(IStaticResourceRegistry));
+			if (staticResourceRegistry != null)
+			{
+				AddService(typeof(IStaticResourceRegistry), staticResourceRegistry);
+			}
 		}
 
 		/// <summary>
@@ -369,6 +376,10 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<IJSONSerializer>())
 			{
 				AddService<IJSONSerializer>(CreateService<NewtonsoftJSONSerializer>());
+			}
+			if (!HasService<IStaticResourceRegistry>())
+			{
+				AddService<IStaticResourceRegistry>(CreateService<DefaultStaticResourceRegistry>());
 			}
 		}
 
@@ -679,6 +690,23 @@ namespace Castle.MonoRail.Framework.Container
 				return jsonSerializerCached;
 			}
 			set { jsonSerializerCached = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the static resource registry service.
+		/// </summary>
+		/// <value>The static resource registry.</value>
+		public IStaticResourceRegistry StaticResourceRegistry
+		{
+			get
+			{
+				if (staticResourceRegCached == null)
+				{
+					staticResourceRegCached = GetService<IStaticResourceRegistry>();
+				}
+				return staticResourceRegCached;
+			}
+			set { staticResourceRegCached = value; }
 		}
 
 		#endregion

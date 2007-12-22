@@ -26,6 +26,7 @@
 		private IActionSelector actionSelector;
 		private IScaffoldingSupport scaffoldSupport;
 		private IJSONSerializer jsonSerializer;
+		private IStaticResourceRegistry staticResourceRegistry;
 		private readonly Dictionary<Type, object> service2Impl = new Dictionary<Type, object>();
 
 		/// <summary>
@@ -55,6 +56,7 @@
 
 			controllerTree = new DefaultControllerTree();
 			controllerFactory = new DefaultControllerFactory(controllerTree);
+			staticResourceRegistry = new DefaultStaticResourceRegistry();
 
 			controllerContextFactory = new DefaultControllerContextFactory();
 
@@ -215,6 +217,16 @@
 		{
 			get { return jsonSerializer; }
 			set { jsonSerializer = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the static resource registry service.
+		/// </summary>
+		/// <value>The static resource registry.</value>
+		public IStaticResourceRegistry StaticResourceRegistry
+		{
+			get { return staticResourceRegistry; }
+			set { staticResourceRegistry = value; }
 		}
 
 		/// <summary>

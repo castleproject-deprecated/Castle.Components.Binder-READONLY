@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Test
 {
 	using System.IO;
+	using System.Web;
 	using Castle.MonoRail.Framework;
 
 	/// <summary>
@@ -34,6 +35,12 @@ namespace Castle.MonoRail.Framework.Test
 		/// </summary>
 		/// <value>The output.</value>
 		new TextWriter Output { set; }
+
+		/// <summary>
+		/// Sets the cache policy.
+		/// </summary>
+		/// <value>The cache policy.</value>
+		new HttpCachePolicy CachePolicy { set; }
 
 //		/// <summary>
 //		/// Gets the http headers.

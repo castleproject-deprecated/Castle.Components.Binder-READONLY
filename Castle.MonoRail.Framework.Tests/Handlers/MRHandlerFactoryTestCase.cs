@@ -52,6 +52,7 @@ namespace Castle.MonoRail.Framework.Tests.Handlers
 			SetupResult.For(container.ControllerFactory).Return(controllerFactoryMock);
 			SetupResult.For(container.ControllerContextFactory).Return(controllerContextFactoryMock);
 			SetupResult.For(container.ControllerDescriptorProvider).Return(controllerDescriptorProviderMock);
+			SetupResult.For(container.StaticResourceRegistry).Return(new DefaultStaticResourceRegistry());
 
 			handlerFactory = new MonoRailHttpHandlerFactory(serviceProviderLocatorMock);
 			handlerFactory.Configuration = new MonoRailConfiguration();

@@ -326,6 +326,7 @@ namespace Castle.MonoRail.Framework.Test
 		public HttpCachePolicy CachePolicy
 		{
 			get { return cachePolicy; }
+			set { cachePolicy = value; }
 		}
 
 //		/// <summary>

@@ -144,6 +144,7 @@
     <Compile Include="Controllers\Products\CartController.cs" />
     <Compile Include="Controllers\Products\ListController.cs" />
     <Compile Include="FlashTestCase.cs" />
+    <Compile Include="Handlers\ResourceFileHandlerTestCase.cs" />
     <Compile Include="JSON\JsonDataBinderTestCase.cs" />
     <Compile Include="JSON\JsonHelperTestCase.cs" />
     <Compile Include="Rescues\ActionLevelRescuesTestCase.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="Providers\DefaultRescueDescriptorProviderTestCase.cs" />
     <Compile Include="Providers\DefaultResourceDescriptorProviderTestCase.cs" />
     <Compile Include="Providers\DefaultTransformFilterDescriptorProviderTestCase.cs" />
+    <Compile Include="Services\StaticResourceRegistry\DefaultStaticResourceRegistryTestCase.cs" />
     <Compile Include="UrlPartsBuilderTestCase.cs" />
     <Compile Include="ViewEngines\ViewEngineBaseTestCase.cs" />
     <Compile Include="WikiFormatterTestCase.cs" />
@@ -170,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Handlers\Files\simplerequest.txt" />
+    <EmbeddedResource Include="Services\StaticResourceRegistry\DummyRes.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Filters\" />

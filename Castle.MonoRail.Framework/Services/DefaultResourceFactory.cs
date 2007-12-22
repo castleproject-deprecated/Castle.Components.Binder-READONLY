@@ -18,7 +18,6 @@ namespace Castle.MonoRail.Framework.Services
 	using System.Resources;
 	using System.Reflection;
 	using System.Globalization;
-	
 	using Castle.Core;
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Resources;
@@ -35,7 +34,7 @@ namespace Castle.MonoRail.Framework.Services
 		private ILogger logger = NullLogger.Instance;
 
 		#region IServiceEnabledComponent implementation
-		
+
 		/// <summary>
 		/// Invoked by the framework in order to give a chance to
 		/// obtain other services
@@ -44,7 +43,7 @@ namespace Castle.MonoRail.Framework.Services
 		public void Service(IServiceProvider provider)
 		{
 			ILoggerFactory loggerFactory = (ILoggerFactory) provider.GetService(typeof(ILoggerFactory));
-			
+
 			if (loggerFactory != null)
 			{
 				logger = loggerFactory.Create(typeof(DefaultResourceFactory));
@@ -64,12 +63,12 @@ namespace Castle.MonoRail.Framework.Services
 		/// <returns></returns>
 		public IResource Create(ResourceDescriptor descriptor, Assembly appAssembly)
 		{
-			Assembly assembly = this.ResolveAssembly(descriptor.AssemblyName, appAssembly);
-			CultureInfo cultureInfo = this.ResolveCulture(descriptor.CultureName);
+			Assembly assembly = ResolveAssembly(descriptor.AssemblyName, appAssembly);
+			CultureInfo cultureInfo = ResolveCulture(descriptor.CultureName);
 
 			if (logger.IsDebugEnabled)
 			{
-				logger.DebugFormat("Creating resource name {0}, assembly {1}, resource {2}", 
+				logger.DebugFormat("Creating resource name {0}, assembly {1}, resource {2}",
 				                   descriptor.Name, descriptor.AssemblyName, descriptor.ResourceName);
 			}
 
@@ -118,7 +117,7 @@ namespace Castle.MonoRail.Framework.Services
 		private Assembly ResolveAssembly(String name, Assembly assembly)
 		{
 			if (name == null) return assembly;
-			
+
 			if (logger.IsDebugEnabled)
 			{
 				logger.DebugFormat("Resolving assembly {0}", name);
@@ -131,7 +130,7 @@ namespace Castle.MonoRail.Framework.Services
 			catch(Exception ex)
 			{
 				logger.Error("Could not load assembly", ex);
-				
+
 				throw;
 			}
 		}

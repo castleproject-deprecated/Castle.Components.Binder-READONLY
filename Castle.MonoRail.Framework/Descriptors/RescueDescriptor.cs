@@ -37,6 +37,7 @@ namespace Castle.MonoRail.Framework.Descriptors
 			this.viewName = viewName;
 			this.exceptionType = exceptionType;
 		}
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RescueDescriptor"/> class.
 		/// </summary>
