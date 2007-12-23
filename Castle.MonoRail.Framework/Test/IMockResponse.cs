@@ -42,6 +42,12 @@ namespace Castle.MonoRail.Framework.Test
 		/// <value>The cache policy.</value>
 		new HttpCachePolicy CachePolicy { set; }
 
+		/// <summary>
+		/// Gets the output.
+		/// </summary>
+		/// <value>The output.</value>
+		string OutputContent { get; }
+
 //		/// <summary>
 //		/// Gets the http headers.
 //		/// </summary>

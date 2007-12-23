@@ -34,9 +34,7 @@ namespace Castle.MonoRail.Framework.Test
 		private string redirectedTo;
 		private bool wasRedirected = false;
 		private bool isClientConnected = false;
-		private TextWriter output = new StringWriter();
-		private Stream outputStream = new MemoryStream();
-		private TextWriter outputStreamWriter;
+		private StringWriter output;
 		private HttpCachePolicy cachePolicy;
 		private NameValueCollection headers = new NameValueCollection();
 
@@ -47,7 +45,7 @@ namespace Castle.MonoRail.Framework.Test
 		public MockResponse(IDictionary cookies)
 		{
 			this.cookies = cookies;
-			outputStreamWriter = new StreamWriter(outputStream);
+			output = new StringWriter();
 		}
 
 		/// <summary>
@@ -131,7 +129,7 @@ namespace Castle.MonoRail.Framework.Test
 		/// <param name="s">The string.</param>
 		public virtual void Write(string s)
 		{
-			outputStreamWriter.Write(s);
+			output.Write(s);
 		}
 
 		/// <summary>
@@ -140,7 +138,7 @@ namespace Castle.MonoRail.Framework.Test
 		/// <param name="obj">The obj.</param>
 		public virtual void Write(object obj)
 		{
-			outputStreamWriter.Write(obj);
+			output.Write(obj);
 		}
 
 		/// <summary>
@@ -149,7 +147,7 @@ namespace Castle.MonoRail.Framework.Test
 		/// <param name="ch">The char.</param>
 		public virtual void Write(char ch)
 		{
-			outputStreamWriter.Write(ch);
+			output.Write(ch);
 		}
 
 		/// <summary>
@@ -160,7 +158,7 @@ namespace Castle.MonoRail.Framework.Test
 		/// <param name="count">The count.</param>
 		public virtual void Write(char[] buffer, int index, int count)
 		{
-			outputStreamWriter.Write(buffer, index, count);
+			output.Write(buffer, index, count);
 		}
 
 //		/// <summary>
@@ -356,7 +354,7 @@ namespace Castle.MonoRail.Framework.Test
 		public virtual TextWriter Output
 		{
 			get { return output; }
-			set { output = value; }
+			set { output = (StringWriter) value; }
 		}
 
 		/// <summary>
@@ -365,7 +363,7 @@ namespace Castle.MonoRail.Framework.Test
 		/// <value>The output stream.</value>
 		public virtual Stream OutputStream
 		{
-			get { return outputStream; }
+			get { return new MemoryStream(); }
 		}
 
 		/// <summary>
@@ -386,6 +384,15 @@ namespace Castle.MonoRail.Framework.Test
 		public virtual bool IsClientConnected
 		{
 			get { return isClientConnected; }
+		}
+
+		/// <summary>
+		/// Gets the output.
+		/// </summary>
+		/// <value>The output.</value>
+		public string OutputContent
+		{
+			get { return output.GetStringBuilder().ToString(); }
 		}
 
 		#endregion
