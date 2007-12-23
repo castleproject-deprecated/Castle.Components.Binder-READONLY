@@ -85,14 +85,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		bool CheckClientIsConnected { get; set; }
 
 		/// <summary>
-		/// Gets a value indicating whether to use windsor integration.
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if it should use windsor integration; otherwise, <c>false</c>.
-		/// </value>
-		bool UseWindsorIntegration { get; }
-
-		/// <summary>
 		/// Gets a value indicating whether match host name and path should be used on 
 		/// MonoRail routing.
 		/// </summary>

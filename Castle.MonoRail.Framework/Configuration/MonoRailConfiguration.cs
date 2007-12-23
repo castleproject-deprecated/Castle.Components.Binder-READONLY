@@ -242,18 +242,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		}
 
 		/// <summary>
-		/// Gets a value indicating whether to use windsor integration.
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if it should use windsor integration; otherwise, <c>false</c>.
-		/// </value>
-		public bool UseWindsorIntegration
-		{
-			get { return useWindsorIntegration; }
-			set { useWindsorIntegration = value; }
-		}
-
-		/// <summary>
 		/// Gets a value indicating whether match host name and path should be used on 
 		/// MonoRail routing.
 		/// </summary>
@@ -345,27 +333,5 @@ namespace Castle.MonoRail.Framework.Configuration
 				excludeAppPath = String.Compare(excludeAppPathAtt.Value, "true", true) == 0;
 			}
 		}
-
-//		private void ConfigureWindsorIntegration()
-//		{
-//			const string windsorExtensionAssemblyName = "Castle.MonoRail.WindsorExtension";
-//
-//			services.RegisterService(ServiceIdentification.ControllerTree, TypeLoadUtil.GetType(
-//			                                                               	TypeLoadUtil.GetEffectiveTypeName(
-//			                                                               		"Castle.MonoRail.WindsorExtension.ControllerTreeAccessor, " +
-//			                                                               		windsorExtensionAssemblyName)));
-//
-//			controllersConfig.CustomControllerFactory = TypeLoadUtil.GetType(
-//				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorControllerFactory, " +
-//				                                  windsorExtensionAssemblyName));
-//
-//			viewComponentsConfig.CustomViewComponentFactory = TypeLoadUtil.GetType(
-//				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorViewComponentFactory, " +
-//				                                  windsorExtensionAssemblyName));
-//
-//			customFilterFactory = TypeLoadUtil.GetType(
-//				TypeLoadUtil.GetEffectiveTypeName("Castle.MonoRail.WindsorExtension.WindsorFilterFactory, " +
-//				                                  windsorExtensionAssemblyName));
-//		}
 	}
 }
