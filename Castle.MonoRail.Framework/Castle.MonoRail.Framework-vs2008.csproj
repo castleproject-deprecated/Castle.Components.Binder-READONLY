@@ -171,10 +171,15 @@
     </Compile>
     <Compile Include="DelegateDynamicAction.cs" />
     <Compile Include="DynamicActionExecutor.cs" />
+    <Compile Include="Extensions\ExceptionChaining\AbstractExceptionHandler.cs" />
+    <Compile Include="Extensions\ExceptionChaining\EmailHandler.cs" />
     <Compile Include="Extensions\ExceptionChaining\ExceptionChainingExtension.cs" />
+    <Compile Include="Extensions\ExceptionChaining\FilteredExceptionHandler.cs" />
     <Compile Include="Extensions\ExceptionChaining\IConfigurableHandler.cs" />
     <Compile Include="Extensions\ExceptionChaining\IExceptionHandler.cs" />
     <Compile Include="Extensions\ExceptionChaining\IExceptionProcessor.cs" />
+    <Compile Include="Extensions\ExceptionChaining\LocalExceptionFilterHandler.cs" />
+    <Compile Include="Extensions\ExceptionChaining\LoggingExceptionHandler.cs" />
     <Compile Include="Extensions\ExtensionManager.cs" />
     <Compile Include="Extensions\IMonoRailExtension.cs" />
     <Compile Include="Extensions\Session\CustomSessionExtension.cs" />

@@ -34,7 +34,6 @@ namespace Castle.MonoRail.Framework
 		private readonly static string CurrentControllerKey = "currentmrcontroller";
 		private readonly static string CurrentControllerContextKey = "currentmrcontrollercontext";
 		private readonly object locker = new object();
-		private ExtensionManager extensionManager;
 
 		private IMonoRailConfiguration configuration;
 		private IMonoRailContainer mrContainer;

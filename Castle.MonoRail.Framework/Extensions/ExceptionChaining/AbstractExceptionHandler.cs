@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Castle.MonoRail.Framework;
-
 namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 {
 	using System;
@@ -39,10 +37,10 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		/// <summary>
 		/// Implementors should perform the action
 		/// on the exception. Note that the exception
-		/// is available in <see cref="IHandlerContext.LastException"/>
+		/// is available in <see cref="IEngineContext.LastException"/>
 		/// </summary>
 		/// <param name="context"></param>
-		public abstract void Process(IHandlerContext context);
+		public abstract void Process(IEngineContext context);
 
 		/// <summary>
 		/// The next exception in the sink
@@ -59,7 +57,7 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		/// Invokes the next handler.
 		/// </summary>
 		/// <param name="context">The context.</param>
-		protected void InvokeNext(IHandlerContext context)
+		protected void InvokeNext(IEngineContext context)
 		{
 			if (nextHandler != null)
 			{
@@ -72,13 +70,13 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <returns></returns>
-		protected string BuildStandardMessage(IHandlerContext context)
+		protected string BuildStandardMessage(IEngineContext context)
 		{
 			StringBuilder sbMessage = new StringBuilder();
 	
 			sbMessage.Append("Controller details\r\n");
 			sbMessage.Append("==================\r\n\r\n");
-			sbMessage.AppendFormat("Url {0}\r\n", context.Url);
+//			sbMessage.AppendFormat("Url {0}\r\n", context.Url);
 			sbMessage.AppendFormat("Area {0}\r\n", context.UrlInfo.Area);
 			sbMessage.AppendFormat("Controller {0}\r\n", context.UrlInfo.Controller);
 			sbMessage.AppendFormat("Action {0}\r\n", context.UrlInfo.Action);
@@ -92,20 +90,20 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 			sbMessage.Append("\r\nEnvironment and params");
 			sbMessage.Append("\r\n======================\r\n\r\n");
 			sbMessage.AppendFormat("ApplicationPath {0}\r\n", context.ApplicationPath);
-			sbMessage.AppendFormat("ApplicationPhysicalPath {0}\r\n", context.ApplicationPhysicalPath);
-			sbMessage.AppendFormat("RequestType {0}\r\n", context.RequestType);
-			sbMessage.AppendFormat("UrlReferrer {0}\r\n", context.UrlReferrer);
-	
-			if (context.CurrentUser != null)
-			{
-				sbMessage.AppendFormat("CurrentUser.Name {0}\r\n", context.CurrentUser.Identity.Name);
-				sbMessage.AppendFormat("CurrentUser.AuthenticationType {0}\r\n", context.CurrentUser.Identity.AuthenticationType);
-				sbMessage.AppendFormat("CurrentUser.IsAuthenticated {0}\r\n", context.CurrentUser.Identity.IsAuthenticated);
-			}
+//			sbMessage.AppendFormat("ApplicationPhysicalPath {0}\r\n", context.ApplicationPhysicalPath);
+//			sbMessage.AppendFormat("RequestType {0}\r\n", context.RequestType);
+//			sbMessage.AppendFormat("UrlReferrer {0}\r\n", context.UrlReferrer);
+//	
+//			if (context.CurrentUser != null)
+//			{
+//				sbMessage.AppendFormat("CurrentUser.Name {0}\r\n", context.CurrentUser.Identity.Name);
+//				sbMessage.AppendFormat("CurrentUser.AuthenticationType {0}\r\n", context.CurrentUser.Identity.AuthenticationType);
+//				sbMessage.AppendFormat("CurrentUser.IsAuthenticated {0}\r\n", context.CurrentUser.Identity.IsAuthenticated);
+//			}
 	
 			DumpDictionary(context.Flash, "Flash", sbMessage);
 	
-			DumpDictionary(context.Params, "Params", sbMessage);
+//			DumpDictionary(context.Params, "Params", sbMessage);
 	
 			DumpDictionary(context.Session, "Session", sbMessage);
 
