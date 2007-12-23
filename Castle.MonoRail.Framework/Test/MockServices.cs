@@ -27,6 +27,7 @@
 		private IScaffoldingSupport scaffoldSupport;
 		private IJSONSerializer jsonSerializer;
 		private IStaticResourceRegistry staticResourceRegistry;
+		private ExtensionManager extensionManager;
 		private readonly Dictionary<Type, object> service2Impl = new Dictionary<Type, object>();
 
 		/// <summary>
@@ -227,6 +228,16 @@
 		{
 			get { return staticResourceRegistry; }
 			set { staticResourceRegistry = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the extension manager.
+		/// </summary>
+		/// <value>The extension manager.</value>
+		public ExtensionManager ExtensionManager
+		{
+			get { return extensionManager; }
+			set { extensionManager = value; }
 		}
 
 		/// <summary>

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Castle.MonoRail.Framework;
-
 namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 {
 	/// <summary>
@@ -34,15 +32,15 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 		/// <summary>
 		/// Implementors should perform the action 
 		/// on the exception. Note that the exception 
-		/// is available in <see cref="IHandlerContext.LastException"/>
+		/// is available in <see cref="IEngineContext.LastException"/>
 		/// </summary>
 		/// <param name="context"></param>
-		void Process(IHandlerContext context);
+		void Process(IEngineContext context);
 
 		/// <summary>
 		/// The next exception in the sink 
 		/// or null if none exists.
 		/// </summary>
-		IExceptionHandler Next { get;set; }
+		IExceptionHandler Next { get; set; }
 	}
 }

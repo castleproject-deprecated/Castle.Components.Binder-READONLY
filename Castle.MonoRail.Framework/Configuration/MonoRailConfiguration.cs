@@ -30,7 +30,7 @@ namespace Castle.MonoRail.Framework.Configuration
 
 		private bool checkClientIsConnected, useWindsorIntegration, matchHostNameAndPath, excludeAppPath;
 		private Type customFilterFactory;
-		private XmlNode configurationSection;
+		private IConfiguration configurationSection;
 
 		private SmtpConfig smtpConfig;
 		private ViewEngineConfig viewEngineConfig;
@@ -70,7 +70,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// <param name="section"></param>
 		public MonoRailConfiguration(XmlNode section) : this()
 		{
-			configurationSection = section;
+			configurationSection = XmlConfigurationDeserializer.GetDeserializedNode(section);
 		}
 
 		/// <summary>
@@ -167,6 +167,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		public ControllersConfig ControllersConfig
 		{
 			get { return controllersConfig; }
+			set { controllersConfig = value; }
 		}
 
 		/// <summary>
@@ -176,6 +177,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		public ViewComponentsConfig ViewComponentsConfig
 		{
 			get { return viewComponentsConfig; }
+			set { viewComponentsConfig = value; }
 		}
 
 		/// <summary>
@@ -185,6 +187,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		public RoutingRuleCollection RoutingRules
 		{
 			get { return routingRules; }
+			set { routingRules = value; }
 		}
 
 		/// <summary>
@@ -203,6 +206,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		public Type CustomFilterFactory
 		{
 			get { return customFilterFactory; }
+			set { customFilterFactory = value; }
 		}
 
 		/// <summary>
@@ -212,6 +216,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		public ScaffoldConfig ScaffoldConfig
 		{
 			get { return scaffoldConfig; }
+			set { scaffoldConfig = value; }
 		}
 
 		/// <summary>
@@ -220,7 +225,8 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// <value>The url config.</value>
 		public UrlConfig UrlConfig
 		{
-			get { return urlConfig; }	
+			get { return urlConfig; }
+			set { urlConfig = value; }
 		}
 
 		/// <summary>
@@ -232,6 +238,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		public bool CheckClientIsConnected
 		{
 			get { return checkClientIsConnected; }
+			set { checkClientIsConnected = value; }
 		}
 
 		/// <summary>
@@ -243,6 +250,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		public bool UseWindsorIntegration
 		{
 			get { return useWindsorIntegration; }
+			set { useWindsorIntegration = value; }
 		}
 
 		/// <summary>
@@ -255,6 +263,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		public bool MatchHostNameAndPath
 		{
 			get { return matchHostNameAndPath; }
+			set { matchHostNameAndPath = value; }
 		}
 
 		/// <summary>
@@ -264,15 +273,17 @@ namespace Castle.MonoRail.Framework.Configuration
 		public bool ExcludeAppPath
 		{
 			get { return excludeAppPath; }
+			set { excludeAppPath = value; }
 		}
 
 		/// <summary>
 		/// Gets the configuration section.
 		/// </summary>
 		/// <value>The configuration section.</value>
-		public XmlNode ConfigurationSection
+		public IConfiguration ConfigurationSection
 		{
 			get { return configurationSection; }
+			set { configurationSection = value; }
 		}
 
 		/// <summary>

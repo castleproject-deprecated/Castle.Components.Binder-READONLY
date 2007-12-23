@@ -15,7 +15,6 @@
 namespace Castle.MonoRail.Framework.Configuration
 {
 	using System;
-	using System.Xml;
 	using Castle.Core.Configuration;
 
 	/// <summary>
@@ -39,19 +38,19 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// Gets the controllers config.
 		/// </summary>
 		/// <value>The controllers config.</value>
-		ControllersConfig ControllersConfig { get; }
+		ControllersConfig ControllersConfig { get; set; }
 
 		/// <summary>
 		/// Gets the view components config.
 		/// </summary>
 		/// <value>The view components config.</value>
-		ViewComponentsConfig ViewComponentsConfig { get; }
+		ViewComponentsConfig ViewComponentsConfig { get; set; }
 
 		/// <summary>
 		/// Gets the routing rules.
 		/// </summary>
 		/// <value>The routing rules.</value>
-		RoutingRuleCollection RoutingRules { get; }
+		RoutingRuleCollection RoutingRules { get; set; }
 
 		/// <summary>
 		/// Gets the extension entries.
@@ -63,19 +62,19 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// Gets the custom filter factory.
 		/// </summary>
 		/// <value>The custom filter factory.</value>
-		Type CustomFilterFactory { get; }
+		Type CustomFilterFactory { get; set; }
 
 		/// <summary>
 		/// Gets the scaffold config.
 		/// </summary>
 		/// <value>The scaffold config.</value>
-		ScaffoldConfig ScaffoldConfig { get; }
+		ScaffoldConfig ScaffoldConfig { get; set; }
 
 		/// <summary>
 		/// Gets the url config.
 		/// </summary>
 		/// <value>The url config.</value>
-		UrlConfig UrlConfig { get; }
+		UrlConfig UrlConfig { get; set; }
 
 		/// <summary>
 		/// Gets a value indicating whether MR should check for client connection.
@@ -83,7 +82,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// <value>
 		/// 	<c>true</c> if it should check client is connected; otherwise, <c>false</c>.
 		/// </value>
-		bool CheckClientIsConnected { get; }
+		bool CheckClientIsConnected { get; set; }
 
 		/// <summary>
 		/// Gets a value indicating whether to use windsor integration.
@@ -124,6 +123,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// Gets the configuration section.
 		/// </summary>
 		/// <value>The configuration section.</value>
-		XmlNode ConfigurationSection { get; }
+		IConfiguration ConfigurationSection { get; set; }
 	}
 }

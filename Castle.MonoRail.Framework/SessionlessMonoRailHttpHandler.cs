@@ -29,5 +29,19 @@ namespace Castle.MonoRail.Framework
 			: base(engineContext, controller, context, true)
 		{
 		}
+
+		/// <summary>
+		/// Overriden to prevent acquiring a session from the custom session
+		/// </summary>
+		protected override void AcquireCustomSession()
+		{
+		}
+
+		/// <summary>
+		/// Overriden to prevent persisting a session to the custom session
+		/// </summary>
+		protected override void PersistCustomSession()
+		{
+		}
 	}
 }

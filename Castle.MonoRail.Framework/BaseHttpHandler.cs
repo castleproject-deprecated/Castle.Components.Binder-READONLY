@@ -88,13 +88,19 @@ namespace Castle.MonoRail.Framework
 			context.Items["mr.propertybag"] = controllerContext.PropertyBag;
 			context.Items["mr.session"] = context.Session;
 
+			AcquireCustomSession();
+
 			try
 			{
 				controller.Process(engineContext, controllerContext);
 			}
 			catch(Exception ex)
 			{
-				throw new MonoRailException("Error processing action " +
+				engineContext.LastException = ex;
+
+				engineContext.Services.ExtensionManager.RaiseUnhandledError(engineContext);
+
+				throw new MonoRailException("Error processing MonoRail request. Action " +
 				                            controllerContext.Action + " on controller " + controllerContext.Name, ex);
 			}
 			finally
@@ -103,6 +109,8 @@ namespace Castle.MonoRail.Framework
 				{
 					PersistFlashItems();
 				}
+
+				PersistCustomSession();
 
 				ReleaseController(controller);
 			}
@@ -136,6 +144,22 @@ namespace Castle.MonoRail.Framework
 			{
 				return (IDictionary)session;
 			}	
+		}
+
+		/// <summary>
+		/// Acquires the custom session from the custom session.
+		/// </summary>
+		protected virtual void AcquireCustomSession()
+		{
+			engineContext.Services.ExtensionManager.RaiseAcquireRequestState(engineContext);
+		}
+
+		/// <summary>
+		/// Persists the custom session to the custom session.
+		/// </summary>
+		protected virtual void PersistCustomSession()
+		{
+			engineContext.Services.ExtensionManager.RaiseReleaseRequestState(engineContext);
 		}
 
 		private void ReleaseController(IController controller)

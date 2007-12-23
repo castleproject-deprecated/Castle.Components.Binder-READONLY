@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using Castle.Core;
+	using Castle.Core.Configuration;
 
 	/// <summary>
 	/// Contract for extensions that want to hook 
@@ -23,7 +24,7 @@ namespace Castle.MonoRail.Framework
 	/// <remarks>
 	/// Extensions implementations must be thread safe and stateless.
 	/// </remarks>
-	public interface IMonoRailExtension : IServiceEnabledComponent
+	public interface IMonoRailExtension : IMRServiceEnabled
 	{
 		/// <summary>
 		/// Gives to the extension implementor a chance to read 

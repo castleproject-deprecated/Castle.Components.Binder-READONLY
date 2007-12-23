@@ -118,5 +118,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The static resource registry.</value>
 		IStaticResourceRegistry StaticResourceRegistry { get; set; }
+
+		/// <summary>
+		/// Gets or sets the extension manager.
+		/// </summary>
+		/// <value>The extension manager.</value>
+		ExtensionManager ExtensionManager { get; set; }
 	}
 }

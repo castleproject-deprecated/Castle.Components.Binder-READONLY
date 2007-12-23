@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Container
 {
 	using System;
+	using System.Configuration;
 	using Castle.Components.Validator;
 	using Castle.Core;
 	using Castle.Core.Configuration;
@@ -171,6 +172,7 @@ namespace Castle.MonoRail.Framework.Container
 		private IScaffoldingSupport scaffoldSupportCached;
 		private IJSONSerializer jsonSerializerCached;
 		private IStaticResourceRegistry staticResourceRegCached;
+		private ExtensionManager extensionManager;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultMonoRailContainer"/> class.
@@ -227,7 +229,8 @@ namespace Castle.MonoRail.Framework.Container
 				AddService(typeof(IControllerFactory), controllerFactory);
 			}
 
-			IControllerContextFactory controllerCtxFactory = (IControllerContextFactory) Parent.GetService(typeof(IControllerContextFactory));
+			IControllerContextFactory controllerCtxFactory =
+				(IControllerContextFactory) Parent.GetService(typeof(IControllerContextFactory));
 			if (controllerCtxFactory != null)
 			{
 				AddService(typeof(IControllerContextFactory), controllerCtxFactory);
@@ -251,13 +254,15 @@ namespace Castle.MonoRail.Framework.Container
 				AddService(typeof(IFilterFactory), filterFactory);
 			}
 
-			IControllerDescriptorProvider controllerDescriptorProvider = (IControllerDescriptorProvider) Parent.GetService(typeof(IControllerDescriptorProvider));
+			IControllerDescriptorProvider controllerDescriptorProvider =
+				(IControllerDescriptorProvider) Parent.GetService(typeof(IControllerDescriptorProvider));
 			if (controllerDescriptorProvider != null)
 			{
 				AddService(typeof(IControllerDescriptorProvider), controllerDescriptorProvider);
 			}
 
-			ITransformFilterDescriptorProvider transformFilterDescriptorProvider = (ITransformFilterDescriptorProvider) Parent.GetService(typeof(ITransformFilterDescriptorProvider));
+			ITransformFilterDescriptorProvider transformFilterDescriptorProvider =
+				(ITransformFilterDescriptorProvider) Parent.GetService(typeof(ITransformFilterDescriptorProvider));
 			if (transformFilterDescriptorProvider != null)
 			{
 				AddService(typeof(ITransformFilterDescriptorProvider), transformFilterDescriptorProvider);
@@ -281,7 +286,8 @@ namespace Castle.MonoRail.Framework.Container
 				AddService(typeof(IJSONSerializer), jsonSerializer);
 			}
 
-			IStaticResourceRegistry staticResourceRegistry = (IStaticResourceRegistry) Parent.GetService(typeof(IStaticResourceRegistry));
+			IStaticResourceRegistry staticResourceRegistry =
+				(IStaticResourceRegistry) Parent.GetService(typeof(IStaticResourceRegistry));
 			if (staticResourceRegistry != null)
 			{
 				AddService(typeof(IStaticResourceRegistry), staticResourceRegistry);
@@ -380,6 +386,29 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<IStaticResourceRegistry>())
 			{
 				AddService<IStaticResourceRegistry>(CreateService<DefaultStaticResourceRegistry>());
+			}
+		}
+
+		/// <summary>
+		/// Initialize extensions and start the extension manager.
+		/// </summary>
+		public void StartExtensionManager()
+		{
+			extensionManager = new ExtensionManager(this);
+
+			AddService(typeof(ExtensionManager), extensionManager);
+
+			IMonoRailConfiguration config = GetService<IMonoRailConfiguration>();
+
+			foreach(ExtensionEntry entry in config.ExtensionEntries)
+			{
+				AssertImplementsService(typeof(IMonoRailExtension), entry.ExtensionType);
+
+				IMonoRailExtension extension = (IMonoRailExtension) CreateService(entry.ExtensionType);
+
+				extension.SetExtensionConfigNode(entry.ExtensionNode);
+
+				extensionManager.Extensions.Add(extension);
 			}
 		}
 
@@ -709,6 +738,16 @@ namespace Castle.MonoRail.Framework.Container
 			set { staticResourceRegCached = value; }
 		}
 
+		/// <summary>
+		/// Gets or sets the extension manager.
+		/// </summary>
+		/// <value>The extension manager.</value>
+		public ExtensionManager ExtensionManager
+		{
+			get { return extensionManager; }
+			set { extensionManager = value; }
+		}
+
 		#endregion
 
 		private void RegisterServiceOverrideFromConfigurationNode(IConfiguration serviceConfig)
@@ -829,6 +868,16 @@ namespace Castle.MonoRail.Framework.Container
 //					return typeof(IViewComponentDescriptorProvider);
 				default:
 					throw new NotSupportedException("Id not supported " + id);
+			}
+		}
+
+		private static void AssertImplementsService(Type service, Type impl)
+		{
+			if (!service.IsAssignableFrom(impl))
+			{
+				String message = String.Format("Initialization Exception: " +
+											   "Service {0} does not implement or extend {1}", impl.FullName, service.FullName);
+				throw new ConfigurationErrorsException(message);
 			}
 		}
 	}

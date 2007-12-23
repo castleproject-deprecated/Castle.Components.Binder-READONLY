@@ -944,6 +944,8 @@ namespace Castle.MonoRail.Framework
 			{
 				actionException = (ex is TargetInvocationException) ? ex.InnerException : ex;
 				engineContext.LastException = actionException;
+
+				RaiseOnActionExceptionOnExtension();
 			}
 			finally
 			{
@@ -1511,6 +1513,11 @@ namespace Castle.MonoRail.Framework
 		private void ResetIsPostback()
 		{
 			resetIsPostBack = true;
+		}
+
+		private void RaiseOnActionExceptionOnExtension()
+		{
+			engineContext.Services.ExtensionManager.RaiseActionError(engineContext);
 		}
 	}
 }
