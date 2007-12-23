@@ -116,7 +116,7 @@ namespace Castle.MonoRail.Framework.ViewComponents
 		{
 			collProperty = rootNode.GetType().GetProperty(collectionPropertyName, BindingFlags.Public | BindingFlags.Instance);
 
-			inlineStyleImagesDir = inlineStyleImagesDir ?? string.Format("{0}/content/images", HandlerContext.ApplicationPath);
+			inlineStyleImagesDir = inlineStyleImagesDir ?? string.Format("{0}/content/images", EngineContext.ApplicationPath);
 
 			base.Initialize();
 		}

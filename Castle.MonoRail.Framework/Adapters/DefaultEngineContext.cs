@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Adapters
 {
 	using System;
+	using System.Security.Principal;
 	using System.Web;
 	using System.Collections;
 	using Castle.MonoRail.Framework;
@@ -203,16 +204,16 @@ namespace Castle.MonoRail.Framework.Adapters
 //		{
 //			_context.Server.Transfer(path, preserveForm);
 //		}
-//
-//		/// <summary>
-//		/// Gets or sets the current user.
-//		/// </summary>
-//		/// <value></value>
-//		public IPrincipal CurrentUser
-//		{
-//			get { return _context.User; }
-//			set { _context.User = value; }
-//		}
+
+		/// <summary>
+		/// Gets or sets the current user.
+		/// </summary>
+		/// <value></value>
+		public IPrincipal CurrentUser
+		{
+			get { return context.User; }
+			set { context.User = value; }
+		}
 
 		/// <summary>
 		/// Returns the <see cref="UrlInfo"/> of the the current request.

@@ -20,7 +20,6 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 	using System.IO;
 	using System.Collections;
 	using System.Reflection;
-	using JSGeneration;
 
 	/// <summary>
 	/// Default implementation of a <see cref="IViewEngine"/>.

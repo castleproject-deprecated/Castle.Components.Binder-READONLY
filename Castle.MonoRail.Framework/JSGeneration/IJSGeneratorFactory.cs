@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.Providers
+namespace Castle.MonoRail.Framework.JSGeneration
 {
-	using System;
-	using Descriptors;
-
 	/// <summary>
 	/// Pendent
 	/// </summary>
-	public interface IViewComponentDescriptorProvider : IProvider
+	public interface IJSGeneratorFactory
 	{
 		/// <summary>
-		/// Pendent
+		/// Creates the a JS generator using the
+		/// specified library as underlying implementation.
 		/// </summary>
-		/// <param name="viewComponentType">Type of the view component.</param>
+		/// <param name="library">The library.</param>
 		/// <returns></returns>
-		ViewComponentDescriptor Collect(Type viewComponentType);
+		IJSGenerator Create(string library);
 	}
 }

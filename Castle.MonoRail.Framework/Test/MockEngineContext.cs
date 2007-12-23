@@ -42,7 +42,7 @@ namespace Castle.MonoRail.Framework.Test
 //		private readonly List<RenderedEmailTemplate> renderedEmailTemplates = new List<RenderedEmailTemplate>();
 //		private readonly List<Message> messagesSent = new List<Message>();
 //		private IServiceProvider container;
-//		private IPrincipal currentUser;
+		private IPrincipal currentUser;
 		private Exception lastException;
 		private IDictionary session = new HybridDictionary(true);
 		private IController currentController;
@@ -178,18 +178,17 @@ namespace Castle.MonoRail.Framework.Test
 //		/// <param name="preserveForm"></param>
 //		public virtual void Transfer(string path, bool preserveForm)
 //		{
-//			throw new NotImplementedException();
 //		}
-//
-//		/// <summary>
-//		/// Gets or sets the current user.
-//		/// </summary>
-//		/// <value></value>
-//		public IPrincipal CurrentUser
-//		{
-//			get { return currentUser; }
-//			set { currentUser = value; }
-//		}
+
+		/// <summary>
+		/// Gets or sets the current user.
+		/// </summary>
+		/// <value></value>
+		public IPrincipal CurrentUser
+		{
+			get { return currentUser; }
+			set { currentUser = value; }
+		}
 
 		/// <summary>
 		/// Gets the last exception raised during

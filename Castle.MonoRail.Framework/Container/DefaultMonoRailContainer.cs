@@ -80,10 +80,10 @@ namespace Castle.MonoRail.Framework.Container
 			/// The <see cref="IFilterFactory"/> service.
 			/// </summary>
 			FilterFactory,
-//			/// <summary>
-//			/// The <see cref="IViewComponentFactory"/> service
-//			/// </summary>
-//			ViewComponentFactory,
+			/// <summary>
+			/// The <see cref="IViewComponentFactory"/> service
+			/// </summary>
+			ViewComponentFactory,
 //			/// <summary>
 //			/// The <see cref="IEmailSender"/> service.
 //			/// </summary>
@@ -96,10 +96,10 @@ namespace Castle.MonoRail.Framework.Container
 			/// The <see cref="IResourceDescriptorProvider"/> service
 			/// </summary>
 			ResourceDescriptorProvider,
-//			/// <summary>
-//			/// The <see cref="IViewComponentDescriptorProvider"/> service
-//			/// </summary>
-//			ViewComponentDescriptorProvider,
+			/// <summary>
+			/// The <see cref="IViewComponentDescriptorProvider"/> service
+			/// </summary>
+			ViewComponentDescriptorProvider,
 			/// <summary>
 			/// The <see cref="IRescueDescriptorProvider"/> service
 			/// </summary>
@@ -124,14 +124,10 @@ namespace Castle.MonoRail.Framework.Container
 //			/// The <see cref="IEmailTemplateService"/> service
 //			/// </summary>
 //			EmailTemplateService,
-//			/// <summary>
-//			/// The <see cref="IScaffoldingSupport"/> service
-//			/// </summary>
-//			ScaffoldingSupport,
-//			/// <summary>
-//			/// The <see cref="IControllerLifecycleExecutorFactory"/> service
-//			/// </summary>
-//			ExecutorFactory,
+			/// <summary>
+			/// The <see cref="IScaffoldingSupport"/> service
+			/// </summary>
+			ScaffoldingSupport,
 			/// <summary>
 			/// The <see cref="ITransformFilterDescriptorProvider"/> service
 			/// </summary>
@@ -386,6 +382,18 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<IStaticResourceRegistry>())
 			{
 				AddService<IStaticResourceRegistry>(CreateService<DefaultStaticResourceRegistry>());
+			}
+			if (!HasService<IViewComponentRegistry>())
+			{
+				AddService<IViewComponentRegistry>(CreateService<DefaultViewComponentRegistry>());
+			}
+			if (!HasService<IViewComponentFactory>())
+			{
+				AddService<IViewComponentFactory>(CreateService<DefaultViewComponentFactory>());
+			}
+			if (!HasService<IViewComponentDescriptorProvider>())
+			{
+				AddService<IViewComponentDescriptorProvider>(CreateService<DefaultViewComponentDescriptorProvider>());
 			}
 		}
 
@@ -852,14 +860,12 @@ namespace Castle.MonoRail.Framework.Container
 					return typeof(IValidatorRegistry);
 //				case ServiceIdentification.EmailSender:
 //					return typeof(IEmailSender);
-//				case ServiceIdentification.ViewComponentFactory:
-//					return typeof(IViewComponentFactory);
-//				case ServiceIdentification.ScaffoldingSupport:
-//					return typeof(IScaffoldingSupport);
+				case ServiceIdentification.ViewComponentFactory:
+					return typeof(IViewComponentFactory);
+				case ServiceIdentification.ScaffoldingSupport:
+					return typeof(IScaffoldingSupport);
 //				case ServiceIdentification.EmailTemplateService:
 //					return typeof(IEmailTemplateService);
-//				case ServiceIdentification.ExecutorFactory:
-//					return typeof(IControllerLifecycleExecutorFactory);
 //				case ServiceIdentification.TransformationFilterFactory:
 //					return typeof(ITransformFilterFactory);
 //				case ServiceIdentification.AjaxProxyGenerator:

@@ -17,7 +17,8 @@ namespace Castle.MonoRail.Framework.Providers
 	using System;
 	using System.Collections.Generic;
 	using Castle.MonoRail.Framework;
-	using Castle.MonoRail.Framework.ViewComponents;
+	using Descriptors;
+	using ViewComponents;
 
 	/// <summary>
 	/// Creates <see cref="ViewComponentDescriptor"/> from attributes 
@@ -25,7 +26,8 @@ namespace Castle.MonoRail.Framework.Providers
 	/// </summary>
 	public class DefaultViewComponentDescriptorProvider : IViewComponentDescriptorProvider
 	{
-		private readonly IDictionary<Type, ViewComponentDescriptor> type2Desc = new Dictionary<Type, ViewComponentDescriptor>();
+		private readonly IDictionary<Type, ViewComponentDescriptor> type2Desc =
+			new Dictionary<Type, ViewComponentDescriptor>();
 
 		/// <summary>
 		/// Services the specified provider.
@@ -73,12 +75,12 @@ namespace Castle.MonoRail.Framework.Providers
 					try
 					{
 						generator = (IViewComponentCacheKeyGenerator)
-							Activator.CreateInstance(details.CacheKeyFactory);
+						            Activator.CreateInstance(details.CacheKeyFactory);
 					}
 					catch(Exception ex)
 					{
 						throw new MonoRailException(
-							"Could not instantiate IViewComponentCacheKeyGenerator implementation or " + 
+							"Could not instantiate IViewComponentCacheKeyGenerator implementation or " +
 							"it does not implement this interface. Type: " + details.CacheKeyFactory.FullName, ex);
 					}
 				}

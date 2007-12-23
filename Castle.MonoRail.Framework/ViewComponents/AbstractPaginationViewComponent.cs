@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework.ViewComponents
 	using System.Collections;
 	using System.IO;
 	using Helpers;
+	using Services;
 
 	/// <summary>
 	/// Pendent
@@ -178,7 +179,7 @@ namespace Castle.MonoRail.Framework.ViewComponents
 				urlPartsBuilder.QueryString[pageParamName] = pageIndex.ToString();
 			}
 
-			return urlPartsBuilder.BuildPathForLink(HandlerContext.Server);
+			return urlPartsBuilder.BuildPathForLink(EngineContext.Server);
 		}
 
 		private void CreateUrlPartBuilder()
@@ -189,8 +190,8 @@ namespace Castle.MonoRail.Framework.ViewComponents
 			{
 				urlParams["encode"] = "true";
 
-				IUrlBuilder urlBuilder = HandlerContext.GetService<IUrlBuilder>();
-				urlPartsBuilder = urlBuilder.CreateUrlPartsBuilder(HandlerContext.UrlInfo, urlParams);
+				IUrlBuilder urlBuilder = EngineContext.Services.GetService<IUrlBuilder>();
+				urlPartsBuilder = urlBuilder.CreateUrlPartsBuilder(EngineContext.UrlInfo, urlParams);
 			}
 			else
 			{
@@ -200,7 +201,7 @@ namespace Castle.MonoRail.Framework.ViewComponents
 				}
 				else
 				{
-					urlPartsBuilder = new UrlPartsBuilder(HandlerContext.Request.FilePath);
+					urlPartsBuilder = new UrlPartsBuilder(EngineContext.Request.FilePath);
 				}
 			}
 		}

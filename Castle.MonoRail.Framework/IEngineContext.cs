@@ -81,11 +81,11 @@ namespace Castle.MonoRail.Framework
 //		/// <param name="path"></param>
 //		/// <param name="preserveForm"></param>
 //		void Transfer( String path, bool preserveForm );
-//
-//		/// <summary>
-//		/// Gets or sets the current user.
-//		/// </summary>
-//		IPrincipal CurrentUser { get; set; }
+
+		/// <summary>
+		/// Gets or sets the current user.
+		/// </summary>
+		IPrincipal CurrentUser { get; set; }
 
 		/// <summary>
 		/// Gets the last exception raised during

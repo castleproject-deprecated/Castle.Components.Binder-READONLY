@@ -14,7 +14,6 @@
 
 namespace Castle.MonoRail.Framework.Tests.Controllers
 {
-	using Castle.MonoRail.Framework.Providers;
 	using Castle.MonoRail.Framework.Services;
 	using Descriptors;
 	using NUnit.Framework;

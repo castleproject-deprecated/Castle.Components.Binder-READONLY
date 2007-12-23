@@ -134,6 +134,8 @@
     <Compile Include="Attributes\SkipFilterAttribute.cs" />
     <Compile Include="Attributes\SkipRescueAttribute.cs" />
     <Compile Include="Attributes\TransformFilterAttribute.cs" />
+    <Compile Include="Attributes\ViewComponentDetailsAttribute.cs" />
+    <Compile Include="Attributes\ViewComponentParamAttribute.cs" />
     <Compile Include="BaseExecutableAction.cs" />
     <Compile Include="BaseHttpHandler.cs" />
     <Compile Include="CacheKey.cs" />
@@ -170,6 +172,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DelegateDynamicAction.cs" />
+    <Compile Include="Descriptors\ViewComponentDescriptor.cs" />
     <Compile Include="DynamicActionExecutor.cs" />
     <Compile Include="Extensions\ExceptionChaining\AbstractExceptionHandler.cs" />
     <Compile Include="Extensions\ExceptionChaining\EmailHandler.cs" />
@@ -238,6 +241,7 @@
     <Compile Include="Internal\ActionProviderUtil.cs" />
     <Compile Include="Internal\RescueUtils.cs" />
     <Compile Include="Internal\Test\TestContextHolder.cs" />
+    <Compile Include="Internal\ViewComponentCacheBag.cs" />
     <Compile Include="Internal\WizardUtils.cs" />
     <Compile Include="IParameterBinder.cs" />
     <Compile Include="ISubActionSelector.cs" />
@@ -249,6 +253,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JSGeneration\DynamicDispatchSupport.cs" />
+    <Compile Include="JSGeneration\IJSGeneratorFactory.cs" />
     <Compile Include="JSGeneration\JSCollectionGeneratorBase.cs" />
     <Compile Include="JSGeneration\JSElementGeneratorBase.cs" />
     <Compile Include="JSGeneration\JSGeneratorDispatcherBase.cs">
@@ -263,6 +268,7 @@
     <Compile Include="Providers\DefaultRescueDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultResourceDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultTransformFilterDescriptorProvider.cs" />
+    <Compile Include="Providers\DefaultViewComponentDescriptorProvider.cs" />
     <Compile Include="Providers\IFilterDescriptorProvider.cs" />
     <Compile Include="Providers\IHelperDescriptorProvider.cs" />
     <Compile Include="Providers\ILayoutDescriptorProvider.cs" />
@@ -318,6 +324,7 @@
     <Compile Include="IViewEngine.cs" />
     <Compile Include="IViewSource.cs" />
     <Compile Include="IViewSourceLoader.cs" />
+    <Compile Include="Providers\IViewComponentDescriptorProvider.cs" />
     <Compile Include="ResourceFileHandler.cs" />
     <Compile Include="Routing\IRoutingRule.cs" />
     <Compile Include="Routing\RouteMatch.cs" />
@@ -325,6 +332,7 @@
     <Compile Include="Services\AbstractControllerFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Services\AbstractViewComponentFactory.cs" />
     <Compile Include="Services\AjaxProxyGenerator\IAjaxProxyGenerator.cs" />
     <Compile Include="Services\DefaultActionSelector.cs" />
     <Compile Include="Services\DefaultCacheProvider.cs" />
@@ -339,6 +347,8 @@
     <Compile Include="Services\DefaultResourceFactory.cs" />
     <Compile Include="Services\DefaultStaticResourceRegistry.cs" />
     <Compile Include="Services\DefaultUrlBuilder.cs" />
+    <Compile Include="Services\DefaultViewComponentFactory.cs" />
+    <Compile Include="Services\DefaultViewComponentRegistry.cs" />
     <Compile Include="Services\DefaultViewEngineManager.cs" />
     <Compile Include="Services\IControllerContextFactory.cs" />
     <Compile Include="Services\IControllerFactory.cs">
@@ -350,6 +360,7 @@
     <Compile Include="Services\IFilterFactory.cs" />
     <Compile Include="Services\IJSONSerializer.cs" />
     <Compile Include="Services\IStaticResourceRegistry.cs" />
+    <Compile Include="Services\IViewComponentFactory.cs" />
     <Compile Include="Services\IViewComponentRegistry.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -429,6 +440,23 @@
     <Compile Include="TransformFilters\LowerCaseTransformFilter.cs" />
     <Compile Include="TransformFilters\UpperCaseTransformFilter.cs" />
     <Compile Include="TransformFilters\WikiTransformFilter.cs" />
+    <Compile Include="ViewComponent.cs" />
+    <Compile Include="ViewComponentException.cs" />
+    <Compile Include="ViewComponents\AbstractPaginationViewComponent.cs" />
+    <Compile Include="ViewComponents\AlwaysCacheKeyGenerator.cs" />
+    <Compile Include="ViewComponents\AuthenticatedContent.cs" />
+    <Compile Include="ViewComponents\CaptureFor.cs" />
+    <Compile Include="ViewComponents\ChildContentComponent.cs" />
+    <Compile Include="ViewComponents\ColumnRenderer.cs" />
+    <Compile Include="ViewComponents\DiggStylePagination.cs" />
+    <Compile Include="ViewComponents\IViewComponentCacheKeyGenerator.cs" />
+    <Compile Include="ViewComponents\IViewComponentContext.cs" />
+    <Compile Include="ViewComponents\SecurityComponent.cs" />
+    <Compile Include="ViewComponents\SelectStylePagination.cs" />
+    <Compile Include="ViewComponents\SiteMapComponent.cs" />
+    <Compile Include="ViewComponents\TreeMakerComponent.cs" />
+    <Compile Include="ViewComponents\UpdatePage.cs" />
+    <Compile Include="ViewComponents\UpdatePageTag.cs" />
     <Compile Include="Views\Aspx\Contents.cs" />
     <Compile Include="Views\Aspx\EventUtil.cs" />
     <Compile Include="Views\Aspx\MasterPageBase.cs">
@@ -505,6 +533,9 @@
     <EmbeddedResource Include="JSResources\ZebdaValidation.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="JSGeneration\jQuery\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

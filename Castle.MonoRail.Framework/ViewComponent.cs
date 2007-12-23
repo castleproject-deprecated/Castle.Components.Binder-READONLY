@@ -76,10 +76,10 @@ namespace Castle.MonoRail.Framework
 		private IViewComponentContext context;
 
 		/// <summary>
-		/// Holds the <see cref="IHandlerContext"/> associated
+		/// Holds the <see cref="IEngineContext"/> associated
 		/// to the request lifetime.
 		/// </summary>
-		private IHandlerContext handlerContext;
+		private IEngineContext engineContext;
 
 		/// <summary>
 		/// Holds a reference to the <see cref="ViewComponentDetailsAttribute"/> if any.
@@ -106,9 +106,9 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="context">Request context</param>
 		/// <param name="componentContext">ViewComponent context</param>
-		public void Init(IHandlerContext context, IViewComponentContext componentContext)
+		public void Init(IEngineContext context, IViewComponentContext componentContext)
 		{
-			handlerContext = context;
+			engineContext = context;
 			this.context = componentContext;
 
 			BindComponentParameters();
@@ -236,12 +236,12 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
-		/// Gets the <see cref="IHandlerContext"/>
+		/// Gets the <see cref="IEngineContext"/>
 		/// associated with the current request
 		/// </summary>
-		protected IHandlerContext HandlerContext
+		protected IEngineContext EngineContext
 		{
-			get { return handlerContext; }
+			get { return engineContext; }
 		}
 
 		/// <summary>
@@ -257,7 +257,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected IDictionary Session
 		{
-			get { return handlerContext.Session; }
+			get { return engineContext.Session; }
 		}
 
 		/// <summary>
@@ -266,7 +266,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected Flash Flash
 		{
-			get { return handlerContext.Flash; }
+			get { return engineContext.Flash; }
 		}
 
 		/// <summary>
@@ -274,7 +274,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected HttpContext HttpContext
 		{
-			get { return handlerContext.UnderlyingContext; }
+			get { return engineContext.UnderlyingContext; }
 		}
 
 		/// <summary>
@@ -282,7 +282,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected IRequest Request
 		{
-			get { return handlerContext.Request; }
+			get { return engineContext.Request; }
 		}
 
 		/// <summary>
@@ -290,7 +290,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected IResponse Response
 		{
-			get { return handlerContext.Response; }
+			get { return engineContext.Response; }
 		}
 
 		/// <summary>

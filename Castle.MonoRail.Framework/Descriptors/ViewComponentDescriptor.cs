@@ -15,7 +15,6 @@
 namespace Castle.MonoRail.Framework.Descriptors
 {
 	using Castle.MonoRail.Framework;
-	using Castle.MonoRail.Framework.ViewComponents;
 
 	/// <summary>
 	/// Represents a <see cref="ViewComponent"/> cache configuration.
