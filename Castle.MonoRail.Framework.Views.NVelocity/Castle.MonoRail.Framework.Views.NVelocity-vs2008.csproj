@@ -117,9 +117,6 @@
     </Compile>
     <Compile Include="CustomTemplate.cs" />
     <Compile Include="Helpers\StaticAccessorHelper.cs" />
-    <Compile Include="JSGeneration\JSCollectionGeneratorDuck.cs" />
-    <Compile Include="JSGeneration\JSElementGeneratorDuck.cs" />
-    <Compile Include="JSGeneration\JSGeneratorDuck.cs" />
     <Compile Include="NVelocityViewContextAdapter.cs" />
     <Compile Include="NVelocityViewEngine.cs">
       <SubType>Code</SubType>

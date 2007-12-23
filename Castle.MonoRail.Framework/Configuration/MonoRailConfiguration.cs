@@ -28,7 +28,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		private static readonly String SectionName = "monorail";
 		private static readonly String AlternativeSectionName = "monoRail";
 
-		private bool checkClientIsConnected, useWindsorIntegration, matchHostNameAndPath, excludeAppPath;
+		private bool matchHostNameAndPath, excludeAppPath;
 		private Type customFilterFactory;
 		private IConfiguration configurationSection;
 
@@ -59,7 +59,7 @@ namespace Castle.MonoRail.Framework.Configuration
 			extensions = new ExtensionEntryCollection();
 			defaultUrls = new DefaultUrlCollection();
 
-			checkClientIsConnected = false;
+			// old routing support related
 			matchHostNameAndPath = false;
 			excludeAppPath = false;
 		}
@@ -118,25 +118,6 @@ namespace Castle.MonoRail.Framework.Configuration
 			if (services != null)
 			{
 				servicesConfig = XmlConfigurationDeserializer.GetDeserializedNode(services);
-			}
-
-			XmlAttribute checkClientIsConnectedAtt = node.Attributes["checkClientIsConnected"];
-
-			if (checkClientIsConnectedAtt != null && checkClientIsConnectedAtt.Value != String.Empty)
-			{
-				checkClientIsConnected = String.Compare(checkClientIsConnectedAtt.Value, "true", true) == 0;
-			}
-
-			XmlAttribute useWindsorAtt = node.Attributes["useWindsorIntegration"];
-
-			if (useWindsorAtt != null && useWindsorAtt.Value != String.Empty)
-			{
-				useWindsorIntegration = String.Compare(useWindsorAtt.Value, "true", true) == 0;
-
-//				if (useWindsorIntegration)
-//				{
-//					ConfigureWindsorIntegration();
-//				}
 			}
 		}
 
@@ -227,18 +208,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		{
 			get { return urlConfig; }
 			set { urlConfig = value; }
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether MR should check for client connection.
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if it should check client is connected; otherwise, <c>false</c>.
-		/// </value>
-		public bool CheckClientIsConnected
-		{
-			get { return checkClientIsConnected; }
-			set { checkClientIsConnected = value; }
 		}
 
 		/// <summary>

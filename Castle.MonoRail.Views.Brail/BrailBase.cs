@@ -39,7 +39,7 @@ namespace Castle.MonoRail.Views.Brail
 		/// </summary>
 		protected TextWriter childOutput;
 
-		protected IRailsEngineContext context;
+		protected IEngineContext context;
 		private TextWriter outputStream;
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace Castle.MonoRail.Views.Brail
 		/// <param name="output">The output.</param>
 		/// <param name="context">The context.</param>
 		/// <param name="__controller">The controller.</param>
-		public BrailBase(BooViewEngine viewEngine, TextWriter output, IRailsEngineContext context, Controller __controller)
+		public BrailBase(BooViewEngine viewEngine, TextWriter output, IEngineContext context, Controller __controller)
 		{
 			this.viewEngine = viewEngine;
 			outputStream = output;
@@ -72,7 +72,6 @@ namespace Castle.MonoRail.Views.Brail
 			this.__controller = __controller;
 			InitProperties(context, __controller);
 		}
-
 
 		/// <summary>
 		///The path of the script, this is filled by AddBrailBaseClassStep
@@ -385,7 +384,7 @@ namespace Castle.MonoRail.Views.Brail
 		/// </summary>
 		/// <param name="myContext"></param>
 		/// <param name="myController"></param>
-		private void InitProperties(IRailsEngineContext myContext, IController myController)
+		private void InitProperties(IEngineContext myContext, IController myController)
 		{
 			properties = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 			//properties.Add("dsl", new DslWrapper(this));

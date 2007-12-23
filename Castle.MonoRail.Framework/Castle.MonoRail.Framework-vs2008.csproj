@@ -252,16 +252,6 @@
     <Compile Include="IWizardStepPage.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JSGeneration\DynamicDispatchSupport.cs" />
-    <Compile Include="JSGeneration\IJSGeneratorFactory.cs" />
-    <Compile Include="JSGeneration\JSCollectionGeneratorBase.cs" />
-    <Compile Include="JSGeneration\JSElementGeneratorBase.cs" />
-    <Compile Include="JSGeneration\JSGeneratorDispatcherBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="JSGeneration\Prototype\JSCollectionGenerator.cs" />
-    <Compile Include="JSGeneration\Prototype\JSElementGenerator.cs" />
-    <Compile Include="JSGeneration\Prototype\JSGenerator.cs" />
     <Compile Include="Providers\DefaultFilterDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultHelperDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultLayoutDescriptorProvider.cs" />
@@ -280,9 +270,6 @@
     <Compile Include="IResponse.cs" />
     <Compile Include="ITransformFilter.cs" />
     <Compile Include="IViewEngineManager.cs" />
-    <Compile Include="JSGeneration\IJSCollectionGenerator.cs" />
-    <Compile Include="JSGeneration\IJSElementGenerator.cs" />
-    <Compile Include="JSGeneration\IJSGenerator.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="IController.cs">
       <SubType>Code</SubType>
@@ -455,8 +442,6 @@
     <Compile Include="ViewComponents\SelectStylePagination.cs" />
     <Compile Include="ViewComponents\SiteMapComponent.cs" />
     <Compile Include="ViewComponents\TreeMakerComponent.cs" />
-    <Compile Include="ViewComponents\UpdatePage.cs" />
-    <Compile Include="ViewComponents\UpdatePageTag.cs" />
     <Compile Include="Views\Aspx\Contents.cs" />
     <Compile Include="Views\Aspx\EventUtil.cs" />
     <Compile Include="Views\Aspx\MasterPageBase.cs">
@@ -535,7 +520,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="JSGeneration\jQuery\" />
+    <Folder Include="JSGeneration\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

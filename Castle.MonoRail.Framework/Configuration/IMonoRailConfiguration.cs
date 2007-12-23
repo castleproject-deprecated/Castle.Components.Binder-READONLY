@@ -77,14 +77,6 @@ namespace Castle.MonoRail.Framework.Configuration
 		UrlConfig UrlConfig { get; set; }
 
 		/// <summary>
-		/// Gets a value indicating whether MR should check for client connection.
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if it should check client is connected; otherwise, <c>false</c>.
-		/// </value>
-		bool CheckClientIsConnected { get; set; }
-
-		/// <summary>
 		/// Gets a value indicating whether match host name and path should be used on 
 		/// MonoRail routing.
 		/// </summary>
