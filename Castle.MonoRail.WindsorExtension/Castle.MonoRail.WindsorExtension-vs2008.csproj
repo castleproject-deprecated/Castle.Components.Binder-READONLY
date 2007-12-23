@@ -113,10 +113,17 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ControllerTreeAccessor.cs" />
+    <Compile Include="DefaultWizardPageFactory.cs" />
+    <Compile Include="IWizardPageFactory.cs" />
     <Compile Include="RailsFacility.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="WindsorContainerAccessorUtil.cs" />
+    <Compile Include="WindsorControllerFactory.cs" />
+    <Compile Include="WindsorFilterFactory.cs" />
+    <Compile Include="WindsorMonoRailSectionHandler.cs" />
+    <Compile Include="WindsorViewComponentFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\CastleKey.snk">

@@ -15,10 +15,7 @@
 namespace Castle.MonoRail.WindsorExtension
 {
 	using System;
-
-	using Castle.Windsor;
 	using Castle.MicroKernel;
-
 	using Castle.MonoRail.Framework;
 
 	/// <summary>
@@ -28,34 +25,45 @@ namespace Castle.MonoRail.WindsorExtension
 	/// </summary>
 	public class WindsorControllerFactory : IControllerFactory
 	{
-		public Controller CreateController(UrlInfo urlInfo)
-		{
-			IWindsorContainer container = WindsorContainerAccessorUtil.ObtainContainer();
+		private readonly IKernel kernel;
 
+		public WindsorControllerFactory(IKernel kernel)
+		{
+			this.kernel = kernel;
+		}
+
+		public IController CreateController(string area, string controller)
+		{
 			IControllerTree tree;
 			
 			try
 			{
-				tree = (IControllerTree) container["rails.controllertree"];
+				tree = (IControllerTree) kernel["rails.controllertree"];
 			}
 			catch(ComponentNotFoundException)
 			{
 				throw new MonoRailException("ControllerTree not found. Check whether RailsFacility is properly configured/registered");
 			}
 
-			Type implType = tree.GetController(urlInfo.Area, urlInfo.Controller);
+			Type implType = tree.GetController(area, controller);
 
 			if (implType == null)
 			{
-				throw new ControllerNotFoundException(urlInfo);
+				throw new ControllerNotFoundException(area, controller);
 			}
 
-			return (Controller) container[implType];
+			return (Controller) kernel[implType];
 		}
 
-		public void Release(Controller controller)
+
+		public IController CreateController(Type controllerType)
 		{
-			WindsorContainerAccessorUtil.ObtainContainer().Release(controller);
+			return (IController) kernel.Resolve(controllerType);
+		}
+
+		public void Release(IController controller)
+		{
+			kernel.ReleaseComponent(controller);
 		}
 	}
 }

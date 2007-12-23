@@ -17,6 +17,9 @@ namespace Castle.MonoRail.WindsorExtension
 	using Castle.Core;
 	using Castle.MicroKernel.Facilities;
 	using Castle.MonoRail.Framework;
+	using Castle.MonoRail.Framework.Descriptors;
+	using Castle.MonoRail.Framework.Services;
+	using Castle.MonoRail.Framework.Services.Utils;
 
 	/// <summary>
 	/// Facility responsible for registering the controllers in
@@ -24,8 +27,8 @@ namespace Castle.MonoRail.WindsorExtension
 	/// </summary>
 	public class RailsFacility : AbstractFacility
 	{
-//		private IControllerTree controllerTree;
-//		private IViewComponentRegistry componentRegistry;
+		private IControllerTree controllerTree;
+		private IViewComponentRegistry componentRegistry;
 
 		public RailsFacility()
 		{
@@ -33,56 +36,52 @@ namespace Castle.MonoRail.WindsorExtension
 
 		protected override void Init()
 		{
-			RegisterWindsorLocationWithinMonoRail();
+			RegisterWindsorLocatorStrategyWithinMonoRail();
 
-//			Kernel.AddComponent("rails.controllertree", typeof(IControllerTree), typeof(DefaultControllerTree));
-//			Kernel.AddComponent("rails.wizardpagefactory", typeof(IWizardPageFactory), typeof(DefaultWizardPageFactory));
-//			Kernel.AddComponent("rails.viewcomponentregistry", typeof(IViewComponentRegistry), typeof(DefaultViewComponentRegistry));
-//
-//			controllerTree = (IControllerTree) Kernel["rails.controllertree"];
-//			componentRegistry = (IViewComponentRegistry) Kernel["rails.viewcomponentregistry"];
-//
-//			Kernel.ComponentModelCreated += OnComponentModelCreated;
-//
-//			AddBuiltInControllers();
+			Kernel.AddComponent("mr.controllertree", typeof(IControllerTree), typeof(DefaultControllerTree));
+			Kernel.AddComponent("mr.wizardpagefactory", typeof(IWizardPageFactory), typeof(DefaultWizardPageFactory));
+			Kernel.AddComponent("mr.viewcomponentregistry", typeof(IViewComponentRegistry), typeof(DefaultViewComponentRegistry));
+			Kernel.AddComponent("mr.controllerfactory", typeof(IControllerFactory), typeof(WindsorControllerFactory));
+			Kernel.AddComponent("mr.filterFactory", typeof(IFilterFactory), typeof(WindsorFilterFactory));
+			Kernel.AddComponent("mr.viewcompfactory", typeof(IFilterFactory), typeof(WindsorViewComponentFactory));
+
+			controllerTree = (IControllerTree) Kernel["rails.controllertree"];
+			componentRegistry = (IViewComponentRegistry) Kernel["rails.viewcomponentregistry"];
+
+			Kernel.ComponentModelCreated += OnComponentModelCreated;
 		}
 
-		private void RegisterWindsorLocationWithinMonoRail()
+		private void RegisterWindsorLocatorStrategyWithinMonoRail()
 		{
 			ServiceProviderLocator.Instance.AddLocatorStrategy(new WindsorAccessorStrategy());
 		}
 
-//		protected virtual void AddBuiltInControllers()
-//		{
-//			Kernel.AddComponent("files", typeof(FilesController), typeof(FilesController));
-//		}
-//
-//		private void OnComponentModelCreated(ComponentModel model)
-//		{
-//			bool isController = typeof(Controller).IsAssignableFrom(model.Implementation);
-//			bool isViewComponent = typeof(ViewComponent).IsAssignableFrom(model.Implementation);
-//
-//			if (!isController && !isViewComponent)
-//			{
-//				return;
-//			}
-//
-//			// Ensure it's transient
-//			model.LifestyleType = LifestyleType.Transient;
-//			model.InspectionBehavior = PropertiesInspectionBehavior.DeclaredOnly;
-//
-//			if (isController)
-//			{
-//				ControllerDescriptor descriptor = ControllerInspectionUtil.Inspect(model.Implementation);
-//
-//				controllerTree.AddController(descriptor.Area, descriptor.Name, model.Implementation);
-//			}
-//
-//			if (isViewComponent)
-//			{
-//				componentRegistry.AddViewComponent(model.Name, model.Implementation);
-//			}
-//		}
+		private void OnComponentModelCreated(ComponentModel model)
+		{
+			bool isController = typeof(Controller).IsAssignableFrom(model.Implementation);
+			bool isViewComponent = typeof(ViewComponent).IsAssignableFrom(model.Implementation);
+
+			if (!isController && !isViewComponent)
+			{
+				return;
+			}
+
+			// Ensure it's transient
+			model.LifestyleType = LifestyleType.Transient;
+			model.InspectionBehavior = PropertiesInspectionBehavior.DeclaredOnly;
+
+			if (isController)
+			{
+				ControllerDescriptor descriptor = ControllerInspectionUtil.Inspect(model.Implementation);
+
+				controllerTree.AddController(descriptor.Area, descriptor.Name, model.Implementation);
+			}
+
+			if (isViewComponent)
+			{
+				componentRegistry.AddViewComponent(model.Name, model.Implementation);
+			}
+		}
 
 		public class WindsorAccessorStrategy : ServiceProviderLocator.IAccessorStrategy
 		{
