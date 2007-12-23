@@ -20,84 +20,89 @@ namespace Castle.MonoRail.Views.Brail
 	using Boo.Lang;
 
 	public class HtmlExtension : IDslLanguageExtension
-    {
-        readonly private TextWriter _output = null;
-        public HtmlExtension(TextWriter output)
-        {
-            _output = output;
-        }
+	{
+		private readonly TextWriter _output = null;
 
-        public TextWriter Output
-        {
-            get { return _output; }
-        }
+		public HtmlExtension(TextWriter output)
+		{
+			_output = output;
+		}
 
-        private void BlockTag(string tag, IDictionary attributes, ICallable block)
-        {
-            Output.Write("<{0}", tag);
+		public TextWriter Output
+		{
+			get { return _output; }
+		}
 
-            List<string> attributeValues = new List<string>();
+		#region IDslLanguageExtension Members
 
-            if (null != attributes)
-            {
-                foreach (DictionaryEntry entry in attributes)
-                {
-                    attributeValues.Add(string.Format("{0}=\"{1}\"", entry.Key, entry.Value));
-                }
-            }
+		public void Tag(string name)
+		{
+			BlockTag(name, null, null);
+		}
 
-            if (0 != attributeValues.Count)
-            {
-                Output.Write(" ");
-                Output.Write(string.Join(" ", attributeValues.ToArray()));
-            }
+		public void Tag(string name, ICallable block)
+		{
+			BlockTag(name, null, block);
+		}
 
-            Output.Write(">");
-            if(block!=null)
-            {
-                block.Call(null);
-            }
-            Output.Write("</{0}>", tag);
-        }
+		public void Tag(string name, IDictionary attributes, ICallable block)
+		{
+			BlockTag(name, attributes, block);
+		}
 
-        public void html(ICallable block)
-        {
-            BlockTag("html", null, block);
-        }
+		public void Flush()
+		{
+			//no op
+		}
 
-        public void text(string value)
-        {
-            Output.Write(value);
-        }
+		#endregion
 
-        public void p(ICallable block)
-        {
-            p(null, block);
-        }
+		private void BlockTag(string tag, IDictionary attributes, ICallable block)
+		{
+			Output.Write("<{0}", tag);
 
-        public void p(IDictionary attributes, ICallable block)
-        {
-            BlockTag("p", attributes, block);
-        }
+			List<string> attributeValues = new List<string>();
 
-        public void Tag(string name)
-        {
-            BlockTag(name,null,null);
-        }
+			if (null != attributes)
+			{
+				foreach(DictionaryEntry entry in attributes)
+				{
+					attributeValues.Add(string.Format("{0}=\"{1}\"", entry.Key, entry.Value));
+				}
+			}
 
-        public void Tag(string name, ICallable block)
-        {
-            BlockTag(name, null, block);
-        }
+			if (0 != attributeValues.Count)
+			{
+				Output.Write(" ");
+				Output.Write(string.Join(" ", attributeValues.ToArray()));
+			}
 
-        public void Tag(string name, IDictionary attributes, ICallable block)
-        {
-            BlockTag(name, attributes,block);
-        }
+			Output.Write(">");
+			if (block != null)
+			{
+				block.Call(null);
+			}
+			Output.Write("</{0}>", tag);
+		}
 
-        public void Flush()
-        {
-            //no op
-        }
-    }
+		public void html(ICallable block)
+		{
+			BlockTag("html", null, block);
+		}
+
+		public void text(string value)
+		{
+			Output.Write(value);
+		}
+
+		public void p(ICallable block)
+		{
+			p(null, block);
+		}
+
+		public void p(IDictionary attributes, ICallable block)
+		{
+			BlockTag("p", attributes, block);
+		}
+	}
 }

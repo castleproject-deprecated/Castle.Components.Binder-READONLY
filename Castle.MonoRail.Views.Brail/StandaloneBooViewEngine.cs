@@ -18,20 +18,20 @@ namespace Castle.MonoRail.Views.Brail
 	using Framework;
 	using System.Collections;
 
-	public class IndependentBooViewEngine
+	public class StandaloneBooViewEngine
 	{
-		readonly BooViewEngine bve = new BooViewEngine();
+		private readonly BooViewEngine bve = new BooViewEngine();
 
-		public BooViewEngineOptions Options
-		{
-			get { return bve.Options; }
-		}
-
-		public IndependentBooViewEngine(IViewSourceLoader viewSourceLoader, BooViewEngineOptions options)
+		public StandaloneBooViewEngine(IViewSourceLoader viewSourceLoader, BooViewEngineOptions options)
 		{
 			bve.Options = options;
 			bve.SetViewSourceLoader(viewSourceLoader);
 			bve.Initialize();
+		}
+
+		public BooViewEngineOptions Options
+		{
+			get { return bve.Options; }
 		}
 
 		public void Process(string templateName, TextWriter output, IDictionary parameters)
@@ -42,8 +42,12 @@ namespace Castle.MonoRail.Views.Brail
 			bve.Process(templateName, output, null, controller, context);
 		}
 
+		#region Nested type: DummyController
+
 		private class DummyController : Controller
 		{
 		}
+
+		#endregion
 	}
 }

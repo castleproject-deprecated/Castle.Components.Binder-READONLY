@@ -18,11 +18,11 @@ namespace Castle.MonoRail.Views.Brail
 	using Boo.Lang;
 
 	public interface IDslLanguageExtension
-    {
-        void Tag(string name);
-        void Tag(string name, ICallable block);
-        void Tag(string name, IDictionary attributes, ICallable block);
+	{
+		void Tag(string name);
+		void Tag(string name, ICallable block);
+		void Tag(string name, IDictionary attributes, ICallable block);
 
-        void Flush();
-    }
+		void Flush();
+	}
 }

@@ -41,6 +41,7 @@ namespace Castle.MonoRail.Views.Brail
 		protected TextWriter childOutput;
 
 		protected IEngineContext context;
+		public string LastVariableAccessed;
 		private TextWriter outputStream;
 
 		/// <summary>
@@ -56,7 +57,6 @@ namespace Castle.MonoRail.Views.Brail
 		private IList viewComponentsParameters;
 
 		protected BooViewEngine viewEngine;
-		public string LastVariableAccessed;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BrailBase"/> class.
@@ -197,7 +197,8 @@ namespace Castle.MonoRail.Views.Brail
 		public void OutputSubView(string subviewName, TextWriter writer, IDictionary parameters)
 		{
 			string subViewFileName = GetSubViewFilename(subviewName);
-			BrailBase subView = viewEngine.GetCompiledScriptInstance(subViewFileName, writer, context, __controller, __controllerContext);
+			BrailBase subView =
+				viewEngine.GetCompiledScriptInstance(subViewFileName, writer, context, __controller, __controllerContext);
 			subView.SetParent(this);
 			foreach(DictionaryEntry entry in parameters)
 			{

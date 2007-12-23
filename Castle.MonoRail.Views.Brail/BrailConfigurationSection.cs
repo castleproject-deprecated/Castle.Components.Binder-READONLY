@@ -21,6 +21,8 @@ namespace Castle.MonoRail.Views.Brail
 
 	public class BrailConfigurationSection : IConfigurationSectionHandler
 	{
+		#region IConfigurationSectionHandler Members
+
 		public object Create(object parent, object configContext, XmlNode section)
 		{
 			BooViewEngineOptions options = new BooViewEngineOptions();
@@ -34,7 +36,7 @@ namespace Castle.MonoRail.Views.Brail
 				options.SaveDirectory = section.Attributes["saveDirectory"].Value;
 			if (section.Attributes["commonScriptsDirectory"] != null)
 				options.CommonScriptsDirectory = section.Attributes["commonScriptsDirectory"].Value;
-			foreach (XmlNode refence in section.SelectNodes("reference"))
+			foreach(XmlNode refence in section.SelectNodes("reference"))
 			{
 				XmlAttribute attribute = refence.Attributes["assembly"];
 				if (attribute == null)
@@ -43,7 +45,7 @@ namespace Castle.MonoRail.Views.Brail
 				options.AssembliesToReference.Add(asm);
 			}
 
-			foreach (XmlNode import in section.SelectNodes("import"))
+			foreach(XmlNode import in section.SelectNodes("import"))
 			{
 				XmlAttribute attribute = import.Attributes["namespace"];
 				if (attribute == null)
@@ -53,6 +55,8 @@ namespace Castle.MonoRail.Views.Brail
 			}
 			return options;
 		}
+
+		#endregion
 
 		private static Exception GetConfigurationException(string error)
 		{

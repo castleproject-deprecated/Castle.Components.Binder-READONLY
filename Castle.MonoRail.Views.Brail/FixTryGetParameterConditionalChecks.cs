@@ -75,7 +75,7 @@ namespace Castle.MonoRail.Views.Brail
 				);
 
 			MemberReferenceExpression isNull =
-                new MemberReferenceExpression(condition, "_IsIgnoreNullReferencingNotNullObject_");
+				new MemberReferenceExpression(condition, "_IsIgnoreNullReferencingNotNullObject_");
 
 			return isNull;
 		}

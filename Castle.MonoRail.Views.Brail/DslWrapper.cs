@@ -22,7 +22,10 @@ namespace Castle.MonoRail.Views.Brail
 
 	public class DslProvider : IQuackFu
 	{
+		private readonly IDictionary<string, MethodInfo> extensionMethods = new Dictionary<string, MethodInfo>();
 		private readonly BrailBase view = null;
+		private readonly IDictionary<string, MethodInfo> viewProperties = new Dictionary<string, MethodInfo>();
+		private IDslLanguageExtension currentExtension = null;
 
 		public DslProvider(BrailBase view)
 		{
@@ -36,30 +39,6 @@ namespace Castle.MonoRail.Views.Brail
 
 				viewProperties.Add(prop.Name, prop.GetGetMethod());
 			}
-		}
-
-		private IDslLanguageExtension currentExtension = null;
-		private readonly IDictionary<string, MethodInfo> extensionMethods = new Dictionary<string, MethodInfo>();
-		private readonly IDictionary<string, MethodInfo> viewProperties = new Dictionary<string, MethodInfo>();
-
-		public void Register(IDslLanguageExtension dslExtension)
-		{
-			if (currentExtension == null)
-			{
-				foreach(MethodInfo method in dslExtension.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance))
-				{
-					if (method.DeclaringType == typeof(object))
-						continue;
-					string name = CreateMethodKey(method.Name, method.GetParameters());
-					extensionMethods.Add(name, method);
-				}
-				currentExtension = dslExtension;
-			}
-		}
-
-		private string CreateMethodKey(string methodName, object[] parameters)
-		{
-			return string.Format("{0}_{1}", methodName, parameters.GetLength(0));
 		}
 
 		#region IQuackFu Members
@@ -110,5 +89,25 @@ namespace Castle.MonoRail.Views.Brail
 		}
 
 		#endregion
+
+		public void Register(IDslLanguageExtension dslExtension)
+		{
+			if (currentExtension == null)
+			{
+				foreach(MethodInfo method in dslExtension.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance))
+				{
+					if (method.DeclaringType == typeof(object))
+						continue;
+					string name = CreateMethodKey(method.Name, method.GetParameters());
+					extensionMethods.Add(name, method);
+				}
+				currentExtension = dslExtension;
+			}
+		}
+
+		private string CreateMethodKey(string methodName, object[] parameters)
+		{
+			return string.Format("{0}_{1}", methodName, parameters.GetLength(0));
+		}
 	}
 }
