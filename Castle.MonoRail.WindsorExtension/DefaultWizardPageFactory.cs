@@ -15,7 +15,6 @@
 namespace Castle.MonoRail.WindsorExtension
 {
 	using System;
-
 	using Castle.MicroKernel;
 	using Castle.MonoRail.Framework;
 

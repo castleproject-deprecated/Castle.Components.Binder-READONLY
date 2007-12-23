@@ -235,7 +235,7 @@ namespace Castle.MonoRail.Framework
 		/// <returns></returns>
 		protected virtual IMonoRailContainer CreateDefaultMonoRailContainer(IServiceProviderEx userServiceProvider)
 		{
-			DefaultMonoRailContainer container = new DefaultMonoRailContainer();
+			DefaultMonoRailContainer container = new DefaultMonoRailContainer(userServiceProvider);
 
 			container.UseServicesFromParent();
 			container.Configure(Configuration);

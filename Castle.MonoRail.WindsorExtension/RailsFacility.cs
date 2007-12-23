@@ -30,10 +30,6 @@ namespace Castle.MonoRail.WindsorExtension
 		private IControllerTree controllerTree;
 		private IViewComponentRegistry componentRegistry;
 
-		public RailsFacility()
-		{
-		}
-
 		protected override void Init()
 		{
 			RegisterWindsorLocatorStrategyWithinMonoRail();
@@ -45,8 +41,8 @@ namespace Castle.MonoRail.WindsorExtension
 			Kernel.AddComponent("mr.filterFactory", typeof(IFilterFactory), typeof(WindsorFilterFactory));
 			Kernel.AddComponent("mr.viewcompfactory", typeof(IFilterFactory), typeof(WindsorViewComponentFactory));
 
-			controllerTree = (IControllerTree) Kernel["rails.controllertree"];
-			componentRegistry = (IViewComponentRegistry) Kernel["rails.viewcomponentregistry"];
+			controllerTree = Kernel.Resolve<IControllerTree>();
+			componentRegistry = Kernel.Resolve<IViewComponentRegistry>();
 
 			Kernel.ComponentModelCreated += OnComponentModelCreated;
 		}
@@ -58,7 +54,7 @@ namespace Castle.MonoRail.WindsorExtension
 
 		private void OnComponentModelCreated(ComponentModel model)
 		{
-			bool isController = typeof(Controller).IsAssignableFrom(model.Implementation);
+			bool isController = typeof(IController).IsAssignableFrom(model.Implementation);
 			bool isViewComponent = typeof(ViewComponent).IsAssignableFrom(model.Implementation);
 
 			if (!isController && !isViewComponent)

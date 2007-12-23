@@ -270,6 +270,18 @@ namespace Castle.MonoRail.Framework.Container
 				AddService(typeof(IViewEngineManager), viewEngManager);
 			}
 
+			IViewComponentFactory viewComponentFactory = (IViewComponentFactory) Parent.GetService(typeof(IViewComponentFactory));
+			if (viewComponentFactory != null)
+			{
+				AddService(typeof(IViewComponentFactory), viewComponentFactory);
+			}
+
+			IViewComponentRegistry viewComponentRegistry = (IViewComponentRegistry) Parent.GetService(typeof(IViewComponentRegistry));
+			if (viewComponentRegistry != null)
+			{
+				AddService(typeof(IViewComponentRegistry), viewComponentRegistry);
+			}
+
 			IValidatorRegistry validatorRegistry = (IValidatorRegistry) Parent.GetService(typeof(IValidatorRegistry));
 			if (validatorRegistry != null)
 			{

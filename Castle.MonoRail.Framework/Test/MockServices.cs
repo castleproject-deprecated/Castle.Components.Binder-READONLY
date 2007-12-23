@@ -247,7 +247,7 @@
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public T GetService<T>()
+		public T GetService<T>() where T : class
 		{
 			return (T) service2Impl[typeof(T)];
 		}

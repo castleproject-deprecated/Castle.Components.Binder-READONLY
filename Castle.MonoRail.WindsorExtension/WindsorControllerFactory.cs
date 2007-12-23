@@ -25,36 +25,27 @@ namespace Castle.MonoRail.WindsorExtension
 	/// </summary>
 	public class WindsorControllerFactory : IControllerFactory
 	{
+		private readonly IControllerTree controllerTree;
 		private readonly IKernel kernel;
 
-		public WindsorControllerFactory(IKernel kernel)
+		public WindsorControllerFactory(IControllerTree controllerTree, IKernel kernel)
 		{
+			this.controllerTree = controllerTree;
 			this.kernel = kernel;
 		}
 
 		public IController CreateController(string area, string controller)
 		{
-			IControllerTree tree;
-			
-			try
-			{
-				tree = (IControllerTree) kernel["rails.controllertree"];
-			}
-			catch(ComponentNotFoundException)
-			{
-				throw new MonoRailException("ControllerTree not found. Check whether RailsFacility is properly configured/registered");
-			}
-
-			Type implType = tree.GetController(area, controller);
+			Type implType = controllerTree.GetController(area, controller);
 
 			if (implType == null)
 			{
-				throw new ControllerNotFoundException(area, controller);
+				throw new ControllerNotFoundException("Controller not found on the Windsor container instance. " +
+					"Have you registered it? Name: '" + controller + "' area: '" + area + "'");
 			}
 
-			return (Controller) kernel[implType];
+			return CreateController(implType);
 		}
-
 
 		public IController CreateController(Type controllerType)
 		{

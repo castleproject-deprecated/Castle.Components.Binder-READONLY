@@ -29,6 +29,14 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ControllerNotFoundException"/> class.
 		/// </summary>
+		/// <param name="message">The message.</param>
+		public ControllerNotFoundException(string message) : base(message)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ControllerNotFoundException"/> class.
+		/// </summary>
 		/// <param name="area">The area.</param>
 		/// <param name="controller">The controller.</param>
 		public ControllerNotFoundException(String area, String controller) : base(BuildExceptionMessage(area, controller))
