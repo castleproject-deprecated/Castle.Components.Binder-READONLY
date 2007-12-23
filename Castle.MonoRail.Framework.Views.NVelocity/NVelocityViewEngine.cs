@@ -59,8 +59,8 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 
 			// Set up a custom directive manager
-//			props.SetProperty("directive.manager",
-//			                  "Castle.MonoRail.Framework.Views.NVelocity.CustomDirectiveManager; Castle.MonoRail.Framework.Views.NVelocity");
+			props.SetProperty("directive.manager",
+			                  "Castle.MonoRail.Framework.Views.NVelocity.CustomDirectiveManager; Castle.MonoRail.Framework.Views.NVelocity");
 
 			InitializeVelocityProperties(props);
 

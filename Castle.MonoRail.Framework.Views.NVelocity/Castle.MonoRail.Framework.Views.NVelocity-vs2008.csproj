@@ -105,6 +105,13 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CustomDirectiveManager.cs" />
+    <Compile Include="CustomDirectives\AbstractComponentDirective.cs" />
+    <Compile Include="CustomDirectives\BlockComponentDirective.cs" />
+    <Compile Include="CustomDirectives\CaptureForDirective.cs" />
+    <Compile Include="CustomDirectives\ComponentDirective.cs" />
+    <Compile Include="CustomDirectives\IViewRenderer.cs" />
+    <Compile Include="CustomDirectives\SubSectionDirective.cs" />
     <Compile Include="CustomResourceManager.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -113,6 +120,7 @@
     <Compile Include="JSGeneration\JSCollectionGeneratorDuck.cs" />
     <Compile Include="JSGeneration\JSElementGeneratorDuck.cs" />
     <Compile Include="JSGeneration\JSGeneratorDuck.cs" />
+    <Compile Include="NVelocityViewContextAdapter.cs" />
     <Compile Include="NVelocityViewEngine.cs">
       <SubType>Code</SubType>
     </Compile>
