@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text;
-
 namespace Castle.MonoRail.Views.Brail
 {
 	using System.Collections;
@@ -27,8 +24,8 @@ namespace Castle.MonoRail.Views.Brail
 		bool saveToDisk;
 		string commonScriptsDirectory = "CommonScripts";
 		string saveDirectory = "Brail_Generated_Code";
-		IList assembliesToReference = new ArrayList();
-		IList namespacesToImport = new ArrayList();
+	    readonly IList assembliesToReference = new ArrayList();
+	    readonly IList namespacesToImport = new ArrayList();
 
 		public bool Debug
 		{
@@ -74,6 +71,7 @@ namespace Castle.MonoRail.Views.Brail
 		{
 			AssembliesToReference.Add(typeof(BooViewEngineOptions).Assembly);//Brail's assembly
 			AssembliesToReference.Add(typeof(Controller).Assembly);//MonoRail.Framework's assembly
+            AssembliesToReference.Add(typeof(Boo.Lang.Extensions.AssertMacro).Assembly);//Boo.Lang.Extensions assembly
 		}
 	}
 }

@@ -14,10 +14,10 @@
 
 namespace Castle.MonoRail.Views.Brail
 {
-	using System;
 	using Boo.Lang.Compiler.Ast;
 	using Boo.Lang.Compiler.Steps;
 	using Boo.Lang.Compiler.TypeSystem;
+
 	///<summary>
 	/// Replace any uknown identifier with a call to GetParameter('unknown')
 	/// this mean that unknonw identifier in scripts will only fail in run time if they

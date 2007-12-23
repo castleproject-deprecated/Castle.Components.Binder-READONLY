@@ -19,7 +19,6 @@ namespace Castle.MonoRail.Framework.Tests
 	using System;
 	using System.Collections;
 	using System.IO;
-	using JSGeneration;
 	using NUnit.Framework;
 
 	[TestFixture]

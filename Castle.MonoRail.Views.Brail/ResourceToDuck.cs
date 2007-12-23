@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text;
-
 namespace Castle.MonoRail.Views.Brail
 {
 	using System.Collections;
