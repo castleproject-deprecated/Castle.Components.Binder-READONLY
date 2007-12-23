@@ -20,7 +20,7 @@ namespace Castle.MonoRail.Framework.JSGeneration
 	/// Abstract class that contains the shared logic of JS Generation, separated from
 	/// the various view engines implementations
 	/// </summary>
-	public abstract class JSGeneratorBase
+	public abstract class JSGeneratorDispatcherBase
 	{
 		/// <summary>
 		/// The generator instance
@@ -28,10 +28,10 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		protected readonly IJSGenerator generator;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="JSGeneratorBase"/> class.
+		/// Initializes a new instance of the <see cref="JSGeneratorDispatcherBase"/> class.
 		/// </summary>
 		/// <param name="generator">The generator.</param>
-		protected JSGeneratorBase(IJSGenerator generator)
+		protected JSGeneratorDispatcherBase(IJSGenerator generator)
 		{
 			this.generator = generator;
 		}
@@ -77,7 +77,7 @@ namespace Castle.MonoRail.Framework.JSGeneration
 			DynamicDispatchSupport dispInterface = generator as DynamicDispatchSupport;
 			if (dispInterface == null)
 			{
-				throw new MonoRail.Framework.MonoRailException("JS Generators must inherit DynamicDispatchSupport");
+				throw new MonoRailException("JS Generators must inherit DynamicDispatchSupport");
 			}
 
 			if (dispInterface.IsGeneratorMethod(method))

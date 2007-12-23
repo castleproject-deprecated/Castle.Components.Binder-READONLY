@@ -106,7 +106,7 @@ namespace Castle.MonoRail.Framework.Tests.Configuration
 			get { return _jsGeneratorFileExtension; }
 		}
 
-		public override IJSGenerator CreateJSGenerator(IEngineContext context)
+		public override object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}

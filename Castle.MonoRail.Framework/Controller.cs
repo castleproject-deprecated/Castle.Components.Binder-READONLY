@@ -1159,7 +1159,7 @@ namespace Castle.MonoRail.Framework
 				}
 
 				// Also makes the helper available with a less verbose name
-				// FormHelper and Form, AjaxHelper and Ajax
+				// i.e. FormHelper and Form, AjaxHelper and Ajax
 				if (helperName.EndsWith("Helper"))
 				{
 					helpers[helperName.Substring(0, helperName.Length - 6)] = helper;

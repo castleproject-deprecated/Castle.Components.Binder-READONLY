@@ -17,8 +17,7 @@ using NVelocity;
 namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 {
 	using System;
-	using Castle.MonoRail.Framework.Helpers;
-	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.JSGeneration;
 
 	/// <summary>
 	/// 

@@ -238,7 +238,7 @@ namespace Castle.MonoRail.Framework.Tests
 		/// </summary>
 		/// <param name="context">The request context.</param>
 		/// <returns>A JS generator instance</returns>
-		public override IJSGenerator CreateJSGenerator(IEngineContext context)
+		public override object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}

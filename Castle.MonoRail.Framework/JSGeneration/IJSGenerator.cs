@@ -426,19 +426,6 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		void AppendLine(String content);
 
 		/// <summary>
-		/// Dump the operations recorded so far as javascript code. 
-		/// </summary>
-		/// 
-		/// <returns></returns>
-		string ToString();
-
-		/// <summary>
-		/// Gets the js lines.
-		/// </summary>
-		/// <value>The js lines.</value>
-		StringBuilder Lines { get; }
-
-		/// <summary>
 		/// Creates a generator for a collection.
 		/// </summary>
 		/// <param name="root">The root expression.</param>
@@ -451,5 +438,18 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		/// <param name="root">The root expression.</param>
 		/// <returns></returns>
 		IJSElementGenerator CreateElementGenerator(string root);
+
+		/// <summary>
+		/// Gets the js lines.
+		/// </summary>
+		/// <value>The js lines.</value>
+		StringBuilder Lines { get; }
+
+		/// <summary>
+		/// Dump the operations recorded so far as javascript code. 
+		/// </summary>
+		/// 
+		/// <returns></returns>
+		string ToString();
 	}
 }

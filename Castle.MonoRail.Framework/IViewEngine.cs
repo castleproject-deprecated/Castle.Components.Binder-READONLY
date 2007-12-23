@@ -50,8 +50,10 @@ namespace Castle.MonoRail.Framework
 		/// the view engine supports JS generation.
 		/// </summary>
 		/// <param name="context">The request context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <returns>A JS generator instance</returns>
-		IJSGenerator CreateJSGenerator(IEngineContext context);
+		object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Processes the js generation view template - using the templateName

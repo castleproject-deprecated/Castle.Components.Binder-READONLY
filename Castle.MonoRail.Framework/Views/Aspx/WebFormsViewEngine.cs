@@ -138,8 +138,10 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// Creates the JS generator.
 		/// </summary>
 		/// <param name="context">The context.</param>
-		/// <returns></returns>
-		public override IJSGenerator CreateJSGenerator(IEngineContext context)
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns>A JS generator instance</returns>
+		public override object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}

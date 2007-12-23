@@ -17,10 +17,8 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Configuration;
 	using System.IO;
-
 	using Castle.Core;
 	using Castle.Core.Logging;
-	using JSGeneration;
 
 	/// <summary>
 	/// Abstract base class for View Engines.
@@ -92,8 +90,10 @@ namespace Castle.MonoRail.Framework
 		/// the view engine supports JS generation.
 		/// </summary>
 		/// <param name="context">The request context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <returns>A JS generator instance</returns>
-		public abstract IJSGenerator CreateJSGenerator(IEngineContext context);
+		public abstract object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Processes the js generation view template - using the templateName

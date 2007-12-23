@@ -17,13 +17,12 @@ using NVelocity;
 namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 {
 	using System;
-	using Castle.MonoRail.Framework.Helpers;
-	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.JSGeneration;
 
 	/// <summary>
 	/// 
 	/// </summary>
-	public class JSGeneratorDuck : JSGeneratorBase, IDuck
+	public class JSGeneratorDuck : JSGeneratorDispatcherBase, IDuck
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="JSGeneratorDuck"/> class.

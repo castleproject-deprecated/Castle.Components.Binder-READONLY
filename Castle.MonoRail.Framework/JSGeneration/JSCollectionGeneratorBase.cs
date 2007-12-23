@@ -14,6 +14,8 @@
 
 namespace Castle.MonoRail.Framework.JSGeneration
 {
+	using Prototype;
+
 	/// <summary>
 	/// Collection related generator
 	/// </summary>
@@ -48,8 +50,8 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		/// <returns>value back to the template</returns>
 		protected void InternalGet(string propName)
 		{
-			PrototypeHelper.JSGenerator.ReplaceTailByPeriod(parentGenerator);
-			PrototypeHelper.JSGenerator.Record(parentGenerator, propName);
+			JSGenerator.ReplaceTailByPeriod(parentGenerator);
+			JSGenerator.Record(parentGenerator, propName);
 		}
 
 		/// <summary>
@@ -62,15 +64,13 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		{
 			if (method == "set")
 			{
-				PrototypeHelper.JSGenerator.RemoveTail(parentGenerator);
-
-				PrototypeHelper.JSGenerator.Record(parentGenerator, " = " + args[0]);
-
+				JSGenerator.RemoveTail(parentGenerator);
+				JSGenerator.Record(parentGenerator, " = " + args[0]);
 				return null;
 			}
 			else
 			{
-				PrototypeHelper.JSGenerator.ReplaceTailByPeriod(parentGenerator);
+				JSGenerator.ReplaceTailByPeriod(parentGenerator);
 				DynamicDispatchSupport dispInterface = generator as DynamicDispatchSupport;
 				if (dispInterface == null)
 				{

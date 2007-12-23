@@ -23,9 +23,9 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	using System.IO;
 	using System.Collections;
 	using Castle.Core;
-	using Castle.MonoRail.Framework.JSGeneration;
-//	using Castle.MonoRail.Framework.Views.NVelocity.JSGeneration;
+	using Castle.MonoRail.Framework.JSGeneration.Prototype;
 	using Commons.Collections;
+	using JSGeneration;
 
 	/// <summary>
 	/// Implements a view engine using the popular Velocity syntax.
@@ -143,7 +143,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 				else
 				{
 					// No layout so render direct to the output
-					writer = context.Response.Output;
+					writer = output;
 				}
 
 				String view = ResolveTemplateName(viewName);
@@ -160,7 +160,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 				if (hasLayout)
 				{
 					String contents = (writer as StringWriter).GetStringBuilder().ToString();
-					ProcessLayout(contents, controller, controllerContext, ctx, context);
+					ProcessLayout(contents, controller, controllerContext, ctx, context, output);
 				}
 			}
 			catch(Exception ex)
@@ -196,17 +196,17 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 		}
 
-		public override IJSGenerator CreateJSGenerator(IEngineContext context)
+		public override object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
-			return null;
-//			return new JSGeneratorDuck(new PrototypeHelper.JSGenerator(context));
+			return new JSGeneratorDuck(new JSGenerator(context, controller, controllerContext));
 		}
 
-		public override void GenerateJS(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext)
+		public override void GenerateJS(String templateName, TextWriter output, IEngineContext context, IController controller,
+		                                IControllerContext controllerContext)
 		{
 			IContext ctx = CreateContext(context, controller, controllerContext);
 
-			object generator = CreateJSGenerator(context);
+			object generator = CreateJSGenerator(context, controller, controllerContext);
 
 			ctx.Put("page", generator);
 
@@ -236,7 +236,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		}
 
 		public override void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller,
-		                                     IControllerContext controllerContext)
+		                                              IControllerContext controllerContext)
 		{
 			IContext ctx = CreateContext(context, controller, controllerContext);
 			AdjustContentType(context);
@@ -245,7 +245,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 			if (hasLayout)
 			{
-				ProcessLayout(contents, controller, controllerContext, ctx, context);
+				ProcessLayout(contents, controller, controllerContext, ctx, context, context.Response.Output);
 			}
 			else
 			{
@@ -292,13 +292,13 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		}
 
 		private void ProcessLayout(String contents, IController controller, IControllerContext controllerContext, IContext ctx,
-		                           IEngineContext context)
+		                           IEngineContext context, TextWriter output)
 		{
 			String layout = ResolveLayoutTemplateName(controllerContext.LayoutName);
 
 			BeforeApplyingLayout(layout, ref contents, controller, ctx, context);
 
-			RenderLayout(layout, contents, ctx, context, context.Response.Output);
+			RenderLayout(layout, contents, ctx, context, output);
 		}
 
 		protected virtual void BeforeApplyingLayout(string layout, ref string contents,

@@ -21,7 +21,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 	using System.Reflection;
 	using System.Text;
 	using System.Text.RegularExpressions;
-	using Helpers;
+	using Castle.MonoRail.Framework.Helpers;
 
 	/// <summary>
 	/// Pendent
@@ -116,7 +116,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		{
 			position = Enum.Parse(typeof(Position), position, true).ToString();
 
-			Call("new Insertion." + position, Quote(id), Render(renderOptions));
+			Call("new Insertion." + position, AbstractHelper.Quote(id), Render(renderOptions));
 		}
 
 		/// <summary>
@@ -132,7 +132,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void ReplaceHtml(String id, object renderOptions)
 		{
-			Call("Element.update", Quote(id), Render(renderOptions));
+			Call("Element.update", AbstractHelper.Quote(id), Render(renderOptions));
 		}
 
 		/// <summary>
@@ -149,7 +149,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void Replace(String id, object renderOptions)
 		{
-			Call("Element.replace", Quote(id), Render(renderOptions));
+			Call("Element.replace", AbstractHelper.Quote(id), Render(renderOptions));
 		}
 
 		/// <summary>
@@ -167,7 +167,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void Show(params string[] ids)
 		{
-			Call("Element.show", Quote(ids));
+			Call("Element.show", AbstractHelper.Quote(ids));
 		}
 
 		/// <summary>
@@ -185,7 +185,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void Hide(params string[] ids)
 		{
-			Call("Element.hide", Quote(ids));
+			Call("Element.hide", AbstractHelper.Quote(ids));
 		}
 
 		/// <summary>
@@ -203,7 +203,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void Toggle(params string[] ids)
 		{
-			Call("Element.toggle", Quote(ids));
+			Call("Element.toggle", AbstractHelper.Quote(ids));
 		}
 
 		/// <summary>
@@ -221,7 +221,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void Remove(params string[] ids)
 		{
-			Record(this, "[" + BuildJSArguments(Quote(ids)) + "].each(Element.remove)");
+			Record(this, "[" + BuildJSArguments(AbstractHelper.Quote(ids)) + "].each(Element.remove)");
 		}
 
 		/// <summary>
@@ -236,7 +236,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void Alert(object message)
 		{
-			Call("alert", Quote(message));
+			Call("alert", AbstractHelper.Quote(message));
 		}
 
 		/// <summary>
@@ -270,7 +270,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 				target = url.ToString();
 			}
 
-			Assign("window.location.href", Quote(target));
+			Assign("window.location.href", AbstractHelper.Quote(target));
 		}
 
 		/// <summary>
@@ -444,7 +444,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 
 					StringWriter writer = new StringWriter();
 
-					viewEngineManager.ProcessPartial(writer, context, controller, controllerContext, partialName);
+					viewEngineManager.ProcessPartial(partialName, writer, context, controller, controllerContext);
 
 					renderOptions = writer.ToString();
 				}
@@ -454,7 +454,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 				}
 			}
 
-			return Quote(JsEscape(renderOptions.ToString()));
+			return AbstractHelper.Quote(JsEscape(renderOptions.ToString()));
 		}
 
 		/// <summary>
@@ -520,7 +520,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// <returns></returns>
 		public IJSCollectionGenerator CreateCollectionGenerator(string root)
 		{
-			return new PrototypeHelper.JSCollectionGenerator(this, root);
+			return new JSCollectionGenerator(this, root);
 		}
 
 		/// <summary>
@@ -530,7 +530,7 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// <returns></returns>
 		public IJSElementGenerator CreateElementGenerator(string root)
 		{
-			return new PrototypeHelper.JSElementGenerator(this, root);
+			return new JSElementGenerator(this, root);
 		}
 
 		#region Static members

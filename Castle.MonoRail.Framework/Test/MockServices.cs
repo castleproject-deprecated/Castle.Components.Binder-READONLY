@@ -68,6 +68,8 @@
 				new DefaultRescueDescriptorProvider(),
 				new DefaultResourceDescriptorProvider(),
 				new DefaultTransformFilterDescriptorProvider());
+
+			extensionManager = new ExtensionManager(this);
 		}
 
 		/// <summary>
