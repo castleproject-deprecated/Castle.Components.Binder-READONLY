@@ -126,6 +126,7 @@
     <None Include="contentinfs.vm" />
     <EmbeddedResource Include="Content\contentinassembly.vm" />
     <None Include="Content\notinassembly.vm" />
+    <Compile Include="Controllers\AccessibleThroughTestCase.cs" />
     <Compile Include="Actions\ActionMethodExecutorCompatibleTestCase.cs" />
     <Compile Include="Actions\ActionMethodExecutorTestCase.cs" />
     <Compile Include="Actions\DynamicActionExecutorTestCase.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Products\CartController.cs" />
     <Compile Include="Controllers\Products\ListController.cs" />
+    <Compile Include="ViewComponents\DefaultViewComponentRegistryTests.cs" />
     <Compile Include="FlashTestCase.cs" />
     <Compile Include="Handlers\ResourceFileHandlerTestCase.cs" />
     <Compile Include="Helpers\AbstractHelperTestCase.cs" />

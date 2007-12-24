@@ -115,6 +115,16 @@ namespace Castle.MonoRail.Framework.Tests
 		/// <summary>
 		/// Gets/sets the root directory of views, obtained from the configuration.
 		/// </summary>
+		/// <value></value>
+		public string VirtualViewDir
+		{
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
+		}
+
+		/// <summary>
+		/// Gets/sets the root directory of views, obtained from the configuration.
+		/// </summary>
 		public string ViewRootDir
 		{
 			get { throw new NotImplementedException(); }
