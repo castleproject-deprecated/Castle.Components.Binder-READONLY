@@ -144,6 +144,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Products\CartController.cs" />
     <Compile Include="Controllers\Products\ListController.cs" />
+    <Compile Include="Filters\ControllerLevelFiltersTestCase.cs" />
     <Compile Include="ViewComponents\DefaultViewComponentRegistryTests.cs" />
     <Compile Include="FlashTestCase.cs" />
     <Compile Include="Handlers\ResourceFileHandlerTestCase.cs" />
@@ -196,9 +197,6 @@
     <EmbeddedResource Include="Services\StaticResourceRegistry\DummyRes.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Filters\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
