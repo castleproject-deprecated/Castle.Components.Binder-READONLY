@@ -159,6 +159,11 @@
     <Compile Include="Helpers\TextHelperTestCase.cs" />
     <Compile Include="Helpers\ValidationHelperTestCase.cs" />
     <Compile Include="Helpers\Validations\FormValidationTestCase.cs" />
+    <Compile Include="JSGeneration\DynamicDispatcherTestCase.cs" />
+    <Compile Include="JSGeneration\JSCodeGeneratorTestCase.cs" />
+    <Compile Include="JSGeneration\JSGeneratorDispatcherBaseTestCase.cs" />
+    <Compile Include="JSGeneration\PrototypeElementGeneratorTestCase.cs" />
+    <Compile Include="JSGeneration\PrototypeGeneratorTestCase.cs" />
     <Compile Include="JSON\JsonDataBinderTestCase.cs" />
     <Compile Include="JSON\JsonHelperTestCase.cs" />
     <Compile Include="Rescues\ActionLevelRescuesTestCase.cs" />

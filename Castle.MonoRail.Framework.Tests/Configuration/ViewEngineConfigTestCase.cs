@@ -35,7 +35,9 @@ namespace Castle.MonoRail.Framework.Tests.Configuration
       <assembly>Castle.MonoRail.Framework.Tests</assembly>
     </controllers>
 
-    <viewEngine viewPathRoot=""" + viewFolder + @""">
+    <viewEngine viewPathRoot=""" +
+				viewFolder +
+				@""">
 
       <additionalSources>
         <assembly name=""Castle.MonoRail.Framework.Tests"" namespace=""Castle.MonoRail.Framework.Tests.Content"" />
@@ -54,13 +56,16 @@ namespace Castle.MonoRail.Framework.Tests.Configuration
 		[Test]
 		public void ShouldProcessAdditionalSourcesElement_IfConfiguringMultipleViewEngines()
 		{
-			string configXml = @"
+			string configXml =
+				@"
 			<monorail>
     <controllers>
       <assembly>Castle.MonoRail.Framework.Tests</assembly>
     </controllers>
 
-    <viewEngines viewPathRoot=""" + viewFolder + @""">
+    <viewEngines viewPathRoot=""" +
+				viewFolder +
+				@""">
 		<add type=""Castle.MonoRail.Framework.Tests.Configuration.TestViewEngine, Castle.MonoRail.Framework.Tests"" />
       <additionalSources>
         <assembly name=""Castle.MonoRail.Framework.Tests"" namespace=""Castle.MonoRail.Framework.Tests.Content"" />
@@ -105,13 +110,15 @@ namespace Castle.MonoRail.Framework.Tests.Configuration
 			get { return _jsGeneratorFileExtension; }
 		}
 
-		public override object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext)
+		public override object CreateJSGenerator(JSCodeGeneratorInfo generatorInfo,
+		                                         IEngineContext context, IController controller,
+		                                         IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override void GenerateJS(string templateName, TextWriter output, IEngineContext context, IController controller,
-		                                IControllerContext controllerContext)
+		public override void GenerateJS(string templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo,
+		                                IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 #pragma warning disable 67
 
 namespace Castle.MonoRail.Framework.Tests
@@ -40,7 +41,7 @@ namespace Castle.MonoRail.Framework.Tests
 			TestableViewEngineBase engine = new TestableViewEngineBase();
 			engine.Service(new TestServiceProvider(new TestViewSourceLoader()));
 			Assert.IsFalse(engine.IsTemplateForJSGeneration("view.testjs"),
-						   "This template does not 'exist' so it should have failed");
+			               "This template does not 'exist' so it should have failed");
 		}
 
 		[Test]
@@ -50,7 +51,7 @@ namespace Castle.MonoRail.Framework.Tests
 			TestableViewEngineBase engine = new TestableViewEngineBase();
 			engine.Service(new TestServiceProvider(new TestViewSourceLoader(templateName)));
 			Assert.IsTrue(engine.IsTemplateForJSGeneration(templateName),
-						   "Should have been accepted and found with correct extension");
+			              "Should have been accepted and found with correct extension");
 		}
 
 		[Test]
@@ -59,7 +60,7 @@ namespace Castle.MonoRail.Framework.Tests
 			TestableViewEngineBase engine = new TestableViewEngineBase();
 			engine.Service(new TestServiceProvider(new TestViewSourceLoader("fakeview.testjs")));
 			Assert.IsTrue(engine.IsTemplateForJSGeneration("fakeview"),
-						   "Should have been accepted and found without extension");
+			              "Should have been accepted and found without extension");
 		}
 	}
 
@@ -81,7 +82,7 @@ namespace Castle.MonoRail.Framework.Tests
 		/// <returns><c>true</c> if it exists</returns>
 		public bool HasSource(string templateName)
 		{
-			foreach (string view in views)
+			foreach(string view in views)
 			{
 				if (view.Equals(templateName, StringComparison.InvariantCultureIgnoreCase))
 				{
@@ -217,7 +218,8 @@ namespace Castle.MonoRail.Framework.Tests
 		/// to obtain the correct template,
 		/// and using the context to output the result.
 		/// </summary>
-		public override void Process(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext)
+		public override void Process(String templateName, TextWriter output, IEngineContext context, IController controller,
+		                             IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -226,7 +228,8 @@ namespace Castle.MonoRail.Framework.Tests
 		/// Should process the specified partial. The partial name must contains
 		/// the path relative to the views folder.
 		/// </summary>
-		public override void ProcessPartial(String partialName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext)
+		public override void ProcessPartial(String partialName, TextWriter output, IEngineContext context,
+		                                    IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -237,13 +240,15 @@ namespace Castle.MonoRail.Framework.Tests
 		/// </summary>
 		/// <param name="context">The request context.</param>
 		/// <returns>A JS generator instance</returns>
-		public override object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext)
+		public override object CreateJSGenerator(JSCodeGeneratorInfo generatorInfo,
+		                                         IEngineContext context, IController controller,
+		                                         IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override void GenerateJS(string templateName, TextWriter output, IEngineContext context, IController controller,
-		                                IControllerContext controllerContext)
+		public override void GenerateJS(string templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo,
+		                                IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -252,7 +257,8 @@ namespace Castle.MonoRail.Framework.Tests
 		/// Wraps the specified content in the layout using the 
 		/// context to output the result.
 		/// </summary>
-		public override void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller, IControllerContext controllerContext)
+		public override void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller,
+		                                              IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
