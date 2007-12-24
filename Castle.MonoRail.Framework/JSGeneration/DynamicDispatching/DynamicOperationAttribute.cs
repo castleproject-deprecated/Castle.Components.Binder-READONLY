@@ -14,17 +14,13 @@
 
 namespace Castle.MonoRail.Framework.JSGeneration
 {
+	using System;
+
 	/// <summary>
 	/// Pendent
 	/// </summary>
-	public interface IJSGeneratorFactory
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true), Serializable]
+	public class DynamicOperationAttribute : Attribute
 	{
-		/// <summary>
-		/// Creates the a JS generator using the
-		/// specified library as underlying implementation.
-		/// </summary>
-		/// <param name="library">The library.</param>
-		/// <returns></returns>
-		IJSGenerator Create(string library);
 	}
 }

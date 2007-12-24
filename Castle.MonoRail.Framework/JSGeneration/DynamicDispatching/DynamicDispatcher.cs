@@ -12,49 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.JSGeneration
+namespace Castle.MonoRail.Framework.JSGeneration.DynamicDispatching
 {
 	using System;
-	using System.Collections;
+	using System.Collections.Generic;
 	using System.Reflection;
 
 	/// <summary>
-	/// DynamicDispatch support is an infrastructure 
-	/// that mimics a dynamic language/environment. 
-	/// It is not finished but the idea is to allow 
-	/// plugins to add operations to the generators.
+	/// The DynamicDispatcher has the ability of late bound and dispatch method invocation
+	/// to several targets. The intention is mimic what you can achieve with dynamic languages
+	/// and mixins.
 	/// </summary>
-	public abstract class DynamicDispatchSupport
+	public class DynamicDispatcher
 	{
+		private readonly Dictionary<string, MethodTarget> method2Target;
+
 		/// <summary>
-		/// Populates the available methods.
+		/// Initializes a new instance of the <see cref="DynamicDispatcher"/> class.
 		/// </summary>
-		/// <param name="generatorMethods">The generator methods.</param>
-		/// <param name="methods">The methods.</param>
-		protected static void PopulateAvailableMethods(IDictionary generatorMethods, MethodInfo[] methods)
+		/// <param name="mainTarget">The main target.</param>
+		/// <param name="extensions">The extensions.</param>
+		public DynamicDispatcher(object mainTarget, params object[] extensions)
 		{
-			foreach(MethodInfo method in methods)
+			method2Target = new Dictionary<string, MethodTarget>(StringComparer.InvariantCultureIgnoreCase);
+
+			// We can create a cache of operations per type here as inspecting types over and over is very time consuming
+
+			CollectOperations(mainTarget);
+
+			foreach(object extension in extensions)
 			{
-				generatorMethods[method.Name] = method;
+				CollectOperations(extension);
 			}
 		}
 
 		/// <summary>
-		/// Gets the generator methods.
+		/// Determines whether the specified instance has the method.
 		/// </summary>
-		/// <value>The generator methods.</value>
-		protected abstract IDictionary GeneratorMethods { get; }
-
-		/// <summary>
-		/// Determines whether [is generator method] [the specified method].
-		/// </summary>
-		/// <param name="method">The method.</param>
+		/// <param name="methodName">Name of the method.</param>
 		/// <returns>
-		/// 	<c>true</c> if [is generator method] [the specified method]; otherwise, <c>false</c>.
+		/// 	<c>true</c> if the method was registered; otherwise, <c>false</c>.
 		/// </returns>
-		public bool IsGeneratorMethod(string method)
+		public bool HasMethod(string methodName)
 		{
-			return GeneratorMethods.Contains(method);
+			return method2Target.ContainsKey(methodName);
 		}
 
 		/// <summary>
@@ -65,13 +66,19 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		/// <returns></returns>
 		public object Dispatch(string method, params object[] args)
 		{
-			MethodInfo methodInfo = (MethodInfo) GeneratorMethods[method];
+			MethodTarget target;
+			if (!method2Target.TryGetValue(method, out target))
+			{
+				throw new InvalidOperationException("Method " + method + " not found for dynamic dispatching");
+			}
+
+			MethodInfo methodInfo = target.Method;
 
 			ParameterInfo[] parameters = methodInfo.GetParameters();
 
 			int paramArrayIndex = -1;
 
-			for(int i = 0; i < parameters.Length; i++)
+			for (int i = 0; i < parameters.Length; i++)
 			{
 				ParameterInfo paramInfo = parameters[i];
 
@@ -83,7 +90,7 @@ namespace Castle.MonoRail.Framework.JSGeneration
 
 			try
 			{
-				return methodInfo.Invoke(this, BuildMethodArgs(methodInfo, args, paramArrayIndex));
+				return methodInfo.Invoke(target.Target, BuildMethodArgs(methodInfo, args, paramArrayIndex));
 			}
 			catch(MonoRailException)
 			{
@@ -91,13 +98,28 @@ namespace Castle.MonoRail.Framework.JSGeneration
 			}
 			catch(Exception ex)
 			{
-				throw new MonoRailException("Error invoking method on generator. " +
-				                            "Method invoked [" + method + "] with " + args.Length + " argument(s)", ex);
+				throw new Exception("Error invoking method on generator. " +
+				                    "Method invoked [" + method + "] with " + args.Length + " argument(s)", ex);
+			}
+		}
+
+		private void CollectOperations(object target)
+		{
+			foreach (MethodInfo method in target.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance))
+			{
+				if (!method.IsDefined(typeof(DynamicOperationAttribute), true))
+				{
+					continue;
+				}
+
+				method2Target[method.Name] = new MethodTarget(target, method);
 			}
 		}
 
 		private object[] BuildMethodArgs(MethodInfo method, object[] methodArguments, int paramArrayIndex)
 		{
+			if (methodArguments == null) return new object[0];
+
 			ParameterInfo[] methodArgs = method.GetParameters();
 
 			if (paramArrayIndex != -1)
@@ -141,6 +163,28 @@ namespace Castle.MonoRail.Framework.JSGeneration
 			}
 
 			return methodArguments;
+		}
+
+		private class MethodTarget
+		{
+			private readonly object target;
+			private readonly MethodInfo method;
+
+			public MethodTarget(object target, MethodInfo method)
+			{
+				this.target = target;
+				this.method = method;
+			}
+
+			public object Target
+			{
+				get { return target; }
+			}
+
+			public MethodInfo Method
+			{
+				get { return method; }
+			}
 		}
 	}
 }

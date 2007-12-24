@@ -15,49 +15,26 @@
 namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 {
 	using System;
-	using System.Collections;
-	using System.Collections.Specialized;
-	using System.Reflection;
 
 	/// <summary>
 	/// Implementation for the <see cref="IJSElementGenerator"/>
 	/// </summary>
-	public class JSElementGenerator : DynamicDispatchSupport, IJSElementGenerator
+	public class PrototypeElementGenerator : IJSElementGenerator
 	{
-		private static readonly IDictionary DispMethods;
-
-		private readonly JSGenerator generator;
-
-		#region Type Constructor
-
-		/// <summary>
-		/// Collects the public methods
-		/// </summary>
-		static JSElementGenerator()
-		{
-			DispMethods = new HybridDictionary(true);
-
-			BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-
-			MethodInfo[] methods = typeof(IJSElementGenerator).GetMethods(flags);
-
-			PopulateAvailableMethods(DispMethods, methods);
-		}
-
-		#endregion
+		private readonly PrototypeGenerator generator;
 
 		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="JSElementGenerator"/> class.
+		/// Initializes a new instance of the <see cref="PrototypeElementGenerator"/> class.
 		/// </summary>
 		/// <param name="generator">The generator.</param>
 		/// <param name="root">The root.</param>
-		public JSElementGenerator(JSGenerator generator, String root)
+		public PrototypeElementGenerator(PrototypeGenerator generator, String root)
 		{
 			this.generator = generator;
 
-			JSGenerator.Record(generator, "$('" + root + "')");
+			generator.CodeGenerator.Record("$('" + root + "')");
 		}
 
 		#endregion
@@ -70,19 +47,6 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		{
 			get { return generator; }
 		}
-
-		#region DynamicDispatchSupport overrides
-
-		/// <summary>
-		/// Gets the generator methods.
-		/// </summary>
-		/// <value>The generator methods.</value>
-		protected override IDictionary GeneratorMethods
-		{
-			get { return DispMethods; }
-		}
-
-		#endregion
 
 		#region Dispatchable operations
 
@@ -98,7 +62,9 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void ReplaceHtml(object renderOptions)
 		{
-			generator.Call("update", generator.Render(renderOptions));
+			generator.CodeGenerator.ReplaceTailByPeriod();
+
+			generator.CodeGenerator.Call("update", generator.Render(renderOptions));
 		}
 
 		/// <summary>
@@ -114,7 +80,9 @@ namespace Castle.MonoRail.Framework.JSGeneration.Prototype
 		/// </example>
 		public void Replace(object renderOptions)
 		{
-			generator.Call("replace", generator.Render(renderOptions));
+			generator.CodeGenerator.ReplaceTailByPeriod();
+
+			generator.CodeGenerator.Call("replace", generator.Render(renderOptions));
 		}
 
 		#endregion

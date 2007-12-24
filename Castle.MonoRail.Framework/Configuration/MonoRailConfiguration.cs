@@ -19,6 +19,8 @@ namespace Castle.MonoRail.Framework.Configuration
 	using System.Xml;
 	using Castle.Core.Configuration;
 	using Castle.Core.Configuration.Xml;
+	using Castle.MonoRail.Framework.JSGeneration.Prototype;
+	using JSGeneration;
 
 	/// <summary>
 	/// Represents the MonoRail external configuration
@@ -38,7 +40,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		private ViewComponentsConfig viewComponentsConfig;
 		private ScaffoldConfig scaffoldConfig;
 		private UrlConfig urlConfig;
-
+		private JSGeneratorConfiguration jsGeneratorConfig;
 		private RoutingRuleCollection routingRules;
 		private ExtensionEntryCollection extensions;
 		private DefaultUrlCollection defaultUrls;
@@ -58,6 +60,13 @@ namespace Castle.MonoRail.Framework.Configuration
 			routingRules = new RoutingRuleCollection();
 			extensions = new ExtensionEntryCollection();
 			defaultUrls = new DefaultUrlCollection();
+			jsGeneratorConfig = new JSGeneratorConfiguration();
+
+			jsGeneratorConfig.AddLibrary("prototype-1.5.1", typeof(PrototypeGenerator))
+				.AddExtension(typeof(CommonJSExtension))
+				.AddExtension(typeof(ScriptaculousExtension))
+				.AddExtension(typeof(BehaviourExtension))
+				.SetAsDefault();
 
 			// old routing support related
 			matchHostNameAndPath = false;
@@ -208,6 +217,16 @@ namespace Castle.MonoRail.Framework.Configuration
 		{
 			get { return urlConfig; }
 			set { urlConfig = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the JS generator configuration.
+		/// </summary>
+		/// <value>The JS generator configuration.</value>
+		public JSGeneratorConfiguration JSGeneratorConfiguration
+		{
+			get { return jsGeneratorConfig; }
+			set { jsGeneratorConfig = value; }
 		}
 
 		/// <summary>

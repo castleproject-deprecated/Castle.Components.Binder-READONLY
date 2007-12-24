@@ -12,32 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.JSGeneration
+namespace Castle.MonoRail.Framework.JSGeneration.DynamicDispatching
 {
-	using Prototype;
-
 	/// <summary>
 	/// Operations related to an element
 	/// </summary>
-	public abstract class JSElementGeneratorBase
+	public abstract class JSElementGeneratorDispatcherBase : DynamicDispatcher
 	{
-		/// <summary>
-		/// Element generator instance
-		/// </summary>
-		protected readonly IJSElementGenerator generator;
-		/// <summary>
-		/// Parent Generator instance
-		/// </summary>
-		protected readonly IJSGenerator parentGenerator;
+		private readonly IJSCodeGenerator codeGen;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="JSElementGeneratorBase"/> class.
+		/// Initializes a new instance of the <see cref="JSElementGeneratorDispatcherBase"/> class.
 		/// </summary>
-		/// <param name="generator">The generator.</param>
-		public JSElementGeneratorBase(IJSElementGenerator generator)
+		/// <param name="codeGen">The code gen.</param>
+		/// <param name="elementGenerator">The element generator.</param>
+		/// <param name="extensions">The extensions.</param>
+		protected JSElementGeneratorDispatcherBase(IJSCodeGenerator codeGen, IJSElementGenerator elementGenerator, params object[] extensions)
+			: base(elementGenerator, extensions)
 		{
-			this.generator = generator;
-			parentGenerator = generator.ParentGenerator;
+			this.codeGen = codeGen;
 		}
 
 		/// <summary>
@@ -46,8 +39,8 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		/// <param name="propName">Name of the prop.</param>
 		protected void InternalGet(string propName)
 		{
-			JSGenerator.ReplaceTailByPeriod(parentGenerator);
-			JSGenerator.Record(parentGenerator, propName);
+			codeGen.ReplaceTailByPeriod();
+			codeGen.Record(propName);
 		}
 
 		/// <summary>
@@ -60,26 +53,21 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		{
 			if (method == "set")
 			{
-				JSGenerator.RemoveTail(parentGenerator);
-				JSGenerator.Record(parentGenerator, " = " + args[0]);
+				codeGen.RemoveTail();
+				codeGen.Record(" = " + args[0]);
 				return null;
 			}
 			else
 			{
-				JSGenerator.ReplaceTailByPeriod(parentGenerator);
-				//TODO: This code is duplicated JSCollectionGeneratorBase line 65
-				DynamicDispatchSupport dispInterface = generator as DynamicDispatchSupport;
-				if (dispInterface == null)
+				codeGen.ReplaceTailByPeriod();
+
+				if (HasMethod(method))
 				{
-					throw new MonoRail.Framework.MonoRailException("JS Generators must inherit DynamicDispatchSupport");
-				}
-				if (dispInterface.IsGeneratorMethod(method))
-				{
-					dispInterface.Dispatch(method, args);
+					Dispatch(method, args);
 				}
 				else
 				{
-					parentGenerator.Call(method, args);
+					codeGen.Call(method, args);
 				}
 
 				return this;

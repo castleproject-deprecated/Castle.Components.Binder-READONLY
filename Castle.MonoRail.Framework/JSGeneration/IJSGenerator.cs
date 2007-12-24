@@ -16,7 +16,6 @@ namespace Castle.MonoRail.Framework.JSGeneration
 {
 	using System;
 	using System.Collections;
-	using System.Text;
 	using Castle.MonoRail.Framework;
 	using Castle.MonoRail.Framework.Helpers;
 	using Castle.MonoRail.Framework.Services;
@@ -207,169 +206,6 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		void Remove(params string[] ids);
 
 		/// <summary>
-		/// Shows a JS alert
-		/// </summary>
-		/// 
-		/// <example>
-		/// The following example uses nvelocity syntax:
-		/// 
-		/// <code>
-		///   $page.Alert('You won a Mercedez')
-		/// </code>
-		/// </example>
-		/// 
-		/// <param name="message">The message to display.</param>
-		void Alert(object message);
-
-		/// <summary>
-		/// Redirects to an url using the <c>location.href</c>.
-		/// This is required as most ajax libs don't care for the redirect status
-		/// in the http reply.
-		/// </summary>
-		/// 
-		/// <example>
-		/// The following redirects to a static page
-		/// 
-		/// <code>
-		///   $page.RedirectTo('about.aspx')
-		/// </code>
-		/// 
-		/// <para>
-		/// The following redirects using the <see cref="UrlHelper"/>
-		/// </para>
-		/// 
-		/// <code>
-		///   $page.RedirectTo("%{controller='Home',action='index'}")
-		/// </code>
-		/// </example>
-		/// 
-		/// <param name="url">The URL.</param>
-		void RedirectTo(object url);
-
-		/// <summary>
-		/// Re-apply Behaviour css' rules.
-		/// </summary>
-		/// <remarks>
-		/// Only makes sense if you are using the Behaviour javascript library.
-		/// </remarks>
-		void ReApply();
-
-		/// <summary>
-		/// Generates a call to a scriptaculous' visual effect. 
-		/// </summary>
-		/// 
-		/// <seealso cref="ScriptaculousHelper"/>
-		/// 
-		/// <example>
-		/// The following example uses nvelocity syntax:
-		/// 
-		/// <code>
-		///   $page.VisualEffect('ToggleSlide', 'myelement')
-		/// </code>
-		/// 
-		/// <para>
-		/// This is especially useful to show which elements 
-		/// where updated in an ajax call.
-		/// </para>
-		/// 
-		/// <code>
-		///	  $page.ReplaceHtml('mydiv', "Hey, I've changed")
-		///   $page.VisualEffect('Highlight', 'mydiv')
-		/// </code>
-		/// 
-		/// </example>
-		/// 
-		/// <param name="name">The effect name.</param>
-		/// <param name="element">The target element.</param>
-		/// <param name="options">The optional options.</param>
-		void VisualEffect(String name, String element, IDictionary options);
-
-		/// <summary>
-		/// Generates a call to a scriptaculous' drop out visual effect. 
-		/// </summary>
-		/// 
-		/// <seealso cref="ScriptaculousHelper"/>
-		/// 
-		/// <param name="element">The target element.</param>
-		/// <param name="options">The optional options.</param>
-		void VisualEffectDropOut(String element, IDictionary options);
-
-		/// <summary>
-		/// Assigns a javascript variable with the expression.
-		/// </summary>
-		/// 
-		/// <example>
-		/// The following example uses nvelocity syntax:
-		/// 
-		/// <code>
-		///   $page.Assign('myvariable', '10')
-		/// </code>
-		/// 
-		/// <para>
-		/// Which outputs:
-		/// </para>
-		/// 
-		/// <code>
-		///   myvariable = 10;
-		/// </code>
-		/// 
-		/// <para>
-		/// With strings you can escape strings:
-		/// </para>
-		/// 
-		/// <code>
-		///   $page.Assign('myvariable', '\'Hello world\'')
-		/// </code>
-		/// 
-		/// <para>
-		/// Which outputs:
-		/// </para>
-		/// 
-		/// <code>
-		///   myvariable = 'Hello world';
-		/// </code>
-		/// 
-		/// </example>
-		/// 
-		/// <param name="variable">The target variable</param>
-		/// <param name="expression">The right side expression</param>
-		void Assign(String variable, String expression);
-
-		/// <summary>
-		/// Declares the specified variable as null.
-		/// </summary>
-		/// 
-		/// <seealso cref="Assign"/>
-		/// 
-		/// <param name="variable">The variable name.</param>
-		void Declare(String variable);
-
-		/// <summary>
-		/// Calls the specified function with the optional arguments.
-		/// </summary>
-		/// 
-		/// <example>
-		/// The following example uses nvelocity syntax:
-		/// 
-		/// <code>
-		///   $page.call('myJsFunctionAlreadyDeclared', '10', "'message'", $somethingfrompropertybag, $anothermessage.to_squote)
-		/// </code>
-		/// 
-		/// <para>
-		/// Which outputs:
-		/// </para>
-		/// 
-		/// <code>
-		///   myJsFunctionAlreadyDeclared(10, 'message', 1001, 'who let the dogs out?')
-		/// </code>
-		/// 
-		/// </example>
-		/// 
-		/// <param name="function">The function name.</param>
-		/// <param name="args">The arguments.</param>
-		void Call(object function, params object[] args);
-
-		/// <summary>
 		/// Outputs the content using the renderOptions approach.
 		/// 
 		/// <para>
@@ -405,51 +241,18 @@ namespace Castle.MonoRail.Framework.JSGeneration
 		object Render(object renderOptions);
 
 		/// <summary>
-		/// Writes the content specified to the generator instance
-		/// </summary>
-		/// 
-		/// <remarks>
-		/// This is for advanced scenarios and for the infrastructure. Usually not useful.
-		/// </remarks>
-		/// 
-		/// <param name="content">The content.</param>
-		void Write(String content);
-
-		/// <summary>
-		/// Writes the content specified to the generator instance
-		/// </summary>
-		/// 
-		/// <remarks>
-		/// This is for advanced scenarios and for the infrastructure. Usually not useful.
-		/// </remarks>
-		/// <param name="content">The content.</param>
-		void AppendLine(String content);
-
-		/// <summary>
-		/// Creates a generator for a collection.
-		/// </summary>
-		/// <param name="root">The root expression.</param>
-		/// <returns></returns>
-		IJSCollectionGenerator CreateCollectionGenerator(string root);
-
-		/// <summary>
 		/// Creates a generator for an element.
 		/// </summary>
 		/// <param name="root">The root expression.</param>
 		/// <returns></returns>
 		IJSElementGenerator CreateElementGenerator(string root);
 
-		/// <summary>
-		/// Gets the js lines.
-		/// </summary>
-		/// <value>The js lines.</value>
-		StringBuilder Lines { get; }
+//		/// <summary>
+//		/// Creates a generator for a collection.
+//		/// </summary>
+//		/// <param name="root">The root expression.</param>
+//		/// <returns></returns>
+//		IJSCollectionGenerator CreateCollectionGenerator(string root);
 
-		/// <summary>
-		/// Dump the operations recorded so far as javascript code. 
-		/// </summary>
-		/// 
-		/// <returns></returns>
-		string ToString();
 	}
 }

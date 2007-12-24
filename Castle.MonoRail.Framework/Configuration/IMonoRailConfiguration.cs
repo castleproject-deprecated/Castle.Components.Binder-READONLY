@@ -108,5 +108,11 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// </summary>
 		/// <value>The configuration section.</value>
 		IConfiguration ConfigurationSection { get; set; }
+
+		/// <summary>
+		/// Gets or sets the JS generator configuration.
+		/// </summary>
+		/// <value>The JS generator configuration.</value>
+		JSGeneratorConfiguration JSGeneratorConfiguration { get; set; }
 	}
 }
