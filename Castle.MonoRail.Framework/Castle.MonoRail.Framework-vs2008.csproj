@@ -92,6 +92,7 @@
     <Reference Include="System.Web">
       <Name>System.Web</Name>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
@@ -463,13 +464,10 @@
     <Compile Include="ViewComponents\SelectStylePagination.cs" />
     <Compile Include="ViewComponents\SiteMapComponent.cs" />
     <Compile Include="ViewComponents\TreeMakerComponent.cs" />
-    <Compile Include="Views\Aspx\Contents.cs" />
-    <Compile Include="Views\Aspx\EventUtil.cs" />
-    <Compile Include="Views\Aspx\MasterPageBase.cs">
+    <Compile Include="Views\Aspx\PageBase.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Views\Aspx\WebFormsViewEngine.cs" />
-    <Compile Include="Views\Aspx\WebFormUtils.cs" />
     <Compile Include="Views\EmbeddedResourceViewSource.cs" />
     <Compile Include="Views\FileAssemblyViewSourceLoader.cs" />
     <Compile Include="Views\FileViewSource.cs" />

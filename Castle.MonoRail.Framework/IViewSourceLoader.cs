@@ -47,7 +47,12 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Gets/sets the root directory of views, obtained from the configuration.
 		/// </summary>
-		String ViewRootDir { get; set; }
+		string VirtualViewDir { get; set; }
+
+		/// <summary>
+		/// Gets/sets the root directory of views, obtained from the configuration.
+		/// </summary>
+		string ViewRootDir { get; set; }
 
 		/// <summary>
 		/// Gets or sets whether the instance should use cache

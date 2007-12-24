@@ -27,9 +27,18 @@ namespace Castle.MonoRail.Framework.Configuration
 	/// </summary>
 	public class ViewEngineConfig : ISerializedConfig
 	{
-		private String viewPathRoot;
+		private string viewPathRoot;
+		private string virtualPathRoot;
 		private List<AssemblySourceInfo> sources = new List<AssemblySourceInfo>();
 		private List<ViewEngineInfo> viewEngines = new List<ViewEngineInfo>();
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ViewEngineConfig"/> class.
+		/// </summary>
+		public ViewEngineConfig()
+		{
+			viewPathRoot = virtualPathRoot = "views";
+		}
 
 		#region ISerializedConfig implementation
 
@@ -62,10 +71,20 @@ namespace Castle.MonoRail.Framework.Configuration
 		/// Gets or sets the view path root.
 		/// </summary>
 		/// <value>The view path root.</value>
-		public String ViewPathRoot
+		public string ViewPathRoot
 		{
 			get { return viewPathRoot; }
 			set { viewPathRoot = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the virtual path root.
+		/// </summary>
+		/// <value>The virtual path root.</value>
+		public string VirtualPathRoot
+		{
+			get { return virtualPathRoot; }
+			set { virtualPathRoot = value; }
 		}
 
 		/// <summary>
@@ -130,6 +149,7 @@ namespace Castle.MonoRail.Framework.Configuration
 		{
 			if (!Path.IsPathRooted(viewPathRoot))
 			{
+				virtualPathRoot = viewPathRoot;
 				viewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, viewPathRoot);
 			}
 
@@ -165,11 +185,11 @@ namespace Castle.MonoRail.Framework.Configuration
 
 			if (viewPath == null)
 			{
-				viewPathRoot = "views";
+				viewPathRoot = virtualPathRoot = "views";
 			}
 			else
 			{
-				viewPathRoot = viewPath.Value;
+				viewPathRoot = virtualPathRoot = viewPath.Value;
 			}
 
 			XmlAttribute xhtmlRendering = section.Attributes["xhtmlRendering"];

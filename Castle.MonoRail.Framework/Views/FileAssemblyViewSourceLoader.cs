@@ -27,8 +27,9 @@ namespace Castle.MonoRail.Framework
 	public class FileAssemblyViewSourceLoader : IViewSourceLoader, IMRServiceEnabled
 	{
 		private readonly IList additionalSources = ArrayList.Synchronized(new ArrayList());
-		private String viewRootDir;
 		private bool enableCache = true;
+		private string viewRootDir;
+		private string virtualViewDir;
 		private FileSystemWatcher viewFolderWatcher;
 
 		/// <summary>
@@ -37,7 +38,6 @@ namespace Castle.MonoRail.Framework
 		public FileAssemblyViewSourceLoader()
 		{
 		}
-
 
 		///<summary>
 		/// Creates a new instance with the viewRootDir 
@@ -60,6 +60,7 @@ namespace Castle.MonoRail.Framework
 			if (config != null)
 			{
 				viewRootDir = config.ViewEngineConfig.ViewPathRoot;
+				virtualViewDir = config.ViewEngineConfig.VirtualPathRoot;
 
 				foreach(AssemblySourceInfo sourceInfo in config.ViewEngineConfig.Sources)
 				{
@@ -120,10 +121,20 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
+		/// Gets/sets the root directory of views, obtained from the configuration.
+		/// </summary>
+		/// <value></value>
+		public string VirtualViewDir
+		{
+			get { return virtualViewDir; }
+			set { virtualViewDir = value; }
+		}
+
+		/// <summary>
 		/// Gets/sets the root directory of views, 
 		/// obtained from the configuration.
 		/// </summary>
-		public String ViewRootDir
+		public string ViewRootDir
 		{
 			get { return viewRootDir; }
 			set { viewRootDir = value; }
