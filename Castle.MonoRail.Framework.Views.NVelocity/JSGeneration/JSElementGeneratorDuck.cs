@@ -18,13 +18,15 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 {
 	using System;
 	using Castle.MonoRail.Framework.JSGeneration;
+	using Castle.MonoRail.Framework.JSGeneration.DynamicDispatching;
 
 	/// <summary>
-	/// 
+	/// Pendent
 	/// </summary>
-	public class JSElementGeneratorDuck : JSElementGeneratorBase, IDuck
+	public class JSElementGeneratorDuck : JSElementGeneratorDispatcherBase, IDuck
 	{
-		public JSElementGeneratorDuck(IJSElementGenerator generator) : base(generator)
+		public JSElementGeneratorDuck(IJSCodeGenerator codeGen, IJSElementGenerator elementGenerator, params object[] extensions) : 
+			base(codeGen, elementGenerator, extensions)
 		{
 		}
 

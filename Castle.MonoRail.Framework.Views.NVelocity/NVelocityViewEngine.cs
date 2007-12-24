@@ -24,6 +24,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	using System.Collections;
 	using Castle.Core;
 	using Commons.Collections;
+	using JSGeneration;
 
 	/// <summary>
 	/// Implements a view engine using the popular Velocity syntax.
@@ -194,18 +195,21 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 		}
 
-		public override object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext)
+		public override object CreateJSGenerator(JSCodeGeneratorInfo generatorInfo,
+		                                         IEngineContext context, IController controller,
+		                                         IControllerContext controllerContext)
 		{
-			return null;
-//			return new JSGeneratorDuck(new JSGenerator(context, controller, controllerContext));
+			return new JSGeneratorDuck(generatorInfo.CodeGenerator, generatorInfo.LibraryGenerator,
+			                           generatorInfo.Extensions, generatorInfo.ElementExtensions);
 		}
 
-		public override void GenerateJS(String templateName, TextWriter output, IEngineContext context, IController controller,
+		public override void GenerateJS(String templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo,
+		                                IEngineContext context, IController controller,
 		                                IControllerContext controllerContext)
 		{
 			IContext ctx = CreateContext(context, controller, controllerContext);
 
-			object generator = CreateJSGenerator(context, controller, controllerContext);
+			object generator = CreateJSGenerator(generatorInfo, context, controller, controllerContext);
 
 			ctx.Put("page", generator);
 

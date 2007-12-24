@@ -74,6 +74,10 @@
     <Compile Include="BooViewEngineOptions.cs" />
     <Compile Include="BrailBase.cs" />
     <Compile Include="BrailConfigurationSection.cs" />
+    <Compile Include="BrailJSElementGenerator.cs" />
+    <Compile Include="BrailJSGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="BrailPreProcessor.cs" />
     <Compile Include="BrailViewComponentContext.cs" />
     <Compile Include="DslWrapper.cs" />

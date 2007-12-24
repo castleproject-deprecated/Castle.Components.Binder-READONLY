@@ -176,21 +176,22 @@ namespace Castle.MonoRail.Views.Brail
 			}
 		}
 
-		public override object CreateJSGenerator(IEngineContext context, IController controller,
+		public override object CreateJSGenerator(JSCodeGeneratorInfo generatorInfo, IEngineContext context,
+		                                         IController controller,
 		                                         IControllerContext controllerContext)
 		{
-			return null;
-			// return new BrailJSGenerator(new PrototypeHelper.JSGenerator(context));
+			return new BrailJSGenerator(generatorInfo.CodeGenerator, generatorInfo.LibraryGenerator,
+			                            generatorInfo.Extensions, generatorInfo.ElementExtensions);
 		}
 
-		public override void GenerateJS(string templateName, TextWriter output,
+		public override void GenerateJS(string templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo,
 		                                IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			Log("Generating JS for {0}", templateName);
 
 			try
 			{
-				object generator = CreateJSGenerator(context, controller, controllerContext);
+				object generator = CreateJSGenerator(generatorInfo, context, controller, controllerContext);
 				AdjustJavascriptContentType(context);
 				string file = ResolveJSTemplateName(templateName);
 				BrailBase view = GetCompiledScriptInstance(file,
@@ -363,15 +364,15 @@ namespace Castle.MonoRail.Views.Brail
 			IController controller, IControllerContext controllerContext)
 		{
 			bool batch = options.BatchCompile;
-			
+
 			// normalize filename - replace / or \ to the system path seperator
 			string filename = file.Replace('/', Path.DirectorySeparatorChar)
 				.Replace('\\', Path.DirectorySeparatorChar);
-			
+
 			Log("Getting compiled instnace of {0}", filename);
-			
+
 			Type type;
-			
+
 			if (compilations.ContainsKey(filename))
 			{
 				type = (Type) compilations[filename];
@@ -387,14 +388,14 @@ namespace Castle.MonoRail.Views.Brail
 				Log("Cache miss! Need to recompile {0}", filename);
 				batch = false;
 			}
-			
+
 			type = CompileScript(filename, batch);
 
 			if (type == null)
 			{
 				throw new MonoRailException("Could not find a view with path " + filename);
 			}
-			
+
 			return CreateBrailBase(context, controller, controllerContext, output, type);
 		}
 
@@ -440,8 +441,8 @@ namespace Castle.MonoRail.Views.Brail
 				                                         		typeof(BooViewEngine),
 				                                         		typeof(TextWriter),
 				                                         		typeof(IEngineContext),
-				                                         		typeof(IController), 
-																typeof(IControllerContext)
+				                                         		typeof(IController),
+				                                         		typeof(IControllerContext)
 				                                         	});
 			}
 			type = (Type) compilations[filename];

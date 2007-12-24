@@ -18,6 +18,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 {
 	using System;
 	using Castle.MonoRail.Framework.JSGeneration;
+	using Castle.MonoRail.Framework.JSGeneration.DynamicDispatching;
 
 	/// <summary>
 	/// 
@@ -27,8 +28,12 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 		/// <summary>
 		/// Initializes a new instance of the <see cref="JSGeneratorDuck"/> class.
 		/// </summary>
+		/// <param name="codeGen">The code gen.</param>
 		/// <param name="generator">The generator.</param>
-		public JSGeneratorDuck(IJSGenerator generator) : base(generator)
+		/// <param name="extensions">The extensions.</param>
+		/// <param name="elementExtensions">The element extensions.</param>
+		public JSGeneratorDuck(IJSCodeGenerator codeGen, IJSGenerator generator, object[] extensions, object[] elementExtensions) :
+			base(codeGen, generator, extensions, elementExtensions)
 		{
 		}
 
@@ -72,14 +77,21 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.JSGeneration
 			return null;
 		}
 
-		protected override object CreateJSCollectionGenerator(IJSCollectionGenerator collectionGenerator)
+		/// <summary>
+		/// Creates a JS element generator.
+		/// </summary>
+		/// <param name="codeGen">The code gen.</param>
+		/// <param name="elementGenerator">The element generator.</param>
+		/// <param name="elementExtensions">The element extensions.</param>
+		/// <returns></returns>
+		protected override object CreateJSElementGeneratorProxy(IJSCodeGenerator codeGen, IJSElementGenerator elementGenerator, object[] elementExtensions)
 		{
-			return new JSCollectionGeneratorDuck(collectionGenerator);
+			return new JSElementGeneratorDuck(codeGen, elementGenerator, elementExtensions);
 		}
 
-		protected override object CreateJSElementGenerator(IJSElementGenerator elementGenerator)
+		public override string ToString()
 		{
-			return new JSElementGeneratorDuck(elementGenerator);
+			return CodeGen.ToString();
 		}
 	}
 }
