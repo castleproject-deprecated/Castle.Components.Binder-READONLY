@@ -145,6 +145,7 @@
     <Compile Include="Configuration\ExtensionEntry.cs" />
     <Compile Include="Configuration\ExtensionEntryCollection.cs" />
     <Compile Include="Configuration\ISerializedConfig.cs" />
+    <Compile Include="Configuration\JSGeneratorConfiguration.cs" />
     <Compile Include="Configuration\MonoRailConfiguration.cs" />
     <Compile Include="Configuration\MonoRailSectionHandler.cs" />
     <Compile Include="Configuration\RoutingRule.cs" />
@@ -252,6 +253,26 @@
     <Compile Include="IWizardStepPage.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSGeneration\AbstractJSGenerator.cs" />
+    <Compile Include="JSGeneration\CommonJSExtension.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JSGeneration\DynamicDispatching\DynamicDispatcher.cs" />
+    <Compile Include="JSGeneration\DynamicDispatching\DynamicOperationAttribute.cs" />
+    <Compile Include="JSGeneration\IJSCodeGenerator.cs" />
+    <Compile Include="JSGeneration\IJSElementGenerator.cs" />
+    <Compile Include="JSGeneration\IJSGenerator.cs" />
+    <Compile Include="JSGeneration\JSCodeGenerator.cs" />
+    <Compile Include="JSGeneration\DynamicDispatching\JSElementGeneratorDispatcherBase.cs" />
+    <Compile Include="JSGeneration\DynamicDispatching\JSGeneratorDispatcherBase.cs" />
+    <Compile Include="JSGeneration\Prototype\BehaviourExtension.cs" />
+    <Compile Include="JSGeneration\Prototype\PrototypeElementGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JSGeneration\Prototype\PrototypeGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JSGeneration\Prototype\ScriptaculousExtension.cs" />
     <Compile Include="Providers\DefaultFilterDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultHelperDescriptorProvider.cs" />
     <Compile Include="Providers\DefaultLayoutDescriptorProvider.cs" />
@@ -520,7 +541,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="JSGeneration\" />
+    <Folder Include="JSGeneration\jQuery\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

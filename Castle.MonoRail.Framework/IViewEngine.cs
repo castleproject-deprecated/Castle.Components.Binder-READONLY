@@ -16,6 +16,77 @@ namespace Castle.MonoRail.Framework
 {
 	using System;
 	using System.IO;
+	using JSGeneration;
+
+	#region JSCodeGeneratorInfo
+
+	/// <summary>
+	/// Pendent
+	/// </summary>
+	public class JSCodeGeneratorInfo
+	{
+		private IJSCodeGenerator codeGenerator; 
+		private IJSGenerator libraryGenerator;
+		private object[] extensions;
+		private object[] elementExtensions;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="JSCodeGeneratorInfo"/> class.
+		/// </summary>
+		/// <param name="codeGenerator">The code generator.</param>
+		/// <param name="libraryGenerator">The library generator.</param>
+		/// <param name="extensions">The extensions.</param>
+		/// <param name="elementExtensions">The element extensions.</param>
+		public JSCodeGeneratorInfo(IJSCodeGenerator codeGenerator, IJSGenerator libraryGenerator, object[] extensions, object[] elementExtensions)
+		{
+			this.codeGenerator = codeGenerator;
+			this.libraryGenerator = libraryGenerator;
+			this.extensions = extensions;
+			this.elementExtensions = elementExtensions;
+		}
+
+		/// <summary>
+		/// Gets or sets the code generator.
+		/// </summary>
+		/// <value>The code generator.</value>
+		public IJSCodeGenerator CodeGenerator
+		{
+			get { return codeGenerator; }
+			set { codeGenerator = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the library generator.
+		/// </summary>
+		/// <value>The library generator.</value>
+		public IJSGenerator LibraryGenerator
+		{
+			get { return libraryGenerator; }
+			set { libraryGenerator = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the extensions.
+		/// </summary>
+		/// <value>The extensions.</value>
+		public object[] Extensions
+		{
+			get { return extensions; }
+			set { extensions = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the element extensions.
+		/// </summary>
+		/// <value>The element extensions.</value>
+		public object[] ElementExtensions
+		{
+			get { return elementExtensions; }
+			set { elementExtensions = value; }
+		}
+	}
+
+	#endregion
 
 	/// <summary>
 	/// Depicts the contract used by the engine
@@ -42,29 +113,32 @@ namespace Castle.MonoRail.Framework
 		/// Gets the JS generator view template file extension.
 		/// </summary>
 		/// <value>The JS generator file extension.</value>
-		String JSGeneratorFileExtension { get; }
+		string JSGeneratorFileExtension { get; }
 
 		/// <summary>
 		/// Implementors should return a generator instance if
 		/// the view engine supports JS generation.
 		/// </summary>
+		/// <param name="generatorInfo">The generator info.</param>
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <returns>A JS generator instance</returns>
-		object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext);
+		object CreateJSGenerator(JSCodeGeneratorInfo generatorInfo, IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Processes the js generation view template - using the templateName
 		/// to obtain the correct template, and using the specified <see cref="TextWriter"/>
 		/// to output the result.
 		/// </summary>
+		/// <param name="templateName">Name of the template.</param>
 		/// <param name="output">The output.</param>
+		/// <param name="generatorInfo">The generator info.</param>
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
-		/// <param name="templateName">Name of the template.</param>
-		void GenerateJS(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+		void GenerateJS(String templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo, 
+		                IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the view engine should set the
@@ -77,13 +151,13 @@ namespace Castle.MonoRail.Framework
 		/// Gets the view template file extension.
 		/// </summary>
 		/// <value>The view file extension.</value>
-		String ViewFileExtension { get; }
+		string ViewFileExtension { get; }
 
 		/// <summary>
 		/// Evaluates whether the specified template exists.
 		/// </summary>
 		/// <returns><c>true</c> if it exists</returns>
-		bool HasTemplate(String templateName);
+		bool HasTemplate(string templateName);
 
 		///<summary>
 		/// Processes the view - using the templateName 
@@ -91,7 +165,8 @@ namespace Castle.MonoRail.Framework
 		/// and writes the results to the <see cref="TextWriter"/>. 
 		/// No layout is applied!
 		/// </summary>
-		void Process(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+		void Process(string templateName, TextWriter output, IEngineContext context, IController controller,
+		             IControllerContext controllerContext);
 
 		/// <summary>
 		/// Wraps the specified content in the layout using
@@ -101,17 +176,31 @@ namespace Castle.MonoRail.Framework
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="contents">Static content to output within the layout</param>
-		void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller, IControllerContext controllerContext);
+		void RenderStaticWithinLayout(string contents, IEngineContext context, IController controller,
+		                              IControllerContext controllerContext);
 
 		/// <summary>
 		/// Should process the specified partial. The partial name must contains
 		/// the path relative to the views folder.
 		/// </summary>
+		/// <param name="partialName">The partial name.</param>
 		/// <param name="output">The output.</param>
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
-		/// <param name="partialName">The partial name.</param>
-		void ProcessPartial(String partialName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+		void ProcessPartial(string partialName, TextWriter output, IEngineContext context, IController controller,
+		                    IControllerContext controllerContext);
+
+//		Holding it a little more as it would be a breaking change (meaning all partials view would break)
+// 
+//		/// <summary>
+//		/// Should process the specified partial. The partial name must contains
+//		/// the path relative to the views folder.
+//		/// </summary>
+//		/// <param name="partialName">The partial name.</param>
+//		/// <param name="output">The output.</param>
+//		/// <param name="context">The request context.</param>
+//		/// <param name="parameters">The parameters.</param>
+//		void ProcessPartial(String partialName, TextWriter output, IEngineContext context, IDictionary<string, object> parameters);
 	}
 }

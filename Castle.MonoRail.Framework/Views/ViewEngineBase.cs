@@ -44,7 +44,7 @@ namespace Castle.MonoRail.Framework
 		{
 			serviceProvider = provider;
 
-			viewSourceLoader = (IViewSourceLoader)provider.GetService(typeof(IViewSourceLoader));
+			viewSourceLoader = (IViewSourceLoader) provider.GetService(typeof(IViewSourceLoader));
 
 			if (viewSourceLoader == null)
 			{
@@ -52,7 +52,7 @@ namespace Castle.MonoRail.Framework
 				throw new ConfigurationErrorsException(message);
 			}
 
-			ILoggerFactory loggerFactory = (ILoggerFactory)provider.GetService(typeof(ILoggerFactory));
+			ILoggerFactory loggerFactory = (ILoggerFactory) provider.GetService(typeof(ILoggerFactory));
 
 			if (loggerFactory != null)
 			{
@@ -89,23 +89,27 @@ namespace Castle.MonoRail.Framework
 		/// Implementors should return a generator instance if
 		/// the view engine supports JS generation.
 		/// </summary>
+		/// <param name="generatorInfo">The generator info.</param>
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <returns>A JS generator instance</returns>
-		public abstract object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext);
+		public abstract object CreateJSGenerator(JSCodeGeneratorInfo generatorInfo, IEngineContext context, IController controller,
+		                                         IControllerContext controllerContext);
 
 		/// <summary>
 		/// Processes the js generation view template - using the templateName
 		/// to obtain the correct template, and using the specified <see cref="TextWriter"/>
 		/// to output the result.
 		/// </summary>
+		/// <param name="templateName">Name of the template.</param>
 		/// <param name="output">The output.</param>
+		/// <param name="generatorInfo">The generator info.</param>
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
-		/// <param name="templateName">Name of the template.</param>
-		public abstract void GenerateJS(string templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+		public abstract void GenerateJS(string templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo, 
+		                                IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Gets/sets whether rendering should aim 
@@ -145,9 +149,9 @@ namespace Castle.MonoRail.Framework
 		{
 			string resolvedTemplateName = ResolveJSTemplateName(templateName);
 
-			return 
+			return
 				string.Compare(Path.GetExtension(resolvedTemplateName), JSGeneratorFileExtension, true) == 0 &&
-					HasJsGenerationTemplate(resolvedTemplateName);
+				HasJsGenerationTemplate(resolvedTemplateName);
 		}
 
 		///<summary>
@@ -155,7 +159,8 @@ namespace Castle.MonoRail.Framework
 		/// to obtain the correct template
 		/// and writes the results to the System.IO.TextWriter.
 		/// </summary>
-		public abstract void Process(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+		public abstract void Process(String templateName, TextWriter output, IEngineContext context, IController controller,
+		                             IControllerContext controllerContext);
 
 		/// <summary>
 		/// Should process the specified partial. The partial name must contains
@@ -166,13 +171,15 @@ namespace Castle.MonoRail.Framework
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="partialName">The partial name.</param>
-		public abstract void ProcessPartial(string partialName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+		public abstract void ProcessPartial(string partialName, TextWriter output, IEngineContext context,
+		                                    IController controller, IControllerContext controllerContext);
 
 		/// <summary>
 		/// Wraps the specified content in the layout using the 
 		/// context to output the result.
 		/// </summary>
-		public abstract void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller, IControllerContext controllerContext);
+		public abstract void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller,
+		                                              IControllerContext controllerContext);
 
 		/// <summary>
 		/// Resolves the template name into a file name with the proper file extension

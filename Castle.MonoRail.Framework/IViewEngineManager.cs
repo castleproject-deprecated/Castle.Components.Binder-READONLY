@@ -44,12 +44,25 @@ namespace Castle.MonoRail.Framework
 		/// to obtain the correct template and writes the
 		/// results to the System.TextWriter.
 		/// </summary>
+		/// <param name="partialName">The partial name.</param>
 		/// <param name="output">The output.</param>
 		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
-		/// <param name="partialName">The partial name.</param>
 		void ProcessPartial(String partialName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+
+//		Holding it a little more as it would be a breaking change (meaning all partials view would break)
+// 
+//		/// <summary>
+//		/// Processes a partial view using the partialName
+//		/// to obtain the correct template and writes the
+//		/// results to the System.TextWriter.
+//		/// </summary>
+//		/// <param name="partialName">The partial name.</param>
+//		/// <param name="output">The output.</param>
+//		/// <param name="context">The context.</param>
+//		/// <param name="parameters">The parameters.</param>
+//		void ProcessPartial(String partialName, TextWriter output, IEngineContext context, IDictionary<string, object> parameters);
 
 		/// <summary>
 		/// Wraps the specified content in the layout using 

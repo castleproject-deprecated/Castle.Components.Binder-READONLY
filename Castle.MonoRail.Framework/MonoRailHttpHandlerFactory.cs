@@ -280,22 +280,19 @@ namespace Castle.MonoRail.Framework
 		{
 			IMonoRailConfiguration config = MonoRailConfiguration.GetConfig();
 
-			if (config == null)
+			MethodInfo mrConfigurer = appInstance.GetType().GetMethod("MonoRail_Configure");
+
+			if (mrConfigurer != null)
 			{
-				MethodInfo mrConfigurer = appInstance.GetType().GetMethod("MonoRail_Configure");
+				config = config ?? new MonoRailConfiguration();
 
-				if (mrConfigurer != null)
+				if (mrConfigurer.IsStatic)
 				{
-					config = new MonoRailConfiguration();
-
-					if (mrConfigurer.IsStatic)
-					{
-						mrConfigurer.Invoke(null, new object[] { config });
-					}
-					else
-					{
-						mrConfigurer.Invoke(appInstance, new object[] { config });
-					}
+					mrConfigurer.Invoke(null, new object[] { config });
+				}
+				else
+				{
+					mrConfigurer.Invoke(appInstance, new object[] { config });
 				}
 			}
 
@@ -305,7 +302,7 @@ namespace Castle.MonoRail.Framework
 											   "MonoRail. This can be done using the web.config or " +
 											   "your global asax (your class that extends HttpApplication) " +
 											   "through the method MonoRail_Configure(IMonoRailConfiguration config). " +
-											   "Check the samples or the documentation");
+											   "Check the samples or the documentation.");
 			}
 
 			return config;

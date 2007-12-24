@@ -125,10 +125,10 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="partialName">The partial name.</param>
-		public override void ProcessPartial(string partialName, TextWriter output, 
-			IEngineContext context, IController controller,
+		public override void ProcessPartial(string partialName, TextWriter output,
+		                                    IEngineContext context, IController controller,
 		                                    IControllerContext controllerContext
-		                                    )
+			)
 		{
 			throw new NotImplementedException();
 		}
@@ -136,11 +136,13 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// <summary>
 		/// Creates the JS generator.
 		/// </summary>
+		/// <param name="generatorInfo">The generator info.</param>
 		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <returns>A JS generator instance</returns>
-		public override object CreateJSGenerator(IEngineContext context, IController controller, IControllerContext controllerContext)
+		public override object CreateJSGenerator(JSCodeGeneratorInfo generatorInfo, IEngineContext context,
+		                                         IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -153,8 +155,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="templateName">Name of the template.</param>
-		public override void GenerateJS(string templateName, TextWriter output, IEngineContext context, IController controller,
-		                                IControllerContext controllerContext)
+		public override void GenerateJS(string templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo,
+		                                IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -168,7 +170,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="contents">The contents.</param>
 		public override void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller,
-		                                     IControllerContext controllerContext)
+		                                              IControllerContext controllerContext)
 		{
 			AdjustContentType(context);
 
@@ -207,7 +209,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 		}
 
 #if !MONO
-		private void ProcessExecuteView(IEngineContext context, IController controller, IControllerContext controllerContext, String viewName)
+		private void ProcessExecuteView(IEngineContext context, IController controller, IControllerContext controllerContext,
+		                                String viewName)
 		{
 			HttpContext httpContext = context.UnderlyingContext;
 
@@ -271,8 +274,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			// TODO: There must be a more efficient way to do this than two replace operations
 			return
 				Path.Combine(ViewSourceLoader.ViewRootDir, viewName).
-				Replace('/', Path.DirectorySeparatorChar).
-				Replace('\\', Path.DirectorySeparatorChar);
+					Replace('/', Path.DirectorySeparatorChar).
+					Replace('\\', Path.DirectorySeparatorChar);
 		}
 
 		private String MapViewToVirtualPath(String viewName, ref string physicalPath, HttpContext httpContext)
@@ -343,7 +346,8 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			}
 		}
 
-		private bool ProcessLayoutIfNeeded(IController controller, IControllerContext controllerContext, HttpContext httpContext, IHttpHandler childPage)
+		private bool ProcessLayoutIfNeeded(IController controller, IControllerContext controllerContext,
+		                                   HttpContext httpContext, IHttpHandler childPage)
 		{
 			Page masterHandler = (Page) httpContext.Items["wfv.masterPage"];
 
@@ -490,7 +494,7 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			/// <param name="viewName">Name of the view.</param>
 			public ExecutePageProvider(WebFormsViewEngine engine, string viewName)
 			{
-				this.page = null;
+				page = null;
 				this.engine = engine;
 				this.viewName = viewName;
 			}
