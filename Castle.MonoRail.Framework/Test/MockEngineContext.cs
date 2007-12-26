@@ -20,9 +20,7 @@ namespace Castle.MonoRail.Framework.Test
 	using System.Collections.Specialized;
 	using System.Security.Principal;
 	using System.Web;
-	using Castle.Components.Validator;
-	using Castle.MonoRail.Framework.Internal;
-	using Castle.MonoRail.Framework.Services;
+	using Castle.Components.Common.EmailSender;
 	using Container;
 
 	/// <summary>
@@ -39,8 +37,8 @@ namespace Castle.MonoRail.Framework.Test
 //		private readonly ICacheProvider cacheProvider = new MockCacheProvider();
 		private readonly IServerUtility serverUtility = new MockServerUtility();
 		private readonly IDictionary contextItems = new HybridDictionary(true);
-//		private readonly List<RenderedEmailTemplate> renderedEmailTemplates = new List<RenderedEmailTemplate>();
-//		private readonly List<Message> messagesSent = new List<Message>();
+		private readonly List<RenderedEmailTemplate> renderedEmailTemplates = new List<RenderedEmailTemplate>();
+		private readonly List<Message> messagesSent = new List<Message>();
 //		private IServiceProvider container;
 		private IPrincipal currentUser;
 		private Exception lastException;
@@ -69,7 +67,7 @@ namespace Castle.MonoRail.Framework.Test
 			this.request = request;
 			this.response = response;
 			this.services = services;
-			this.urlInfo = urlInfo; 
+			this.urlInfo = urlInfo;
 		}
 
 //		#region IEngineContext Members
@@ -98,8 +96,8 @@ namespace Castle.MonoRail.Framework.Test
 		/// <value></value>
 		public virtual HttpContext UnderlyingContext
 		{
-			get 
-			{ 
+			get
+			{
 				// new HttpContext(new HttpRequest(), new HttpResponse(writer));
 				// TODO: Consider whether it's worthwhile to implement this one (definitely it's not easy)
 				return null;
@@ -171,15 +169,6 @@ namespace Castle.MonoRail.Framework.Test
 			get { return flash; }
 		}
 
-//		/// <summary>
-//		/// Transfer the execution to another resource.
-//		/// </summary>
-//		/// <param name="path"></param>
-//		/// <param name="preserveForm"></param>
-//		public virtual void Transfer(string path, bool preserveForm)
-//		{
-//		}
-
 		/// <summary>
 		/// Gets or sets the current user.
 		/// </summary>
@@ -209,6 +198,15 @@ namespace Castle.MonoRail.Framework.Test
 		{
 			get { return urlInfo.AppVirtualDir; }
 		}
+
+//		/// <summary>
+//		/// Transfer the execution to another resource.
+//		/// </summary>
+//		/// <param name="path"></param>
+//		/// <param name="preserveForm"></param>
+//		public virtual void Transfer(string path, bool preserveForm)
+//		{
+//		}
 
 //		/// <summary>
 //		/// Returns the physical application path.
@@ -342,53 +340,53 @@ namespace Castle.MonoRail.Framework.Test
 //			AddService(typeof(IViewEngineManager), new DefaultViewEngineManager());
 //			AddService(typeof(IScaffoldingSupport), new MockScaffoldingSupport());
 //		}
-//
-//		internal void AddMailTemplateRendered(string templateName, IDictionary parameters)
-//		{
-//			renderedEmailTemplates.Add(new RenderedEmailTemplate(templateName, parameters));
-//		}
-//
-//		internal void AddEmailMessageSent(Message message)
-//		{
-//			messagesSent.Add(message);
-//		}
-//
-//		/// <summary>
-//		/// Represents an email template for unit test purposes
-//		/// </summary>
-//		public class RenderedEmailTemplate
-//		{
-//			private readonly string name;
-//			private readonly IDictionary parameters;
-//
-//			/// <summary>
-//			/// Initializes a new instance of the <see cref="RenderedEmailTemplate"/> class.
-//			/// </summary>
-//			/// <param name="name">The name.</param>
-//			/// <param name="parameters">The parameters.</param>
-//			public RenderedEmailTemplate(string name, IDictionary parameters)
-//			{
-//				this.name = name;
-//				this.parameters = parameters;
-//			}
-//
-//			/// <summary>
-//			/// Gets the name.
-//			/// </summary>
-//			/// <value>The name.</value>
-//			public string Name
-//			{
-//				get { return name; }
-//			}
-//
-//			/// <summary>
-//			/// Gets the parameters.
-//			/// </summary>
-//			/// <value>The parameters.</value>
-//			public IDictionary Parameters
-//			{
-//				get { return parameters; }
-//			}
-//		}
+
+		internal void AddMailTemplateRendered(string templateName, IDictionary parameters)
+		{
+			renderedEmailTemplates.Add(new RenderedEmailTemplate(templateName, parameters));
+		}
+
+		internal void AddEmailMessageSent(Message message)
+		{
+			messagesSent.Add(message);
+		}
+
+		/// <summary>
+		/// Represents an email template for unit test purposes
+		/// </summary>
+		public class RenderedEmailTemplate
+		{
+			private readonly string name;
+			private readonly IDictionary parameters;
+
+			/// <summary>
+			/// Initializes a new instance of the <see cref="RenderedEmailTemplate"/> class.
+			/// </summary>
+			/// <param name="name">The name.</param>
+			/// <param name="parameters">The parameters.</param>
+			public RenderedEmailTemplate(string name, IDictionary parameters)
+			{
+				this.name = name;
+				this.parameters = parameters;
+			}
+
+			/// <summary>
+			/// Gets the name.
+			/// </summary>
+			/// <value>The name.</value>
+			public string Name
+			{
+				get { return name; }
+			}
+
+			/// <summary>
+			/// Gets the parameters.
+			/// </summary>
+			/// <value>The parameters.</value>
+			public IDictionary Parameters
+			{
+				get { return parameters; }
+			}
+		}
 	}
 }

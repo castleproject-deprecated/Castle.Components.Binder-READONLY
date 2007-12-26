@@ -157,9 +157,6 @@
     <Compile Include="Configuration\UrlConfig.cs" />
     <Compile Include="Configuration\ViewComponentsConfig.cs" />
     <Compile Include="Configuration\ViewEngineConfig.cs" />
-    <Compile Include="Constants.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Container\AbstractServiceContainer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -359,6 +356,7 @@
     <Compile Include="Services\DefaultViewComponentFactory.cs" />
     <Compile Include="Services\DefaultViewComponentRegistry.cs" />
     <Compile Include="Services\DefaultViewEngineManager.cs" />
+    <Compile Include="Services\EmailTemplateService.cs" />
     <Compile Include="Services\IControllerContextFactory.cs" />
     <Compile Include="Services\IControllerFactory.cs">
       <SubType>Code</SubType>
@@ -366,6 +364,7 @@
     <Compile Include="Services\IControllerTree.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Services\IEmailTemplateService.cs" />
     <Compile Include="Services\IFilterFactory.cs" />
     <Compile Include="Services\IJSONSerializer.cs" />
     <Compile Include="Services\IStaticResourceRegistry.cs" />
@@ -373,6 +372,7 @@
     <Compile Include="Services\IViewComponentRegistry.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Services\MonoRailSmtpSender.cs" />
     <Compile Include="Services\NewtonsoftJSONSerializer.cs" />
     <Compile Include="Services\UrlTokenizerException.cs">
       <SubType>Code</SubType>
@@ -432,6 +432,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Test\IMockResponse.cs" />
+    <Compile Include="Test\MockEmailTemplateService.cs" />
     <Compile Include="Test\MockEngineContext.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -443,6 +444,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Test\MockServices.cs" />
+    <Compile Include="Test\MockSmtpSender.cs" />
     <Compile Include="Test\ViewEngineManagerStub.cs" />
     <Compile Include="TransformFilter.cs" />
     <Compile Include="TransformFilters\Formatters\WikiFormatter.cs" />

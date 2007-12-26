@@ -21,6 +21,7 @@ namespace Castle.MonoRail.Framework
 	using System.IO;
 	using System.Reflection;
 	using System.Web;
+	using Castle.Components.Common.EmailSender;
 	using Castle.Components.Validator;
 	using Castle.Core;
 	using Castle.Core.Logging;
@@ -55,6 +56,80 @@ namespace Castle.MonoRail.Framework
 		private ValidatorRunner validator;
 		private FilterDescriptor[] filters = new FilterDescriptor[0];
 //		private ValidatorRunner validatorRunner;
+
+		#region IController
+
+		/// <summary>
+		/// Occurs just before the action execution.
+		/// </summary>
+		public event ControllerHandler BeforeAction;
+
+		/// <summary>
+		/// Occurs just after the action execution.
+		/// </summary>
+		public event ControllerHandler AfterAction;
+
+		/// <summary>
+		/// Performs the specified action, which means:
+		/// <br/>
+		/// 1. Define the default view name<br/>
+		/// 2. Run the before filters<br/>
+		/// 3. Select the method related to the action name and invoke it<br/>
+		/// 4. On error, execute the rescues if available<br/>
+		/// 5. Run the after filters<br/>
+		/// 6. Invoke the view engine<br/>
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="context">The controller context.</param>
+		public virtual void Process(IEngineContext engineContext, IControllerContext context)
+		{
+			this.engineContext = engineContext;
+			this.context = context;
+
+			urlBuilder = engineContext.Services.UrlBuilder; // should not be null (affects redirects)
+			filterFactory = engineContext.Services.FilterFactory; // should not be null
+			viewEngineManager = engineContext.Services.ViewEngineManager; // should not be null
+			actionSelector = engineContext.Services.ActionSelector; // should not be null
+			scaffoldSupport = engineContext.Services.ScaffoldSupport; // might be null
+			//			validatorRunner = CreateValidatorRunner(engineContext.Services.ValidatorRegistry);
+
+			ResetIsPostback();
+			context.LayoutName = ObtainDefaultLayoutName();
+			CreateAndInitializeHelpers();
+			CreateFiltersDescriptors();
+			ProcessScaffoldIfAvailable();
+			ActionProviderUtil.RegisterActions(engineContext, this, context);
+			Initialize();
+			RunActionAndRenderView();
+		}
+
+		/// <summary>
+		/// Invoked by the view engine to perform
+		/// any logic before the view is sent to the client.
+		/// </summary>
+		/// <param name="view"></param>
+		public virtual void PreSendView(object view)
+		{
+		}
+
+		/// <summary>
+		/// Invoked by the view engine to perform
+		/// any logic after the view had been sent to the client.
+		/// </summary>
+		/// <param name="view"></param>
+		public virtual void PostSendView(object view)
+		{
+		}
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
+		public virtual void Dispose()
+		{
+			DisposeFilters();
+		}
+
+		#endregion
 
 		#region Useful Properties
 
@@ -821,76 +896,117 @@ namespace Castle.MonoRail.Framework
 
 		#endregion
 
-		#region IController
+		#region Email operations
 
 		/// <summary>
-		/// Occurs just before the action execution.
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
 		/// </summary>
-		public event ControllerHandler BeforeAction;
-
-		/// <summary>
-		/// Occurs just after the action execution.
-		/// </summary>
-		public event ControllerHandler AfterAction;
-
-		/// <summary>
-		/// Performs the specified action, which means:
-		/// <br/>
-		/// 1. Define the default view name<br/>
-		/// 2. Run the before filters<br/>
-		/// 3. Select the method related to the action name and invoke it<br/>
-		/// 4. On error, execute the rescues if available<br/>
-		/// 5. Run the after filters<br/>
-		/// 6. Invoke the view engine<br/>
-		/// </summary>
-		/// <param name="engineContext">The engine context.</param>
-		/// <param name="context">The controller context.</param>
-		public virtual void Process(IEngineContext engineContext, IControllerContext context)
+		/// <param name="templateName">
+		/// Name of the template to load. 
+		/// Will look in Views/mail for that template file.
+		/// </param>
+		/// <returns>An instance of <see cref="Message"/></returns>
+		[Obsolete]
+		public Message RenderMailMessage(string templateName)
 		{
-			this.engineContext = engineContext;
-			this.context = context;
-
-			urlBuilder = engineContext.Services.UrlBuilder; // should not be null (affects redirects)
-			filterFactory = engineContext.Services.FilterFactory; // should not be null
-			viewEngineManager = engineContext.Services.ViewEngineManager; // should not be null
-			actionSelector = engineContext.Services.ActionSelector; // should not be null
-			scaffoldSupport = engineContext.Services.ScaffoldSupport; // might be null
-//			validatorRunner = CreateValidatorRunner(engineContext.Services.ValidatorRegistry);
-
-			ResetIsPostback();
-			context.LayoutName = ObtainDefaultLayoutName();
-			CreateAndInitializeHelpers();
-			CreateFiltersDescriptors();
-			ProcessScaffoldIfAvailable();
-			ActionProviderUtil.RegisterActions(engineContext, this, context);
-			Initialize();
-			RunActionAndRenderView();
+			return RenderMailMessage(templateName, false);
 		}
 
 		/// <summary>
-		/// Invoked by the view engine to perform
-		/// any logic before the view is sent to the client.
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
 		/// </summary>
-		/// <param name="view"></param>
-		public virtual void PreSendView(object view)
+		/// <param name="templateName">
+		/// Name of the template to load. 
+		/// Will look in Views/mail for that template file.
+		/// </param>
+		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
+		/// <returns>An instance of <see cref="Message"/></returns>
+		[Obsolete]
+		public Message RenderMailMessage(string templateName, bool doNotApplyLayout)
 		{
+			IEmailTemplateService templateService = engineContext.Services.EmailTemplateService;
+			return templateService.RenderMailMessage(templateName, Context, this, ControllerContext, doNotApplyLayout);
 		}
 
 		/// <summary>
-		/// Invoked by the view engine to perform
-		/// any logic after the view had been sent to the client.
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
 		/// </summary>
-		/// <param name="view"></param>
-		public virtual void PostSendView(object view)
+		/// <param name="templateName">Name of the template to load.
+		/// Will look in Views/mail for that template file.</param>
+		/// <param name="layoutName">Name of the layout.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns>An instance of <see cref="Message"/></returns>
+		public Message RenderMailMessage(string templateName, string layoutName, IDictionary parameters)
 		{
+			IEmailTemplateService templateService = engineContext.Services.EmailTemplateService;
+			return templateService.RenderMailMessage(templateName, layoutName, parameters);
 		}
 
 		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
 		/// </summary>
-		public virtual void Dispose()
+		/// <param name="templateName">Name of the template to load.
+		/// Will look in Views/mail for that template file.</param>
+		/// <param name="layoutName">Name of the layout.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns>An instance of <see cref="Message"/></returns>
+		public Message RenderMailMessage(string templateName, string layoutName, IDictionary<string,object> parameters)
 		{
-			DisposeFilters();
+			IEmailTemplateService templateService = engineContext.Services.EmailTemplateService;
+			return templateService.RenderMailMessage(templateName, layoutName, parameters);
+		}
+
+		/// <summary>
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
+		/// </summary>
+		/// <param name="templateName">Name of the template to load.
+		/// Will look in Views/mail for that template file.</param>
+		/// <param name="layoutName">Name of the layout.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns>An instance of <see cref="Message"/></returns>
+		public Message RenderMailMessage(string templateName, string layoutName, object parameters)
+		{
+			IEmailTemplateService templateService = engineContext.Services.EmailTemplateService;
+			return templateService.RenderMailMessage(templateName, layoutName, parameters);
+		}
+
+		/// <summary>
+		/// Attempts to deliver the Message using the server specified on the web.config.
+		/// </summary>
+		/// <param name="message">The instance of System.Web.Mail.MailMessage that will be sent</param>
+		public void DeliverEmail(Message message)
+		{
+			try
+			{
+				IEmailSender sender = engineContext.Services.EmailSender;
+				sender.Send(message);
+			}
+			catch(Exception ex)
+			{
+				if (logger.IsErrorEnabled)
+				{
+					logger.Error("Error sending e-mail", ex);
+				}
+
+				throw new MonoRailException("Error sending e-mail", ex);
+			}
+		}
+
+		/// <summary>
+		/// Renders and delivers the e-mail message.
+		/// <seealso cref="DeliverEmail"/>
+		/// </summary>
+		/// <param name="templateName"></param>
+		[Obsolete]
+		public void RenderEmailAndSend(string templateName)
+		{
+			Message message = RenderMailMessage(templateName);
+			DeliverEmail(message);
 		}
 
 		#endregion

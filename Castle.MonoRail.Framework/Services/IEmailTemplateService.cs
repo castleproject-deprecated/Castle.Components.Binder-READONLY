@@ -14,9 +14,7 @@
 
 namespace Castle.MonoRail.Framework
 {
-	using System;
 	using System.Collections;
-
 	using Castle.Components.Common.EmailSender;
 
 	/// <summary>
@@ -29,31 +27,38 @@ namespace Castle.MonoRail.Framework
 		/// Creates an instance of <see cref="Message"/>
 		/// using the specified template for the body
 		/// </summary>
-		/// <param name="templateName">
-		/// Name of the template to load. 
-		/// Will look in <c>Views/mail</c> for that template file.
-		/// </param>
-		/// <param name="parameters">
-		/// Dictionary with parameters 
-		/// that you can use on the email template
-		/// </param>
-		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
+		/// <param name="templateName">Name of the template to load.
+		/// Will look in <c>Views/mail</c> for that template file.</param>
+		/// <param name="layoutName">Name of the layout.</param>
+		/// <param name="parameters">Dictionary with parameters
+		/// that you can use on the email template</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		Message RenderMailMessage(String templateName, IDictionary parameters, bool doNotApplyLayout);
+		Message RenderMailMessage(string templateName, string layoutName, IDictionary parameters);
 
 		/// <summary>
 		/// Creates an instance of <see cref="Message"/>
 		/// using the specified template for the body
 		/// </summary>
-		/// <param name="templateName">
-		/// Name of the template to load. 
-		/// Will look in <c>Views/mail</c> for that template file.
-		/// </param>
+		/// <param name="templateName">Name of the template to load.
+		/// Will look in <c>Views/mail</c> for that template file.</param>
+		/// <param name="layoutName">Name of the layout.</param>
+		/// <param name="parameters">Dictionary with parameters
+		/// that you can use on the email template</param>
+		/// <returns>An instance of <see cref="Message"/></returns>
+		Message RenderMailMessage(string templateName, string layoutName, object parameters);
+
+		/// <summary>
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
+		/// </summary>
+		/// <param name="templateName">Name of the template to load.
+		/// Will look in <c>Views/mail</c> for that template file.</param>
 		/// <param name="context">Context that represents the current request</param>
 		/// <param name="controller">Controller instance</param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		Message RenderMailMessage(String templateName, IHandlerContext context,
-		                          IController controller, bool doNotApplyLayout);
+		Message RenderMailMessage(string templateName, IEngineContext context,
+		                          IController controller, IControllerContext controllerContext, bool doNotApplyLayout);
 	}
 }

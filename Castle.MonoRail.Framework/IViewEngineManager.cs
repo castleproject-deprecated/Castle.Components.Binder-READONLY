@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
 	
 	/// <summary>
@@ -33,11 +34,15 @@ namespace Castle.MonoRail.Framework
 		/// Processes the view - using the templateName 
 		/// to obtain the correct template
 		/// and writes the results to the System.TextWriter. 
-		/// <para>
-		/// Please note that no layout is applied
-		/// </para>
 		/// </summary>
-		void Process(String templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+		void Process(string templateName, TextWriter output, IEngineContext context, IController controller, IControllerContext controllerContext);
+
+		/// <summary>
+		/// Processes the view - using the templateName
+		/// to obtain the correct template
+		/// and writes the results to the System.TextWriter.
+		/// </summary>
+		void Process(string templateName, string layoutName, TextWriter output, IDictionary<string,object> parameters);
 
 		/// <summary>
 		/// Processes a partial view using the partialName

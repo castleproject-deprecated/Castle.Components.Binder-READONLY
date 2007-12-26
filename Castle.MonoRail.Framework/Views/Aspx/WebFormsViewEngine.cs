@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Views.Aspx
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Web;
 	using System.IO;
 	using Helpers;
@@ -184,6 +185,21 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 			}
 
 			ProcessPage(controller, page, context.UnderlyingContext);
+		}
+
+		/// <summary>
+		/// Processes the view - using the templateName
+		/// to obtain the correct template
+		/// and writes the results to the <see cref="TextWriter"/>.
+		/// </summary>
+		/// <param name="templateName"></param>
+		/// <param name="layoutName"></param>
+		/// <param name="output"></param>
+		/// <param name="parameters"></param>
+		public override void Process(string templateName, string layoutName, TextWriter output,
+		                             IDictionary<string, object> parameters)
+		{
+			throw new NotImplementedException();
 		}
 
 		/// <summary>

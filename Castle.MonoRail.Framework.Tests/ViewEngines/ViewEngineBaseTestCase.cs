@@ -19,6 +19,7 @@ namespace Castle.MonoRail.Framework.Tests
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.IO;
 	using NUnit.Framework;
 
@@ -234,6 +235,12 @@ namespace Castle.MonoRail.Framework.Tests
 			throw new NotImplementedException();
 		}
 
+		public override void Process(string templateName, string layoutName, TextWriter output,
+		                             IDictionary<string, object> parameters)
+		{
+			throw new NotImplementedException();
+		}
+
 		/// <summary>
 		/// Should process the specified partial. The partial name must contains
 		/// the path relative to the views folder.
@@ -248,7 +255,6 @@ namespace Castle.MonoRail.Framework.Tests
 		/// Implementors should return a generator instance if
 		/// the view engine supports JS generation.
 		/// </summary>
-		/// <param name="context">The request context.</param>
 		/// <returns>A JS generator instance</returns>
 		public override object CreateJSGenerator(JSCodeGeneratorInfo generatorInfo,
 		                                         IEngineContext context, IController controller,

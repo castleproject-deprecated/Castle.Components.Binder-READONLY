@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Configuration;
 	using System.IO;
 	using Castle.Core;
@@ -161,6 +162,15 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		public abstract void Process(String templateName, TextWriter output, IEngineContext context, IController controller,
 		                             IControllerContext controllerContext);
+
+
+		/// <summary>
+		/// Processes the view - using the templateName
+		/// to obtain the correct template
+		/// and writes the results to the <see cref="TextWriter"/>.
+		/// </summary>
+		public abstract void Process(string templateName, string layoutName, TextWriter output,
+		                             IDictionary<string, object> parameters);
 
 		/// <summary>
 		/// Should process the specified partial. The partial name must contains

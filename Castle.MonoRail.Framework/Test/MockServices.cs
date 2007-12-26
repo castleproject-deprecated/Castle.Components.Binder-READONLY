@@ -1,7 +1,22 @@
-﻿namespace Castle.MonoRail.Framework.Test
+﻿// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace Castle.MonoRail.Framework.Test
 {
 	using System;
 	using System.Collections.Generic;
+	using Castle.Components.Common.EmailSender;
 	using Castle.Components.Validator;
 	using Providers;
 	using Services;
@@ -27,6 +42,8 @@
 		private IScaffoldingSupport scaffoldSupport;
 		private IJSONSerializer jsonSerializer;
 		private IStaticResourceRegistry staticResourceRegistry;
+		private IEmailTemplateService emailTemplateService;
+		private IEmailSender emailSender;
 		private ExtensionManager extensionManager;
 		private readonly Dictionary<Type, object> service2Impl = new Dictionary<Type, object>();
 
@@ -230,6 +247,26 @@
 		{
 			get { return staticResourceRegistry; }
 			set { staticResourceRegistry = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the email template service.
+		/// </summary>
+		/// <value>The email template service.</value>
+		public IEmailTemplateService EmailTemplateService
+		{
+			get { return emailTemplateService; }
+			set { emailTemplateService = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the email sender.
+		/// </summary>
+		/// <value>The email sender.</value>
+		public IEmailSender EmailSender
+		{
+			get { return emailSender; }
+			set { emailSender = value; }
 		}
 
 		/// <summary>

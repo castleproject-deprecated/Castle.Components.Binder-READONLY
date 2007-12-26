@@ -162,6 +162,20 @@ namespace Castle.MonoRail.Framework.Services
 		}
 
 		/// <summary>
+		/// Processes the view - using the templateName
+		/// to obtain the correct template
+		/// and writes the results to the System.TextWriter.
+		/// </summary>
+		public void Process(string templateName, string layoutName, TextWriter output, IDictionary<string, object> parameters)
+		{
+			IViewEngine engine = ResolveEngine(templateName);
+
+			ContextualizeViewEngine(engine);
+
+			engine.Process(templateName, layoutName, output, parameters);
+		}
+
+		/// <summary>
 		/// Processes a partial view = using the partialName
 		/// to obtain the correct template and writes the
 		/// results to the System.TextWriter.

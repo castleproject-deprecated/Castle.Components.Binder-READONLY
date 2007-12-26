@@ -14,6 +14,7 @@
 
 namespace Castle.MonoRail.Framework
 {
+	using Castle.Components.Common.EmailSender;
 	using Castle.Components.Validator;
 	using Castle.Core;
 	using Castle.MonoRail.Framework.Services;
@@ -118,6 +119,18 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The static resource registry.</value>
 		IStaticResourceRegistry StaticResourceRegistry { get; set; }
+
+		/// <summary>
+		/// Gets or sets the email template service.
+		/// </summary>
+		/// <value>The email template service.</value>
+		IEmailTemplateService EmailTemplateService { get; set; }
+
+		/// <summary>
+		/// Gets or sets the email sender.
+		/// </summary>
+		/// <value>The email sender.</value>
+		IEmailSender EmailSender { get; set; }
 
 		/// <summary>
 		/// Gets or sets the extension manager.

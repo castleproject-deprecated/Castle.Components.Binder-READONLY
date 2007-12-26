@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework.Container
 {
 	using System;
 	using System.Configuration;
+	using Castle.Components.Common.EmailSender;
 	using Castle.Components.Validator;
 	using Castle.Core;
 	using Castle.Core.Configuration;
@@ -84,10 +85,10 @@ namespace Castle.MonoRail.Framework.Container
 			/// The <see cref="IViewComponentFactory"/> service
 			/// </summary>
 			ViewComponentFactory,
-//			/// <summary>
-//			/// The <see cref="IEmailSender"/> service.
-//			/// </summary>
-//			EmailSender,
+			/// <summary>
+			/// The <see cref="IEmailSender"/> service.
+			/// </summary>
+			EmailSender,
 			/// <summary>
 			/// The <see cref="IControllerDescriptorProvider"/> service
 			/// </summary>
@@ -120,10 +121,10 @@ namespace Castle.MonoRail.Framework.Container
 			/// The <see cref="IResourceFactory"/> service
 			/// </summary>
 			ResourceFactory,
-//			/// <summary>
-//			/// The <see cref="IEmailTemplateService"/> service
-//			/// </summary>
-//			EmailTemplateService,
+			/// <summary>
+			/// The <see cref="IEmailTemplateService"/> service
+			/// </summary>
+			EmailTemplateService,
 			/// <summary>
 			/// The <see cref="IScaffoldingSupport"/> service
 			/// </summary>
@@ -168,6 +169,8 @@ namespace Castle.MonoRail.Framework.Container
 		private IScaffoldingSupport scaffoldSupportCached;
 		private IJSONSerializer jsonSerializerCached;
 		private IStaticResourceRegistry staticResourceRegCached;
+		private IEmailTemplateService emailTemplateServiceCached;
+		private IEmailSender emailSenderCached;
 		private ExtensionManager extensionManager;
 
 		/// <summary>
@@ -300,6 +303,20 @@ namespace Castle.MonoRail.Framework.Container
 			{
 				AddService(typeof(IStaticResourceRegistry), staticResourceRegistry);
 			}
+
+			IEmailTemplateService emailTemplateService =
+				(IEmailTemplateService) Parent.GetService(typeof(IEmailTemplateService));
+			if (emailTemplateService != null)
+			{
+				AddService(typeof(IEmailTemplateService), emailTemplateService);
+			}
+
+			IEmailSender emailSender =
+				(IEmailSender) Parent.GetService(typeof(IEmailSender));
+			if (emailSender != null)
+			{
+				AddService(typeof(IEmailSender), emailSender);
+			}
 		}
 
 		/// <summary>
@@ -406,6 +423,14 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<IViewComponentDescriptorProvider>())
 			{
 				AddService<IViewComponentDescriptorProvider>(CreateService<DefaultViewComponentDescriptorProvider>());
+			}
+			if (!HasService<IEmailTemplateService>())
+			{
+				AddService<IEmailTemplateService>(CreateService<EmailTemplateService>());
+			}
+			if (!HasService<IEmailSender>())
+			{
+				AddService<IEmailSender>(CreateService<MonoRailSmtpSender>());
 			}
 		}
 
@@ -756,6 +781,26 @@ namespace Castle.MonoRail.Framework.Container
 				return staticResourceRegCached;
 			}
 			set { staticResourceRegCached = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the email template service.
+		/// </summary>
+		/// <value>The email template service.</value>
+		public IEmailTemplateService EmailTemplateService
+		{
+			get { return emailTemplateServiceCached; }
+			set { emailTemplateServiceCached = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the email sender.
+		/// </summary>
+		/// <value>The email sender.</value>
+		public IEmailSender EmailSender
+		{
+			get { return emailSenderCached; }
+			set { emailSenderCached = value; }
 		}
 
 		/// <summary>

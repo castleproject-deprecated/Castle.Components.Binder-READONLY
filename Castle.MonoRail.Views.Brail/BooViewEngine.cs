@@ -152,6 +152,12 @@ namespace Castle.MonoRail.Views.Brail
 			controller.PostSendView(view);
 		}
 
+		public override void Process(string templateName, string layoutName, TextWriter output,
+		                             IDictionary<string, object> parameters)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override void ProcessPartial(string partialName, TextWriter output, IEngineContext context,
 		                                    IController controller, IControllerContext controllerContext)
 		{

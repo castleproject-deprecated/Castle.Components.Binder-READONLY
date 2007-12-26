@@ -22,6 +22,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	using System;
 	using System.IO;
 	using System.Collections;
+	using System.Collections.Generic;
 	using Castle.Core;
 	using Commons.Collections;
 	using JSGeneration;
@@ -173,6 +174,52 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			}
 		}
 
+		public override void Process(string templateName, string layoutName,
+		                             TextWriter output, IDictionary<string, object> parameters)
+		{
+			IContext ctx = CreateContext(parameters);
+
+			try
+			{
+				bool hasLayout = layoutName != null;
+
+				TextWriter writer;
+
+				if (hasLayout)
+				{
+					// Because we are rendering within a layout we need to catch it first
+					writer = new StringWriter();
+				}
+				else
+				{
+					// No layout so render direct to the output
+					writer = output;
+				}
+
+				String view = ResolveTemplateName(templateName);
+
+				Template template = velocity.GetTemplate(view);
+
+				BeforeMerge(velocity, template, ctx);
+				template.Merge(ctx, writer);
+
+				if (hasLayout)
+				{
+					String contents = (writer as StringWriter).GetStringBuilder().ToString();
+					ProcessLayout(contents, layoutName, ctx, output);
+				}
+			}
+			catch (Exception ex)
+			{
+				if (Logger.IsErrorEnabled)
+				{
+					Logger.Error("Could not render view", ex);
+				}
+
+				throw;
+			}
+		}
+
 		public override void ProcessPartial(String partialName, TextWriter output, IEngineContext context,
 		                                    IController controller, IControllerContext controllerContext)
 		{
@@ -294,6 +341,11 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		{
 		}
 
+		private void ProcessLayout(String contents, string layoutName, IContext ctx, TextWriter output)
+		{
+			RenderLayout(layoutName, contents, ctx, output);
+		}
+
 		private void ProcessLayout(String contents, IController controller, IControllerContext controllerContext, IContext ctx,
 		                           IEngineContext context, TextWriter output)
 		{
@@ -301,7 +353,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 			BeforeApplyingLayout(layout, ref contents, controller, ctx, context);
 
-			RenderLayout(layout, contents, ctx, context, output);
+			RenderLayout(layout, contents, ctx, output);
 		}
 
 		protected virtual void BeforeApplyingLayout(string layout, ref string contents,
@@ -309,31 +361,27 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		{
 		}
 
-		protected void RenderLayout(string layoutName, string contents, IContext ctx, IEngineContext context,
-		                            TextWriter output)
+		protected void RenderLayout(string layoutName, string contents, IContext ctx, TextWriter output)
 		{
-			try
+			ctx.Put(TemplateKeys.ChildContent, contents);
+
+			Template template = velocity.GetTemplate(layoutName);
+
+			BeforeMerge(velocity, template, ctx);
+
+			template.Merge(ctx, output);
+		}
+
+		private IContext CreateContext(IDictionary<string, object> parameters)
+		{
+			Hashtable innerContext = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
+
+			foreach(KeyValuePair<string, object> pair in parameters)
 			{
-				ctx.Put(TemplateKeys.ChildContent, contents);
-
-				Template template = velocity.GetTemplate(layoutName);
-
-				BeforeMerge(velocity, template, ctx);
-
-				template.Merge(ctx, output);
+				innerContext[pair.Key] = pair.Value;
 			}
-			catch(Exception ex)
-			{
-				if (context.Request.IsLocal)
-				{
-					SendErrorDetails(ex, context.Response.Output);
-				}
-				else
-				{
-					throw new MonoRailException("Error processing layout. Maybe the layout file does not exists? File: " + layoutName,
-					                            ex);
-				}
-			}
+
+			return new VelocityContext(innerContext);
 		}
 
 		private IContext CreateContext(IEngineContext context, IController controller, IControllerContext controllerContext)

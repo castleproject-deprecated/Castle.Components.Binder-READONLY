@@ -101,6 +101,10 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
+    <ProjectReference Include="..\..\Components\EmailSender\Castle.Components.Common.EmailSender\Castle.Components.Common.EmailSender-vs2008.csproj">
+      <Project>{CFF1D57F-9FEB-4941-B8FE-8E28F4A8AAC7}</Project>
+      <Name>Castle.Components.Common.EmailSender-vs2008</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Components\Validator\Castle.Components.Validator\Castle.Components.Validator-vs2008.csproj">
       <Project>{4C945D49-02E9-43F2-9202-E7A6E7C56E77}</Project>
       <Name>Castle.Components.Validator-vs2008</Name>
@@ -145,6 +149,7 @@
     <Compile Include="Controllers\Products\CartController.cs" />
     <Compile Include="Controllers\Products\ListController.cs" />
     <Compile Include="Filters\ControllerLevelFiltersTestCase.cs" />
+    <Compile Include="Services\EmailTemplateServiceTestCase.cs" />
     <Compile Include="ViewComponents\DefaultViewComponentRegistryTests.cs" />
     <Compile Include="FlashTestCase.cs" />
     <Compile Include="Handlers\ResourceFileHandlerTestCase.cs" />

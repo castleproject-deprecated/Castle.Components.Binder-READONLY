@@ -93,6 +93,16 @@ namespace Castle.MonoRail.Framework.Test
 		}
 
 		/// <summary>
+		/// Processes the view - using the templateName
+		/// to obtain the correct template
+		/// and writes the results to the System.TextWriter.
+		/// </summary>
+		public void Process(string templateName, string layoutName, TextWriter output, IDictionary<string, object> parameters)
+		{
+			templateRendered = templateName;
+		}
+
+		/// <summary>
 		/// Processes a partial view using the partialName
 		/// to obtain the correct template and writes the
 		/// results to the System.TextWriter.

@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
 	using JSGeneration;
 
@@ -137,7 +138,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="context">The request context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="controllerContext">The controller context.</param>
-		void GenerateJS(String templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo, 
+		void GenerateJS(string templateName, TextWriter output, JSCodeGeneratorInfo generatorInfo, 
 		                IEngineContext context, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
@@ -167,6 +168,14 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		void Process(string templateName, TextWriter output, IEngineContext context, IController controller,
 		             IControllerContext controllerContext);
+
+		/// <summary>
+		/// Processes the view - using the templateName
+		/// to obtain the correct template
+		/// and writes the results to the <see cref="TextWriter"/>.
+		/// No layout is applied!
+		/// </summary>
+		void Process(string templateName, string layoutName, TextWriter output, IDictionary<string,object> parameters);
 
 		/// <summary>
 		/// Wraps the specified content in the layout using
