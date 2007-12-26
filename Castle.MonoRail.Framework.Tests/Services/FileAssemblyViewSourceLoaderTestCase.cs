@@ -30,7 +30,6 @@ namespace Castle.MonoRail.Framework.Tests.Services
 		{
 			loader = new FileAssemblyViewSourceLoader();
 			loader.ViewRootDir = Path.GetFullPath(System.Configuration.ConfigurationManager.AppSettings["tests.src"]);
-//			loader.Service(new TestServiceContainer());
 		}
 
 		[Test]
@@ -86,7 +85,6 @@ namespace Castle.MonoRail.Framework.Tests.Services
 		{
 			loader = new FileAssemblyViewSourceLoader();
 			loader.ViewRootDir = Path.GetFullPath(@"c:\idontexist");
-//			loader.Service(new TestServiceContainer());
 		}
 
 		[Test]

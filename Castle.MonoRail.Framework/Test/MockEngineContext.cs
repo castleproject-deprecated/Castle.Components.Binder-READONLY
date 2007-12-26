@@ -196,7 +196,7 @@ namespace Castle.MonoRail.Framework.Test
 		/// <value></value>
 		public virtual string ApplicationPath
 		{
-			get { return urlInfo.AppVirtualDir; }
+			get { return urlInfo.AppVirtualDir ?? "/"; }
 		}
 
 //		/// <summary>

@@ -59,6 +59,16 @@ namespace Castle.MonoRail.Framework.Services.AjaxProxyGenerator
 			set { controllerDescriptorBuilder = value; }
 		}
 
+		/// <summary>
+		/// Gets or sets the controller tree.
+		/// </summary>
+		/// <value>The controller tree.</value>
+		public IControllerTree ControllerTree
+		{
+			get { return controllerTree; }
+			set { controllerTree = value; }
+		}
+
 		#region IServiceEnabledComponent implementation
 
 		/// <summary>
@@ -169,7 +179,8 @@ namespace Castle.MonoRail.Framework.Services.AjaxProxyGenerator
 
 						// appends " &<paramName>=' + <paramValue> + ' " to the string.
 						// the paramValue will run on the client-side, so it can be a parameter name, or a function call like Object.toJSON().
-						parameters.Append("\\x26").Append(paramName).Append("='+").Append(paramValue).Append("+'");
+						// parameters.Append("\\x26").Append(paramName).Append("='+").Append(paramValue).Append("+'");
+						parameters.Append("&").Append(paramName).Append("='+").Append(paramValue).Append("+'");
 					}
 
 					string httpRequestMethod = "get";
