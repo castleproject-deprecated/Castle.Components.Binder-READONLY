@@ -1,6 +1,9 @@
 1.0
 ===
 
+- Applied Gauthier Segay's patch fixing MR-384
+  "GenericCustomPage<T> should rely on IEnumerable<T> instead of IList<T> for it's datasource"
+
 - Applied James Curran's patch fixing MR-347
   "Cannot specify a default value for ViewComponentParameterAttribute"
 
