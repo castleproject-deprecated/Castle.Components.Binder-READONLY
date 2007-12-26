@@ -15,8 +15,6 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
-	using System.Collections;
-	using System.Collections.Specialized;
 	using System.Web;
 
 	/// <summary>
@@ -31,10 +29,16 @@ namespace Castle.MonoRail.Framework
 		int StatusCode { get; set; }
 
 		/// <summary>
+		/// Gets or sets the status code.
+		/// </summary>
+		/// <value>The status code.</value>
+		string StatusDescription { get; set; }
+
+		/// <summary>
 		/// Gets or sets the type of the content.
 		/// </summary>
 		/// <value>The type of the content.</value>
-		String ContentType { get; set; }
+		string ContentType { get; set; }
 
 		/// <summary>
 		/// Gets the caching policy (expiration time, privacy, 

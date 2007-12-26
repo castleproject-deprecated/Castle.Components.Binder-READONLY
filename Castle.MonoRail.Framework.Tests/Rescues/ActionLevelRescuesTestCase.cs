@@ -24,12 +24,13 @@ namespace Castle.MonoRail.Framework.Tests.Rescues
 		private MockEngineContext engineContext;
 		private ViewEngineManagerStub viewEngStub;
 		private MockServices services;
+		private MockResponse response;
 
 		[SetUp]
 		public void Init()
 		{
 			MockRequest request = new MockRequest();
-			MockResponse response = new MockResponse();
+			response = new MockResponse();
 			services = new MockServices();
 			viewEngStub = new ViewEngineManagerStub();
 			services.ViewEngineManager = viewEngStub;
@@ -46,6 +47,8 @@ namespace Castle.MonoRail.Framework.Tests.Rescues
 
 			controller.Process(engineContext, context);
 
+			Assert.AreEqual(500, response.StatusCode);
+			Assert.AreEqual("Error processing action", response.StatusDescription);
 			Assert.AreEqual("rescues\\specificerror", viewEngStub.TemplateRendered);
 		}
 

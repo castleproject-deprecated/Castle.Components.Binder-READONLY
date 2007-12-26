@@ -14,7 +14,6 @@
 
 namespace Castle.MonoRail.Framework.Test
 {
-	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
 	using System.IO;
@@ -27,7 +26,8 @@ namespace Castle.MonoRail.Framework.Test
 	public class MockResponse : IMockResponse
 	{
 		private readonly IDictionary cookies;
-		private int statusCode = 400;
+		private int statusCode = 200;
+		private string statusDescription = "OK";
 		private string contentType = "text/html";
 //		private string cacheControlHeader = null;
 //		private string charset = "ISO-8859-1";
@@ -304,6 +304,16 @@ namespace Castle.MonoRail.Framework.Test
 		{
 			get { return statusCode; }
 			set { statusCode = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the status description.
+		/// </summary>
+		/// <value>The status code.</value>
+		public string StatusDescription
+		{
+			get { return statusDescription; }
+			set { statusDescription = value; }
 		}
 
 		/// <summary>

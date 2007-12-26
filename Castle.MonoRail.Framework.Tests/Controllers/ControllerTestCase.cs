@@ -25,12 +25,13 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		private MockEngineContext engineContext;
 		private ViewEngineManagerStub viewEngStub;
 		private MockServices services;
+		private MockResponse response;
 
 		[SetUp]
 		public void Init()
 		{
 			MockRequest request = new MockRequest();
-			MockResponse response = new MockResponse();
+			response = new MockResponse();
 			services = new MockServices();
 			viewEngStub = new ViewEngineManagerStub();
 			services.ViewEngineManager = viewEngStub;
@@ -49,6 +50,26 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 			Assert.IsTrue(controller.Initialized);
 		}
 
+		[Test, ExpectedException(typeof(MonoRailException), "Could not find action named NonExistentAction")]
+		public void InvokingNonExistingActionResultsIn404()
+		{
+			ControllerAndViews controller = new ControllerAndViews();
+
+			IControllerContext context = new DefaultControllerContextFactory().
+				Create("", "home", "NonExistentAction", new ControllerMetaDescriptor());
+
+			try
+			{
+				controller.Process(engineContext, context);
+			}
+			catch(MonoRailException)
+			{
+				Assert.AreEqual(404, response.StatusCode);
+
+				throw;
+			}
+		}
+
 		[Test]
 		public void RendersViewByDefault()
 		{
@@ -59,6 +80,8 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 
 			controller.Process(engineContext, context);
 
+			Assert.AreEqual(200, response.StatusCode);
+			Assert.AreEqual("OK", response.StatusDescription);
 			Assert.AreEqual("home\\EmptyAction", viewEngStub.TemplateRendered);
 		}
 
@@ -67,11 +90,13 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		{
 			ControllerAndViews controller = new ControllerAndViews();
 
-			IControllerContext context = new DefaultControllerContextFactory().
+			IControllerContext context = services.ControllerContextFactory.
 				Create("", "home", "ActionWithViewOverride", new ControllerMetaDescriptor());
 
 			controller.Process(engineContext, context);
 
+			Assert.AreEqual(200, response.StatusCode);
+			Assert.AreEqual("OK", response.StatusDescription);
 			Assert.AreEqual("home\\SomethingElse", viewEngStub.TemplateRendered);
 		}
 
@@ -85,6 +110,8 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 
 			controller.Process(engineContext, context);
 
+			Assert.AreEqual(200, response.StatusCode);
+			Assert.AreEqual("OK", response.StatusDescription);
 			Assert.IsNull(viewEngStub.TemplateRendered);
 		}
 
@@ -100,6 +127,8 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 
 			Assert.IsTrue(controller.DefExecuted);
 			Assert.AreEqual("home\\index", viewEngStub.TemplateRendered);
+			Assert.AreEqual(200, response.StatusCode);
+			Assert.AreEqual("OK", response.StatusDescription);
 		}
 
 		[Test]
@@ -114,6 +143,8 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 
 			Assert.IsTrue(controller.DefExecuted);
 			Assert.AreEqual("home\\index", viewEngStub.TemplateRendered);
+			Assert.AreEqual(200, response.StatusCode);
+			Assert.AreEqual("OK", response.StatusDescription);
 		}
 
 		#region Controllers

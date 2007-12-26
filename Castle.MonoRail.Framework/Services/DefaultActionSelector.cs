@@ -54,15 +54,8 @@
 				return executableAction;
 			}
 
-			executableAction = ResolveDefaultMethod(context.ControllerDescriptor, controller, context);
-
-			if (executableAction == null)
-			{
-				throw new ControllerException(string.Format(
-					"Unable to find action '{0}' on controller '{1}'.", actionName, context.Name));
-			}
-
-			return executableAction;
+			// Last try:
+			return ResolveDefaultMethod(context.ControllerDescriptor, controller, context);
 		}
 
 		/// <summary>

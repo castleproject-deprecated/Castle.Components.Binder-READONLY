@@ -96,6 +96,13 @@ namespace Castle.MonoRail.Framework
 			}
 			catch(Exception ex)
 			{
+				HttpResponse response = context.Response;
+
+				if (response.StatusCode == 200)
+				{
+					response.StatusCode = 500;
+				}
+
 				engineContext.LastException = ex;
 
 				engineContext.Services.ExtensionManager.RaiseUnhandledError(engineContext);

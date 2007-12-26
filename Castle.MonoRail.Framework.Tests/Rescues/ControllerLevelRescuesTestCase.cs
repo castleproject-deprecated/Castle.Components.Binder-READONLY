@@ -26,12 +26,13 @@ namespace Castle.MonoRail.Framework.Tests.Rescues
 		private MockEngineContext engineContext;
 		private ViewEngineManagerStub viewEngStub;
 		private MockServices services;
+		private MockResponse response;
 
 		[SetUp]
 		public void Init()
 		{
 			MockRequest request = new MockRequest();
-			MockResponse response = new MockResponse();
+			response = new MockResponse();
 			services = new MockServices();
 			viewEngStub = new ViewEngineManagerStub();
 			services.ViewEngineManager = viewEngStub;
@@ -48,6 +49,8 @@ namespace Castle.MonoRail.Framework.Tests.Rescues
 
 			controller.Process(engineContext, context);
 
+			Assert.AreEqual(500, response.StatusCode);
+			Assert.AreEqual("Error processing action", response.StatusDescription);
 			Assert.AreEqual("rescues\\generalerror", viewEngStub.TemplateRendered);
 		}
 
@@ -61,6 +64,8 @@ namespace Castle.MonoRail.Framework.Tests.Rescues
 
 			controller.Process(engineContext, context);
 
+			Assert.AreEqual(500, response.StatusCode);
+			Assert.AreEqual("Error processing action", response.StatusDescription);
 			Assert.AreEqual("rescues\\sysException", viewEngStub.TemplateRendered);
 		}
 
@@ -74,6 +79,8 @@ namespace Castle.MonoRail.Framework.Tests.Rescues
 
 			controller.Process(engineContext, context);
 
+			Assert.AreEqual(500, response.StatusCode);
+			Assert.AreEqual("Error processing action", response.StatusDescription);
 			Assert.AreEqual("rescues\\sqlexception", viewEngStub.TemplateRendered);
 		}
 
@@ -87,6 +94,8 @@ namespace Castle.MonoRail.Framework.Tests.Rescues
 
 			controller.Process(engineContext, context);
 
+			Assert.AreEqual(500, response.StatusCode);
+			Assert.AreEqual("Error processing action", response.StatusDescription);
 			Assert.AreEqual("rescues\\generalerror", viewEngStub.TemplateRendered);
 		}
 
@@ -98,7 +107,17 @@ namespace Castle.MonoRail.Framework.Tests.Rescues
 			IControllerContext context = new DefaultControllerContextFactory().
 				Create("", "home", "index1", services.ControllerDescriptorProvider.BuildDescriptor(controller));
 
-			controller.Process(engineContext, context);
+			try
+			{
+				controller.Process(engineContext, context);
+			}
+			catch(Exception)
+			{
+				Assert.AreEqual(500, response.StatusCode);
+				Assert.AreEqual("Error processing action", response.StatusDescription);
+
+				throw;
+			}
 		}
 
 		#region Controllers

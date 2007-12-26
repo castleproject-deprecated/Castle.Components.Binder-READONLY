@@ -145,6 +145,7 @@
     <Compile Include="Controllers\Clients\OtherController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\ControllerTestCase.cs" />
+    <Compile Include="Controllers\ControllerWithAccessibleThroughTestCase.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Products\CartController.cs" />
     <Compile Include="Controllers\Products\ListController.cs" />

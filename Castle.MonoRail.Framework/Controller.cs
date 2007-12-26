@@ -955,7 +955,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="layoutName">Name of the layout.</param>
 		/// <param name="parameters">The parameters.</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
-		public Message RenderMailMessage(string templateName, string layoutName, IDictionary<string,object> parameters)
+		public Message RenderMailMessage(string templateName, string layoutName, IDictionary<string, object> parameters)
 		{
 			IEmailTemplateService templateService = engineContext.Services.EmailTemplateService;
 			return templateService.RenderMailMessage(templateName, layoutName, parameters);
@@ -1062,7 +1062,8 @@ namespace Castle.MonoRail.Framework
 			{
 				if (ControllerContext.Resources.ContainsKey(resDesc.Name))
 				{
-					throw new MonoRailException("There is a duplicated entry on the resource dictionary. Resource entry name: " + resDesc.Name);
+					throw new MonoRailException("There is a duplicated entry on the resource dictionary. Resource entry name: " +
+					                            resDesc.Name);
 				}
 
 				ControllerContext.Resources.Add(resDesc.Name, resourceFactory.Create(resDesc, typeAssembly));
@@ -1073,25 +1074,25 @@ namespace Castle.MonoRail.Framework
 
 		private void RunActionAndRenderView()
 		{
-			IExecutableAction action = SelectAction(Action);
-
-			if (action == null)
-			{
-				// Couldn't find action status code: 404 and throw exception
-			}
-
-			EnsureActionIsAccessibleWithCurrentHttpVerb(action);
-
-			CreateActionLevelResources(action);
-
-			bool cancel;
-			RunBeforeActionFilters(action, out cancel);
-			if (cancel) return;
-
+			IExecutableAction action = null;
 			Exception actionException = null;
+			bool cancel;
 
 			try
 			{
+				action = SelectAction(Action);
+
+				if (action == null)
+				{
+					throw new MonoRailException(404, "Not Found", "Could not find action named " + Action);
+				}
+
+				EnsureActionIsAccessibleWithCurrentHttpVerb(action);
+				CreateActionLevelResources(action);
+
+				RunBeforeActionFilters(action, out cancel);
+				if (cancel) return;
+
 				if (BeforeAction != null)
 				{
 					BeforeAction(action, engineContext, this, context);
@@ -1100,14 +1101,33 @@ namespace Castle.MonoRail.Framework
 				action.Execute(engineContext, this, context);
 
 				// Action executed successfully, so it's safe to process the cache configurer
-				if ((MetaDescriptor.CacheConfigurer != null || action.CachePolicyConfigurer != null) && 
-					!Response.WasRedirected && Response.StatusCode == 200)
+				if ((MetaDescriptor.CacheConfigurer != null || action.CachePolicyConfigurer != null) &&
+				    !Response.WasRedirected && Response.StatusCode == 200)
 				{
 					ConfigureCachePolicy(action);
 				}
 			}
+			catch(MonoRailException ex)
+			{
+				if (Response.StatusCode == 200 && ex.HttpStatusCode.HasValue)
+				{
+					Response.StatusCode = ex.HttpStatusCode.Value;
+					Response.StatusDescription = ex.HttpStatusDesc;
+				}
+
+				actionException = (ex is TargetInvocationException) ? ex.InnerException : ex;
+				engineContext.LastException = actionException;
+
+				RaiseOnActionExceptionOnExtension();
+			}
 			catch(Exception ex)
 			{
+				if (Response.StatusCode == 200)
+				{
+					Response.StatusCode = 500;
+					Response.StatusDescription = "Error processing action";
+				}
+
 				actionException = (ex is TargetInvocationException) ? ex.InnerException : ex;
 				engineContext.LastException = actionException;
 
@@ -1115,8 +1135,7 @@ namespace Castle.MonoRail.Framework
 			}
 			finally
 			{
-				// Always executed
-
+				// AfterAction event: always executed
 				if (AfterAction != null)
 				{
 					AfterAction(action, engineContext, this, context);
@@ -1136,7 +1155,6 @@ namespace Castle.MonoRail.Framework
 				if (context.SelectedViewName != null)
 				{
 					ProcessView();
-
 					RunAfterRenderingFilters(action);
 				}
 			}
@@ -1221,9 +1239,10 @@ namespace Castle.MonoRail.Framework
 
 			if ((allowedVerbs & currentVerb) != currentVerb)
 			{
-				throw new ControllerException(string.Format("Access to the action [{0}] " +
-				                                            "on controller [{1}] is not allowed by the http verb [{2}].",
-				                                            Action, Name, method));
+				throw new MonoRailException(403, "Forbidden",
+				                            string.Format("Access to the action [{0}] " +
+				                                          "on controller [{1}] is not allowed to the http verb [{2}].",
+				                                          Action, Name, method));
 			}
 		}
 
@@ -1304,8 +1323,8 @@ namespace Castle.MonoRail.Framework
 				new AbstractHelper[]
 					{
 						new AjaxHelper(), new BehaviourHelper(),
-						new UrlHelper(), new TextHelper(), 
-						new EffectsFatHelper(), new ScriptaculousHelper(), 
+						new UrlHelper(), new TextHelper(),
+						new EffectsFatHelper(), new ScriptaculousHelper(),
 						new DateFormatHelper(), new HtmlHelper(),
 						new ValidationHelper(), new DictHelper(),
 						new PaginationHelper(), new FormHelper(),
@@ -1396,6 +1415,8 @@ namespace Castle.MonoRail.Framework
 		private void RunAfterActionFilters(IExecutableAction action, out bool cancel)
 		{
 			cancel = false;
+			if (action == null) return;
+
 			if (action.ShouldSkipAllFilters) return;
 
 			if (!ProcessFilters(action, ExecuteEnum.AfterAction))
@@ -1544,14 +1565,14 @@ namespace Castle.MonoRail.Framework
 		/// <returns></returns>
 		protected bool ProcessRescue(IExecutableAction action, Exception actionException)
 		{
-			if (action.ShouldSkipRescues)
+			if (action != null && action.ShouldSkipRescues)
 			{
 				return false;
 			}
 
 			Type exceptionType = actionException.GetType();
 
-			RescueDescriptor desc = action.GetRescueFor(exceptionType);
+			RescueDescriptor desc = action != null ? action.GetRescueFor(exceptionType) : null;
 
 			if (desc == null)
 			{
@@ -1560,11 +1581,6 @@ namespace Castle.MonoRail.Framework
 
 			try
 			{
-				if (engineContext.Response.StatusCode == 200)
-				{
-					engineContext.Response.StatusCode = 500;
-				}
-
 				if (desc.RescueController != null)
 				{
 					CreateAndProcessRescueController(desc, actionException);
@@ -1572,7 +1588,7 @@ namespace Castle.MonoRail.Framework
 				else
 				{
 					context.SelectedViewName = Path.Combine("rescues", desc.ViewName);
-					
+
 					ProcessView();
 				}
 
@@ -1613,8 +1629,8 @@ namespace Castle.MonoRail.Framework
 			ControllerDescriptor rescueControllerDesc = rescueControllerMeta.ControllerDescriptor;
 
 			IControllerContext rescueControllerContext = engineContext.Services.ControllerContextFactory.Create(
-				 rescueControllerDesc.Area, rescueControllerDesc.Name, desc.RescueMethod.Name,
-				 rescueControllerMeta);
+				rescueControllerDesc.Area, rescueControllerDesc.Name, desc.RescueMethod.Name,
+				rescueControllerMeta);
 
 			rescueControllerContext.CustomActionParameters["exception"] = actionException;
 			rescueControllerContext.CustomActionParameters["controller"] = this;

@@ -83,6 +83,16 @@ namespace Castle.MonoRail.Framework.Adapters
 		}
 
 		/// <summary>
+		/// Gets or sets the status code.
+		/// </summary>
+		/// <value>The status code.</value>
+		public string StatusDescription
+		{
+			get { return response.StatusDescription; }
+			set { response.StatusDescription = value; }
+		}
+
+		/// <summary>
 		/// Gets or sets the content type.
 		/// </summary>
 		/// <value>The type of the content.</value>
