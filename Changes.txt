@@ -1,6 +1,9 @@
 1.0
 ===
 
+- Applied Felix Gartsman's patch fixing MR-368
+  "Added DetachedCriteria support to ARPaginationHelper/ARPaginableCriteria"
+
 - Applied Gauthier Segay's patch fixing MR-384
   "GenericCustomPage<T> should rely on IEnumerable<T> instead of IList<T> for it's datasource"
 

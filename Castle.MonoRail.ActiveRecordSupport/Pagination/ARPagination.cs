@@ -56,6 +56,15 @@ namespace Castle.MonoRail.ActiveRecordSupport.Pagination
 		}
 
 		/// <summary>
+		/// Paginates using an <see cref="ARPaginableCriteria"/>
+		/// </summary>
+		public static IPaginatedPage CreatePagination(int pageSize, Type targetType, DetachedCriteria detachedCriteria)
+		{
+			IARPaginableDataSource criteria = new ARPaginableCriteria(targetType, detachedCriteria);
+			return CreatePagination(pageSize, criteria);
+		}
+
+		/// <summary>
 		/// Paginates using the specified <see cref="IARPaginableDataSource"/>.
 		/// </summary>
 		public static IPaginatedPage CreatePagination(int pageSize, IARPaginableDataSource criteria)
