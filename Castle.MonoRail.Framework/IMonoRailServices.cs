@@ -18,6 +18,7 @@ namespace Castle.MonoRail.Framework
 	using Castle.Components.Validator;
 	using Castle.Core;
 	using Castle.MonoRail.Framework.Services;
+	using Resources;
 
 	/// <summary>
 	/// Pendent
@@ -131,6 +132,12 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The email sender.</value>
 		IEmailSender EmailSender { get; set; }
+
+		/// <summary>
+		/// Gets or sets the resource factory.
+		/// </summary>
+		/// <value>The resource factory.</value>
+		IResourceFactory ResourceFactory { get; set; }
 
 		/// <summary>
 		/// Gets or sets the extension manager.

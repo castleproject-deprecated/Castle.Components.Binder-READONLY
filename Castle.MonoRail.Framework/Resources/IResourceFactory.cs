@@ -30,11 +30,5 @@ namespace Castle.MonoRail.Framework.Resources
 		/// <param name="appAssembly">The app assembly.</param>
 		/// <returns></returns>
 		IResource Create(ResourceDescriptor descriptor, Assembly appAssembly);
-
-		/// <summary>
-		/// Releases the specified resource.
-		/// </summary>
-		/// <param name="resource">The resource.</param>
-		void Release(IResource resource);
 	}
 }

@@ -37,7 +37,7 @@ namespace Castle.MonoRail.Framework
 		private IDictionary propertyBag = new HybridDictionary(true);
 		private IDictionary helpers = new HybridDictionary(true);
 		private IDictionary<string, IDynamicAction> dynamicActions = new Dictionary<string, IDynamicAction>();
-		private readonly ResourceDictionary resources = new ResourceDictionary();
+		private readonly IDictionary<string, IResource> resources = new Dictionary<string, IResource>(StringComparer.InvariantCultureIgnoreCase);
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ControllerContext"/> class.
@@ -170,7 +170,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The resources.</value>
 		/// <remarks>It is supposed to be used by MonoRail infrastructure only</remarks>
-		public ResourceDictionary Resources
+		public IDictionary<string, IResource> Resources
 		{
 			get { return resources; }
 		}

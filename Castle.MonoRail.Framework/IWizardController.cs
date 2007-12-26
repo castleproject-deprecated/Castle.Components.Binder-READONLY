@@ -53,7 +53,7 @@ namespace Castle.MonoRail.Framework
 	/// events from a wizard lifecycle. The <see cref="GetSteps"/> must be used
 	/// to return the steps the wizard has.
 	/// </remarks>
-	public interface IWizardController
+	public interface IWizardController : IController
 	{
 		/// <summary>
 		/// Called when the wizard starts. 

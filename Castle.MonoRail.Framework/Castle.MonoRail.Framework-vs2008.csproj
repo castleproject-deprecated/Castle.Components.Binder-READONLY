@@ -239,7 +239,6 @@
     <Compile Include="Descriptors\TransformFilterDescriptor.cs" />
     <Compile Include="Internal\ActionProviderUtil.cs" />
     <Compile Include="Internal\RescueUtils.cs" />
-    <Compile Include="Internal\Test\TestContextHolder.cs" />
     <Compile Include="Internal\ViewComponentCacheBag.cs" />
     <Compile Include="Internal\WizardUtils.cs" />
     <Compile Include="IParameterBinder.cs" />
@@ -340,6 +339,7 @@
     </Compile>
     <Compile Include="Services\AbstractViewComponentFactory.cs" />
     <Compile Include="Services\AjaxProxyGenerator\IAjaxProxyGenerator.cs" />
+    <Compile Include="Services\AjaxProxyGenerator\PrototypeAjaxProxyGenerator.cs" />
     <Compile Include="Services\DefaultActionSelector.cs" />
     <Compile Include="Services\DefaultCacheProvider.cs" />
     <Compile Include="Services\DefaultControllerContextFactory.cs" />
@@ -350,7 +350,7 @@
     </Compile>
     <Compile Include="Services\DefaultEngineContextFactory.cs" />
     <Compile Include="Services\DefaultFilterFactory.cs" />
-    <Compile Include="Services\DefaultResourceFactory.cs" />
+    <Compile Include="Resources\DefaultResourceFactory.cs" />
     <Compile Include="Services\DefaultStaticResourceRegistry.cs" />
     <Compile Include="Services\DefaultUrlBuilder.cs" />
     <Compile Include="Services\DefaultViewComponentFactory.cs" />
@@ -380,7 +380,7 @@
     <Compile Include="IRequest.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IResource.cs">
+    <Compile Include="Resources\IResource.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IServerUtility.cs">
@@ -397,9 +397,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Resources\IResourceFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Resources\ResourceDictionary.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Resources\ResourceFacade.cs">

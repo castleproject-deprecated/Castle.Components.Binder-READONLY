@@ -149,7 +149,11 @@
     <Compile Include="Controllers\Products\CartController.cs" />
     <Compile Include="Controllers\Products\ListController.cs" />
     <Compile Include="Filters\ControllerLevelFiltersTestCase.cs" />
+    <Compile Include="Resources\ActionsWithResourcesTestCase.cs" />
+    <Compile Include="Resources\ControllerWithResourcesTestCase.cs" />
+    <Compile Include="Resources\DefaultResourceFactoryTestCase.cs" />
     <Compile Include="Services\EmailTemplateServiceTestCase.cs" />
+    <Compile Include="Services\PrototypeAjaxProxyGeneratorTestCase.cs" />
     <Compile Include="ViewComponents\DefaultViewComponentRegistryTests.cs" />
     <Compile Include="FlashTestCase.cs" />
     <Compile Include="Handlers\ResourceFileHandlerTestCase.cs" />
@@ -199,6 +203,17 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Handlers\Files\simplerequest.txt" />
+    <EmbeddedResource Include="Resources\Language.nl.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Language.de.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Language.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Language.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Services\StaticResourceRegistry\DummyRes.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>

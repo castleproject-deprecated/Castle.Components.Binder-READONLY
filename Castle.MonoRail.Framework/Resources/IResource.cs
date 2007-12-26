@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework
+namespace Castle.MonoRail.Framework.Resources
 {
-	using System;
 	using System.Collections;
 
 	/// <summary>
@@ -26,16 +25,16 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Returns the object linked to the specific key.
 		/// </summary>
-		object this[String key] { get; }
+		object this[string key] { get; }
 
 		/// <summary>
 		/// Returns the object linked to the specific key as a string.
 		/// </summary>
-		String GetString(String key);
+		string GetString(string key);
 
 		/// <summary>
 		/// Returns the object linked to the specific key.
 		/// </summary>
-		object GetObject(String key);
+		object GetObject(string key);
 	}
 }

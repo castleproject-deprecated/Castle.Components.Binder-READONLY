@@ -79,7 +79,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <remarks>It is supposed to be used by MonoRail infrastructure only</remarks>
 		/// <value>The resources.</value>
-		ResourceDictionary Resources { get; }
+		IDictionary<string, IResource> Resources { get; }
 
 		/// <summary>
 		/// Gets the dynamic actions.

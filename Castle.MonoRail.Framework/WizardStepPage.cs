@@ -65,7 +65,7 @@ namespace Castle.MonoRail.Framework
 	{
 		#region Fields
 
-		private IController wizardParentController;
+		private IWizardController wizardParentController;
 		private IControllerContext wizardcontrollerContext;
 
 		#endregion
@@ -95,33 +95,25 @@ namespace Castle.MonoRail.Framework
 		/// Gets the wizard controller.
 		/// </summary>
 		/// <value>The wizard controller.</value>
-		public IController WizardController
+		public IWizardController WizardController
 		{
 			get { return wizardParentController; }
+			set { wizardParentController = value; }
+		}
+
+		/// <summary>
+		/// Gets the controller context.
+		/// </summary>
+		/// <value>The controller context.</value>
+		public IControllerContext WizardControllerContext
+		{
+			get { return wizardcontrollerContext; }
+			set { wizardcontrollerContext = value; }
 		}
 
 		#endregion
 
 		#region Core Lifecycle methods
-
-		/// <summary>
-		/// Invoked by <see xref="WizardActionProvider"/>.
-		/// </summary>
-		/// <param name="engineContext">The engine context.</param>
-		/// <param name="wizardController">The wizard controller.</param>
-		/// <param name="controllerContext">The controller context.</param>
-		/// <remarks>
-		/// This can be overriden but it's important to invoke the base
-		/// implementation.
-		/// </remarks>
-		protected internal virtual void Initialize(IEngineContext engineContext, IController wizardController,
-		                                           IControllerContext controllerContext)
-		{
-			wizardParentController = wizardController;
-			wizardcontrollerContext = controllerContext;
-
-			PropertyBag = controllerContext.PropertyBag;
-		}
 
 		/// <summary>
 		/// Invoked when the wizard is being access from the start 

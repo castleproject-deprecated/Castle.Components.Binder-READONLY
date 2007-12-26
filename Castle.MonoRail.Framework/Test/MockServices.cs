@@ -19,6 +19,7 @@ namespace Castle.MonoRail.Framework.Test
 	using Castle.Components.Common.EmailSender;
 	using Castle.Components.Validator;
 	using Providers;
+	using Resources;
 	using Services;
 
 	/// <summary>
@@ -44,6 +45,7 @@ namespace Castle.MonoRail.Framework.Test
 		private IStaticResourceRegistry staticResourceRegistry;
 		private IEmailTemplateService emailTemplateService;
 		private IEmailSender emailSender;
+		private IResourceFactory resourceFactory;
 		private ExtensionManager extensionManager;
 		private readonly Dictionary<Type, object> service2Impl = new Dictionary<Type, object>();
 
@@ -85,6 +87,8 @@ namespace Castle.MonoRail.Framework.Test
 				new DefaultRescueDescriptorProvider(),
 				new DefaultResourceDescriptorProvider(),
 				new DefaultTransformFilterDescriptorProvider());
+
+			resourceFactory = new DefaultResourceFactory();
 
 			extensionManager = new ExtensionManager(this);
 		}
@@ -267,6 +271,16 @@ namespace Castle.MonoRail.Framework.Test
 		{
 			get { return emailSender; }
 			set { emailSender = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the resource factory.
+		/// </summary>
+		/// <value>The resource factory.</value>
+		public IResourceFactory ResourceFactory
+		{
+			get { return resourceFactory; }
+			set { resourceFactory = value; }
 		}
 
 		/// <summary>

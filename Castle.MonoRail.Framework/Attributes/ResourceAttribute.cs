@@ -26,14 +26,14 @@ namespace Castle.MonoRail.Framework
 	{
 		private String name, resourceName, cultureName, assemblyName;
 		private Type resourceType;
-		
+
 		/// <summary>
 		/// Constructs a resource attribute, with the specified name, based
 		/// on the resource in a satellite assembly.
 		/// </summary>
 		/// <param name="name">Name the resource will be available as in the PropertyBag</param>
 		/// <param name="resourceName">Fully qualified name of the resource in the sattelite assembly</param>
-		public ResourceAttribute( String name, String resourceName )
+		public ResourceAttribute(String name, String resourceName)
 		{
 			this.name = name;
 			this.resourceName = resourceName;
@@ -42,7 +42,7 @@ namespace Castle.MonoRail.Framework
 			{
 				String[] pair = resourceName.Split(',');
 				this.resourceName = pair[0].Trim();
-				this.assemblyName = pair[1].Trim();
+				assemblyName = pair[1].Trim();
 			}
 		}
 
@@ -103,11 +103,14 @@ namespace Castle.MonoRail.Framework
 		/// <returns></returns>
 		public ResourceDescriptor[] BuildResourceDescriptors()
 		{
-			return new ResourceDescriptor[] { new ResourceDescriptor(resourceType, 
-			                                                         name, 
-			                                                         resourceName, 
-			                                                         cultureName, 
-			                                                         assemblyName) };
+			return new ResourceDescriptor[]
+				{
+					new ResourceDescriptor(resourceType,
+					                       name,
+					                       resourceName,
+					                       cultureName,
+					                       assemblyName)
+				};
 		}
 	}
 }

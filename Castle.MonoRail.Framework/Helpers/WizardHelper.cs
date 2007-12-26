@@ -79,7 +79,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns></returns>
 		public String LinkToStep(String linkText, IWizardStepPage step)
 		{
-			return LinkTo(linkText, step.ControllerContext.Name, step.ActionName);
+			return LinkTo(linkText, step.WizardControllerContext.Name, step.ActionName);
 		}
 
 		/// <summary>
@@ -94,7 +94,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns></returns>
 		public String LinkToStep(String linkText, IWizardStepPage step, object id)
 		{
-			return LinkTo(linkText, step.ControllerContext.Name, step.ActionName, id);
+			return LinkTo(linkText, step.WizardControllerContext.Name, step.ActionName, id);
 		}
 
 		/// <summary>
@@ -110,7 +110,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns></returns>
 		public String LinkToStep(String linkText, IWizardStepPage step, object id, IDictionary attributes)
 		{
-			return LinkToAttributed(linkText, step.ControllerContext.Name, step.ActionName, id, attributes);
+			return LinkToAttributed(linkText, step.WizardControllerContext.Name, step.ActionName, id, attributes);
 		}
 
 		#endregion

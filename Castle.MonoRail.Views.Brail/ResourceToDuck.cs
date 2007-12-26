@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Views.Brail
 {
 	using System.Collections;
 	using Boo.Lang;
+	using Castle.MonoRail.Framework.Resources;
 	using Framework;
 
 	// This allows to treat resources in a natural way:

@@ -46,12 +46,12 @@ namespace Castle.MonoRail.Framework
 		/// Gets the wizard controller (parent).
 		/// </summary>
 		/// <value>The wizard controller.</value>
-		IController WizardController { get; }
+		IWizardController WizardController { get; set; }
 
 		/// <summary>
 		/// Gets the controller context.
 		/// </summary>
 		/// <value>The controller context.</value>
-		IControllerContext ControllerContext { get; }
+		IControllerContext WizardControllerContext { get; set; }
 	}
 }

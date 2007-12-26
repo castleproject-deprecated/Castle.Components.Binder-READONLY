@@ -19,7 +19,7 @@ namespace Castle.MonoRail.Framework.Descriptors
 	/// <summary>
 	/// Represents a resource configuration associated with a controller.
 	/// </summary>
-	public class ResourceDescriptor
+	public class ResourceDescriptor : IEquatable<ResourceDescriptor>
 	{
 		private readonly Type resourceType;
 		private readonly string name;
@@ -88,6 +88,33 @@ namespace Castle.MonoRail.Framework.Descriptors
 		public string AssemblyName
 		{
 			get { return assemblyName; }
+		}
+
+		public bool Equals(ResourceDescriptor resourceDescriptor)
+		{
+			if (resourceDescriptor == null) return false;
+			if (!Equals(resourceType, resourceDescriptor.resourceType)) return false;
+			if (!Equals(name, resourceDescriptor.name)) return false;
+			if (!Equals(resourceName, resourceDescriptor.resourceName)) return false;
+			if (!Equals(cultureName, resourceDescriptor.cultureName)) return false;
+			if (!Equals(assemblyName, resourceDescriptor.assemblyName)) return false;
+			return true;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(this, obj)) return true;
+			return Equals(obj as ResourceDescriptor);
+		}
+
+		public override int GetHashCode()
+		{
+			int result = resourceType != null ? resourceType.GetHashCode() : 0;
+			result = 29 * result + name.GetHashCode();
+			result = 29 * result + resourceName.GetHashCode();
+			result = 29 * result + (cultureName != null ? cultureName.GetHashCode() : 0);
+			result = 29 * result + (assemblyName != null ? assemblyName.GetHashCode() : 0);
+			return result;
 		}
 	}
 }

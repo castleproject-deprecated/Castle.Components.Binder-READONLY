@@ -171,6 +171,7 @@ namespace Castle.MonoRail.Framework.Container
 		private IStaticResourceRegistry staticResourceRegCached;
 		private IEmailTemplateService emailTemplateServiceCached;
 		private IEmailSender emailSenderCached;
+		private IResourceFactory resourceFactoryCached;
 		private ExtensionManager extensionManager;
 
 		/// <summary>
@@ -316,6 +317,13 @@ namespace Castle.MonoRail.Framework.Container
 			if (emailSender != null)
 			{
 				AddService(typeof(IEmailSender), emailSender);
+			}
+
+			IResourceFactory resourceFactory =
+				(IResourceFactory) Parent.GetService(typeof(IResourceFactory));
+			if (resourceFactory != null)
+			{
+				AddService(typeof(IResourceFactory), resourceFactory);
 			}
 		}
 
@@ -789,7 +797,14 @@ namespace Castle.MonoRail.Framework.Container
 		/// <value>The email template service.</value>
 		public IEmailTemplateService EmailTemplateService
 		{
-			get { return emailTemplateServiceCached; }
+			get
+			{
+				if (emailTemplateServiceCached == null)
+				{
+					emailTemplateServiceCached = GetService<IEmailTemplateService>();
+				}
+				return emailTemplateServiceCached;
+			}
 			set { emailTemplateServiceCached = value; }
 		}
 
@@ -799,7 +814,14 @@ namespace Castle.MonoRail.Framework.Container
 		/// <value>The email sender.</value>
 		public IEmailSender EmailSender
 		{
-			get { return emailSenderCached; }
+			get
+			{
+				if (emailSenderCached == null)
+				{
+					emailSenderCached = GetService<IEmailSender>();
+				}
+				return emailSenderCached;
+			}
 			set { emailSenderCached = value; }
 		}
 
@@ -811,6 +833,23 @@ namespace Castle.MonoRail.Framework.Container
 		{
 			get { return extensionManager; }
 			set { extensionManager = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the resource factory.
+		/// </summary>
+		/// <value>The resource factory.</value>
+		public IResourceFactory ResourceFactory
+		{
+			get
+			{
+				if (resourceFactoryCached == null)
+				{
+					resourceFactoryCached = GetService<IResourceFactory>();
+				}
+				return resourceFactoryCached;
+			}
+			set { resourceFactoryCached = value; }
 		}
 
 		#endregion
@@ -836,7 +875,7 @@ namespace Castle.MonoRail.Framework.Container
 				                            "Check your configuration file, services node under MonoRail configuration.");
 			}
 
-			Type service = null;
+			Type service;
 
 			if (!string.IsNullOrEmpty(_interface))
 			{

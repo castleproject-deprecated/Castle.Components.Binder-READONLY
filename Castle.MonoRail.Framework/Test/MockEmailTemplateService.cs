@@ -36,6 +36,16 @@ namespace Castle.MonoRail.Framework.Test
 			this.context = context;
 		}
 
+		/// <summary>
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
+		/// </summary>
+		/// <param name="templateName">Name of the template to load.
+		/// Will look in <c>Views/mail</c> for that template file.</param>
+		/// <param name="layoutName">Name of the layout.</param>
+		/// <param name="parameters">Dictionary with parameters
+		/// that you can use on the email template</param>
+		/// <returns>An instance of <see cref="Message"/></returns>
 		public Message RenderMailMessage(string templateName, string layoutName, IDictionary parameters)
 		{
 			context.AddMailTemplateRendered(templateName, parameters);
@@ -43,6 +53,16 @@ namespace Castle.MonoRail.Framework.Test
 			return new Message("from", "to", "subject", "body");
 		}
 
+		/// <summary>
+		/// Creates an instance of <see cref="Message"/>
+		/// using the specified template for the body
+		/// </summary>
+		/// <param name="templateName">Name of the template to load.
+		/// Will look in <c>Views/mail</c> for that template file.</param>
+		/// <param name="layoutName">Name of the layout.</param>
+		/// <param name="parameters">Dictionary with parameters
+		/// that you can use on the email template</param>
+		/// <returns>An instance of <see cref="Message"/></returns>
 		public Message RenderMailMessage(string templateName, string layoutName, object parameters)
 		{
 			context.AddMailTemplateRendered(templateName, new ReflectionBasedDictionaryAdapter(parameters));
@@ -50,6 +70,15 @@ namespace Castle.MonoRail.Framework.Test
 			return new Message("from", "to", "subject", "body");
 		}
 
+		/// <summary>
+		/// Renders the mail message.
+		/// </summary>
+		/// <param name="templateName">Name of the template.</param>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <param name="doNotApplyLayout">if set to <c>true</c> [do not apply layout].</param>
+		/// <returns></returns>
 		public Message RenderMailMessage(string templateName, IEngineContext engineContext, IController controller,
 		                                 IControllerContext controllerContext, bool doNotApplyLayout)
 		{

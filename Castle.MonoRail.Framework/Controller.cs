@@ -91,10 +91,11 @@ namespace Castle.MonoRail.Framework
 			viewEngineManager = engineContext.Services.ViewEngineManager; // should not be null
 			actionSelector = engineContext.Services.ActionSelector; // should not be null
 			scaffoldSupport = engineContext.Services.ScaffoldSupport; // might be null
-			//			validatorRunner = CreateValidatorRunner(engineContext.Services.ValidatorRegistry);
+//			validatorRunner = CreateValidatorRunner(engineContext.Services.ValidatorRegistry);
 
 			ResetIsPostback();
 			context.LayoutName = ObtainDefaultLayoutName();
+			CreateControllerLevelResources();
 			CreateAndInitializeHelpers();
 			CreateFiltersDescriptors();
 			ProcessScaffoldIfAvailable();
@@ -177,7 +178,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <remarks>It is supposed to be used by MonoRail infrastructure only</remarks>
 		/// <value>The resources.</value>
-		public ResourceDictionary Resources
+		public IDictionary<string, IResource> Resources
 		{
 			get { return context.Resources; }
 		}
@@ -1023,6 +1024,53 @@ namespace Castle.MonoRail.Framework
 
 		#endregion
 
+		#region Resources/i18n
+
+		/// <summary>
+		/// Creates the controller level resources.
+		/// </summary>
+		protected virtual void CreateControllerLevelResources()
+		{
+			CreateResources(MetaDescriptor.Resources);
+		}
+
+		/// <summary>
+		/// Creates the controller level resources.
+		/// </summary>
+		/// <param name="action">The action.</param>
+		protected virtual void CreateActionLevelResources(IExecutableAction action)
+		{
+			CreateResources(action.Resources);
+		}
+
+		/// <summary>
+		/// Creates the resources and adds them to the <see cref="IControllerContext.Resources"/>.
+		/// </summary>
+		/// <param name="resources">The resources.</param>
+		protected virtual void CreateResources(ResourceDescriptor[] resources)
+		{
+			if (resources == null || resources.Length == 0)
+			{
+				return;
+			}
+
+			Assembly typeAssembly = GetType().Assembly;
+
+			IResourceFactory resourceFactory = engineContext.Services.ResourceFactory;
+
+			foreach(ResourceDescriptor resDesc in resources)
+			{
+				if (ControllerContext.Resources.ContainsKey(resDesc.Name))
+				{
+					throw new MonoRailException("There is a duplicated entry on the resource dictionary. Resource entry name: " + resDesc.Name);
+				}
+
+				ControllerContext.Resources.Add(resDesc.Name, resourceFactory.Create(resDesc, typeAssembly));
+			}
+		}
+
+		#endregion
+
 		private void RunActionAndRenderView()
 		{
 			IExecutableAction action = SelectAction(Action);
@@ -1033,6 +1081,8 @@ namespace Castle.MonoRail.Framework
 			}
 
 			EnsureActionIsAccessibleWithCurrentHttpVerb(action);
+
+			CreateActionLevelResources(action);
 
 			bool cancel;
 			RunBeforeActionFilters(action, out cancel);

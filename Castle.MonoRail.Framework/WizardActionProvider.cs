@@ -114,6 +114,9 @@ namespace Castle.MonoRail.Framework
 			foreach(IWizardStepPage step in steps)
 			{
 				string actionName = step.ActionName;
+
+				step.WizardController = wizardController;
+				step.WizardControllerContext = controllerContext;
 				
 				if (string.Compare(requestedAction, actionName, true) == 0)
 				{

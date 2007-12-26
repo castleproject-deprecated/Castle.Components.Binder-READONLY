@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.Framework.Services
+namespace Castle.MonoRail.Framework.Resources
 {
 	using System;
-	using System.Resources;
-	using System.Reflection;
 	using System.Globalization;
-	using Castle.Core;
+	using System.Reflection;
+	using System.Resources;
 	using Castle.Core.Logging;
-	using Castle.MonoRail.Framework.Resources;
-	using Castle.MonoRail.Framework.Descriptors;
+	using Core;
+	using Descriptors;
 
 	/// <summary>
 	/// Standard implementation of <see cref="IResourceFactory" />
@@ -74,14 +73,6 @@ namespace Castle.MonoRail.Framework.Services
 
 			ResourceManager manager = new ResourceManager(descriptor.ResourceName, assembly, descriptor.ResourceType);
 			return new ResourceFacade(manager, cultureInfo);
-		}
-
-		/// <summary>
-		/// Releases a resource
-		/// </summary>
-		/// <param name="resource"></param>
-		public void Release(IResource resource)
-		{
 		}
 
 		/// <summary>

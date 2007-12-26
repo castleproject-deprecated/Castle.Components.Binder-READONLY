@@ -80,7 +80,7 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		{
 			ControllerAndViews controller = new ControllerAndViews();
 
-			IControllerContext context = new DefaultControllerContextFactory().
+			IControllerContext context = services.ControllerContextFactory.
 				Create("", "home", "CancelsTheView", new ControllerMetaDescriptor());
 
 			controller.Process(engineContext, context);
@@ -93,7 +93,7 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		{
 			ControllerWithDefMethodOnAction controller = new ControllerWithDefMethodOnAction();
 
-			IControllerContext context = new DefaultControllerContextFactory().
+			IControllerContext context = services.ControllerContextFactory.
 				Create("", "home", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
 
 			controller.Process(engineContext, context);
@@ -107,7 +107,7 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		{
 			ControllerWithDefaultActionAttribute controller = new ControllerWithDefaultActionAttribute();
 
-			IControllerContext context = new DefaultControllerContextFactory().
+			IControllerContext context = services.ControllerContextFactory.
 				Create("", "home", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
 
 			controller.Process(engineContext, context);
