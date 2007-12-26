@@ -404,7 +404,7 @@ namespace Castle.MonoRail.Views.Brail
 
 			if (controllerContext.Resources != null)
 			{
-				foreach(object key in controllerContext.Resources.Keys)
+				foreach(string key in controllerContext.Resources.Keys)
 				{
 					properties.Add(key, new ResourceToDuck(controllerContext.Resources[key]));
 				}

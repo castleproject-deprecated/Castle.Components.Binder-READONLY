@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Adapters
 {
 	using System;
+	using System.Collections;
 	using System.Collections.Specialized;
 	using System.Web;
 	using Castle.Components.Binder;
@@ -27,7 +28,7 @@ namespace Castle.MonoRail.Framework.Adapters
 		private TreeBuilder treeBuilder = new TreeBuilder();
 		private HttpRequest request;
 		private CompositeNode paramsNode, formNode, queryStringNode;
-//		private FileDictionaryAdapter files;
+		private FileDictionaryAdapter files;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RequestAdapter"/> class.
@@ -177,22 +178,22 @@ namespace Castle.MonoRail.Framework.Adapters
 //		{
 //			get { return request[key]; }
 //		}
-//
-//		/// <summary>
-//		/// Gets the <see cref="HttpPostedFile"/> per key.
-//		/// </summary>
-//		/// <value></value>
-//		public IDictionary Files
-//		{
-//			get
-//			{
-//				if (files == null)
-//				{
-//					files = new FileDictionaryAdapter(request.Files);
-//				}
-//				return files;
-//			}
-//		}
+
+		/// <summary>
+		/// Gets the <see cref="HttpPostedFile"/> per key.
+		/// </summary>
+		/// <value></value>
+		public IDictionary Files
+		{
+			get
+			{
+				if (files == null)
+				{
+					files = new FileDictionaryAdapter(request.Files);
+				}
+				return files;
+			}
+		}
 
 		/// <summary>
 		/// Gets the user languages.

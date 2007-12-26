@@ -31,15 +31,13 @@ namespace Castle.MonoRail.Framework.Test
 //		private readonly string physicalPath = AppDomain.CurrentDomain.BaseDirectory;
 		private readonly IRequest request;
 		private readonly IResponse response;
-//		private readonly ITrace trace;
-		private readonly UrlInfo urlInfo;
 		private readonly Flash flash = new Flash();
-//		private readonly ICacheProvider cacheProvider = new MockCacheProvider();
-		private readonly IServerUtility serverUtility = new MockServerUtility();
+		private IServerUtility serverUtility = new MockServerUtility();
 		private readonly IDictionary contextItems = new HybridDictionary(true);
 		private readonly List<RenderedEmailTemplate> renderedEmailTemplates = new List<RenderedEmailTemplate>();
 		private readonly List<Message> messagesSent = new List<Message>();
-//		private IServiceProvider container;
+		private UrlInfo urlInfo;
+		private ITrace trace;
 		private IPrincipal currentUser;
 		private Exception lastException;
 		private IDictionary session = new HybridDictionary(true);
@@ -104,15 +102,6 @@ namespace Castle.MonoRail.Framework.Test
 			}
 		}
 
-//		/// <summary>
-//		/// Access the params (Query, Post, headers and Cookies)
-//		/// </summary>
-//		/// <value></value>
-//		public virtual NameValueCollection Params
-//		{
-//			get { return request.Params; }
-//		}
-
 		/// <summary>
 		/// Access the session objects.
 		/// </summary>
@@ -141,24 +130,15 @@ namespace Castle.MonoRail.Framework.Test
 			get { return response; }
 		}
 
-//		/// <summary>
-//		/// Gets the trace object.
-//		/// </summary>
-//		/// <value></value>
-//		public virtual ITrace Trace
-//		{
-//			get { return trace; }
-//		}
-//
-//		/// <summary>
-//		/// Access the Cache associated with this
-//		/// web execution context.
-//		/// </summary>
-//		/// <value></value>
-//		public virtual ICacheProvider Cache
-//		{
-//			get { return cacheProvider; }
-//		}
+		/// <summary>
+		/// Gets the trace object.
+		/// </summary>
+		/// <value></value>
+		public virtual ITrace Trace
+		{
+			get { return trace; }
+			set { trace = value; }
+		}
 
 		/// <summary>
 		/// Access a dictionary of volative items.
@@ -224,6 +204,7 @@ namespace Castle.MonoRail.Framework.Test
 		public virtual UrlInfo UrlInfo
 		{
 			get { return urlInfo; }
+			set { urlInfo = value; }
 		}
 
 		/// <summary>
@@ -233,6 +214,7 @@ namespace Castle.MonoRail.Framework.Test
 		public virtual IServerUtility Server
 		{
 			get { return serverUtility; }
+			set { serverUtility = value; }
 		}
 
 		/// <summary>
@@ -271,18 +253,9 @@ namespace Castle.MonoRail.Framework.Test
 		public IMonoRailServices Services
 		{
 			get { return services; }
+			set { services = value; }
 		}
 
-//		/// <summary>
-//		/// If a container is available for the app, this
-//		/// property exposes its instance.
-//		/// </summary>
-//		/// <value></value>
-//		public IServiceProvider Container
-//		{
-//			get { return container; }
-//		}
-//
 //		#endregion
 //
 //		/// <summary>
@@ -293,53 +266,24 @@ namespace Castle.MonoRail.Framework.Test
 //		{
 //			container = serviceProvider;
 //		}
-//
-//		/// <summary>
-//		/// Gets the rendered email templates.
-//		/// </summary>
-//		/// <value>The rendered email templates.</value>
-//		public virtual List<RenderedEmailTemplate> RenderedEmailTemplates
-//		{
-//			get { return renderedEmailTemplates; }
-//		}
-//
-//		/// <summary>
-//		/// Gets the messages sent.
-//		/// </summary>
-//		/// <value>The messages sent.</value>
-//		public virtual List<Message> MessagesSent
-//		{
-//			get { return messagesSent; }
-//		}
-//
-//		/// <summary>
-//		/// Registers the services.
-//		/// </summary>
-//		private void RegisterServices()
-//		{
-//			DefaultUrlBuilder urlBuilder = new DefaultUrlBuilder();
-//			urlBuilder.ServerUtil = serverUtility;
-//			AddService(typeof(IUrlBuilder), urlBuilder);
-//
-//			AddService(typeof(IValidatorRegistry), new CachedValidationRegistry());
-//
-//			AddService(typeof(IEmailTemplateService), new MockEmailTemplateService(this));
-//			AddService(typeof(IEmailSender), new MockSmtpSender(this));
-//
-//			AddService(typeof(IHelperDescriptorProvider), new DefaultHelperDescriptorProvider());
-//			AddService(typeof(IFilterDescriptorProvider), new DefaultFilterDescriptorProvider());
-//			AddService(typeof(ILayoutDescriptorProvider), new DefaultLayoutDescriptorProvider());
-//			AddService(typeof(IRescueDescriptorProvider), new DefaultRescueDescriptorProvider());
-//			AddService(typeof(IResourceDescriptorProvider), new DefaultResourceDescriptorProvider());
-//			AddService(typeof(ITransformFilterDescriptorProvider), new DefaultTransformFilterDescriptorProvider());
-//
-//			DefaultControllerDescriptorProvider controllerDescProvider = new DefaultControllerDescriptorProvider();
-//			controllerDescProvider.Service(this);
-//			AddService(typeof(IControllerDescriptorProvider), controllerDescProvider);
-//
-//			AddService(typeof(IViewEngineManager), new DefaultViewEngineManager());
-//			AddService(typeof(IScaffoldingSupport), new MockScaffoldingSupport());
-//		}
+
+		/// <summary>
+		/// Gets the rendered email templates.
+		/// </summary>
+		/// <value>The rendered email templates.</value>
+		public virtual List<RenderedEmailTemplate> RenderedEmailTemplates
+		{
+			get { return renderedEmailTemplates; }
+		}
+
+		/// <summary>
+		/// Gets the messages sent.
+		/// </summary>
+		/// <value>The messages sent.</value>
+		public virtual List<Message> MessagesSent
+		{
+			get { return messagesSent; }
+		}
 
 		internal void AddMailTemplateRendered(string templateName, IDictionary parameters)
 		{

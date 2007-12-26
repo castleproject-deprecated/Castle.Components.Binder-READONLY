@@ -90,6 +90,11 @@ namespace Castle.MonoRail.Framework.Descriptors
 			get { return assemblyName; }
 		}
 
+		/// <summary>
+		/// Equalses the specified resource descriptor.
+		/// </summary>
+		/// <param name="resourceDescriptor">The resource descriptor.</param>
+		/// <returns></returns>
 		public bool Equals(ResourceDescriptor resourceDescriptor)
 		{
 			if (resourceDescriptor == null) return false;
@@ -101,12 +106,26 @@ namespace Castle.MonoRail.Framework.Descriptors
 			return true;
 		}
 
+		/// <summary>
+		/// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
+		/// </summary>
+		/// <param name="obj">The <see cref="T:System.Object"/> to compare with the current <see cref="T:System.Object"/>.</param>
+		/// <returns>
+		/// true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>; otherwise, false.
+		/// </returns>
+		/// <exception cref="T:System.NullReferenceException">The <paramref name="obj"/> parameter is null.</exception>
 		public override bool Equals(object obj)
 		{
 			if (ReferenceEquals(this, obj)) return true;
 			return Equals(obj as ResourceDescriptor);
 		}
 
+		/// <summary>
+		/// Serves as a hash function for a particular type.
+		/// </summary>
+		/// <returns>
+		/// A hash code for the current <see cref="T:System.Object"/>.
+		/// </returns>
 		public override int GetHashCode()
 		{
 			int result = resourceType != null ? resourceType.GetHashCode() : 0;

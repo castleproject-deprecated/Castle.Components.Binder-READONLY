@@ -52,7 +52,8 @@ namespace Castle.MonoRail.Framework.Services
 			return new DefaultEngineContext(container, urlInfo, context,
 			                                new ServerUtilityAdapter(context.Server),
 			                                new RequestAdapter(context.Request),
-											new ResponseAdapter(context.Response, urlInfo, urlBuilder), session, flash);
+											new ResponseAdapter(context.Response, urlInfo, urlBuilder),
+											new TraceAdapter(context.Trace), session, flash);
 		}
 
 		/// <summary>

@@ -59,16 +59,10 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		IResponse Response { get; }
 
-//		/// <summary>
-//		/// Gets the trace object.
-//		/// </summary>
-//		ITrace Trace { get; }
-//
-//		/// <summary>
-//		/// Access the Cache associated with this 
-//		/// web execution context.
-//		/// </summary>
-//		ICacheProvider Cache { get; }
+		/// <summary>
+		/// Gets the trace object.
+		/// </summary>
+		ITrace Trace { get; }
 
 		/// <summary>
 		/// Access a dictionary of volative items.

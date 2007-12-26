@@ -119,9 +119,8 @@
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
     <ProjectReference Include="..\Castle.MonoRail.TestSupport\Castle.MonoRail.TestSupport-vs2008.csproj">
-      <Name>Castle.MonoRail.TestSupport-vs2008</Name>
       <Project>{E572DC59-2A96-482F-BE39-E938AB47EA9D}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+      <Name>Castle.MonoRail.TestSupport-vs2008</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +154,7 @@
     <Compile Include="Resources\DefaultResourceFactoryTestCase.cs" />
     <Compile Include="Services\EmailTemplateServiceTestCase.cs" />
     <Compile Include="Services\PrototypeAjaxProxyGeneratorTestCase.cs" />
+    <Compile Include="ViewComponents\AuthenticatedContentTestCase.cs" />
     <Compile Include="ViewComponents\DefaultViewComponentRegistryTests.cs" />
     <Compile Include="FlashTestCase.cs" />
     <Compile Include="Handlers\ResourceFileHandlerTestCase.cs" />
@@ -196,8 +196,13 @@
     <Compile Include="Providers\DefaultTransformFilterDescriptorProviderTestCase.cs" />
     <Compile Include="Services\StaticResourceRegistry\DefaultStaticResourceRegistryTestCase.cs" />
     <Compile Include="UrlPartsBuilderTestCase.cs" />
+    <Compile Include="ViewComponents\DiggStylePaginationTestCase.cs" />
+    <Compile Include="ViewComponents\SelectStylePaginationTestCase.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ViewEngines\ViewEngineBaseTestCase.cs" />
     <Compile Include="WikiFormatterTestCase.cs" />
+    <Compile Include="Wizards\WizardActionProviderTestCase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />

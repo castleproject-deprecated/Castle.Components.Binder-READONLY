@@ -57,11 +57,11 @@ namespace Castle.MonoRail.Framework.Test
 		/// <value>The HTTP method.</value>
 		new string HttpMethod { set; }
 
-//		/// <summary>
-//		/// Sets the file path.
-//		/// </summary>
-//		/// <value>The file path.</value>
-//		new String FilePath { set; }
+		/// <summary>
+		/// Sets the file path.
+		/// </summary>
+		/// <value>The file path.</value>
+		new string FilePath { set; }
 
 		/// <summary>
 		/// Sets the user languages.

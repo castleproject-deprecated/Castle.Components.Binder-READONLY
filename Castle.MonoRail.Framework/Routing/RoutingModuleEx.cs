@@ -21,6 +21,7 @@ namespace Castle.MonoRail.Framework.Routing
 	using Castle.MonoRail.Framework.Adapters;
 	using Castle.MonoRail.Framework.Services.Utils;
 	using Castle.MonoRail.Framework.Internal;
+	using Descriptors;
 
 	/// <summary>
 	/// Pendent
@@ -109,7 +110,7 @@ namespace Castle.MonoRail.Framework.Routing
 		{
 			ControllerDescriptor desc = ControllerInspectionUtil.Inspect(match.ControllerType);
 
-			return "~/" + (string.IsNullOrEmpty(desc.Area) ? null : desc.Area + "/") + desc.Name + "/" + match.Action + MonoRailServiceContainer.MonoRailExtension;
+			return "~/" + (string.IsNullOrEmpty(desc.Area) ? null : desc.Area + "/") + desc.Name + "/" + match.Action; // TODO: + MonoRailServiceContainer.MonoRailExtension;
 		}
 
 		/// <summary>

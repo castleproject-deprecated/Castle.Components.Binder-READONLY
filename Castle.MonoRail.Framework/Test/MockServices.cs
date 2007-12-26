@@ -89,6 +89,8 @@ namespace Castle.MonoRail.Framework.Test
 				new DefaultTransformFilterDescriptorProvider());
 
 			resourceFactory = new DefaultResourceFactory();
+			scaffoldSupport = new MockScaffoldingSupport();
+			cacheProvider = new MockCacheProvider();
 
 			extensionManager = new ExtensionManager(this);
 		}

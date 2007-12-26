@@ -102,10 +102,12 @@
     <Compile Include="Adapters\DefaultEngineContext.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Adapters\FileDictionaryAdapter.cs" />
     <Compile Include="Adapters\RequestAdapter.cs" />
     <Compile Include="Adapters\ResponseAdapter.cs" />
     <Compile Include="Adapters\ServerUtilityAdapter.cs" />
     <Compile Include="Adapters\SessionAdapter.cs" />
+    <Compile Include="Adapters\TraceAdapter.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -332,7 +334,12 @@
     <Compile Include="Providers\IViewComponentDescriptorProvider.cs" />
     <Compile Include="ResourceFileHandler.cs" />
     <Compile Include="Routing\IRoutingRule.cs" />
+    <Compile Include="Routing\PatternRule.cs" />
+    <Compile Include="Routing\RegexRule.cs" />
+    <Compile Include="Routing\RouteContext.cs" />
     <Compile Include="Routing\RouteMatch.cs" />
+    <Compile Include="Routing\RoutingEngine.cs" />
+    <Compile Include="Routing\RoutingModuleEx.cs" />
     <Compile Include="ServiceContainerAccessor.cs" />
     <Compile Include="Services\AbstractControllerFactory.cs">
       <SubType>Code</SubType>
@@ -429,6 +436,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Test\IMockResponse.cs" />
+    <Compile Include="Test\IMockViewComponentContext.cs" />
+    <Compile Include="Test\MockCacheProvider.cs" />
     <Compile Include="Test\MockEmailTemplateService.cs" />
     <Compile Include="Test\MockEngineContext.cs">
       <SubType>Code</SubType>
@@ -437,12 +446,16 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Test\MockResponse.cs" />
+    <Compile Include="Test\MockScaffoldingSupport.cs" />
     <Compile Include="Test\MockServerUtility.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Test\MockServices.cs" />
     <Compile Include="Test\MockSmtpSender.cs" />
+    <Compile Include="Test\MockTrace.cs" />
+    <Compile Include="Test\MockViewComponentContext.cs" />
     <Compile Include="Test\ViewEngineManagerStub.cs" />
+    <Compile Include="Test\ViewEngineStub.cs" />
     <Compile Include="TransformFilter.cs" />
     <Compile Include="TransformFilters\Formatters\WikiFormatter.cs" />
     <Compile Include="TransformFilters\LowerCaseTransformFilter.cs" />

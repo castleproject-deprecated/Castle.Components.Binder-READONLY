@@ -45,13 +45,6 @@ namespace Castle.MonoRail.Framework
 		private UrlInfo urlInfo;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="WizardActionProvider"/> class.
-		/// </summary>
-		public WizardActionProvider()
-		{
-		}
-
-		/// <summary>
 		/// Implementation of IDynamicActionProvider.
 		/// <para>
 		/// Grab all steps related to the wizard

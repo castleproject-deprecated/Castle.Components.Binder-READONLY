@@ -141,6 +141,7 @@ namespace Castle.MonoRail.Framework
 		public IControllerContext ControllerContext
 		{
 			get { return context; }
+			set { context = value; }
 		}
 
 		/// <summary>
@@ -1115,8 +1116,7 @@ namespace Castle.MonoRail.Framework
 					Response.StatusDescription = ex.HttpStatusDesc;
 				}
 
-				actionException = (ex is TargetInvocationException) ? ex.InnerException : ex;
-				engineContext.LastException = actionException;
+				engineContext.LastException = actionException = ex;
 
 				RaiseOnActionExceptionOnExtension();
 			}

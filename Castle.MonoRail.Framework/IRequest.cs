@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
+	using System.Web;
 	using Castle.Components.Binder;
 
 	/// <summary>
@@ -64,10 +65,10 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		String UrlReferrer { get; }
 
-//		/// <summary>
-//		/// Gets the <see cref="HttpPostedFile"/> per key.
-//		/// </summary>
-//		IDictionary Files { get; }
+		/// <summary>
+		/// Gets the <see cref="HttpPostedFile"/> per key.
+		/// </summary>
+		IDictionary Files { get; }
 
 		/// <summary>
 		/// Gets the params which accumulates headers, post, querystring and cookies.

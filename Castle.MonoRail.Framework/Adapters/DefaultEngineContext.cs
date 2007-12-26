@@ -35,7 +35,7 @@ namespace Castle.MonoRail.Framework.Adapters
 		private readonly IResponse response;
 		private readonly Flash flash;
 		private IDictionary session;
-//		private TraceAdapter _trace;
+		private ITrace trace;
 		private Exception lastException;
 //		private IDictionary _session;
 //		private String _url;
@@ -54,10 +54,12 @@ namespace Castle.MonoRail.Framework.Adapters
 		/// <param name="server">The server.</param>
 		/// <param name="request">The request.</param>
 		/// <param name="response">The response.</param>
+		/// <param name="trace">The trace.</param>
 		/// <param name="session">The session.</param>
 		/// <param name="flash">The flash.</param>
 		public DefaultEngineContext(IMonoRailContainer container, UrlInfo urlInfo,
-		                            HttpContext context, IServerUtility server, IRequest request, IResponse response,
+		                            HttpContext context, IServerUtility server, 
+			IRequest request, IResponse response, ITrace trace, 
 		                            IDictionary session, Flash flash)
 			: base(container)
 		{
@@ -69,6 +71,7 @@ namespace Castle.MonoRail.Framework.Adapters
 			this.session = session;
 			this.server = server;
 			this.flash = flash;
+			this.trace = trace;
 		}
 
 		/// <summary>
@@ -158,14 +161,14 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return response; }
 		}
 
-//		/// <summary>
-//		/// Gets the trace object.
-//		/// </summary>
-//		/// <value></value>
-//		public ITrace Trace
-//		{
-//			get { return _trace; }
-//		}
+		/// <summary>
+		/// Gets the trace object.
+		/// </summary>
+		/// <value></value>
+		public ITrace Trace
+		{
+			get { return trace; }
+		}
 
 		/// <summary>
 		/// Returns an <see cref="IServerUtility"/>.

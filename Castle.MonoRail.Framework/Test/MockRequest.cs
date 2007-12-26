@@ -31,7 +31,7 @@ namespace Castle.MonoRail.Framework.Test
 		private NameValueCollection @params = new NameValueCollection();
 		private string urlReferrer;
 		private IDictionary cookies;
-//		private IDictionary files = new Hashtable();
+		private IDictionary files = new Hashtable();
 		private bool isLocal = true;
 		private string httpMethod = "GET";
 		private string[] userLanguages = new string[] { "en-ES", "pt-BR" };
@@ -115,14 +115,14 @@ namespace Castle.MonoRail.Framework.Test
 			get { return headers; }
 		}
 
-//		/// <summary>
-//		/// Gets the <see cref="HttpPostedFile"/> per key.
-//		/// </summary>
-//		/// <value></value>
-//		public virtual IDictionary Files
-//		{
-//			get { return files; }
-//		}
+		/// <summary>
+		/// Gets the <see cref="HttpPostedFile"/> per key.
+		/// </summary>
+		/// <value></value>
+		public virtual IDictionary Files
+		{
+			get { return files; }
+		}
 
 		/// <summary>
 		/// Gets a value indicating whether this requeest is from a local address.
