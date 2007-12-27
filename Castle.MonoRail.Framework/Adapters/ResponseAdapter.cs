@@ -28,7 +28,6 @@ namespace Castle.MonoRail.Framework.Adapters
 	/// </summary>
 	public class ResponseAdapter : IResponse
 	{
-//		private readonly IHandlerContext context;
 		private readonly HttpResponse response;
 		private readonly UrlInfo currentUrl;
 		private readonly IUrlBuilder urlBuilder;
@@ -56,23 +55,23 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return response.Cache; }
 		}
 
-//		/// <summary>
-//		/// Sets the Cache-Control HTTP header to Public or Private.
-//		/// </summary>
-//		public String CacheControlHeader
-//		{
-//			get { return response.CacheControl; }
-//			set { response.CacheControl = value; }
-//		}
-//
-//		/// <summary>
-//		/// Gets or sets the HTTP character set of the output stream.
-//		/// </summary>
-//		public String Charset
-//		{
-//			get { return response.Charset; }
-//			set { response.Charset = value; }
-//		}
+		/// <summary>
+		/// Sets the Cache-Control HTTP header to Public or Private.
+		/// </summary>
+		public String CacheControlHeader
+		{
+			get { return response.CacheControl; }
+			set { response.CacheControl = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the HTTP character set of the output stream.
+		/// </summary>
+		public String Charset
+		{
+			get { return response.Charset; }
+			set { response.Charset = value; }
+		}
 
 		/// <summary>
 		/// Gets or sets the status code.
@@ -153,22 +152,22 @@ namespace Castle.MonoRail.Framework.Adapters
 //
 //			BinaryWrite(buffer);
 //		}
-//
-//		/// <summary>
-//		/// Clears the response (only works if buffered)
-//		/// </summary>
-//		public void Clear()
-//		{
-//			response.Clear();
-//		}
-//
-//		/// <summary>
-//		/// Clears the response content (only works if buffered).
-//		/// </summary>
-//		public void ClearContent()
-//		{
-//			response.ClearContent();
-//		}
+
+		/// <summary>
+		/// Clears the response (only works if buffered)
+		/// </summary>
+		public void Clear()
+		{
+			response.Clear();
+		}
+
+		/// <summary>
+		/// Clears the response content (only works if buffered).
+		/// </summary>
+		public void ClearContent()
+		{
+			response.ClearContent();
+		}
 
 		/// <summary>
 		/// Writes the specified string.
@@ -265,20 +264,18 @@ namespace Castle.MonoRail.Framework.Adapters
 			response.Redirect(urlBuilder.BuildUrl(currentUrl, area, controller, action), false);
 		}
 
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		public void Redirect(string controller, string action, NameValueCollection parameters)
-//		{
-//			redirected = true;
-//
-//			IUrlBuilder builder = (IUrlBuilder) context.GetService(typeof(IUrlBuilder));
-//
-//			response.Redirect(builder.BuildUrl(context.UrlInfo, controller, action, parameters), false);
-//		}
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		public void Redirect(string controller, string action, NameValueCollection parameters)
+		{
+			redirected = true;
+
+			response.Redirect(urlBuilder.BuildUrl(currentUrl, controller, action, parameters), false);
+		}
 
 		/// <summary>
 		/// Redirects to another controller and action with the specified paramters.
@@ -294,20 +291,18 @@ namespace Castle.MonoRail.Framework.Adapters
 			response.Redirect(urlBuilder.BuildUrl(currentUrl, area, controller, action, parameters), false);
 		}
 
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		public void Redirect(string controller, string action, IDictionary parameters)
-//		{
-//			redirected = true;
-//
-//			IUrlBuilder builder = (IUrlBuilder) context.GetService(typeof(IUrlBuilder));
-//
-//			response.Redirect(builder.BuildUrl(context.UrlInfo, controller, action, parameters), false);
-//		}
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		public void Redirect(string controller, string action, IDictionary parameters)
+		{
+			redirected = true;
+
+			response.Redirect(urlBuilder.BuildUrl(currentUrl, controller, action, parameters), false);
+		}
 
 		/// <summary>
 		/// Redirects to another controller and action with the specified paramters.
@@ -343,53 +338,58 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return redirected; }
 		}
 
-//		/// <summary>
-//		/// Creates the cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		/// <param name="cookieValue">The cookie value.</param>
-//		public void CreateCookie(String name, String cookieValue)
-//		{
-//			CreateCookie(new HttpCookie(name, cookieValue));
-//		}
-//
-//		/// <summary>
-//		/// Creates the cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		/// <param name="cookieValue">The cookie value.</param>
-//		/// <param name="expiration">The expiration.</param>
-//		public void CreateCookie(String name, String cookieValue, DateTime expiration)
-//		{
-//			HttpCookie cookie = new HttpCookie(name, cookieValue);
-//
-//			cookie.Expires = expiration;
-//			cookie.Path = context.ApplicationPath;
-//
-//			CreateCookie(cookie);
-//		}
-//
-//		/// <summary>
-//		/// Creates the cookie.
-//		/// </summary>
-//		/// <param name="cookie">The cookie.</param>
-//		public void CreateCookie(HttpCookie cookie)
-//		{
-//			response.Cookies.Add(cookie);
-//		}
-//
-//		/// <summary>
-//		/// Removes the cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		public void RemoveCookie(string name)
-//		{
-//			HttpCookie cookie = new HttpCookie(name, "");
-//			
-//			cookie.Expires = DateTime.Now.AddYears(-10);
-//			cookie.Path = context.ApplicationPath;
-//			
-//			CreateCookie(cookie);
-//		}
+		/// <summary>
+		/// Creates the cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="cookieValue">The cookie value.</param>
+		public void CreateCookie(String name, String cookieValue)
+		{
+			CreateCookie(new HttpCookie(name, cookieValue));
+		}
+
+		/// <summary>
+		/// Creates the cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="cookieValue">The cookie value.</param>
+		/// <param name="expiration">The expiration.</param>
+		public void CreateCookie(String name, String cookieValue, DateTime expiration)
+		{
+			HttpCookie cookie = new HttpCookie(name, cookieValue);
+
+			cookie.Expires = expiration;
+			cookie.Path = SafeAppPath();
+
+			CreateCookie(cookie);
+		}
+
+		/// <summary>
+		/// Creates the cookie.
+		/// </summary>
+		/// <param name="cookie">The cookie.</param>
+		public void CreateCookie(HttpCookie cookie)
+		{
+			response.Cookies.Add(cookie);
+		}
+
+		/// <summary>
+		/// Removes the cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		public void RemoveCookie(string name)
+		{
+			HttpCookie cookie = new HttpCookie(name, "");
+			
+			cookie.Expires = DateTime.Now.AddYears(-10);
+			cookie.Path = SafeAppPath();
+			
+			CreateCookie(cookie);
+		}
+
+		private string SafeAppPath()
+		{
+			return currentUrl.AppVirtualDir == string.Empty ? "/" : currentUrl.AppVirtualDir;
+		}
 	}
 }

@@ -35,13 +35,11 @@ namespace Castle.MonoRail.Framework.Test
 		private bool isLocal = true;
 		private string httpMethod = "GET";
 		private string[] userLanguages = new string[] { "en-ES", "pt-BR" };
-
-//		private string rawUrl = null;
+		private string rawUrl = null;
 		private string filePath = null;
 		private Uri uri = null;
-//
-//		private string userHostAddress = "127.0.0.1";
-//		private string pathInfo;
+		private string userHostAddress = "127.0.0.1";
+		private string pathInfo;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MockRequest"/> class.
@@ -134,26 +132,44 @@ namespace Castle.MonoRail.Framework.Test
 			set { isLocal = value; }
 		}
 
-//		/// <summary>
-//		/// Gets additional path information for
-//		/// a resource with a URL extension.
-//		/// </summary>
-//		/// <value>The path info.</value>
-//		public virtual string PathInfo
-//		{
-//			get { return pathInfo; }
-//			set { pathInfo = value; }
-//		}
-//
-//		/// <summary>
-//		/// Gets the raw URL.
-//		/// </summary>
-//		/// <value>The raw URL.</value>
-//		public virtual string RawUrl
-//		{
-//			get { return rawUrl; }
-//			set { rawUrl = value; }
-//		}
+		/// <summary>
+		/// Gets additional path information for
+		/// a resource with a URL extension.
+		/// </summary>
+		/// <value>The path info.</value>
+		public virtual string PathInfo
+		{
+			get { return pathInfo; }
+			set { pathInfo = value; }
+		}
+
+		/// <summary>
+		/// Gets the request type (GET, POST, etc)
+		/// </summary>
+		/// <value></value>
+		public string RequestType
+		{
+			get { return HttpMethod; }
+		}
+
+		/// <summary>
+		/// Gets the request URL.
+		/// </summary>
+		/// <value></value>
+		public string Url
+		{
+			get { return RawUrl; }
+		}
+
+		/// <summary>
+		/// Gets the raw URL.
+		/// </summary>
+		/// <value>The raw URL.</value>
+		public virtual string RawUrl
+		{
+			get { return rawUrl; }
+			set { rawUrl = value; }
+		}
 
 		/// <summary>
 		/// Gets the URI.
@@ -185,14 +201,14 @@ namespace Castle.MonoRail.Framework.Test
 			set { filePath = value; }
 		}
 
-//		/// <summary>
-//		/// Gets the param with the specified key.
-//		/// </summary>
-//		/// <value></value>
-//		public virtual string this[string key]
-//		{
-//			get { return @params[key]; }
-//		}
+		/// <summary>
+		/// Gets the param with the specified key.
+		/// </summary>
+		/// <value></value>
+		public virtual string this[string key]
+		{
+			get { return @params[key]; }
+		}
 
 		/// <summary>
 		/// Gets the params which accumulates headers, post, querystring and cookies.
@@ -279,14 +295,14 @@ namespace Castle.MonoRail.Framework.Test
 			}
 		}
 
-//		/// <summary>
-//		/// Gets the IP host address of the remote client.
-//		/// </summary>
-//		/// <value>The IP address of the remote client.</value>
-//		public virtual string UserHostAddress
-//		{
-//			get { return userHostAddress; }
-//			set { userHostAddress = value; }
-//		}
+		/// <summary>
+		/// Gets the IP host address of the remote client.
+		/// </summary>
+		/// <value>The IP address of the remote client.</value>
+		public virtual string UserHostAddress
+		{
+			get { return userHostAddress; }
+			set { userHostAddress = value; }
+		}
 	}
 }

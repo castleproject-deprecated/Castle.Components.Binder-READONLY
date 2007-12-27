@@ -14,6 +14,7 @@
 
 namespace Castle.MonoRail.Framework.Test
 {
+	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
 	using System.IO;
@@ -29,8 +30,8 @@ namespace Castle.MonoRail.Framework.Test
 		private int statusCode = 200;
 		private string statusDescription = "OK";
 		private string contentType = "text/html";
-//		private string cacheControlHeader = null;
-//		private string charset = "ISO-8859-1";
+		private string cacheControlHeader;
+		private string charset = "ISO-8859-1";
 		private string redirectedTo;
 		private bool wasRedirected = false;
 		private bool isClientConnected = false;
@@ -106,22 +107,21 @@ namespace Castle.MonoRail.Framework.Test
 //
 //			BinaryWrite(buffer);
 //		}
-//
-//		/// <summary>
-//		/// Clears the response (only works if buffered)
-//		/// </summary>
-//		public virtual void Clear()
-//		{
-//			outputStream.SetLength(0);
-//		}
-//
-//		/// <summary>
-//		/// Clears the response content (only works if buffered).
-//		/// </summary>
-//		public virtual void ClearContent()
-//		{
-//			outputStreamWriter.Flush();
-//		}
+
+		/// <summary>
+		/// Clears the response (only works if buffered)
+		/// </summary>
+		public virtual void Clear()
+		{
+			output.GetStringBuilder().Length = 0;
+		}
+
+		/// <summary>
+		/// Clears the response content (only works if buffered).
+		/// </summary>
+		public virtual void ClearContent()
+		{
+		}
 
 		/// <summary>
 		/// Writes the specified string.
@@ -191,16 +191,16 @@ namespace Castle.MonoRail.Framework.Test
 			RedirectToUrl(BuildMockUrl(area, controller, action));
 		}
 
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		public void Redirect(string controller, string action, NameValueCollection parameters)
-//		{
-//			RedirectToUrl(BuildMockUrl(controller, action, parameters));
-//		}
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		public void Redirect(string controller, string action, NameValueCollection parameters)
+		{
+			RedirectToUrl(BuildMockUrl(controller, action, parameters));
+		}
 
 		/// <summary>
 		/// Redirects to another controller and action with the specified paramters.
@@ -214,16 +214,16 @@ namespace Castle.MonoRail.Framework.Test
 			RedirectToUrl(BuildMockUrl(area, controller, action, parameters));
 		}
 
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		public void Redirect(string controller, string action, IDictionary parameters)
-//		{
-//			RedirectToUrl(BuildMockUrl(controller, action, parameters));
-//		}
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		public void Redirect(string controller, string action, IDictionary parameters)
+		{
+			RedirectToUrl(BuildMockUrl(controller, action, parameters));
+		}
 
 		/// <summary>
 		/// Redirects to another controller and action with the specified paramters.
@@ -257,44 +257,44 @@ namespace Castle.MonoRail.Framework.Test
 			RedirectToUrl(url);
 		}
 
-//		/// <summary>
-//		/// Creates a cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		/// <param name="value">The value.</param>
-//		public virtual void CreateCookie(string name, string value)
-//		{
-//			cookies.Add(name, value);
-//		}
-//
-//		/// <summary>
-//		/// Creates a cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		/// <param name="value">The value.</param>
-//		/// <param name="expiration">The expiration.</param>
-//		public virtual void CreateCookie(string name, string value, DateTime expiration)
-//		{
-//			CreateCookie(name, value);
-//		}
-//
-//		/// <summary>
-//		/// Creates a cookie.
-//		/// </summary>
-//		/// <param name="cookie">The cookie.</param>
-//		public virtual void CreateCookie(HttpCookie cookie)
-//		{
-//			throw new NotSupportedException();
-//		}
-//
-//		/// <summary>
-//		/// Removes a cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		public virtual void RemoveCookie(string name)
-//		{
-//			cookies.Remove(name);
-//		}
+		/// <summary>
+		/// Creates a cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="value">The value.</param>
+		public virtual void CreateCookie(string name, string value)
+		{
+			cookies.Add(name, value);
+		}
+
+		/// <summary>
+		/// Creates a cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="value">The value.</param>
+		/// <param name="expiration">The expiration.</param>
+		public virtual void CreateCookie(string name, string value, DateTime expiration)
+		{
+			CreateCookie(name, value);
+		}
+
+		/// <summary>
+		/// Creates a cookie.
+		/// </summary>
+		/// <param name="cookie">The cookie.</param>
+		public virtual void CreateCookie(HttpCookie cookie)
+		{
+			CreateCookie(cookie.Name, cookie.Value);
+		}
+
+		/// <summary>
+		/// Removes a cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		public virtual void RemoveCookie(string name)
+		{
+			cookies.Remove(name);
+		}
 
 		/// <summary>
 		/// Gets or sets the status code.
@@ -337,25 +337,25 @@ namespace Castle.MonoRail.Framework.Test
 			set { cachePolicy = value; }
 		}
 
-//		/// <summary>
-//		/// Sets the Cache-Control HTTP header to Public or Private.
-//		/// </summary>
-//		/// <value></value>
-//		public string CacheControlHeader
-//		{
-//			get { return cacheControlHeader; }
-//			set { cacheControlHeader = value; }
-//		}
-//
-//		/// <summary>
-//		/// Gets or sets the HTTP character set of the output stream.
-//		/// </summary>
-//		/// <value></value>
-//		public string Charset
-//		{
-//			get { return charset; }
-//			set { charset = value; }
-//		}
+		/// <summary>
+		/// Sets the Cache-Control HTTP header to Public or Private.
+		/// </summary>
+		/// <value></value>
+		public string CacheControlHeader
+		{
+			get { return cacheControlHeader; }
+			set { cacheControlHeader = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the HTTP character set of the output stream.
+		/// </summary>
+		/// <value></value>
+		public string Charset
+		{
+			get { return charset; }
+			set { charset = value; }
+		}
 
 		/// <summary>
 		/// Gets the output.

@@ -40,6 +40,15 @@ namespace Castle.MonoRail.Framework.Adapters
 		}
 
 		/// <summary>
+		/// Gets the request URL.
+		/// </summary>
+		/// <value></value>
+		public string Url
+		{
+			get { return RawUrl; }
+		}
+
+		/// <summary>
 		/// Gets the accept header.
 		/// </summary>
 		/// <value>The accept header.</value>
@@ -79,7 +88,16 @@ namespace Castle.MonoRail.Framework.Adapters
 		}
 
 		/// <summary>
-		/// Gets the HTTP method.
+		/// Gets the request type (GET, POST, etc)
+		/// </summary>
+		/// <value></value>
+		public string RequestType
+		{
+			get { return HttpMethod; }
+		}
+
+		/// <summary>
+		/// Gets the HTTP method (GET, POST, etc).
 		/// </summary>
 		/// <value>The HTTP method.</value>
 		public string HttpMethod
@@ -96,24 +114,24 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return request.Url; }
 		}
 
-//		/// <summary>
-//		/// Gets additional path information for 
-//		/// a resource with a URL extension.
-//		/// </summary>
-//		/// <value>The path info.</value>
-//		public String PathInfo
-//		{
-//			get { return request.PathInfo; }
-//		}
-//
-//		/// <summary>
-//		/// Gets the raw URL.
-//		/// </summary>
-//		/// <value>The raw URL.</value>
-//		public String RawUrl
-//		{
-//			get { return request.RawUrl; }
-//		}
+		/// <summary>
+		/// Gets additional path information for 
+		/// a resource with a URL extension.
+		/// </summary>
+		/// <value>The path info.</value>
+		public String PathInfo
+		{
+			get { return request.PathInfo; }
+		}
+
+		/// <summary>
+		/// Gets the raw URL.
+		/// </summary>
+		/// <value>The raw URL.</value>
+		public String RawUrl
+		{
+			get { return request.RawUrl; }
+		}
 
 		/// <summary>
 		/// Gets the file path.
@@ -160,6 +178,15 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return request.Form; }
 		}
 
+		/// <summary>
+		/// Indexer to access <see cref="Params"/> entries.
+		/// </summary>
+		/// <value></value>
+		public string this[string name]
+		{
+			get { return request[name]; }
+		}
+
 //		/// <summary>
 //		/// Reads the request data as a byte array.
 //		/// </summary>
@@ -169,15 +196,7 @@ namespace Castle.MonoRail.Framework.Adapters
 //		{
 //			return request.BinaryRead(count);
 //		}
-//
-//		/// <summary>
-//		/// Gets the param with the specified key.
-//		/// </summary>
-//		/// <value></value>
-//		public String this[String key]
-//		{
-//			get { return request[key]; }
-//		}
+
 
 		/// <summary>
 		/// Gets the <see cref="HttpPostedFile"/> per key.
@@ -204,14 +223,14 @@ namespace Castle.MonoRail.Framework.Adapters
 			get { return request.UserLanguages; }
 		}
 
-//		/// <summary>
-//		/// Gets the IP host address of the remote client.
-//		/// </summary>
-//		/// <value>The IP address of the remote client.</value>
-//		public string UserHostAddress
-//		{
-//			get { return request.UserHostAddress; }
-//		}
+		/// <summary>
+		/// Gets the IP host address of the remote client.
+		/// </summary>
+		/// <value>The IP address of the remote client.</value>
+		public string UserHostAddress
+		{
+			get { return request.UserHostAddress; }
+		}
 
 		/// <summary>
 		/// Reads the cookie.

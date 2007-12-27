@@ -14,6 +14,8 @@
 
 namespace Castle.MonoRail.Framework.Test
 {
+	using System;
+
 	/// <summary>
 	/// Exposes methods on top of <see cref="IRequest"/>
 	/// that can be useful to write unit tests
@@ -26,11 +28,11 @@ namespace Castle.MonoRail.Framework.Test
 		/// <value>The accept header.</value>
 		new string AcceptHeader { set; }
 
-//		/// <summary>
-//		/// Sets the path info.
-//		/// </summary>
-//		/// <value>The path info.</value>
-//		new string PathInfo { set; }
+		/// <summary>
+		/// Sets the path info.
+		/// </summary>
+		/// <value>The path info.</value>
+		new string PathInfo { set; }
 
 		/// <summary>
 		/// Sets a value indicating whether this 
@@ -39,17 +41,17 @@ namespace Castle.MonoRail.Framework.Test
 		/// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
 		new bool IsLocal { set; }
 
-//		/// <summary>
-//		/// Sets the raw URL.
-//		/// </summary>
-//		/// <value>The raw URL.</value>
-//		new string RawUrl { set; }
-//
-//		/// <summary>
-//		/// Sets the URI.
-//		/// </summary>
-//		/// <value>The URI.</value>
-//		new Uri Uri { set; }
+		/// <summary>
+		/// Sets the raw URL.
+		/// </summary>
+		/// <value>The raw URL.</value>
+		new string RawUrl { set; }
+
+		/// <summary>
+		/// Sets the URI.
+		/// </summary>
+		/// <value>The URI.</value>
+		new Uri Uri { set; }
 
 		/// <summary>
 		/// Sets the HTTP method.
@@ -69,10 +71,10 @@ namespace Castle.MonoRail.Framework.Test
 		/// <value>The user languages.</value>
 		new string[] UserLanguages { set; }
 
-//		/// <summary>
-//		/// Sets the IP host address of the remote client. 
-//		/// </summary>
-//		/// <value>The IP address of the remote client.</value>
-//		new string UserHostAddress { set; }
+		/// <summary>
+		/// Sets the IP host address of the remote client. 
+		/// </summary>
+		/// <value>The IP address of the remote client.</value>
+		new string UserHostAddress { set; }
 	}
 }

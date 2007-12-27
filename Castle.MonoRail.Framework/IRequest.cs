@@ -50,15 +50,36 @@ namespace Castle.MonoRail.Framework
 		/// <value>The accept header.</value>
 		string AcceptHeader { get; }
 
-//		/// <summary>
-//		/// Gets the request type (GET, POST, etc)
-//		/// </summary>
-//		String RequestType { get; }
-//
-//		/// <summary>
-//		/// Gets the request URL.
-//		/// </summary>
-//		String Url { get; }
+		/// <summary>
+		/// Gets the request type (GET, POST, etc)
+		/// </summary>
+		[Obsolete("Use the property HttpMethod instead")]
+		String RequestType { get; }
+
+		/// <summary>
+		/// Gets additional path information for 
+		/// a resource with a URL extension.
+		/// </summary>
+		/// <value>The path info.</value>
+		String PathInfo { get; }
+
+		/// <summary>
+		/// Gets the raw URL.
+		/// </summary>
+		/// <value>The raw URL.</value>
+		[Obsolete("Use the property Url instead")]
+		String RawUrl { get; }
+
+		/// <summary>
+		/// Gets the URI.
+		/// </summary>
+		/// <value>The URI.</value>
+		Uri Uri { get; }
+
+		/// <summary>
+		/// Gets the request URL.
+		/// </summary>
+		String Url { get; }
 
 		/// <summary>
 		/// Gets the referring URL.
@@ -95,29 +116,16 @@ namespace Castle.MonoRail.Framework
 		NameValueCollection Headers { get; }
 
 		/// <summary>
+		/// Indexer to access <see cref="Params"/> entries.
+		/// </summary>
+		/// <value></value>
+		string this[string name] { get; }
+		
+		/// <summary>
 		/// Gets a value indicating whether this requeest is from a local address.
 		/// </summary>
 		/// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
 		bool IsLocal { get; }
-
-//		/// <summary>
-//		/// Gets additional path information for 
-//		/// a resource with a URL extension.
-//		/// </summary>
-//		/// <value>The path info.</value>
-//		String PathInfo { get; }
-//
-//		/// <summary>
-//		/// Gets the raw URL.
-//		/// </summary>
-//		/// <value>The raw URL.</value>
-//		String RawUrl { get; }
-
-		/// <summary>
-		/// Gets the URI.
-		/// </summary>
-		/// <value>The URI.</value>
-		Uri Uri { get; }
 
 		/// <summary>
 		/// Gets the HTTP method.
@@ -137,12 +145,7 @@ namespace Castle.MonoRail.Framework
 //		/// <param name="count">How many bytes.</param>
 //		/// <returns></returns>
 //		byte[] BinaryRead(int count);
-//
-//		/// <summary>
-//		/// Gets the param with the specified key.
-//		/// </summary>
-//		/// <value></value>
-//		String this [String key] { get; }
+
 
 		/// <summary>
 		/// Reads the cookie.
@@ -157,11 +160,11 @@ namespace Castle.MonoRail.Framework
 		/// <value>The user languages.</value>
 		String[] UserLanguages { get; }
 
-//		/// <summary>
-//		/// Gets the IP host address of the remote client. 
-//		/// </summary>
-//		/// <value>The IP address of the remote client.</value>
-//		string UserHostAddress { get; }
+		/// <summary>
+		/// Gets the IP host address of the remote client. 
+		/// </summary>
+		/// <value>The IP address of the remote client.</value>
+		string UserHostAddress { get; }
 
 		/// <summary>
 		/// Lazy initialized property with a hierarchical 

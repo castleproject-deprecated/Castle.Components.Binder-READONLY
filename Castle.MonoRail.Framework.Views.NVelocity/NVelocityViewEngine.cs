@@ -76,7 +76,6 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		public override void Service(IServiceProvider provider)
 		{
 			base.Service(provider);
-
 			this.provider = provider;
 		}
 
@@ -209,7 +208,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 					ProcessLayout(contents, layoutName, ctx, output);
 				}
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				if (Logger.IsErrorEnabled)
 				{
@@ -351,13 +350,14 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		{
 			String layout = ResolveLayoutTemplateName(controllerContext.LayoutName);
 
-			BeforeApplyingLayout(layout, ref contents, controller, ctx, context);
+			BeforeApplyingLayout(layout, ref contents, controller, controllerContext, ctx, context);
 
 			RenderLayout(layout, contents, ctx, output);
 		}
 
 		protected virtual void BeforeApplyingLayout(string layout, ref string contents,
-		                                            IController controller, IContext ctx, IEngineContext context)
+		                                            IController controller, IControllerContext controllerContext,
+		                                            IContext ctx, IEngineContext context)
 		{
 		}
 
@@ -479,13 +479,6 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			innerContext[TemplateKeys.SiteRoot] = context.ApplicationPath;
 
 			return new VelocityContext(innerContext);
-		}
-
-		private void SendErrorDetails(Exception ex, TextWriter writer)
-		{
-			writer.WriteLine("<pre>");
-			writer.WriteLine(ex);
-			writer.WriteLine("</pre>");
 		}
 
 		private void LoadMacros(ExtendedProperties props)

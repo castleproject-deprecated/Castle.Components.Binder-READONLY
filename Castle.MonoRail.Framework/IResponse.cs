@@ -48,15 +48,15 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		HttpCachePolicy CachePolicy  { get; }
 
-//		/// <summary>
-//		/// Sets the Cache-Control HTTP header to Public or Private.
-//		/// </summary>
-//		String CacheControlHeader { get; set; } 
-//
-//		/// <summary>
-//		/// Gets or sets the HTTP character set of the output stream.
-//		/// </summary>
-//		String Charset { get; set; }
+		/// <summary>
+		/// Sets the Cache-Control HTTP header to Public or Private.
+		/// </summary>
+		String CacheControlHeader { get; set; } 
+
+		/// <summary>
+		/// Gets or sets the HTTP character set of the output stream.
+		/// </summary>
+		String Charset { get; set; }
 
 		/// <summary>
 		/// Gets the output.
@@ -88,16 +88,16 @@ namespace Castle.MonoRail.Framework
 //		/// </summary>
 //		/// <param name="stream">The stream.</param>
 //		void BinaryWrite(System.IO.Stream stream);
-//
-//		/// <summary>
-//		/// Clears the response (only works if buffered)
-//		/// </summary>
-//		void Clear();
-//
-//		/// <summary>
-//		/// Clears the response content (only works if buffered).
-//		/// </summary>
-//		void ClearContent();
+
+		/// <summary>
+		/// Clears the response (only works if buffered)
+		/// </summary>
+		void Clear();
+
+		/// <summary>
+		/// Clears the response content (only works if buffered).
+		/// </summary>
+		void ClearContent();
 
 		/// <summary>
 		/// Writes the specified string.
@@ -146,13 +146,13 @@ namespace Castle.MonoRail.Framework
 		/// <param name="action">The action.</param>
 		void Redirect(String area, String controller, String action);
 
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		void Redirect(string controller, string action, NameValueCollection parameters);
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		void Redirect(string controller, string action, NameValueCollection parameters);
 
 		/// <summary>
 		/// Redirects to another controller and action with the specified paramters.
@@ -162,14 +162,14 @@ namespace Castle.MonoRail.Framework
 		/// <param name="action">Action name</param>
 		/// <param name="parameters">Key/value pairings</param>
 		void Redirect(string area, string controller, string action, NameValueCollection parameters);
-//
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		void Redirect(string controller, string action, IDictionary parameters);
+
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		void Redirect(string controller, string action, IDictionary parameters);
 
 		/// <summary>
 		/// Redirects to another controller and action with the specified paramters.
@@ -207,31 +207,31 @@ namespace Castle.MonoRail.Framework
 		/// </value>
 		bool IsClientConnected { get; }
 
-//		/// <summary>
-//		/// Creates a cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		/// <param name="value">The value.</param>
-//		void CreateCookie(String name, String value);
-//
-//		/// <summary>
-//		/// Creates a cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		/// <param name="value">The value.</param>
-//		/// <param name="expiration">The expiration.</param>
-//		void CreateCookie(String name, String value, DateTime expiration);
-//
-//		/// <summary>
-//		/// Creates a cookie.
-//		/// </summary>
-//		/// <param name="cookie">The cookie.</param>
-//		void CreateCookie(HttpCookie cookie);
-//
-//		/// <summary>
-//		/// Removes a cookie.
-//		/// </summary>
-//		/// <param name="name">The name.</param>
-//		void RemoveCookie(string name);
+		/// <summary>
+		/// Creates a cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="value">The value.</param>
+		void CreateCookie(String name, String value);
+
+		/// <summary>
+		/// Creates a cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="value">The value.</param>
+		/// <param name="expiration">The expiration.</param>
+		void CreateCookie(String name, String value, DateTime expiration);
+
+		/// <summary>
+		/// Creates a cookie.
+		/// </summary>
+		/// <param name="cookie">The cookie.</param>
+		void CreateCookie(HttpCookie cookie);
+
+		/// <summary>
+		/// Removes a cookie.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		void RemoveCookie(string name);
 	}
 }

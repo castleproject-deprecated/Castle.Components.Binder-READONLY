@@ -37,6 +37,10 @@ namespace Castle.MonoRail.Framework.Tests.Routing.Stubs
 			get { return httpMethod.ToString(); }
 		}
 
+		public string this[string name]
+		{
+			get { throw new NotImplementedException(); }
+		}
 
 		public string AcceptHeader
 		{
@@ -121,6 +125,31 @@ namespace Castle.MonoRail.Framework.Tests.Routing.Stubs
 		public void ValidateInput()
 		{
 			throw new NotImplementedException();
+		}
+
+		public string PathInfo
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public string RawUrl
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public string RequestType
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public string Url
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public string UserHostAddress
+		{
+			get { throw new NotImplementedException(); }
 		}
 	}
 }
