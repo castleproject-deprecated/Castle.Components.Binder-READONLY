@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
 
@@ -35,23 +35,23 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		{
 		}
 
-		protected override string ComputeTemplateName(Controller controller)
+		protected override string ComputeTemplateName(IControllerContext controller)
 		{
 			return String.Format(@"{0}\confirm{1}remove", controller.Name, Model.Type.Name);
 		}
 
-		protected override void PerformActionProcess(Controller controller)
+		protected override void PerformActionProcess(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			base.PerformActionProcess(controller);
+			base.PerformActionProcess(engineContext, controller, controllerContext);
 			
-			object idVal = CommonOperationUtils.ReadPkFromParams(controller, ObtainPKProperty());
+			object idVal = CommonOperationUtils.ReadPkFromParams(engineContext.Request, ObtainPKProperty());
 
 			try
 			{
 				object instance = ActiveRecordMediator.FindByPrimaryKey(Model.Type, idVal, true);
 
-				controller.PropertyBag["instance"] = instance;
-				controller.PropertyBag["id"] = idVal;
+				controllerContext.PropertyBag["instance"] = instance;
+				controllerContext.PropertyBag["id"] = idVal;
 			}
 			catch(Exception ex)
 			{
@@ -59,10 +59,10 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			}
 		}
 
-		protected override void RenderStandardHtml(Controller controller)
+		protected override void RenderStandardHtml(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			SetUpHelpers(controller);
-			RenderFromTemplate("confirm.vm", controller);
+			SetUpHelpers(engineContext, controller, controllerContext);
+			RenderFromTemplate("confirm.vm", engineContext, controller, controllerContext);
 		}
 	}
 }

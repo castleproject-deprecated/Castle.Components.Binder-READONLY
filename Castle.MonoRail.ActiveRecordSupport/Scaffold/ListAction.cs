@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
 	using System.Reflection;
@@ -41,16 +41,16 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		{
 		}
 
-		protected override void PerformActionProcess(Controller controller)
+		protected override void PerformActionProcess(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			base.PerformActionProcess(controller);
-			
-			controller.PropertyBag.Add( "items", 
-				PaginationHelper.CreatePagination(controller, PerformFindAll(), 10) );
-			
-			controller.PropertyBag["properties"] = ObtainListableProperties(Model);
+			base.PerformActionProcess(engineContext, controller, controllerContext);
 
-			controller.RenderView(controller.Name, "list" + Model.Type.Name);
+			controllerContext.PropertyBag.Add("items",
+				PaginationHelper.CreatePagination(engineContext, PerformFindAll(), 10));
+
+			controllerContext.PropertyBag["properties"] = ObtainListableProperties(Model);
+
+			controllerContext.SelectedViewName = controllerContext.Name + "/" + "list" + Model.Type.Name;
 		}
 
 		private IList PerformFindAll()
@@ -58,7 +58,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			return CommonOperationUtils.FindAll( Model.Type );
 		}
 
-		protected override string ComputeTemplateName(Controller controller)
+		protected override string ComputeTemplateName(IControllerContext controller)
 		{
 			return String.Format(@"{0}\list{1}", controller.Name, Model.Type.Name);
 		}
@@ -66,11 +66,13 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		/// <summary>
 		/// Called when the template was not found
 		/// </summary>
-		/// <param name="controller"></param>
-		protected override void RenderStandardHtml(Controller controller)
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		protected override void RenderStandardHtml(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			SetUpHelpers(controller);
-			RenderFromTemplate("list.vm", controller);
+			SetUpHelpers(engineContext, controller, controllerContext);
+			RenderFromTemplate("list.vm", engineContext, controller, controllerContext);
 		}
 
 		private IList ObtainListableProperties(ActiveRecordModel model)

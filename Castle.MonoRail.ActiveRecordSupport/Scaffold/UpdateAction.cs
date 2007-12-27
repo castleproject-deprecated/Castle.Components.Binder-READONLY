@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
 	using System.Collections;
@@ -34,20 +34,20 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		{
 		}
 
-		protected override string ComputeTemplateName(Controller controller)
+		protected override string ComputeTemplateName(IControllerContext controller)
 		{
 			return String.Format(@"{0}\update{1}", controller.Name, Model.Type.Name);
 		}
 
-		protected override void PerformActionProcess(Controller controller)
+		protected override void PerformActionProcess(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
 			object instance = null;
 			
 			try
 			{
-				AssertIsPost(controller);
-				
-				instance = binder.BindObject(Model.Type, Model.Type.Name, builder.BuildSourceNode(controller.Request.Form));
+				AssertIsPost(engineContext.Request.HttpMethod);
+
+				instance = binder.BindObject(Model.Type, Model.Type.Name, builder.BuildSourceNode(engineContext.Request.Form));
 
 				CommonOperationUtils.SaveInstance(instance, controller, errors, ref prop2Validation, false);
 
@@ -55,11 +55,11 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 				
 				if (UseModelName)
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "list" + Model.Type.Name);
+					engineContext.Response.Redirect(controllerContext.AreaName, controllerContext.Name, "list" + Model.Type.Name);
 				}
 				else
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "list");
+					engineContext.Response.Redirect(controllerContext.AreaName, controllerContext.Name, "list");
 				}
 			}
 			catch(Exception ex)
@@ -69,8 +69,8 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 
 			if (errors.Count != 0)
 			{
-				controller.Context.Flash[Model.Type.Name] = instance;
-				controller.Context.Flash["errors"] = errors;
+				engineContext.Flash[Model.Type.Name] = instance;
+				engineContext.Flash["errors"] = errors;
 
 				PropertyInfo keyProp = ObtainPKProperty();
 				IDictionary props = new Hashtable();
@@ -82,16 +82,16 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 				
 				if (UseModelName)
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "edit" + Model.Type.Name, props);
+					engineContext.Response.Redirect(controllerContext.AreaName, controllerContext.Name, "edit" + Model.Type.Name, props);
 				}
 				else
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "edit", props);
+					engineContext.Response.Redirect(controllerContext.AreaName, controllerContext.Name, "edit", props);
 				}
 			}
 		}
 
-		protected override void RenderStandardHtml(Controller controller)
+		protected override void RenderStandardHtml(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
 		}
 	}

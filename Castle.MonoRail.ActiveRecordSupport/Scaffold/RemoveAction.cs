@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
 
@@ -33,39 +33,39 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		{
 		}
 
-		protected override string ComputeTemplateName(Controller controller)
+		protected override string ComputeTemplateName(IControllerContext controller)
 		{
 			return String.Format(@"{0}\{1}removed", controller.Name, Model.Type.Name);
 		}
 
-		protected override void PerformActionProcess(Controller controller)
+		protected override void PerformActionProcess(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			base.PerformActionProcess(controller);
-			
-			object idVal = CommonOperationUtils.ReadPkFromParams(controller, ObtainPKProperty());
+			base.PerformActionProcess(engineContext, controller, controllerContext);
 
-			controller.PropertyBag["id"] = idVal;
+			object idVal = CommonOperationUtils.ReadPkFromParams(engineContext.Request, ObtainPKProperty());
+
+			controllerContext.PropertyBag["id"] = idVal;
 
 			try
 			{
-				AssertIsPost(controller);
+				AssertIsPost(engineContext.Request.HttpMethod);
 
 				object instance = ActiveRecordMediator.FindByPrimaryKey(Model.Type, idVal, true);
 
-				controller.PropertyBag["instance"] = instance;
+				controllerContext.PropertyBag["instance"] = instance;
 
 				ActiveRecordMediator.Delete(instance);
 			}
 			catch(Exception ex)
 			{
-				controller.PropertyBag["exception"] = ex;
+				controllerContext.PropertyBag["exception"] = ex;
 			}
 		}
 
-		protected override void RenderStandardHtml(Controller controller)
+		protected override void RenderStandardHtml(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			SetUpHelpers(controller);
-			RenderFromTemplate("remove.vm", controller);
+			SetUpHelpers(engineContext, controller, controllerContext);
+			RenderFromTemplate("remove.vm", engineContext, controller, controllerContext);
 		}
 	}
 }

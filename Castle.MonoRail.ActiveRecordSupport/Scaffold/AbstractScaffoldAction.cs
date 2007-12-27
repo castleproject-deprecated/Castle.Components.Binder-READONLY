@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
 	using System.IO;
@@ -23,7 +23,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 	using Castle.Components.Binder;
 	using Castle.Components.Common.TemplateEngine;
 
-	using Castle.MonoRail.ActiveRecordScaffold.Helpers;
+	using Castle.MonoRail.ActiveRecordSupport.Scaffold.Helpers;
 	using Castle.MonoRail.ActiveRecordSupport;
 	using Castle.MonoRail.Framework;
 	using Castle.MonoRail.Framework.Helpers;
@@ -93,15 +93,17 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		/// <summary>
 		/// Executes the basic flow which is
 		/// <list type="number">
-		/// <item><description>Resolve the <see cref="ActiveRecordModel"/></description></item>
-		/// <item><description>Resolve the layout (if not is associated with the controller, defaults to "scaffold")</description></item>
-		/// <item><description>Invokes <see cref="PerformActionProcess"/> which should perform the correct process for this action</description></item>
-		/// <item><description>Resolves the template name that the developer might provide by using <see cref="ComputeTemplateName"/></description></item>
-		/// <item><description>If the template exists, renders it. Otherwise invokes <see cref="RenderStandardHtml"/></description></item>
-		/// </list>
+		/// 		<item><description>Resolve the <see cref="ActiveRecordModel"/></description></item>
+		/// 		<item><description>Resolve the layout (if not is associated with the controller, defaults to "scaffold")</description></item>
+		/// 		<item><description>Invokes <see cref="PerformActionProcess"/> which should perform the correct process for this action</description></item>
+		/// 		<item><description>Resolves the template name that the developer might provide by using <see cref="ComputeTemplateName"/></description></item>
+		/// 		<item><description>If the template exists, renders it. Otherwise invokes <see cref="RenderStandardHtml"/></description></item>
+		/// 	</list>
 		/// </summary>
-		/// <param name="controller"></param>
-		public void Execute(Controller controller)
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		public object Execute(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
 			// We make sure the code is always surrounded by a SessionScope.
 			// If none is found, we create one
@@ -117,17 +119,17 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			{
 				model = GetARModel();
 
-				PerformActionProcess(controller);
+				PerformActionProcess(engineContext, controller, controllerContext);
 
-				String templateName = ComputeTemplateName(controller);
+				String templateName = ComputeTemplateName(controllerContext);
 
-				if (controller.HasTemplate(templateName))
+				if (engineContext.Services.ViewEngineManager.HasTemplate(templateName))
 				{
-					controller.RenderSharedView(templateName);
+					controllerContext.SelectedViewName = templateName;
 				}
 				else
 				{
-					RenderStandardHtml(controller);
+					RenderStandardHtml(engineContext, controller, controllerContext);
 				}
 			}
 			finally
@@ -137,34 +139,40 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 					scope.Dispose();
 				}
 			}
+
+			return null;
 		}
 
 		/// <summary>
-		/// Implementors should return the template name 
+		/// Implementors should return the template name
 		/// for the current action.
 		/// </summary>
-		/// <param name="controller"></param>
+		/// <param name="controllerContext">The controller context.</param>
 		/// <returns></returns>
-		protected abstract string ComputeTemplateName(Controller controller);
+		protected abstract string ComputeTemplateName(IControllerContext controllerContext);
 
 		/// <summary>
 		/// Only invoked if the programmer havent provided
 		/// a custom template for the current action. Implementors
 		/// should create a basic html to present.
 		/// </summary>
-		/// <param name="controller"></param>
-		protected abstract void RenderStandardHtml(Controller controller);
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		protected abstract void RenderStandardHtml(IEngineContext engineContext, IController controller, IControllerContext controllerContext);
 
 		/// <summary>
-		/// Implementors should perform the action for the 
+		/// Implementors should perform the action for the
 		/// scaffolding, like new or create.
 		/// </summary>
-		/// <param name="controller"></param>
-		protected virtual void PerformActionProcess(Controller controller)
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		protected virtual void PerformActionProcess(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			controller.PropertyBag["useModelName"] = useModelName;
-			controller.PropertyBag["model"] = Model;
-			controller.PropertyBag["keyprop"] = ObtainPKProperty();
+			controllerContext.PropertyBag["useModelName"] = useModelName;
+			controllerContext.PropertyBag["model"] = Model;
+			controllerContext.PropertyBag["keyprop"] = ObtainPKProperty();
 		}
 
 		/// <summary>
@@ -205,15 +213,15 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			return null;
 		}
 
-		protected void RenderFromTemplate(String templateName, Controller controller)
+		protected void RenderFromTemplate(String templateName, IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
 			StringWriter writer = new StringWriter();
 
 			IDictionary context = new Hashtable();
 
-			context.Add("flash", controller.Context.Flash);
+			context.Add("flash", engineContext.Flash);
 
-			foreach(DictionaryEntry entry in controller.PropertyBag)
+			foreach(DictionaryEntry entry in controllerContext.PropertyBag)
 			{
 				context.Add(entry.Key, entry.Value);
 			}
@@ -221,7 +229,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 #if USE_LOCAL_TEMPLATES
 			templateEngine.Process( context, templateName, writer );
 #else
-			templateEngine.Process( context, "Castle.MonoRail.ActiveRecordScaffold/Templates/" + templateName, writer );
+			templateEngine.Process( context, "Castle.MonoRail.ActiveRecordSupport.Scaffold/Templates/" + templateName, writer );
 #endif
 
 			if (useDefaultLayout)
@@ -233,52 +241,56 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 #if USE_LOCAL_TEMPLATES
 				templateEngine.Process(context, "layout.vm", layoutwriter);
 #else
-				templateEngine.Process(context, "Castle.MonoRail.ActiveRecordScaffold/Templates/layout.vm", layoutwriter);
+				templateEngine.Process(context, "Castle.MonoRail.ActiveRecordSupport.Scaffold/Templates/layout.vm", layoutwriter);
 #endif
 				
 				writer = layoutwriter;
 
-				controller.CancelView();
-				controller.Response.Write(writer.GetStringBuilder().ToString());
+				controllerContext.SelectedViewName = null;
+				engineContext.Response.Write(writer.GetStringBuilder().ToString());
 			}
 			else
 			{
-				controller.DirectRender(writer.GetStringBuilder().ToString());
+				engineContext.Services.ViewEngineManager.RenderStaticWithinLayout(writer.GetStringBuilder().ToString(), engineContext, controller, controllerContext);
 			}
 		}
 
-		protected static void SetUpHelpers(Controller controller)
+		protected static void SetUpHelpers(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
 			ARFormHelper formHelper = new ARFormHelper();
-			formHelper.SetController(controller);
+			formHelper.SetContext(engineContext);
+			formHelper.SetController(controller, controllerContext);
 	
 			ValidationHelper validationHelper = new ValidationHelper();
-			validationHelper.SetController(controller);
+			validationHelper.SetContext(engineContext);
+			validationHelper.SetController(controller, controllerContext);
 	
 			PresentationHelper presentationHelper = new PresentationHelper();
-			presentationHelper.SetController(controller);
+			presentationHelper.SetContext(engineContext);
+			presentationHelper.SetController(controller, controllerContext);
 	
             PaginationHelper paginationHelper = new PaginationHelper();
-            paginationHelper.SetController(controller);
+			paginationHelper.SetContext(engineContext);
+			paginationHelper.SetController(controller, controllerContext);
 
 			ScriptaculousHelper scriptaculous = new ScriptaculousHelper();
-			scriptaculous.SetController(controller);
+			scriptaculous.SetContext(engineContext);
+			scriptaculous.SetController(controller, controllerContext);
 
 			AjaxHelper ajaxHelper = new AjaxHelper();
-			ajaxHelper.SetController(controller);
+			ajaxHelper.SetContext(engineContext);
+			ajaxHelper.SetController(controller, controllerContext);
 
-			controller.PropertyBag["Scriptaculous"] = scriptaculous;
-			controller.PropertyBag["Ajax"] = ajaxHelper;
-			controller.PropertyBag["Form"] = formHelper;
-			controller.PropertyBag["ValidationHelper"] = validationHelper;
-			controller.PropertyBag["PresentationHelper"] = presentationHelper;
-            controller.PropertyBag["PaginationHelper"] = paginationHelper;
+			controllerContext.Helpers["Scriptaculous"] = scriptaculous;
+			controllerContext.Helpers["Ajax"] = ajaxHelper;
+			controllerContext.Helpers["Form"] = formHelper;
+			controllerContext.Helpers["ValidationHelper"] = validationHelper;
+			controllerContext.Helpers["PresentationHelper"] = presentationHelper;
+			controllerContext.Helpers["PaginationHelper"] = paginationHelper;
 		}
 		
-		protected static void AssertIsPost(Controller controller)
+		protected static void AssertIsPost(string method)
 		{
-			String method = controller.Context.UnderlyingContext.Request.HttpMethod;
-			
 			if (method != "POST")
 			{
 				throw new Exception("This action cannot be accessed using the verb " + method);

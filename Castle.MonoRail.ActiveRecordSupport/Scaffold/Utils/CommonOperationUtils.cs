@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
 	using System.Reflection;
@@ -51,7 +51,7 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			return items;
 		}
 
-		internal static void SaveInstance(object instance, Controller controller, 
+		internal static void SaveInstance(object instance, IController controller, 
 		                                  ArrayList errors, ref IDictionary prop2Validation, bool create)
 		{
 			bool isValid = true;
@@ -99,9 +99,9 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			}
 		}
 
-		internal static object ReadPkFromParams(Controller controller, PropertyInfo keyProperty)
+		internal static object ReadPkFromParams(IRequest request, PropertyInfo keyProperty)
 		{
-			String id = controller.Context.Params["id"];
+			String id = request.Params["id"];
 
 			if (id == null)
 			{

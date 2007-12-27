@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Runtime.CompilerServices;
 	using Castle.MonoRail.Framework;
 	using Castle.Components.Common.TemplateEngine;
 	using Castle.Components.Common.TemplateEngine.NVelocityTemplateEngine;
+	using Castle.MonoRail.Framework.Descriptors;
 
 	/// <summary>
 	/// Uses the dynamic action infrastructure to 
@@ -62,51 +64,53 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 	{
 		private static ITemplateEngine templateEngine = null;
 
-		public void Process(Controller controller)
+		public void Process(IEngineContext context, IController controller, IControllerContext controllerContext)
 		{
 			InitializeTemplateEngine();
 
-			bool useDefaultLayout = controller.MetaDescriptor.Layout == null;
+			ControllerMetaDescriptor desc = controllerContext.ControllerDescriptor;
+			IDictionary<string, IDynamicAction> dynamicActions = controllerContext.DynamicActions;
 
-			if (controller.MetaDescriptor.Scaffoldings.Count == 1)
+			bool useDefaultLayout = desc.Layout == null;
+
+			if (desc.Scaffoldings.Count == 1)
 			{
-				ScaffoldingAttribute scaffoldAtt = (ScaffoldingAttribute)
-				                                   controller.MetaDescriptor.Scaffoldings[0];
+				ScaffoldingAttribute scaffoldAtt = desc.Scaffoldings[0];
 
-				controller.DynamicActions["new"] = 
+				dynamicActions["new"] = 
 					new NewAction(scaffoldAtt.Model, templateEngine, false, useDefaultLayout);
-				controller.DynamicActions["create"] = 
+				dynamicActions["create"] = 
 					new CreateAction(scaffoldAtt.Model, templateEngine, false, useDefaultLayout);
-				controller.DynamicActions["edit"] = 
+				dynamicActions["edit"] = 
 					new EditAction(scaffoldAtt.Model, templateEngine, false, useDefaultLayout);
-				controller.DynamicActions["update"] = 
+				dynamicActions["update"] = 
 					new UpdateAction(scaffoldAtt.Model, templateEngine, false, useDefaultLayout);
-				controller.DynamicActions["remove"] = 
+				dynamicActions["remove"] = 
 					new RemoveAction(scaffoldAtt.Model, templateEngine, false, useDefaultLayout);
-				controller.DynamicActions["confirm"] =
+				dynamicActions["confirm"] =
 					new ConfirmRemoveAction(scaffoldAtt.Model, templateEngine, false, useDefaultLayout);
-				controller.DynamicActions["list"] = 
+				dynamicActions["list"] = 
 					new ListAction(scaffoldAtt.Model, templateEngine, false, useDefaultLayout);
 			}
 			else
 			{
-				foreach(ScaffoldingAttribute scaffoldAtt in controller.MetaDescriptor.Scaffoldings)
+				foreach (ScaffoldingAttribute scaffoldAtt in desc.Scaffoldings)
 				{
 					String name = scaffoldAtt.Model.Name;
 
-					controller.DynamicActions[String.Format("new{0}", name)] =
+					dynamicActions[String.Format("new{0}", name)] =
 						new NewAction(scaffoldAtt.Model, templateEngine, true, useDefaultLayout);
-					controller.DynamicActions[String.Format("create{0}", name)] =
+					dynamicActions[String.Format("create{0}", name)] =
 						new CreateAction(scaffoldAtt.Model, templateEngine, true, useDefaultLayout);
-					controller.DynamicActions[String.Format("edit{0}", name)] =
+					dynamicActions[String.Format("edit{0}", name)] =
 						new EditAction(scaffoldAtt.Model, templateEngine, true, useDefaultLayout);
-					controller.DynamicActions[String.Format("update{0}", name)] =
+					dynamicActions[String.Format("update{0}", name)] =
 						new UpdateAction(scaffoldAtt.Model, templateEngine, true, useDefaultLayout);
-					controller.DynamicActions[String.Format("remove{0}", name)] =
+					dynamicActions[String.Format("remove{0}", name)] =
 						new RemoveAction(scaffoldAtt.Model, templateEngine, true, useDefaultLayout);
-					controller.DynamicActions[String.Format("confirm{0}", name)] =
+					dynamicActions[String.Format("confirm{0}", name)] =
 						new ConfirmRemoveAction(scaffoldAtt.Model, templateEngine, true, useDefaultLayout);
-					controller.DynamicActions[String.Format("list{0}", name)] =
+					dynamicActions[String.Format("list{0}", name)] =
 						new ListAction(scaffoldAtt.Model, templateEngine, true, useDefaultLayout);
 				}
 			}
@@ -120,11 +124,11 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 				NVelocityTemplateEngine nvelTemplateEng = new NVelocityTemplateEngine();
 
 #if USE_LOCAL_TEMPLATES
-				nvelTemplateEng.TemplateDir = @"E:\dev\castle\trunk\MonoRail\Castle.MonoRail.ActiveRecordScaffold\Templates\";
+				nvelTemplateEng.TemplateDir = @"E:\dev\castle\trunk\MonoRail\Castle.MonoRail.ActiveRecordSupport.Scaffold\Templates\";
 				nvelTemplateEng.BeginInit();
 				nvelTemplateEng.EndInit();
 #else
-				nvelTemplateEng.AddResourceAssembly("Castle.MonoRail.ActiveRecordScaffold");
+				nvelTemplateEng.AddResourceAssembly("Castle.MonoRail.ActiveRecordSupport.Scaffold");
 				nvelTemplateEng.BeginInit();
 				nvelTemplateEng.EndInit();
 #endif

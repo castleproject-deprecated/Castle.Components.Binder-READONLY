@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold.Helpers
 {
 	using System;
 	using System.Collections;

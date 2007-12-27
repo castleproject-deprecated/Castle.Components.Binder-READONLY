@@ -199,21 +199,21 @@ namespace Castle.MonoRail.Framework.Test
 //		/// <param name="parameters">Key/value pairings</param>
 //		public void Redirect(string controller, string action, NameValueCollection parameters)
 //		{
-//			Redirect(BuildMockUrl(controller, action, parameters));
+//			RedirectToUrl(BuildMockUrl(controller, action, parameters));
 //		}
-//
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="area">Area name</param>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		public void Redirect(string area, string controller, string action, NameValueCollection parameters)
-//		{
-//			Redirect(BuildMockUrl(area, controller, action, parameters));
-//		}
-//
+
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="area">Area name</param>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		public void Redirect(string area, string controller, string action, NameValueCollection parameters)
+		{
+			RedirectToUrl(BuildMockUrl(area, controller, action, parameters));
+		}
+
 //		/// <summary>
 //		/// Redirects to another controller and action with the specified paramters.
 //		/// </summary>
@@ -222,20 +222,20 @@ namespace Castle.MonoRail.Framework.Test
 //		/// <param name="parameters">Key/value pairings</param>
 //		public void Redirect(string controller, string action, IDictionary parameters)
 //		{
-//			Redirect(BuildMockUrl(controller, action, parameters));
+//			RedirectToUrl(BuildMockUrl(controller, action, parameters));
 //		}
-//
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="area">Area name</param>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		public void Redirect(string area, string controller, string action, IDictionary parameters)
-//		{
-//			Redirect(BuildMockUrl(area, controller, action, parameters));
-//		}
+
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="area">Area name</param>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		public void Redirect(string area, string controller, string action, IDictionary parameters)
+		{
+			RedirectToUrl(BuildMockUrl(area, controller, action, parameters));
+		}
 
 		/// <summary>
 		/// Redirects the specified URL.
@@ -431,25 +431,25 @@ namespace Castle.MonoRail.Framework.Test
 			return BuildMockUrl(area, controller, action, (string) null);
 		}
 
-//		private static string BuildMockUrl(string area, string controller, string action, IDictionary parameters)
-//		{
-//			return BuildMockUrl(area, controller, action, ToQueryString(parameters));
-//		}
-//
-//		private static string BuildMockUrl(string controller, string action, IDictionary parameters)
-//		{
-//			return BuildMockUrl(controller, action, ToQueryString(parameters));
-//		}
-//
-//		private static string BuildMockUrl(string area, string controller, string action, NameValueCollection parameters)
-//		{
-//			return BuildMockUrl(area, controller, action, ToQueryString(parameters));
-//		}
-//
-//		private static string BuildMockUrl(string controller, string action, NameValueCollection parameters)
-//		{
-//			return BuildMockUrl(controller, action, ToQueryString(parameters));
-//		}
+		private static string BuildMockUrl(string area, string controller, string action, IDictionary parameters)
+		{
+			return BuildMockUrl(area, controller, action, ToQueryString(parameters));
+		}
+
+		private static string BuildMockUrl(string controller, string action, IDictionary parameters)
+		{
+			return BuildMockUrl(controller, action, ToQueryString(parameters));
+		}
+
+		private static string BuildMockUrl(string area, string controller, string action, NameValueCollection parameters)
+		{
+			return BuildMockUrl(area, controller, action, ToQueryString(parameters));
+		}
+
+		private static string BuildMockUrl(string controller, string action, NameValueCollection parameters)
+		{
+			return BuildMockUrl(controller, action, ToQueryString(parameters));
+		}
 
 		/// <summary>
 		/// Creates a querystring string representation of the namevalue collection.

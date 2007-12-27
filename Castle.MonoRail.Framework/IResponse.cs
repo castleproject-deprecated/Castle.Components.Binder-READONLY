@@ -15,6 +15,8 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.Collections;
+	using System.Collections.Specialized;
 	using System.Web;
 
 	/// <summary>
@@ -151,15 +153,15 @@ namespace Castle.MonoRail.Framework
 //		/// <param name="action">Action name</param>
 //		/// <param name="parameters">Key/value pairings</param>
 //		void Redirect(string controller, string action, NameValueCollection parameters);
-//
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="area">Area name</param>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		void Redirect(string area, string controller, string action, NameValueCollection parameters);
+
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="area">Area name</param>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		void Redirect(string area, string controller, string action, NameValueCollection parameters);
 //
 //		/// <summary>
 //		/// Redirects to another controller and action with the specified paramters.
@@ -168,15 +170,15 @@ namespace Castle.MonoRail.Framework
 //		/// <param name="action">Action name</param>
 //		/// <param name="parameters">Key/value pairings</param>
 //		void Redirect(string controller, string action, IDictionary parameters);
-//
-//		/// <summary>
-//		/// Redirects to another controller and action with the specified paramters.
-//		/// </summary>
-//		/// <param name="area">Area name</param>
-//		/// <param name="controller">Controller name</param>
-//		/// <param name="action">Action name</param>
-//		/// <param name="parameters">Key/value pairings</param>
-//		void Redirect(string area, string controller, string action, IDictionary parameters);
+
+		/// <summary>
+		/// Redirects to another controller and action with the specified paramters.
+		/// </summary>
+		/// <param name="area">Area name</param>
+		/// <param name="controller">Controller name</param>
+		/// <param name="action">Action name</param>
+		/// <param name="parameters">Key/value pairings</param>
+		void Redirect(string area, string controller, string action, IDictionary parameters);
 
 		/// <summary>
 		/// Redirects the specified URL.

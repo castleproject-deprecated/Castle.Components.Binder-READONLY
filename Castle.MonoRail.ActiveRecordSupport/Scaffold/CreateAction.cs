@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
 
@@ -33,20 +33,20 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		{
 		}
 
-		protected override string ComputeTemplateName(Controller controller)
+		protected override string ComputeTemplateName(IControllerContext controllerContext)
 		{
-			return String.Format(@"{0}\create{1}", controller.Name, Model.Type.Name);
+			return String.Format(@"{0}\create{1}", controllerContext.Name, Model.Type.Name);
 		}
 
-		protected override void PerformActionProcess(Controller controller)
+		protected override void PerformActionProcess(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
 			object instance = null; 
 			
 			try
 			{
-				AssertIsPost(controller);
+				AssertIsPost(engineContext.Request.HttpMethod);
 
-				instance = binder.BindObject(Model.Type, Model.Type.Name, builder.BuildSourceNode(controller.Form));
+				instance = binder.BindObject(Model.Type, Model.Type.Name, builder.BuildSourceNode(engineContext.Request.Form));
 
 				CommonOperationUtils.SaveInstance(instance, controller, errors, ref prop2Validation, true);
 
@@ -54,11 +54,11 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 
 				if (UseModelName)
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "list" + Model.Type.Name);
+					engineContext.Response.Redirect(controllerContext.AreaName, controllerContext.Name, "list" + Model.Type.Name);
 				}
 				else
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "list");
+					engineContext.Response.Redirect(controllerContext.AreaName, controllerContext.Name, "list");
 				}
 			}
 			catch(Exception ex)
@@ -68,21 +68,29 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 
 			if (errors.Count != 0)
 			{
-				controller.Context.Flash[Model.Type.Name] = instance;
-				controller.Context.Flash["errors"] = errors;
+				engineContext.Flash[Model.Type.Name] = instance;
+				engineContext.Flash["errors"] = errors;
 				
 				if (UseModelName)
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "new" + Model.Type.Name);
+					engineContext.Response.Redirect(controllerContext.AreaName, controllerContext.Name, "new" + Model.Type.Name);
 				}
 				else
 				{
-					controller.Redirect(controller.AreaName, controller.Name, "new");
+					engineContext.Response.Redirect(controllerContext.AreaName, controllerContext.Name, "new");
 				}
 			}
 		}
 
-		protected override void RenderStandardHtml(Controller controller)
+		/// <summary>
+		/// Only invoked if the programmer havent provided
+		/// a custom template for the current action. Implementors
+		/// should create a basic html to present.
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		protected override void RenderStandardHtml(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
 		}
 	}

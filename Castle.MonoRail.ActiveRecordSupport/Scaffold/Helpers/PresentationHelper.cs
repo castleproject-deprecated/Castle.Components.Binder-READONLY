@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold.Helpers
 {
 	using System;
 	using System.Collections;
@@ -47,12 +47,12 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			if (useModelName)
 			{
 				return String.Format("<a href=\"list{0}.{1}\" {3}>{2}</a>", model.Type.Name, 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes));
+					Context.UrlInfo.Extension, text, GetAttributes(attributes));
 			}
 			else
 			{
-				return String.Format("<a href=\"list.{0}\" {2}>{1}</a>", 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes));
+				return String.Format("<a href=\"list.{0}\" {2}>{1}</a>",
+					Context.UrlInfo.Extension, text, GetAttributes(attributes));
 			}
 		}
 
@@ -61,12 +61,12 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			if (useModelName)
 			{
 				return String.Format("<a href=\"new{0}.{1}\" {3}>{2}</a>", model.Type.Name, 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes));
+					Context.UrlInfo.Extension, text, GetAttributes(attributes));
 			}
 			else
 			{
 				return String.Format("<a href=\"new.{0}\" {2}>{1}</a>", 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes));
+					Context.UrlInfo.Extension, text, GetAttributes(attributes));
 			}
 		}
 
@@ -76,12 +76,12 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			if (useModelName)
 			{
 				return String.Format("<a href=\"edit{0}.{1}?id={4}\" {3}>{2}</a>", model.Type.Name, 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
+					Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
 			}
 			else
 			{
 				return String.Format("<a href=\"edit.{0}?id={3}\" {2}>{1}</a>", 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
+					Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
 			}
 		}
 
@@ -90,12 +90,12 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			if (useModelName)
 			{
 				return String.Format("<a href=\"confirm{0}.{1}?id={4}\" {3}>{2}</a>", model.Type.Name, 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
+					Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
 			}
 			else
 			{
 				return String.Format("<a href=\"confirm.{0}?id={3}\" {2}>{1}</a>", 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
+					Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
 			}
 		}
 
@@ -104,12 +104,12 @@ namespace Castle.MonoRail.ActiveRecordScaffold.Helpers
 			if (useModelName)
 			{
 				return String.Format("<a href=\"remove{0}.{1}?id={4}\" {3}>{2}</a>", model.Type.Name, 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
+					Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
 			}
 			else
 			{
 				return String.Format("<a href=\"remove.{0}?id={3}\" {2}>{1}</a>", 
-					Controller.Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
+					Context.UrlInfo.Extension, text, GetAttributes(attributes), key);
 			}
 		}
 	}

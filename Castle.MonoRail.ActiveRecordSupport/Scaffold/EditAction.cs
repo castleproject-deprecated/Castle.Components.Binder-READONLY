@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.MonoRail.ActiveRecordScaffold
+namespace Castle.MonoRail.ActiveRecordSupport.Scaffold
 {
 	using System;
 	using Castle.ActiveRecord;
@@ -32,28 +32,28 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 		{
 		}
 
-		protected override string ComputeTemplateName(Controller controller)
+		protected override string ComputeTemplateName(IControllerContext controller)
 		{
 			return String.Format(@"{0}\edit{1}", controller.Name, Model.Type.Name);
 		}
 
-		protected override void PerformActionProcess(Controller controller)
+		protected override void PerformActionProcess(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			base.PerformActionProcess(controller);
+			base.PerformActionProcess(engineContext, controller, controllerContext);
 			
-			object idVal = CommonOperationUtils.ReadPkFromParams(controller, ObtainPKProperty());
+			object idVal = CommonOperationUtils.ReadPkFromParams(engineContext.Request, ObtainPKProperty());
 
 			try
 			{
-				if (!controller.Flash.Contains(Model.Type.Name))
+				if (!engineContext.Flash.Contains(Model.Type.Name))
 				{
 					object instance = ActiveRecordMediator.FindByPrimaryKey(Model.Type, idVal, true);
-					controller.PropertyBag["instance"] = instance;
-					controller.PropertyBag[Model.Type.Name] = instance;
+					controllerContext.PropertyBag["instance"] = instance;
+					controllerContext.PropertyBag[Model.Type.Name] = instance;
 				}
 
-				controller.PropertyBag["prefix"] = Model.Type.Name;
-				controller.PropertyBag["id"] = idVal;
+				controllerContext.PropertyBag["prefix"] = Model.Type.Name;
+				controllerContext.PropertyBag["id"] = idVal;
 			}
 			catch(Exception ex)
 			{
@@ -61,10 +61,10 @@ namespace Castle.MonoRail.ActiveRecordScaffold
 			}
 		}
 
-		protected override void RenderStandardHtml(Controller controller)
+		protected override void RenderStandardHtml(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
 		{
-			SetUpHelpers(controller);
-			RenderFromTemplate("edit.vm", controller);
+			SetUpHelpers(engineContext, controller, controllerContext);
+			RenderFromTemplate("edit.vm", engineContext, controller, controllerContext);
 		}
 	}
 }
