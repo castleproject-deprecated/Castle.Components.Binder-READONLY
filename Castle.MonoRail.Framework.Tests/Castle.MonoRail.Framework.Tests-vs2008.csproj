@@ -101,6 +101,10 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
+    <ProjectReference Include="..\..\Components\Binder\Castle.Components.Binder\Castle.Components.Binder-vs2008.csproj">
+      <Project>{98F19522-C9B8-400D-8A12-DABB3DA9411D}</Project>
+      <Name>Castle.Components.Binder-vs2008</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Components\EmailSender\Castle.Components.Common.EmailSender\Castle.Components.Common.EmailSender-vs2008.csproj">
       <Project>{CFF1D57F-9FEB-4941-B8FE-8E28F4A8AAC7}</Project>
       <Name>Castle.Components.Common.EmailSender-vs2008</Name>
@@ -153,6 +157,11 @@
     <Compile Include="Resources\ActionsWithResourcesTestCase.cs" />
     <Compile Include="Resources\ControllerWithResourcesTestCase.cs" />
     <Compile Include="Resources\DefaultResourceFactoryTestCase.cs" />
+    <Compile Include="Routing\BaseRuleTestFixture.cs" />
+    <Compile Include="Routing\PatternRuleTestCase.cs" />
+    <Compile Include="Routing\RegexRuleTestCase.cs" />
+    <Compile Include="Routing\RoutingEngineTestCase.cs" />
+    <Compile Include="Routing\Stubs\StubRequest.cs" />
     <Compile Include="Services\DefaultUrlBuilderTestCase.cs" />
     <Compile Include="Services\EmailTemplateServiceTestCase.cs" />
     <Compile Include="Services\PrototypeAjaxProxyGeneratorTestCase.cs" />

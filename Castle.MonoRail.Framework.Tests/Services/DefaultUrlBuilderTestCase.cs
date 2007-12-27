@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework.Tests.Services
 	using System;
 	using System.Collections.Specialized;
 	using Castle.MonoRail.Framework.Helpers;
+	using Castle.MonoRail.Framework.Routing;
 	using Castle.MonoRail.Framework.Services;
 	using NUnit.Framework;
 	using Routing;

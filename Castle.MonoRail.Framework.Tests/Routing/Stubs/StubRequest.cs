@@ -17,6 +17,7 @@ namespace Castle.MonoRail.Framework.Tests.Routing.Stubs
 	using System;
 	using System.Collections;
 	using System.Collections.Specialized;
+	using Castle.Components.Binder;
 
 	public class StubRequest : IRequest
 	{
@@ -31,7 +32,18 @@ namespace Castle.MonoRail.Framework.Tests.Routing.Stubs
 			this.httpMethod = httpMethod;
 		}
 
-		public NameValueCollection Headers
+		public string HttpMethod
+		{
+			get { return httpMethod.ToString(); }
+		}
+
+
+		public string AcceptHeader
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public string UrlReferrer
 		{
 			get { throw new NotImplementedException(); }
 		}
@@ -46,51 +58,6 @@ namespace Castle.MonoRail.Framework.Tests.Routing.Stubs
 			get { throw new NotImplementedException(); }
 		}
 
-		public bool IsLocal
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public string PathInfo
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public string RawUrl
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public Uri Uri
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public string HttpMethod
-		{
-			get { return httpMethod.ToString(); }
-		}
-
-		public string FilePath
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public byte[] BinaryRead(int count)
-		{
-			throw new NotImplementedException();
-		}
-
-		public string this[string key]
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public string ReadCookie(string name)
-		{
-			throw new NotImplementedException();
-		}
-
 		public NameValueCollection QueryString
 		{
 			get { throw new NotImplementedException(); }
@@ -101,14 +68,54 @@ namespace Castle.MonoRail.Framework.Tests.Routing.Stubs
 			get { throw new NotImplementedException(); }
 		}
 
+		public NameValueCollection Headers
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public bool IsLocal
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public Uri Uri
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public string FilePath
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public string ReadCookie(string name)
+		{
+			throw new NotImplementedException();
+		}
+
 		public string[] UserLanguages
 		{
 			get { throw new NotImplementedException(); }
 		}
 
-		public string UserHostAddress
+		public CompositeNode ParamsNode
 		{
 			get { throw new NotImplementedException(); }
+		}
+
+		public CompositeNode FormNode
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public CompositeNode QueryStringNode
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public CompositeNode ObtainParamsNode(ParamStore from)
+		{
+			throw new NotImplementedException();
 		}
 
 		public void ValidateInput()
