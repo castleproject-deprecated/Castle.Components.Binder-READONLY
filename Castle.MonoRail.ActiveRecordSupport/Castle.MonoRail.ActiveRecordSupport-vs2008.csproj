@@ -139,11 +139,30 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Pagination\IARPaginableDataSource.cs" />
+    <Compile Include="Scaffold\AbstractScaffoldAction.cs" />
+    <Compile Include="Scaffold\ConfirmRemoveAction.cs" />
+    <Compile Include="Scaffold\CreateAction.cs" />
+    <Compile Include="Scaffold\EditAction.cs" />
+    <Compile Include="Scaffold\Helpers\ARFormHelper.cs" />
+    <Compile Include="Scaffold\Helpers\PresentationHelper.cs" />
+    <Compile Include="Scaffold\ListAction.cs" />
+    <Compile Include="Scaffold\NewAction.cs" />
+    <Compile Include="Scaffold\RemoveAction.cs" />
+    <Compile Include="Scaffold\ScaffoldingSupport.cs" />
+    <Compile Include="Scaffold\UpdateAction.cs" />
+    <Compile Include="Scaffold\Utils\CommonOperationUtils.cs" />
+    <Compile Include="Scaffold\Utils\CreationUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\CastleKey.snk">
       <Link>CastleKey.snk</Link>
     </None>
+    <EmbeddedResource Include="Scaffold\Templates\remove.vm" />
+    <EmbeddedResource Include="Scaffold\Templates\new.vm" />
+    <EmbeddedResource Include="Scaffold\Templates\list.vm" />
+    <EmbeddedResource Include="Scaffold\Templates\layout.vm" />
+    <EmbeddedResource Include="Scaffold\Templates\edit.vm" />
+    <EmbeddedResource Include="Scaffold\Templates\confirm.vm" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
