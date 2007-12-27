@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Reflection;
 	using System.Web;
 	using Castle.Core;
@@ -109,16 +110,14 @@ namespace Castle.MonoRail.Framework
 
 			IController controller = null;
 
-//			try
+			try
 			{
 				controller = controllerFactory.CreateController(urlInfo.Area, urlInfo.Controller);
 			}
-//			catch(ControllerNotFoundException)
-//			{
-//				// TODO: Set the status code to 404 and Process 404 view/controller if available
-//
-//				throw;
-//			}
+			catch(ControllerNotFoundException)
+			{
+				return new NotFoundHandler(urlInfo.Area, urlInfo.Controller, engineContext);
+			}
 
 			ControllerMetaDescriptor controllerDesc = 
 				mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
@@ -329,6 +328,60 @@ namespace Castle.MonoRail.Framework
 			if (staticResourceRegistry == null)
 			{
 				staticResourceRegistry = mrContainer.StaticResourceRegistry;
+			}
+		}
+
+		/// <summary>
+		/// Handles the controller not found situation
+		/// </summary>
+		public class NotFoundHandler : IHttpHandler
+		{
+			private readonly string area;
+			private readonly string controller;
+			private readonly IEngineContext engineContext;
+
+			/// <summary>
+			/// Initializes a new instance of the <see cref="NotFoundHandler"/> class.
+			/// </summary>
+			/// <param name="area">The area.</param>
+			/// <param name="controller">The controller.</param>
+			/// <param name="engineContext">The engine context.</param>
+			public NotFoundHandler(string area, string controller, IEngineContext engineContext)
+			{
+				this.area = area;
+				this.controller = controller;
+				this.engineContext = engineContext;
+			}
+
+			/// <summary>
+			/// Enables processing of HTTP Web requests by a custom HttpHandler that implements the <see cref="T:System.Web.IHttpHandler"/> interface.
+			/// </summary>
+			/// <param name="context">An <see cref="T:System.Web.HttpContext"/> object that provides references to the intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
+			public void ProcessRequest(HttpContext context)
+			{
+				engineContext.Response.StatusCode = 404;
+				engineContext.Response.StatusDescription = "Not found";
+
+				if (engineContext.Services.ViewEngineManager.HasTemplate("rescues/404"))
+				{
+					Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+					engineContext.Services.ViewEngineManager.Process("rescues/404", null, engineContext.Response.Output, parameters);
+
+					return; // gracefully handled
+				}
+
+				throw new ControllerNotFoundException(area, controller);
+			}
+
+			/// <summary>
+			/// Gets a value indicating whether another request can use the <see cref="T:System.Web.IHttpHandler"/> instance.
+			/// </summary>
+			/// <value></value>
+			/// <returns>true if the <see cref="T:System.Web.IHttpHandler"/> instance is reusable; otherwise, false.</returns>
+			public bool IsReusable
+			{
+				get { return false; }
 			}
 		}
 	}
