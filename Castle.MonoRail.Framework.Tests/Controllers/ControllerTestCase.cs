@@ -75,7 +75,7 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		{
 			ControllerAndViews controller = new ControllerAndViews();
 
-			IControllerContext context = new DefaultControllerContextFactory().
+			IControllerContext context = services.ControllerContextFactory.
 				Create("", "home", "EmptyAction", new ControllerMetaDescriptor());
 
 			controller.Process(engineContext, context);

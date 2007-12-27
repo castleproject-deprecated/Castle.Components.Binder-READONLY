@@ -148,10 +148,12 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Products\CartController.cs" />
     <Compile Include="Controllers\Products\ListController.cs" />
+    <Compile Include="Controllers\SmartDispatcherSimpleBindingTestCase.cs" />
     <Compile Include="Filters\ControllerLevelFiltersTestCase.cs" />
     <Compile Include="Resources\ActionsWithResourcesTestCase.cs" />
     <Compile Include="Resources\ControllerWithResourcesTestCase.cs" />
     <Compile Include="Resources\DefaultResourceFactoryTestCase.cs" />
+    <Compile Include="Services\DefaultUrlBuilderTestCase.cs" />
     <Compile Include="Services\EmailTemplateServiceTestCase.cs" />
     <Compile Include="Services\PrototypeAjaxProxyGeneratorTestCase.cs" />
     <Compile Include="ViewComponents\AuthenticatedContentTestCase.cs" />

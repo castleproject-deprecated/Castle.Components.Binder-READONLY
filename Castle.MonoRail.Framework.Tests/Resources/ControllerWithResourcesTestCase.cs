@@ -102,7 +102,7 @@ namespace Castle.MonoRail.Framework.Tests.Resources
 		}
 
 		[Resource("key", "Castle.MonoRail.Framework.Tests.Resources.Language", CultureName = "neutral", AssemblyName = "Castle.MonoRail.Framework.Tests")]
-		[Resource("key", "Castle.MonoRail.Framework.Tests.Resources.Language", CultureName = "de", AssemblyName = "Castle.MonoRail.Framework.Tests")]
+		[Resource("key", "Castle.MonoRail.Framework.Tests.Resources.Language", CultureName = "neutral", AssemblyName = "Castle.MonoRail.Framework.Tests")]
 		private class ControllerWithResourceDuplicated : Controller
 		{
 			public void Index()
