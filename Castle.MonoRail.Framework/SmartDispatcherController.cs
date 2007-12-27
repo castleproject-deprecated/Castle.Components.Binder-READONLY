@@ -35,7 +35,6 @@ namespace Castle.MonoRail.Framework
 	public abstract class SmartDispatcherController : Controller
 	{
 		private IDataBinder binder;
-		private IDictionary<object, ErrorSummary> validationSummaryPerInstance = new Dictionary<object, ErrorSummary>();
 
 		/// <summary>
 		/// Represents the errors associated with an instance bound.
@@ -65,77 +64,6 @@ namespace Castle.MonoRail.Framework
 		public IDataBinder Binder
 		{
 			get { return binder; }
-		}
-
-		/// <summary>
-		/// Gets or sets the bound instance errors.
-		/// </summary>
-		/// <value>The bound instance errors.</value>
-		public IDictionary<object, ErrorList> BoundInstanceErrors
-		{
-			get { return boundInstances; }
-			set { boundInstances = value; }
-		}
-
-		/// <summary>
-		/// Gets the validation summary (key is the object instance)
-		/// </summary>
-		/// <value>The validation summary per instance.</value>
-		public IDictionary<object, ErrorSummary> ValidationSummaryPerInstance
-		{
-			get { return validationSummaryPerInstance; }
-		}
-
-		/// <summary>
-		/// Populates the validator error summary.
-		/// </summary>
-		/// <param name="instance">The instance.</param>
-		/// <param name="binderUsedForBinding">The binder used for binding.</param>
-		protected internal void PopulateValidatorErrorSummary(object instance, IDataBinder binderUsedForBinding)
-		{
-			ValidationSummaryPerInstance[instance] = binderUsedForBinding.GetValidationSummary(instance);
-		}
-
-		/// <summary>
-		/// Gets the error summary associated with validation errors.
-		/// <para>
-		/// Will only work for instances populated by the <c>DataBinder</c>
-		/// </para>
-		/// </summary>
-		/// <param name="instance">object instance</param>
-		/// <returns>Error summary instance (can be null if the DataBinder wasn't configured to validate)</returns>
-		protected ErrorSummary GetErrorSummary(object instance)
-		{
-			return validationSummaryPerInstance.ContainsKey(instance) ? validationSummaryPerInstance[instance] : null;
-		}
-
-		/// <summary>
-		/// Returns <c>true</c> if the given instance had 
-		/// validation errors during binding.
-		/// <para>
-		/// Will only work for instances populated by the <c>DataBinder</c>
-		/// </para>
-		/// </summary>
-		/// <param name="instance">object instance</param>
-		/// <returns><c>true</c> if the validation had an error</returns>
-		protected bool HasValidationError(object instance)
-		{
-			ErrorSummary summary = GetErrorSummary(instance);
-
-			if (summary == null) return false;
-
-			return summary.ErrorsCount != 0;
-		}
-
-		/// <summary>
-		/// Gets a list of errors that were thrown during the 
-		/// object process, like conversion errors.
-		/// </summary>
-		/// <param name="instance">The instance that was populated by a binder.</param>
-		/// <returns>List of errors</returns>
-		protected ErrorList GetDataBindErrors(object instance)
-		{
-			return boundInstances[instance];
 		}
 
 		/// <summary>
@@ -441,7 +369,7 @@ namespace Castle.MonoRail.Framework
 			object instance = binder.BindObject(targetType, prefix, excludedProperties, allowedProperties, node);
 
 			boundInstances[instance] = binder.ErrorList;
-			PopulateValidatorErrorSummary(instance, binder);
+			PopulateValidatorErrorSummary(instance, binder.GetValidationSummary(instance));
 
 			return instance;
 		}
@@ -470,7 +398,7 @@ namespace Castle.MonoRail.Framework
 			binder.BindObjectInstance(instance, prefix, node);
 
 			boundInstances[instance] = binder.ErrorList;
-			PopulateValidatorErrorSummary(instance, binder);
+			PopulateValidatorErrorSummary(instance, binder.GetValidationSummary(instance));
 		}
 
 		/// <summary>

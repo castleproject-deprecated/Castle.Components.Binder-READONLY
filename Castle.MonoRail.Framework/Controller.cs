@@ -54,7 +54,6 @@ namespace Castle.MonoRail.Framework
 		private IViewEngineManager viewEngineManager;
 		private IActionSelector actionSelector;
 		private IScaffoldingSupport scaffoldSupport;
-		private ValidatorRunner validator;
 		private FilterDescriptor[] filters = new FilterDescriptor[0];
 		private ValidatorRunner validatorRunner;
 		private Dictionary<object, ErrorSummary> validationSummaryPerInstance;
@@ -1783,15 +1782,15 @@ namespace Castle.MonoRail.Framework
 			return new ValidatorRunner(validatorRegistry);
 		}
 
-//		/// <summary>
-//		/// Gives a chance to subclasses to format the action name properly
-//		/// </summary>
-//		/// <param name="action">Raw action name</param>
-//		/// <returns>Properly formatted action name</returns>
-//		internal virtual string TransformActionName(string action)
-//		{
-//			return action;
-//		}
+		/// <summary>
+		/// Gives a chance to subclasses to format the action name properly
+		/// </summary>
+		/// <param name="action">Raw action name</param>
+		/// <returns>Properly formatted action name</returns>
+		protected virtual string TransformActionName(string action)
+		{
+			return action;
+		}
 
 		/// <summary>
 		/// To preserve standard Action semantics when using ASP.NET Views,

@@ -246,6 +246,7 @@
     <Compile Include="IParameterBinder.cs" />
     <Compile Include="ISubActionSelector.cs" />
     <Compile Include="ITrace.cs" />
+    <Compile Include="IValidatorAccessor.cs" />
     <Compile Include="IWizardController.cs">
       <SubType>Code</SubType>
     </Compile>

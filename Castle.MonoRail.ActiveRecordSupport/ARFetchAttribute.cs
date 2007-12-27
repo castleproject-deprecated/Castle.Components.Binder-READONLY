@@ -26,7 +26,7 @@ namespace Castle.MonoRail.ActiveRecordSupport
 	/// </summary>
 	/// <remarks>
 	/// The <see cref="ARFetchAttribute"/> only loads an instance
-	/// based on the primary key value obtained from <see cref="IRailsEngineContext.Params"/>
+	/// based on the primary key value obtained from <see cref="IRequest.Params"/>
 	/// <para>For example:</para>
 	/// <code>
 	/// public class CustomerController : ARSmartDispatcherController

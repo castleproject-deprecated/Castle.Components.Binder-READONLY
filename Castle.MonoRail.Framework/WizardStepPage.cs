@@ -447,7 +447,7 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="action">Raw action name</param>
 		/// <returns>Properly formatted action name</returns>
-		internal override String TransformActionName(String action)
+		protected override String TransformActionName(String action)
 		{
 			return base.TransformActionName(ActionName + "-" + action);
 		}
