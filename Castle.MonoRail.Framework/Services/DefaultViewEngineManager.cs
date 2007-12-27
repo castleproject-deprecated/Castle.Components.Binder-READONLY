@@ -212,6 +212,38 @@ namespace Castle.MonoRail.Framework.Services
 			engine.RenderStaticWithinLayout(contents, context, controller, controllerContext);
 		}
 
+		/// <summary>
+		/// Creates the JS code generator info. Temporarily on IViewEngineManager
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns></returns>
+		public JSCodeGeneratorInfo CreateJSCodeGeneratorInfo(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
+		{
+			JSGeneratorConfiguration jsConfig = config.JSGeneratorConfiguration;
+
+			if (jsConfig.DefaultLibrary == null)
+			{
+				throw new MonoRailException("No default JS Generator library configured. By default MonoRail configures " +
+					"itself to use the Prototype JS library. If you have configured other, make sure you set it as default.");
+			}
+
+			JSCodeGenerator codeGenerator =
+				new JSCodeGenerator(engineContext.Server, this,
+					engineContext, controller, controllerContext, engineContext.Services.UrlBuilder);
+
+			IJSGenerator jsGen = (IJSGenerator)
+				Activator.CreateInstance(jsConfig.DefaultLibrary.MainGenerator, new object[] { codeGenerator });
+
+			codeGenerator.JSGenerator = jsGen;
+
+			object[] extensions = CreateExtensions(codeGenerator, jsConfig.DefaultLibrary.MainExtensions);
+			object[] elementExtension = CreateExtensions(codeGenerator, jsConfig.DefaultLibrary.ElementExtension);
+
+			return new JSCodeGeneratorInfo(codeGenerator, jsGen, extensions, elementExtension);
+		}
+
 		#endregion
 
 		/// <summary>
@@ -221,31 +253,6 @@ namespace Castle.MonoRail.Framework.Services
 		private void ContextualizeViewEngine(IViewEngine engine)
 		{
 			MonoRailHttpHandlerFactory.CurrentEngineContext.AddService(typeof(IViewEngine), engine);
-		}
-
-		private JSCodeGeneratorInfo CreateJSCodeGeneratorInfo(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
-		{
-			JSGeneratorConfiguration jsConfig = config.JSGeneratorConfiguration;
-
-			if (jsConfig.DefaultLibrary == null)
-			{
-				throw new MonoRailException("No default JS Generator library configured. By default MonoRail configures " + 
-					"itself to use the Prototype JS library. If you have configured other, make sure you set it as default.");
-			}
-
-			JSCodeGenerator codeGenerator =
-				new JSCodeGenerator(engineContext.Server, this, 
-					engineContext, controller, controllerContext, engineContext.Services.UrlBuilder);
-
-			IJSGenerator jsGen = (IJSGenerator) 
-				Activator.CreateInstance(jsConfig.DefaultLibrary.MainGenerator, new object[] { codeGenerator });
-
-			codeGenerator.JSGenerator = jsGen;
-
-			object[] extensions = CreateExtensions(codeGenerator, jsConfig.DefaultLibrary.MainExtensions);
-			object[] elementExtension = CreateExtensions(codeGenerator, jsConfig.DefaultLibrary.ElementExtension);
-
-			return new JSCodeGeneratorInfo(codeGenerator, jsGen, extensions, elementExtension);
 		}
 
 		private static object[] CreateExtensions(IJSCodeGenerator generator, List<Type> extensions)

@@ -25,6 +25,16 @@ namespace Castle.MonoRail.Framework
 	public interface IViewEngineManager
 	{
 		/// <summary>
+		/// Creates the JS code generator info. Temporarily on IViewEngineManager
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns></returns>
+		JSCodeGeneratorInfo CreateJSCodeGeneratorInfo(IEngineContext engineContext, IController controller,
+		                                              IControllerContext controllerContext);
+
+		/// <summary>
 		/// Evaluates whether the specified template exists.
 		/// </summary>
 		/// <returns><c>true</c> if it exists</returns>

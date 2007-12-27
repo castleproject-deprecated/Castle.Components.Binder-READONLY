@@ -476,6 +476,8 @@
     <Compile Include="ViewComponents\SelectStylePagination.cs" />
     <Compile Include="ViewComponents\SiteMapComponent.cs" />
     <Compile Include="ViewComponents\TreeMakerComponent.cs" />
+    <Compile Include="ViewComponents\UpdatePage.cs" />
+    <Compile Include="ViewComponents\UpdatePageTag.cs" />
     <Compile Include="Views\Aspx\PageBase.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

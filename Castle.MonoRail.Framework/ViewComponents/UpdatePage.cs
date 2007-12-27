@@ -55,13 +55,20 @@ namespace Castle.MonoRail.Framework.ViewComponents
 		/// <returns></returns>
 		protected string GenerateJS()
 		{
-			object generator = Context.ViewEngine.CreateJSGenerator(
-				EngineContext, EngineContext.CurrentController, EngineContext.CurrentControllerContext);
+			IViewEngineManager viewEngManager = EngineContext.Services.ViewEngineManager;
+			IViewEngine viewEngine = Context.ViewEngine;
+			IController currentController = EngineContext.CurrentController;
+			IControllerContext currentControllerCtx = EngineContext.CurrentControllerContext;
+
+			JSCodeGeneratorInfo jsCodeGen =
+				viewEngManager.CreateJSCodeGeneratorInfo(EngineContext, currentController, currentControllerCtx);
+
+			object generator = viewEngine.CreateJSGenerator(jsCodeGen, EngineContext, currentController, currentControllerCtx);
 
 			PropertyBag["page"] = generator;
 
-			Context.RenderBody(new StringWriter());
-			
+			Context.RenderBody(new StringWriter()); // Just for evaluation of generator
+
 			PropertyBag.Remove("page");
 
 			return generator.ToString();

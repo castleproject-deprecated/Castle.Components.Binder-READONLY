@@ -21,6 +21,7 @@ namespace Castle.MonoRail.Framework
 	using System.IO;
 	using System.Reflection;
 	using System.Web;
+	using Castle.Components.Binder;
 	using Castle.Components.Common.EmailSender;
 	using Castle.Components.Validator;
 	using Castle.Core;
@@ -35,7 +36,7 @@ namespace Castle.MonoRail.Framework
 	/// Implements the core functionality and exposes the
 	/// common methods for concrete controllers.
 	/// </summary>
-	public abstract class Controller : IController
+	public abstract class Controller : IController, IValidatorAccessor
 	{
 		private IEngineContext engineContext;
 		private IControllerContext context;
@@ -55,7 +56,9 @@ namespace Castle.MonoRail.Framework
 		private IScaffoldingSupport scaffoldSupport;
 		private ValidatorRunner validator;
 		private FilterDescriptor[] filters = new FilterDescriptor[0];
-//		private ValidatorRunner validatorRunner;
+		private ValidatorRunner validatorRunner;
+		private Dictionary<object, ErrorSummary> validationSummaryPerInstance;
+		private Dictionary<object, ErrorList> boundInstances;
 
 		#region IController
 
@@ -91,7 +94,6 @@ namespace Castle.MonoRail.Framework
 			viewEngineManager = engineContext.Services.ViewEngineManager; // should not be null
 			actionSelector = engineContext.Services.ActionSelector; // should not be null
 			scaffoldSupport = engineContext.Services.ScaffoldSupport; // might be null
-//			validatorRunner = CreateValidatorRunner(engineContext.Services.ValidatorRegistry);
 
 			ResetIsPostback();
 			context.LayoutName = ObtainDefaultLayoutName();
@@ -128,6 +130,112 @@ namespace Castle.MonoRail.Framework
 		public virtual void Dispose()
 		{
 			DisposeFilters();
+		}
+
+		#endregion
+
+		#region IValidatorAccessor
+
+		/// <summary>
+		/// Gets the validator runner instance.
+		/// </summary>
+		/// <value>The validator instance.</value>
+		public ValidatorRunner Validator
+		{
+			get
+			{
+				if (validatorRunner == null)
+				{
+					validatorRunner = CreateValidatorRunner(engineContext.Services.ValidatorRegistry);
+				}
+				return validatorRunner;
+			}
+			set { validatorRunner = value; }
+		}
+
+		/// <summary>
+		/// Gets the bound instance errors. These are errors relative to
+		/// the binding process performed for the specified instance.
+		/// </summary>
+		/// <value>The bound instance errors.</value>
+		public IDictionary<object, ErrorList> BoundInstanceErrors
+		{
+			get 
+			{
+				if (boundInstances == null)
+				{
+					boundInstances = new Dictionary<object, ErrorList>();
+				}
+				return boundInstances; 
+			}
+		}
+
+		/// <summary>
+		/// Populates the validator error summary with errors relative to the
+		/// validation rules associated with the target type.
+		/// </summary>
+		/// <param name="instance">The instance.</param>
+		/// <param name="binderUsedForBinding">The binder used for binding.</param>
+		public void PopulateValidatorErrorSummary(object instance, ErrorSummary binderUsedForBinding)
+		{
+			if (validationSummaryPerInstance == null)
+			{
+				validationSummaryPerInstance = new Dictionary<object, ErrorSummary>();
+			}
+			validationSummaryPerInstance[instance] = binderUsedForBinding;
+		}
+
+		/// <summary>
+		/// Gets the error summary associated with validation errors.
+		/// <para>
+		/// Will only work for instances populated by the <c>DataBinder</c>
+		/// </para>
+		/// </summary>
+		/// <param name="instance">object instance</param>
+		/// <returns>Error summary instance (can be null if the DataBinder wasn't configured to validate)</returns>
+		protected ErrorSummary GetErrorSummary(object instance)
+		{
+			if (validationSummaryPerInstance == null)
+			{
+				return null;
+			}
+			return validationSummaryPerInstance.ContainsKey(instance) ? validationSummaryPerInstance[instance] : null;
+		}
+
+		/// <summary>
+		/// Returns <c>true</c> if the given instance had 
+		/// validation errors during binding.
+		/// <para>
+		/// Will only work for instances populated by the <c>DataBinder</c>
+		/// </para>
+		/// </summary>
+		/// <param name="instance">object instance</param>
+		/// <returns><c>true</c> if the validation had an error</returns>
+		protected bool HasValidationError(object instance)
+		{
+			ErrorSummary summary = GetErrorSummary(instance);
+
+			if (summary == null)
+			{
+				return false;
+			}
+
+			return summary.ErrorsCount != 0;
+		}
+
+		/// <summary>
+		/// Gets a list of errors that were thrown during the 
+		/// object process, like conversion errors.
+		/// </summary>
+		/// <param name="instance">The instance that was populated by a binder.</param>
+		/// <returns>List of errors</returns>
+		protected ErrorList GetDataBindErrors(object instance)
+		{
+			if (boundInstances != null && boundInstances.ContainsKey(instance))
+			{
+				return boundInstances[instance];
+			}
+			return null;
 		}
 
 		#endregion
@@ -381,16 +489,6 @@ namespace Castle.MonoRail.Framework
 		public IDictionary<string, IDynamicAction> DynamicActions
 		{
 			get { return context.DynamicActions; }
-		}
-
-		/// <summary>
-		/// Gets the validator runner instance.
-		/// </summary>
-		/// <value>The validator instance.</value>
-		public ValidatorRunner Validator
-		{
-			get { return validator; }
-			set { validator = value; }
 		}
 
 		/// <summary>
@@ -1666,30 +1764,34 @@ namespace Castle.MonoRail.Framework
 			return method.Invoke(this, new object[0]);
 		}
 
-//		/// <summary>
-//		/// Creates the default validator runner. 
-//		/// </summary>
-//		/// <param name="validatorRegistry">The validator registry.</param>
-//		/// <returns></returns>
-//		/// <remarks>
-//		/// You can override this method to create a runner
-//		/// with some different configuration
-//		/// </remarks>
-//		protected virtual ValidatorRunner CreateValidatorRunner(IValidatorRegistry validatorRegistry)
-//		{
-//			return new ValidatorRunner(validatorRegistry);
-//		}
-
 		/// <summary>
-		/// Gives a chance to subclasses to format the action name properly
+		/// Creates the default validator runner. 
 		/// </summary>
-		/// <param name="action">Raw action name</param>
-		/// <returns>Properly formatted action name</returns>
-		internal virtual string TransformActionName(string action)
+		/// <param name="validatorRegistry">The validator registry.</param>
+		/// <returns></returns>
+		/// <remarks>
+		/// You can override this method to create a runner
+		/// with some different configuration
+		/// </remarks>
+		protected virtual ValidatorRunner CreateValidatorRunner(IValidatorRegistry validatorRegistry)
 		{
-//		/// <seealso cref="WizardStepPage"/>
-			return action;
+			if (validatorRegistry == null)
+			{
+				throw new ArgumentNullException("validatorRegistry");
+			}
+
+			return new ValidatorRunner(validatorRegistry);
 		}
+
+//		/// <summary>
+//		/// Gives a chance to subclasses to format the action name properly
+//		/// </summary>
+//		/// <param name="action">Raw action name</param>
+//		/// <returns>Properly formatted action name</returns>
+//		internal virtual string TransformActionName(string action)
+//		{
+//			return action;
+//		}
 
 		/// <summary>
 		/// To preserve standard Action semantics when using ASP.NET Views,

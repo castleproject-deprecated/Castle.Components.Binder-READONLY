@@ -387,8 +387,9 @@ namespace Castle.MonoRail.Views.Brail
 		/// One thing to note here is that resources are wrapped in ResourceToDuck wrapper
 		/// to enable easy use by the script
 		/// </summary>
-		/// <param name="myContext"></param>
-		/// <param name="myController"></param>
+		/// <param name="myContext">My context.</param>
+		/// <param name="myController">My controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
 		private void InitProperties(IEngineContext myContext, IController myController, IControllerContext controllerContext)
 		{
 			properties = new Hashtable(StringComparer.InvariantCultureIgnoreCase);

@@ -140,15 +140,16 @@ namespace Castle.MonoRail.Framework
 		public virtual object Bind(IEngineContext context, IController controller, IControllerContext controllerContext, ParameterInfo parameterInfo)
 		{
 			IDataBinder binder = CreateBinder();
+			IValidatorAccessor validatorAccessor = controller as IValidatorAccessor;
 
-//			ConfigureValidator(controller, binder);
+			ConfigureValidator(validatorAccessor, binder);
 
 			CompositeNode node = context.Request.ObtainParamsNode(From);
 
 			object instance = binder.BindObject(parameterInfo.ParameterType, prefix, exclude, allow, node);
 
-//			BindInstanceErrors(controller, binder, instance);
-//			PopulateValidatorErrorSummary(controller, binder, instance);
+			BindInstanceErrors(validatorAccessor, binder, instance);
+			PopulateValidatorErrorSummary(validatorAccessor, binder, instance);
 
 			return instance;
 		}
@@ -162,49 +163,54 @@ namespace Castle.MonoRail.Framework
 			return new DataBinder();
 		}
 
-//		/// <summary>
-//		/// Configures the validator.
-//		/// </summary>
-//		/// <param name="controller">The controller.</param>
-//		/// <param name="binder">The binder.</param>
-//		protected void ConfigureValidator(SmartDispatcherController controller, IDataBinder binder)
-//		{
-//			if (validate)
-//			{
-//				binder.Validator = controller.Validator;
-//			}
-//			else
-//			{
-//				binder.Validator = null;
-//			}
-//		}
+		/// <summary>
+		/// Configures the validator.
+		/// </summary>
+		/// <param name="validatorExposer">The validator exposer.</param>
+		/// <param name="binder">The binder.</param>
+		protected virtual void ConfigureValidator(IValidatorAccessor validatorExposer, IDataBinder binder)
+		{
+			if (validate && validatorExposer == null)
+			{
+				throw new MonoRailException("DataBind wants to validate, but controller does not seem to implement IValidatorAccessor interface");
+			}
 
-//		/// <summary>
-//		/// Populates the validator error summary.
-//		/// </summary>
-//		/// <param name="controller">The controller.</param>
-//		/// <param name="binder">The binder.</param>
-//		/// <param name="instance">The instance.</param>
-//		protected void PopulateValidatorErrorSummary(SmartDispatcherController controller, IDataBinder binder, object instance)
-//		{
-//			if (validate)
-//			{
-//				controller.PopulateValidatorErrorSummary(instance, binder);
-//			}
-//		}
+			if (validate)
+			{
+				binder.Validator = validatorExposer.Validator;
+			}
+			else
+			{
+				binder.Validator = null;
+			}
+		}
 
-//		/// <summary>
-//		/// Binds the instance errors.
-//		/// </summary>
-//		/// <param name="controller">The controller.</param>
-//		/// <param name="binder">The binder.</param>
-//		/// <param name="instance">The instance.</param>
-//		protected void BindInstanceErrors(SmartDispatcherController controller, IDataBinder binder, object instance)
-//		{
-//			if (instance != null)
-//			{
-//				controller.BoundInstanceErrors[instance] = binder.ErrorList;
-//			}
-//		}
+		/// <summary>
+		/// Populates the validator error summary.
+		/// </summary>
+		/// <param name="validatorExposer">The validator exposer.</param>
+		/// <param name="binder">The binder.</param>
+		/// <param name="instance">The instance.</param>
+		protected virtual void PopulateValidatorErrorSummary(IValidatorAccessor validatorExposer, IDataBinder binder, object instance)
+		{
+			if (validate)
+			{
+				validatorExposer.PopulateValidatorErrorSummary(instance, binder.GetValidationSummary(instance));
+			}
+		}
+
+		/// <summary>
+		/// Binds the instance errors.
+		/// </summary>
+		/// <param name="validatorExposer">The validator exposer.</param>
+		/// <param name="binder">The binder.</param>
+		/// <param name="instance">The instance.</param>
+		protected virtual void BindInstanceErrors(IValidatorAccessor validatorExposer, IDataBinder binder, object instance)
+		{
+			if (instance != null)
+			{
+				validatorExposer.BoundInstanceErrors[instance] = binder.ErrorList;
+			}
+		}
 	}
 }

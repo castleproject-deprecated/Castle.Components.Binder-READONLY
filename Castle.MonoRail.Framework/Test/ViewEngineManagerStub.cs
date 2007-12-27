@@ -17,6 +17,8 @@ namespace Castle.MonoRail.Framework.Test
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
+	using Castle.MonoRail.Framework.JSGeneration.Prototype;
+	using JSGeneration;
 
 	/// <summary>
 	/// Pendent
@@ -121,6 +123,21 @@ namespace Castle.MonoRail.Framework.Test
 		                                     IControllerContext controllerContext)
 		{
 			contentWithinLayoutRendered = contents;
+		}
+
+		/// <summary>
+		/// Creates the JS code generator info. Temporarily on IViewEngineManager
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns></returns>
+		public JSCodeGeneratorInfo CreateJSCodeGeneratorInfo(IEngineContext engineContext, IController controller,
+		                                                     IControllerContext controllerContext)
+		{
+			JSCodeGenerator codeGen = new JSCodeGenerator();
+
+			return new JSCodeGeneratorInfo(codeGen, new PrototypeGenerator(codeGen), new object[0], new object[0]);
 		}
 	}
 }
