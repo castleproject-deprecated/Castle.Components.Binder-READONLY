@@ -42,16 +42,16 @@ namespace Castle.MonoRail.Framework.Services
 			
 			RegisterAssemblyResource("ZebdaScripts", null, null, "Castle.MonoRail.Framework",
 			                         "Castle.MonoRail.Framework.JSResources.ZebdaValidation", "jsfunctions", "text/javascript");
-			
-			RegisterAssemblyResource("Validation", null, null, "Castle.MonoRail.Framework",
+
+			RegisterAssemblyResource("ValidateCore", null, null, "Castle.MonoRail.Framework",
 			                         "Castle.MonoRail.Framework.JSResources.Validation", "fValidateCore", "text/javascript");
 			
-			RegisterAssemblyResource("ValidationLang", null, null, "Castle.MonoRail.Framework",
-			                         "Castle.MonoRail.Framework.JSResources.Validation", "fValidateLang", "text/javascript");
-			
+			RegisterAssemblyResource("ValidateLang", null, null, "Castle.MonoRail.Framework",
+			                         "Castle.MonoRail.Framework.JSResources.ValidationLang", "fValidateLang", "text/javascript");
+
 			RegisterAssemblyResource("ValidateValidators", null, null, "Castle.MonoRail.Framework",
 			                         "Castle.MonoRail.Framework.JSResources.Validation", "fValidateValidators", "text/javascript");
-			
+
 			RegisterAssemblyResource("ValidateConfig", null, null, "Castle.MonoRail.Framework",
 			                         "Castle.MonoRail.Framework.JSResources.Validation", "fValidateConfig", "text/javascript");
 			

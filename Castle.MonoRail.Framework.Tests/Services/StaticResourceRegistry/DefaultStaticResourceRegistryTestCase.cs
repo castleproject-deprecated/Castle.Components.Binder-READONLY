@@ -70,5 +70,80 @@ namespace Castle.MonoRail.Framework.Tests.Services.StaticResourceRegistry
 			Assert.AreEqual("validators", registry.GetResource("key 2", null, null, out mime));
 			Assert.AreEqual("text/javascript", mime);
 		}
+
+		[Test]
+		public void DefaultResource_CanResolveBehaviourScripts()
+		{
+			string mime;
+			Assert.AreEqual("\r\n/*\r\n   Behaviour v1.1 by Ben Nolan, June 2005.", 
+				registry.GetResource("BehaviourScripts", null, null, out mime).Substring(0, 48));
+			Assert.AreEqual("text/javascript", mime);
+		}
+
+		[Test]
+		public void DefaultResource_CanResolveAjaxScripts()
+		{
+			string mime;
+			Assert.AreEqual("\r\n/*  Prototype JavaScript framework, version 1.5.1\r\n *  (c)", 
+				registry.GetResource("AjaxScripts", null, null, out mime).Substring(0, 60));
+			Assert.AreEqual("text/javascript", mime);
+		}
+
+		[Test]
+		public void DefaultResource_CanResolveFormHelperScript()
+		{
+			string mime;
+			Assert.AreEqual("\r\n\r\n\r\nfunction monorail_formhelper_numberonly(e, exceptions, forbidalso)\r\n{\r\n\tex",
+				registry.GetResource("FormHelperScript", null, null, out mime).Substring(0, 80));
+			Assert.AreEqual("text/javascript", mime);
+		}
+
+		[Test]
+		public void DefaultResource_CanResolveZebdaScripts()
+		{
+			string mime;
+			Assert.AreEqual(" \r\n\r\n/*\r\n\r\nZebda javascript library, version 0.3.1\r\n http://labs.cavorite.com/ze",
+				registry.GetResource("ZebdaScripts", null, null, out mime).Substring(0, 80));
+			Assert.AreEqual("text/javascript", mime);
+		}
+
+		[Test]
+		public void DefaultResource_CanResolveValidateScripts()
+		{
+			string mime;
+			Assert.AreEqual(" \r\n\t\t\t \r\n\t\t\t/*************************************",
+				registry.GetResource("ValidateCore", null, null, out mime).Substring(0, 50));
+			Assert.AreEqual("text/javascript", mime);
+
+			Assert.AreEqual(" \r\n\t\t\t/*--\tfValidate US-English language file.\r\n\t\t",
+				registry.GetResource("ValidateLang", null, null, out mime).Substring(0, 50));
+			Assert.AreEqual("text/javascript", mime);
+
+			Assert.AreEqual(" \r\n\t\t\t/*< blank basic ****************************",
+				registry.GetResource("ValidateValidators", null, null, out mime).Substring(0, 50));
+			Assert.AreEqual("text/javascript", mime);
+
+			Assert.AreEqual(" \r\n\t\t\t\tfunction fValConfig()\r\n\t\t\t\t{\r\n\t\t\t\t\t/*\tGloba",
+				registry.GetResource("ValidateConfig", null, null, out mime).Substring(0, 50));
+			Assert.AreEqual("text/javascript", mime);
+		}
+
+		[Test]
+		public void DefaultResource_CanResolveEffects2()
+		{
+			string mime;
+			Assert.AreEqual("\r\n\r\n// script.aculo.us scriptaculous.js v1.7.1_beta3, Fri May 25 17:19:41 +0200 ",
+				registry.GetResource("Effects2", null, null, out mime).Substring(0, 80));
+			Assert.AreEqual("text/javascript", mime);
+		}
+
+		[Test]
+		public void DefaultResource_CanResolveEffectsFatScripts()
+		{
+			string mime;
+			Assert.AreEqual("\r\n// @name      The Fade Anything Technique\r\n// @namespace http://www.axentric.c",
+				registry.GetResource("EffectsFatScripts", null, null, out mime).Substring(0, 80));
+			Assert.AreEqual("text/javascript", mime);
+		}
 	}
 }
