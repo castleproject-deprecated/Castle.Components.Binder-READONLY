@@ -24,6 +24,7 @@ namespace Castle.MonoRail.Framework.Container
 	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Providers;
 	using Castle.MonoRail.Framework.Resources;
+	using Castle.MonoRail.Framework.Services.AjaxProxyGenerator;
 
 	/// <summary>
 	/// Pendent
@@ -145,10 +146,10 @@ namespace Castle.MonoRail.Framework.Container
 			/// The <see cref="IValidatorRegistry"/> service
 			/// </summary>
 			ValidatorRegistry,
-//			/// <summary>
-//			/// The <see cref="IAjaxProxyGenerator"/> service
-//			/// </summary>
-//			AjaxProxyGenerator
+			/// <summary>
+			/// The <see cref="IAjaxProxyGenerator"/> service
+			/// </summary>
+			AjaxProxyGenerator
 		}
 
 		#endregion
@@ -439,6 +440,10 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<IEmailSender>())
 			{
 				AddService<IEmailSender>(CreateService<MonoRailSmtpSender>());
+			}
+			if (!HasService<IAjaxProxyGenerator>())
+			{
+				AddService<IAjaxProxyGenerator>(CreateService<PrototypeAjaxProxyGenerator>());
 			}
 		}
 
