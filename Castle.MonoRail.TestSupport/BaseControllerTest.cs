@@ -108,7 +108,7 @@ namespace Castle.MonoRail.TestSupport
 		private MockServices services;
 		private ITrace trace;
 		private IDictionary cookies;
-		private ControllerContext controllerContext;
+		private IControllerContext controllerContext;
 		protected string virtualDir = "";
 
 		/// <summary>
@@ -181,6 +181,24 @@ namespace Castle.MonoRail.TestSupport
 		public ITrace Trace
 		{
 			get { return trace; }
+		}
+
+		/// <summary>
+		/// Gets the controller context.
+		/// </summary>
+		/// <value>The controller context.</value>
+		public IControllerContext ControllerContext
+		{
+			get { return controllerContext; }
+		}
+
+		/// <summary>
+		/// Gets the services.
+		/// </summary>
+		/// <value>The services.</value>
+		public MockServices Services
+		{
+			get { return services; }
 		}
 
 		/// <summary>
@@ -261,9 +279,11 @@ namespace Castle.MonoRail.TestSupport
 
 			BuildEngineContext(areaName, controllerName, actionName, contextInitializer);
 
-			controllerContext = new ControllerContext(controllerName, areaName, actionName, services.ControllerDescriptorProvider.BuildDescriptor(controller));
+			controllerContext = services.ControllerContextFactory.Create(areaName, controllerName, actionName, services.ControllerDescriptorProvider.BuildDescriptor(controller));
 
+			controller.SetEngineContext(Context);
 			controller.ControllerContext = controllerContext;
+			controller.CreateStandardHelpers();
 		}
 
 		/// <summary>
