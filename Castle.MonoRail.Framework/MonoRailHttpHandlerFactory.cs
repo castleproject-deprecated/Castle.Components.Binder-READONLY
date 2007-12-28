@@ -17,11 +17,14 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection;
+	using System.Threading;
 	using System.Web;
+	using Adapters;
 	using Castle.Core;
 	using Castle.MonoRail.Framework.Container;
 	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Descriptors;
+	using Routing;
 	using Services;
 
 	/// <summary>
@@ -34,16 +37,16 @@ namespace Castle.MonoRail.Framework
 		private readonly static string CurrentEngineContextKey = "currentmrengineinstance";
 		private readonly static string CurrentControllerKey = "currentmrcontroller";
 		private readonly static string CurrentControllerContextKey = "currentmrcontrollercontext";
-		private readonly object locker = new object();
+		private readonly ReaderWriterLock locker = new ReaderWriterLock();
 
-		private IMonoRailConfiguration configuration;
-		private IMonoRailContainer mrContainer;
-		private IUrlTokenizer urlTokenizer;
-		private IEngineContextFactory engineContextFactory;
-		private IServiceProviderLocator serviceProviderLocator;
-		private IControllerFactory controllerFactory;
-		private IControllerContextFactory controllerContextFactory;
-		private IStaticResourceRegistry staticResourceRegistry;
+		private static IMonoRailConfiguration configuration;
+		private static IMonoRailContainer mrContainer;
+		private static IUrlTokenizer urlTokenizer;
+		private static IEngineContextFactory engineContextFactory;
+		private static IServiceProviderLocator serviceProviderLocator;
+		private static IControllerFactory controllerFactory;
+		private static IControllerContextFactory controllerContextFactory;
+		private static IStaticResourceRegistry staticResourceRegistry;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MonoRailHttpHandlerFactory"/> class.
@@ -76,21 +79,7 @@ namespace Castle.MonoRail.Framework
 		                                       String requestType, 
 		                                       String url, String pathTranslated)
 		{
-			// TODO: Replace by a readwriterlock or something more efficient
-			lock(locker)
-			{
-				if (mrContainer == null)
-				{
-					if (configuration == null)
-					{
-						configuration = ObtainConfiguration(context.ApplicationInstance);
-					}
-
-					IServiceProviderEx userServiceProvider = serviceProviderLocator.LocateProvider();
-
-					mrContainer = CreateDefaultMonoRailContainer(userServiceProvider);
-				}
-			}
+			PerformOneTimeInitializationIfNecessary(context);
 
 			EnsureServices();
 
@@ -108,7 +97,7 @@ namespace Castle.MonoRail.Framework
 			IEngineContext engineContext = engineContextFactory.Create(mrContainer, urlInfo, context);
 			engineContext.AddService(typeof(IEngineContext), engineContext);
 
-			IController controller = null;
+			IController controller;
 
 			try
 			{
@@ -124,6 +113,9 @@ namespace Castle.MonoRail.Framework
 
 			IControllerContext controllerContext = 
 				controllerContextFactory.Create(urlInfo.Area, urlInfo.Controller, urlInfo.Action, controllerDesc);
+
+			engineContext.CurrentController = controller;
+			engineContext.CurrentControllerContext = controllerContext;
 
 			context.Items[CurrentEngineContextKey] = engineContext;
 			context.Items[CurrentControllerKey] = controller;
@@ -145,6 +137,21 @@ namespace Castle.MonoRail.Framework
 		/// <param name="handler">The <see cref="T:System.Web.IHttpHandler"></see> object to reuse.</param>
 		public virtual void ReleaseHandler(IHttpHandler handler)
 		{
+		}
+
+		/// <summary>
+		/// Resets the state (only used from test cases)
+		/// </summary>
+		public void ResetState()
+		{
+			configuration = null;
+			mrContainer = null;
+			urlTokenizer = null;
+			engineContextFactory = null;
+			serviceProviderLocator = null;
+			controllerFactory = null;
+			controllerContextFactory = null;
+			staticResourceRegistry = null;
 		}
 
 		/// <summary>
@@ -231,15 +238,31 @@ namespace Castle.MonoRail.Framework
 		/// Creates the default service container.
 		/// </summary>
 		/// <param name="userServiceProvider">The user service provider.</param>
+		/// <param name="appInstance">The app instance.</param>
 		/// <returns></returns>
-		protected virtual IMonoRailContainer CreateDefaultMonoRailContainer(IServiceProviderEx userServiceProvider)
+		protected virtual IMonoRailContainer CreateDefaultMonoRailContainer(IServiceProviderEx userServiceProvider, HttpApplication appInstance)
 		{
 			DefaultMonoRailContainer container = new DefaultMonoRailContainer(userServiceProvider);
 
 			container.UseServicesFromParent();
 			container.Configure(Configuration);
+
+			FireContainerCreated(appInstance, container);
+
+			// Too dependent on Http and MR surroundings services to be moved to Container class
+			if (!container.HasService<IServerUtility>())
+			{
+				container.AddService<IServerUtility>(new ServerUtilityAdapter(appInstance.Context.Server));
+			}
+			if (!container.HasService<IRoutingEngine>())
+			{
+				container.AddService<IRoutingEngine>(RoutingModuleEx.Engine);
+			}
+
 			container.InstallMissingServices();
 			container.StartExtensionManager();
+
+			FireContainerInitialized(appInstance, container);
 
 			return container;
 		}
@@ -274,6 +297,72 @@ namespace Castle.MonoRail.Framework
 		}
 
 		#endregion
+
+		private void PerformOneTimeInitializationIfNecessary(HttpContext context)
+		{
+			locker.AcquireReaderLock(Timeout.Infinite);
+
+			if (mrContainer != null)
+			{
+				locker.ReleaseReaderLock();
+				return;
+			}
+
+			locker.UpgradeToWriterLock(Timeout.Infinite);
+
+			if (mrContainer != null) // remember remember the race condition
+			{
+				locker.ReleaseWriterLock();
+				return;
+			}
+
+			try
+			{
+				if (configuration == null)
+				{
+					configuration = ObtainConfiguration(context.ApplicationInstance);
+				}
+
+				IServiceProviderEx userServiceProvider = serviceProviderLocator.LocateProvider();
+
+				mrContainer = CreateDefaultMonoRailContainer(userServiceProvider, context.ApplicationInstance);
+			}
+			finally
+			{
+				locker.ReleaseWriterLock();
+			}
+		}
+
+		private void FireContainerCreated(HttpApplication instance, DefaultMonoRailContainer container)
+		{
+			MethodInfo eventMethod = instance.GetType().GetMethod("MonoRail_ContainerCreated");
+
+			ExecuteContainerEvent(eventMethod, instance, container);
+		}
+
+		private void FireContainerInitialized(HttpApplication instance, DefaultMonoRailContainer container)
+		{
+			MethodInfo eventMethod = instance.GetType().GetMethod("MonoRail_ContainerInitialized");
+
+			ExecuteContainerEvent(eventMethod, instance, container);
+		}
+
+		private static void ExecuteContainerEvent(MethodInfo eventMethod, HttpApplication instance, DefaultMonoRailContainer container)
+		{
+			if (eventMethod == null)
+			{
+				return;
+			}
+
+			if (eventMethod.IsStatic)
+			{
+				eventMethod.Invoke(null, new object[] { container });
+			}
+			else
+			{
+				eventMethod.Invoke(instance, new object[] { container });
+			}
+		}
 
 		private IMonoRailConfiguration ObtainConfiguration(HttpApplication appInstance)
 		{

@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework.Test
 {
 	using System;
 	using System.Collections.Generic;
+	using System.ComponentModel.Design;
 	using Castle.Components.Common.EmailSender;
 	using Castle.Components.Validator;
 	using Providers;
@@ -25,7 +26,7 @@ namespace Castle.MonoRail.Framework.Test
 	/// <summary>
 	/// Pendent
 	/// </summary>
-	public class MockServices : IMonoRailServices
+	public class MockServices : IMonoRailServices, IServiceContainer
 	{
 		private IUrlTokenizer urlTokenizer;
 		private IUrlBuilder urlBuilder;
@@ -52,7 +53,7 @@ namespace Castle.MonoRail.Framework.Test
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MockServices"/> class with default mock services.
 		/// </summary>
-		public MockServices() : this(new DefaultUrlBuilder(),
+		public MockServices() : this(new DefaultUrlBuilder(new MockServerUtility(), new MockRoutingEngine()),
 		                             new DefaultFilterFactory(),
 		                             new ViewEngineManagerStub(),
 		                             new DefaultActionSelector())
@@ -94,6 +95,71 @@ namespace Castle.MonoRail.Framework.Test
 
 			extensionManager = new ExtensionManager(this);
 		}
+
+		#region IServiceContainer
+
+		/// <summary>
+		/// Adds the specified service to the service container.
+		/// </summary>
+		/// <param name="serviceType">The type of service to add.</param>
+		/// <param name="serviceInstance">An instance of the service type to add. This object must implement or inherit from the type indicated by the <paramref name="serviceType"/> parameter.</param>
+		public void AddService(Type serviceType, object serviceInstance)
+		{
+			service2Impl[serviceType] = serviceInstance;
+		}
+
+		/// <summary>
+		/// Adds the specified service to the service container, and optionally promotes the service to any parent service containers.
+		/// </summary>
+		/// <param name="serviceType">The type of service to add.</param>
+		/// <param name="serviceInstance">An instance of the service type to add. This object must implement or inherit from the type indicated by the <paramref name="serviceType"/> parameter.</param>
+		/// <param name="promote">true to promote this request to any parent service containers; otherwise, false.</param>
+		public void AddService(Type serviceType, object serviceInstance, bool promote)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Adds the specified service to the service container.
+		/// </summary>
+		/// <param name="serviceType">The type of service to add.</param>
+		/// <param name="callback">A callback object that is used to create the service. This allows a service to be declared as available, but delays the creation of the object until the service is requested.</param>
+		public void AddService(Type serviceType, ServiceCreatorCallback callback)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Adds the specified service to the service container, and optionally promotes the service to parent service containers.
+		/// </summary>
+		/// <param name="serviceType">The type of service to add.</param>
+		/// <param name="callback">A callback object that is used to create the service. This allows a service to be declared as available, but delays the creation of the object until the service is requested.</param>
+		/// <param name="promote">true to promote this request to any parent service containers; otherwise, false.</param>
+		public void AddService(Type serviceType, ServiceCreatorCallback callback, bool promote)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Removes the specified service type from the service container.
+		/// </summary>
+		/// <param name="serviceType">The type of service to remove.</param>
+		public void RemoveService(Type serviceType)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Removes the specified service type from the service container, and optionally promotes the service to parent service containers.
+		/// </summary>
+		/// <param name="serviceType">The type of service to remove.</param>
+		/// <param name="promote">true to promote this request to any parent service containers; otherwise, false.</param>
+		public void RemoveService(Type serviceType, bool promote)
+		{
+			throw new NotImplementedException();
+		}
+
+		#endregion
 
 		/// <summary>
 		/// Gets or sets the URL tokenizer.
