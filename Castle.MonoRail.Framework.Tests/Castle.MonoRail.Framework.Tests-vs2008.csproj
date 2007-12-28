@@ -77,6 +77,8 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
+    <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="nunit.framework">
       <Name>nunit.framework</Name>
       <HintPath>..\..\build\net-2.0\debug\nunit.framework.dll</HintPath>
@@ -126,6 +128,10 @@
       <Project>{E572DC59-2A96-482F-BE39-E938AB47EA9D}</Project>
       <Name>Castle.MonoRail.TestSupport-vs2008</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Castle.MonoRail.WindsorExtension\Castle.MonoRail.WindsorExtension-vs2008.csproj">
+      <Project>{6C51A1E3-7F20-4696-BFD6-829134678341}</Project>
+      <Name>Castle.MonoRail.WindsorExtension-vs2008</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -157,10 +163,6 @@
     <Compile Include="Resources\ActionsWithResourcesTestCase.cs" />
     <Compile Include="Resources\ControllerWithResourcesTestCase.cs" />
     <Compile Include="Resources\DefaultResourceFactoryTestCase.cs" />
-    <Compile Include="Routing\BaseRuleTestFixture.cs" />
-    <Compile Include="Routing\PatternRuleTestCase.cs" />
-    <Compile Include="Routing\RegexRuleTestCase.cs" />
-    <Compile Include="Routing\RoutingEngineTestCase.cs" />
     <Compile Include="Routing\Stubs\StubRequest.cs" />
     <Compile Include="Services\DefaultUrlBuilderTestCase.cs" />
     <Compile Include="Services\EmailTemplateServiceTestCase.cs" />
@@ -213,6 +215,7 @@
     </Compile>
     <Compile Include="ViewEngines\ViewEngineBaseTestCase.cs" />
     <Compile Include="WikiFormatterTestCase.cs" />
+    <Compile Include="WindsorIntegration\FacilityTestCase.cs" />
     <Compile Include="Wizards\WizardActionProviderTestCase.cs" />
   </ItemGroup>
   <ItemGroup>
