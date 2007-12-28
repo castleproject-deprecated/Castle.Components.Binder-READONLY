@@ -14,7 +14,9 @@
 
 namespace Castle.MonoRail.Framework.Tests.Controllers
 {
+	using System;
 	using Castle.MonoRail.Framework.Services;
+	using Core;
 	using Descriptors;
 	using NUnit.Framework;
 	using Test;
@@ -147,6 +149,23 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 			Assert.AreEqual("OK", response.StatusDescription);
 		}
 
+		[Test]
+		public void AllServiceInterfacesAreInvokedForAHelperSoItIsContextualized()
+		{
+			ControllerWithCustomHelper controller = new ControllerWithCustomHelper();
+
+			IControllerContext context = services.ControllerContextFactory.
+				Create("", "home", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
+
+			controller.Process(engineContext, context);
+
+			MyCustomHelper helper = (MyCustomHelper) context.Helpers["MyCustomHelper"];
+			Assert.IsTrue(helper.Service1Invoked);
+			Assert.IsTrue(helper.Service2Invoked);
+			Assert.IsTrue(helper.SetContextInvoked);
+			Assert.IsTrue(helper.SetControllerInvoked);
+		}
+
 		#region Controllers
 
 		private class ControllerWithInitialize : Controller
@@ -218,6 +237,67 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 			public bool DefExecuted
 			{
 				get { return defExecuted; }
+			}
+		}
+
+		[Helper(typeof(MyCustomHelper))]
+		class ControllerWithCustomHelper : Controller
+		{
+			public void Index()
+			{
+			}
+		}
+
+		class MyCustomHelper : IContextAware, IControllerAware, IServiceEnabledComponent, IMRServiceEnabled
+		{
+			private bool setContextInvoked;
+			private bool setControllerInvoked;
+			private bool service1Invoked;
+			private bool service2Invoked;
+
+			public bool SetContextInvoked
+			{
+				get { return setContextInvoked; }
+			}
+
+			public bool SetControllerInvoked
+			{
+				get { return setControllerInvoked; }
+			}
+
+			public bool Service1Invoked
+			{
+				get { return service1Invoked; }
+			}
+
+			public bool Service2Invoked
+			{
+				get { return service2Invoked; }
+			}
+
+			public void SetContext(IEngineContext context)
+			{
+				setContextInvoked = true;
+				Assert.IsNotNull(context);
+			}
+
+			public void SetController(IController controller, IControllerContext context)
+			{
+				setControllerInvoked = true;
+				Assert.IsNotNull(controller);
+				Assert.IsNotNull(context);
+			}
+
+			public void Service(IServiceProvider provider)
+			{
+				service1Invoked = true;
+				Assert.IsNotNull(provider);
+			}
+
+			public void Service(IMonoRailServices serviceProvider)
+			{
+				service2Invoked = true;
+				Assert.IsNotNull(serviceProvider);
 			}
 		}
 

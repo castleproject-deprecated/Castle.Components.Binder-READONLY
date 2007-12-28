@@ -41,12 +41,6 @@ namespace Castle.MonoRail.Framework
 		private IEngineContext engineContext;
 		private IControllerContext context;
 		private ILogger logger = NullLogger.Instance;
-
-		/// <summary>
-		/// True if any Controller.Send operation was called.
-		/// </summary>
-		private bool resetIsPostBack;
-
 		private bool directRenderInvoked;
 
 		private IUrlBuilder urlBuilder;
@@ -85,16 +79,9 @@ namespace Castle.MonoRail.Framework
 		/// <param name="context">The controller context.</param>
 		public virtual void Process(IEngineContext engineContext, IControllerContext context)
 		{
-			this.engineContext = engineContext;
 			this.context = context;
+			SetEngineContext(engineContext);
 
-			urlBuilder = engineContext.Services.UrlBuilder; // should not be null (affects redirects)
-			filterFactory = engineContext.Services.FilterFactory; // should not be null
-			viewEngineManager = engineContext.Services.ViewEngineManager; // should not be null
-			actionSelector = engineContext.Services.ActionSelector; // should not be null
-			scaffoldSupport = engineContext.Services.ScaffoldSupport; // might be null
-
-			ResetIsPostback();
 			context.LayoutName = ObtainDefaultLayoutName();
 			CreateControllerLevelResources();
 			CreateAndInitializeHelpers();
@@ -519,8 +506,6 @@ namespace Castle.MonoRail.Framework
 		{
 			get
 			{
-				if (resetIsPostBack) return false;
-
 				NameValueCollection fields = Params;
 				return (fields["__VIEWSTATE"] != null) || (fields["__EVENTTARGET"] != null);
 			}
@@ -529,6 +514,22 @@ namespace Castle.MonoRail.Framework
 		#endregion
 
 		#region Useful Operations
+
+		/// <summary>
+		/// Sets the engine context. Also initialize all required services by querying
+		/// <see cref="IEngineContext.Services"/>
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		public virtual void SetEngineContext(IEngineContext engineContext)
+		{
+			this.engineContext = engineContext;
+
+			urlBuilder = engineContext.Services.UrlBuilder; // should not be null (affects redirects)
+			filterFactory = engineContext.Services.FilterFactory; // should not be null
+			viewEngineManager = engineContext.Services.ViewEngineManager; // should not be null
+			actionSelector = engineContext.Services.ActionSelector; // should not be null
+			scaffoldSupport = engineContext.Services.ScaffoldSupport; // might be null
+		}
 
 		/// <summary>
 		/// Specifies the view to be processed after the action has finished its processing. 
@@ -1386,7 +1387,7 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Creates the and initialize helpers associated with a controller.
 		/// </summary>
-		protected virtual void CreateAndInitializeHelpers()
+		public virtual void CreateAndInitializeHelpers()
 		{
 			IDictionary helpers = context.Helpers;
 
@@ -1407,14 +1408,13 @@ namespace Castle.MonoRail.Framework
 				helpers.Add(helper.Name, helperInstance);
 			}
 
-			CreateStandardHelpers(helpers);
+			CreateStandardHelpers();
 		}
 
 		/// <summary>
 		/// Creates the standard helpers.
 		/// </summary>
-		/// <param name="helpers">The helpers.</param>
-		protected virtual void CreateStandardHelpers(IDictionary helpers)
+		public virtual void CreateStandardHelpers()
 		{
 			AbstractHelper[] builtInHelpers =
 				new AbstractHelper[]
@@ -1435,9 +1435,9 @@ namespace Castle.MonoRail.Framework
 
 				string helperName = helper.GetType().Name;
 
-				if (!helpers.Contains(helperName))
+				if (!context.Helpers.Contains(helperName))
 				{
-					helpers[helperName] = helper;
+					context.Helpers[helperName] = helper;
 				}
 
 				// Also makes the helper available with a less verbose name
@@ -1446,9 +1446,9 @@ namespace Castle.MonoRail.Framework
 				{
 					string alias = helperName.Substring(0, helperName.Length - 6);
 
-					if (!helpers.Contains(alias))
+					if (!context.Helpers.Contains(alias))
 					{
-						helpers[alias] = helper;
+						context.Helpers[alias] = helper;
 					}
 				}
 
@@ -1463,6 +1463,13 @@ namespace Castle.MonoRail.Framework
 		/// <param name="helperInstance">The helper instance.</param>
 		private void PerformHelperInitialization(object helperInstance)
 		{
+			IContextAware ctxAware = helperInstance as IContextAware;
+
+			if (ctxAware != null)
+			{
+				ctxAware.SetContext(engineContext);
+			}
+
 			IControllerAware aware = helperInstance as IControllerAware;
 
 			if (aware != null)
@@ -1792,16 +1799,7 @@ namespace Castle.MonoRail.Framework
 			return action;
 		}
 
-		/// <summary>
-		/// To preserve standard Action semantics when using ASP.NET Views,
-		/// the event handlers in the CodeBehind typically call <see cref="Process"/>.
-		/// As a result, the <see cref="IsPostBack"/> property must be logically 
-		/// cleared to allow the Action to behave as if it was called directly.
-		/// </summary>
-		private void ResetIsPostback()
-		{
-			resetIsPostBack = true;
-		}
+	
 
 		private void RaiseOnActionExceptionOnExtension()
 		{
