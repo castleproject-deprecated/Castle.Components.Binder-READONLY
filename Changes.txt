@@ -1,6 +1,9 @@
 1.0
 ===
 
+- Applied Felix Gartsman's patch fixing MR-387
+  "ViewComponent selective caching"
+
 - Applied Felix Gartsman's patch fixing MR-368
   "Added DetachedCriteria support to ARPaginationHelper/ARPaginableCriteria"
 

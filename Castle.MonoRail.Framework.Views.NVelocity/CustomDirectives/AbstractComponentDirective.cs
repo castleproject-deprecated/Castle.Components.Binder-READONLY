@@ -18,7 +18,10 @@ using NVelocity.Runtime.Directive;
 using NVelocity.Runtime;
 using NVelocity.Exception;
 using NVelocity.Runtime.Parser;
-using Template = NVelocity.Template;
+using NVelocity.App.Events;
+using NVelocity.Context;
+using NVelocity.Util.Introspection;
+using NVelocity;
 
 namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 {
@@ -31,9 +34,6 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 	using Castle.MonoRail.Framework;
 	using Castle.MonoRail.Framework.Internal;
 	using Descriptors;
-	using global::NVelocity.App.Events;
-	using global::NVelocity.Context;
-	using global::NVelocity.Util.Introspection;
 	using Providers;
 
 	/// <summary>
@@ -42,12 +42,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 	public abstract class AbstractComponentDirective : Directive, IViewRenderer
 	{
 		private readonly IViewComponentFactory viewComponentFactory;
-
-//		private String componentName;
-//		private ViewComponent component;
-//		private NVelocityViewContextAdapter contextAdapter;
 		private IViewEngine viewEngine;
-//		private INode compNameNode;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AbstractComponentDirective"/> class.
@@ -112,33 +107,29 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 			{
 				key = descriptor.CacheKeyGenerator.Create(componentName, componentParams, railsContext);
 
-				if (key == null)
+				if (key != null)
 				{
-					throw new MonoRailException("CacheKeyGenerator returned a null CacheKey implementation (Not good at all). " +
-					                            "Please investigate the implementation: " +
-					                            descriptor.CacheKeyGenerator.GetType().FullName);
-				}
+					ViewComponentCacheBag cachedContent = (ViewComponentCacheBag) cacheProvider.Get(key.ToString());
 
-				ViewComponentCacheBag cachedContent = (ViewComponentCacheBag) cacheProvider.Get(key.ToString());
-
-				if (cachedContent != null)
-				{
-					// Restore entries
-
-					foreach(KeyValuePair<string, object> pair in cachedContent.ContextEntries)
+					if (cachedContent != null)
 					{
-						context[pair.Key] = pair.Value;
+						// Restore entries
+
+						foreach(KeyValuePair<string, object> pair in cachedContent.ContextEntries)
+						{
+							context[pair.Key] = pair.Value;
+						}
+
+						// Render from cache
+
+						writer.Write(cachedContent.Content);
+
+						return true;
 					}
 
-					// Render from cache
-
-					writer.Write(cachedContent.Content);
-
-					return true;
+					isOutputtingToCache = true;
+					bag = new ViewComponentCacheBag();
 				}
-
-				isOutputtingToCache = true;
-				bag = new ViewComponentCacheBag();
 			}
 
 			ViewComponent component = viewComponentFactory.Create(componentName);
@@ -419,7 +410,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 		{
 			Resource current = context.CurrentResource;
 
-			String encoding = null;
+			String encoding;
 
 			if (current != null)
 			{
