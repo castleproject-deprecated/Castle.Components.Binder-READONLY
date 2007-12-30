@@ -19,9 +19,6 @@ namespace Castle.MonoRail.Framework.Routing
 	using System.Text;
 	using System.Web;
 	using Castle.MonoRail.Framework.Adapters;
-	using Castle.MonoRail.Framework.Services.Utils;
-	using Castle.MonoRail.Framework.Internal;
-	using Descriptors;
 
 	/// <summary>
 	/// Pendent
@@ -58,41 +55,52 @@ namespace Castle.MonoRail.Framework.Routing
 			HttpRequest request = context.Request;
 
 			RouteMatch match =
-				engine.FindMatch(request.FilePath + request.PathInfo, 
+				engine.FindMatch(StripAppPathFrom(request.FilePath, request.ApplicationPath) + request.PathInfo, 
 					new RouteContext(new RequestAdapter(request), 
 						request.ApplicationPath));
 
-			if (match != null)
+			if (match == null)
 			{
-				string mrPath = CreateMrPath(match);
-				string url = request.RawUrl;
+				return;
+			}
 
-				string paramsAsQueryString = ConvertToQueryString(match.Parameters, context.Server);
+			string mrPath = CreateMrPath(match);
+			string url = request.RawUrl;
 
-				int queryStringIndex = url.IndexOf('?');
+			string paramsAsQueryString = ConvertToQueryString(match.Parameters, context.Server);
 
-				if (queryStringIndex != -1)
-				{
-					if (paramsAsQueryString.Length != 0)
-					{
-						// Concat
-						paramsAsQueryString += url.Substring(queryStringIndex + 1);
-					}
-					else
-					{
-						paramsAsQueryString = url.Substring(queryStringIndex + 1);
-					}
-				}
+			int queryStringIndex = url.IndexOf('?');
 
+			if (queryStringIndex != -1)
+			{
 				if (paramsAsQueryString.Length != 0)
 				{
-					context.RewritePath(mrPath, request.PathInfo, paramsAsQueryString);
+					// Concat
+					paramsAsQueryString += url.Substring(queryStringIndex + 1);
 				}
 				else
 				{
-					context.RewritePath(mrPath);
+					paramsAsQueryString = url.Substring(queryStringIndex + 1);
 				}
-			}			
+			}
+
+			if (paramsAsQueryString.Length != 0)
+			{
+				context.RewritePath(mrPath, request.PathInfo, paramsAsQueryString);
+			}
+			else
+			{
+				context.RewritePath(mrPath);
+			}
+		}
+
+		private string StripAppPathFrom(string path, string applicationPath)
+		{
+			if (applicationPath.Length != 1)
+			{
+				return path.Substring(applicationPath.Length);
+			}
+			return path;
 		}
 
 		private static string ConvertToQueryString(Dictionary<string, string> parameters, HttpServerUtility serverUtil)
