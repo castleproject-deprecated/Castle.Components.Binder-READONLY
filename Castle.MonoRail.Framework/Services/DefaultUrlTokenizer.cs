@@ -19,6 +19,8 @@ namespace Castle.MonoRail.Framework.Services
 	using System.Collections.Specialized;
 	using System.IO;
 	using System.Text;
+	using Configuration;
+	using Core;
 
 	/// <summary>
 	/// Breaks the url into smaller pieces to find out
@@ -27,7 +29,7 @@ namespace Castle.MonoRail.Framework.Services
 	/// It alsos checks for default urls which map a single resource to an area/controller/action
 	/// </para>
 	/// </summary>
-	public class DefaultUrlTokenizer : IUrlTokenizer// , IServiceEnabledComponent
+	public class DefaultUrlTokenizer : IUrlTokenizer, IServiceEnabledComponent
 	{
 		private readonly IDictionary defaultUrl2CustomUrlInfo = new HybridDictionary(true);
 
@@ -52,23 +54,23 @@ namespace Castle.MonoRail.Framework.Services
 			defaultUrl2CustomUrlInfo[url] = new UrlInfo(area, controller, action);
 		}
 
-//		#region IServiceEnabledComponent
-//
-//		/// <summary>
-//		/// Services the specified provider.
-//		/// </summary>
-//		/// <param name="provider">The provider.</param>
-//		public void Service(IServiceProvider provider)
-//		{
-//			MonoRailConfiguration config = (MonoRailConfiguration) provider.GetService(typeof(MonoRailConfiguration));
-//
-//			foreach(DefaultUrl url in config.DefaultUrls)
-//			{
-//				AddDefaultRule(url.Url, url.Area, url.Controller, url.Action);
-//			}
-//		}
-//
-//		#endregion
+		#region IServiceEnabledComponent
+
+		/// <summary>
+		/// Services the specified provider.
+		/// </summary>
+		/// <param name="provider">The provider.</param>
+		public void Service(IServiceProvider provider)
+		{
+			IMonoRailConfiguration config = (IMonoRailConfiguration) provider.GetService(typeof(IMonoRailConfiguration));
+
+			foreach(DefaultUrl url in config.DefaultUrls)
+			{
+				AddDefaultRule(url.Url, url.Area, url.Controller, url.Action);
+			}
+		}
+
+		#endregion
 
 		#region IUrlTokenizer
 

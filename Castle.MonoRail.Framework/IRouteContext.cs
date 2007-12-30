@@ -27,11 +27,6 @@ namespace Castle.MonoRail.Framework
 		string ApplicationPath { get; }
 
 		/// <summary>
-		/// The raw url with leading and trailing slashes stripped.
-		/// </summary>
-		string Url { get; }
-
-		/// <summary>
 		/// The Http Request
 		/// </summary>
 		IRequest Request { get; }

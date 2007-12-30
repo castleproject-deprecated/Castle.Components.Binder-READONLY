@@ -18,8 +18,8 @@ namespace Castle.MonoRail.Framework.Services
 	using System.Collections;
 	using System.Collections.Specialized;
 	using Castle.Core;
-//	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Internal;
+	using Configuration;
 	using Framework;
 
 	/// <summary>
@@ -102,8 +102,8 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="provider">The provider.</param>
 		public void Service(IServiceProvider provider)
 		{
-//			MonoRailConfiguration config = (MonoRailConfiguration)provider.GetService(typeof(MonoRailConfiguration));
-//			useExtensions = config.UrlConfig.UseExtensions;
+			IMonoRailConfiguration config = (IMonoRailConfiguration)provider.GetService(typeof(IMonoRailConfiguration));
+			useExtensions = config.UrlConfig.UseExtensions;
 
 			serverUtil = (IServerUtility) provider.GetService(typeof(IServerUtility));
 			routingEng = (IRoutingEngine) provider.GetService(typeof(IRoutingEngine));

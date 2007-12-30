@@ -57,7 +57,7 @@ namespace Castle.MonoRail.Framework.Tests.Services
 		[Test]
 		public void ShouldUseRoutingEngineForNamedRoutes()
 		{
-			urlBuilder.RoutingEngine.Add(PatternRule.Build("link", "products", typeof(HomeController), "View"));
+			urlBuilder.RoutingEngine.Add(new PatternRoute("/products/view"));
 
 			HybridDictionary dict = new HybridDictionary(true);
 			dict["named"] = "link";
@@ -68,7 +68,7 @@ namespace Castle.MonoRail.Framework.Tests.Services
 		[Test]
 		public void ShouldUseTheParamsEntryForRoutesWithParams()
 		{
-			urlBuilder.RoutingEngine.Add(PatternRule.Build("link", "products/<id:number>", typeof(HomeController), "View"));
+			urlBuilder.RoutingEngine.Add(new PatternRoute("/products/id"));
 
 			HybridDictionary dict = new HybridDictionary(true);
 			dict["named"] = "link";

@@ -163,7 +163,9 @@
     <Compile Include="Resources\ActionsWithResourcesTestCase.cs" />
     <Compile Include="Resources\ControllerWithResourcesTestCase.cs" />
     <Compile Include="Resources\DefaultResourceFactoryTestCase.cs" />
-    <Compile Include="Routing\Stubs\StubRequest.cs" />
+    <Compile Include="Routing\BaseRuleTestFixture.cs" />
+    <Compile Include="Routing\PatternRouteTestCase.cs" />
+    <Compile Include="Routing\RoutingEngineTestCase.cs" />
     <Compile Include="Services\DefaultUrlBuilderTestCase.cs" />
     <Compile Include="Services\EmailTemplateServiceTestCase.cs" />
     <Compile Include="Services\PrototypeAjaxProxyGeneratorTestCase.cs" />

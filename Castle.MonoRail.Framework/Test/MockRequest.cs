@@ -53,6 +53,15 @@ namespace Castle.MonoRail.Framework.Test
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MockRequest"/> class.
 		/// </summary>
+		/// <param name="httpMethod">The HTTP method.</param>
+		public MockRequest(string httpMethod) : this()
+		{
+			this.httpMethod = httpMethod;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MockRequest"/> class.
+		/// </summary>
 		public MockRequest() : this(new Hashtable())
 		{
 		}

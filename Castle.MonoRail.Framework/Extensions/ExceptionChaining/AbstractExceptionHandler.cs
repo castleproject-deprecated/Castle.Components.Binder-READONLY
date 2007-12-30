@@ -76,7 +76,7 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 	
 			sbMessage.Append("Controller details\r\n");
 			sbMessage.Append("==================\r\n\r\n");
-//			sbMessage.AppendFormat("Url {0}\r\n", context.Url);
+			sbMessage.AppendFormat("Url {0}\r\n", context.Request.Url);
 			sbMessage.AppendFormat("Area {0}\r\n", context.UrlInfo.Area);
 			sbMessage.AppendFormat("Controller {0}\r\n", context.UrlInfo.Controller);
 			sbMessage.AppendFormat("Action {0}\r\n", context.UrlInfo.Action);
@@ -92,20 +92,19 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 			sbMessage.AppendFormat("Machine {0}\r\n", Environment.MachineName);
 			sbMessage.AppendFormat("ApplicationPath {0}\r\n", context.ApplicationPath);
 //			sbMessage.AppendFormat("ApplicationPhysicalPath {0}\r\n", context.ApplicationPhysicalPath);
-//			sbMessage.AppendFormat("RequestType {0}\r\n", context.RequestType);
-//			sbMessage.AppendFormat("UrlReferrer {0}\r\n", context.UrlReferrer);
-//	
-//			if (context.CurrentUser != null)
-//			{
-//				sbMessage.AppendFormat("CurrentUser.Name {0}\r\n", context.CurrentUser.Identity.Name);
-//				sbMessage.AppendFormat("CurrentUser.AuthenticationType {0}\r\n", context.CurrentUser.Identity.AuthenticationType);
-//				sbMessage.AppendFormat("CurrentUser.IsAuthenticated {0}\r\n", context.CurrentUser.Identity.IsAuthenticated);
-//			}
+			sbMessage.AppendFormat("HttpMethod {0}\r\n", context.Request.HttpMethod);
+			sbMessage.AppendFormat("UrlReferrer {0}\r\n", context.Request.UrlReferrer);
+	
+			if (context.CurrentUser != null)
+			{
+				sbMessage.AppendFormat("CurrentUser.Name {0}\r\n", context.CurrentUser.Identity.Name);
+				sbMessage.AppendFormat("CurrentUser.AuthenticationType {0}\r\n", context.CurrentUser.Identity.AuthenticationType);
+				sbMessage.AppendFormat("CurrentUser.IsAuthenticated {0}\r\n", context.CurrentUser.Identity.IsAuthenticated);
+			}
 	
 			DumpDictionary(context.Flash, "Flash", sbMessage);
-	
-//			DumpDictionary(context.Params, "Params", sbMessage);
-	
+			DumpDictionary(context.Request.QueryString, "QueryString", sbMessage);
+			DumpDictionary(context.Request.Form, "Form", sbMessage);
 			DumpDictionary(context.Session, "Session", sbMessage);
 
 			return sbMessage.ToString();
@@ -113,6 +112,11 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 
 		private void DumpDictionary(IDictionary dict, String title, StringBuilder message)
 		{
+			if (dict == null || dict.Count == 0)
+			{
+				return;
+			}
+
 			message.AppendFormat("{0}: \r\n", title);
 
 			try
@@ -130,6 +134,11 @@ namespace Castle.MonoRail.Framework.Extensions.ExceptionChaining
 
 		private void DumpDictionary(NameValueCollection dict, String title, StringBuilder message)
 		{
+			if (dict == null || dict.Count == 0)
+			{
+				return;
+			}
+
 			message.AppendFormat("{0}: \r\n", title);
 
 			try

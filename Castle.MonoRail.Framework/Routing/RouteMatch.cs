@@ -22,52 +22,45 @@ namespace Castle.MonoRail.Framework.Routing
 	/// </summary>
 	public class RouteMatch
 	{
-		private readonly Type controllerType;
-		private readonly string ruleName;
-		private readonly string action;
+//		private readonly Type controllerType;
 		private readonly List<string> literals = new List<string>();
 		private readonly Dictionary<string, string> parameters = new Dictionary<string, string>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RouteMatch"/> class.
 		/// </summary>
-		/// <param name="controllerType">Type of the controller.</param>
 		/// <param name="ruleName">Name of the rule.</param>
-		/// <param name="action">The action.</param>
-		public RouteMatch(Type controllerType, string ruleName, string action)
+		public RouteMatch(string ruleName)
 		{
-			this.controllerType = controllerType;
-			this.ruleName = ruleName;
-			this.action = action;
 		}
 
-		/// <summary>
-		/// Gets the type of the controller.
-		/// </summary>
-		/// <value>The type of the controller.</value>
-		public Type ControllerType
-		{
-			get { return controllerType; }
-		}
-
-		/// <summary>
-		/// Gets the name of the rule.
-		/// </summary>
-		/// <value>The name of the rule.</value>
-		public string RuleName
-		{
-			get { return ruleName; }
-		}
-
-		/// <summary>
-		/// Gets the action.
-		/// </summary>
-		/// <value>The action.</value>
-		public string Action
-		{
-			get { return action; }
-		}
-
+//		/// <summary>
+//		/// Gets the type of the controller.
+//		/// </summary>
+//		/// <value>The type of the controller.</value>
+//		public Type ControllerType
+//		{
+//			get { return controllerType; }
+//		}
+//
+//		/// <summary>
+//		/// Gets the name of the rule.
+//		/// </summary>
+//		/// <value>The name of the rule.</value>
+//		public string RuleName
+//		{
+//			get { return ruleName; }
+//		}
+//
+//		/// <summary>
+//		/// Gets the action.
+//		/// </summary>
+//		/// <value>The action.</value>
+//		public string Action
+//		{
+//			get { return action; }
+//		}
+//
 		/// <summary>
 		/// Gets the literals.
 		/// </summary>

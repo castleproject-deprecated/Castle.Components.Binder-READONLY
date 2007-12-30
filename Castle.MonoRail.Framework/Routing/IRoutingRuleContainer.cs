@@ -1,4 +1,4 @@
-// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,38 +14,35 @@
 
 namespace Castle.MonoRail.Framework.Routing
 {
-	using System.Collections.Generic;
+	using System.Collections;
 
 	/// <summary>
 	/// Pendent
 	/// </summary>
-	public class RoutingEngine : RoutingRuleContainer, IRoutingEngine
+	public interface IRoutingRuleContainer
 	{
-		private readonly List<DomainRule> domainRules = new List<DomainRule>();
+		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="rule">The rule.</param>
+		void Add(IRoutingRule rule);
 
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <param name="domainName">Name of the domain.</param>
+		/// <param name="routeName">Name of the route.</param>
+		/// <param name="hostname">The hostname.</param>
+		/// <param name="virtualPath">The virtual path.</param>
+		/// <param name="parameters">The parameters.</param>
 		/// <returns></returns>
-		public IRoutingRuleContainer ForDomain(string domainName)
-		{
-			throw new System.NotImplementedException();
-		}
+		string CreateUrl(string routeName, string hostname, string virtualPath, IDictionary parameters);
 
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <param name="subdomain">The subdomain.</param>
+		/// <param name="url">The URL.</param>
+		/// <param name="context">The routing context.</param>
 		/// <returns></returns>
-		public IRoutingRuleContainer ForSubDomain(string subdomain)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		class DomainRule
-		{
-			
-		}
+		RouteMatch FindMatch(string url, IRouteContext context);
 	}
 }

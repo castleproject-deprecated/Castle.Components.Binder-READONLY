@@ -58,8 +58,9 @@ namespace Castle.MonoRail.Framework.Routing
 			HttpRequest request = context.Request;
 
 			RouteMatch match =
-				engine.FindMatch(
-					new RouteContext(new RequestAdapter(request), request.ApplicationPath, RouteContext.StripUrl(request.RawUrl)));
+				engine.FindMatch(request.FilePath + request.PathInfo, 
+					new RouteContext(new RequestAdapter(request), 
+						request.ApplicationPath));
 
 			if (match != null)
 			{
@@ -108,9 +109,18 @@ namespace Castle.MonoRail.Framework.Routing
 
 		private static string CreateMrPath(RouteMatch match)
 		{
-			ControllerDescriptor desc = ControllerInspectionUtil.Inspect(match.ControllerType);
+			string controller = match.Parameters["controller"];
+			string area = match.Parameters.ContainsKey("area") ? match.Parameters["area"] : null;
+			string action = match.Parameters["action"];
 
-			return "~/" + (string.IsNullOrEmpty(desc.Area) ? null : desc.Area + "/") + desc.Name + "/" + match.Action; // TODO: + MonoRailServiceContainer.MonoRailExtension;
+			if (area != null)
+			{
+				return "~/" + area + "/" + controller + "/" + action + ".castle";
+			}
+			else
+			{
+				return "~/" + controller + "/" + action + ".castle";
+			}
 		}
 
 		/// <summary>

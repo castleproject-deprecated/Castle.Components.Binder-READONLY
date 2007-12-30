@@ -20,13 +20,14 @@ namespace Castle.MonoRail.Framework.Test
 	/// <summary>
 	/// Lot to do here
 	/// </summary>
-	public class MockRoutingEngine : IRoutingEngine
+	public class MockRoutingEngine : RoutingRuleContainer, IRoutingEngine
 	{
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <param name="rule">The rule.</param>
-		public void Add(IRoutingRule rule)
+		/// <param name="domainName">Name of the domain.</param>
+		/// <returns></returns>
+		public IRoutingRuleContainer ForDomain(string domainName)
 		{
 			throw new System.NotImplementedException();
 		}
@@ -34,22 +35,9 @@ namespace Castle.MonoRail.Framework.Test
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <param name="routeName">Name of the route.</param>
-		/// <param name="hostname">The hostname.</param>
-		/// <param name="virtualPath">The virtual path.</param>
-		/// <param name="parameters">The parameters.</param>
+		/// <param name="subdomain">The subdomain.</param>
 		/// <returns></returns>
-		public string CreateUrl(string routeName, string hostname, string virtualPath, IDictionary parameters)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		/// <summary>
-		/// Pendent
-		/// </summary>
-		/// <param name="context">The routing context.</param>
-		/// <returns></returns>
-		public RouteMatch FindMatch(IRouteContext context)
+		public IRoutingRuleContainer ForSubDomain(string subdomain)
 		{
 			throw new System.NotImplementedException();
 		}
