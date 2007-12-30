@@ -126,12 +126,23 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			string routeName = CommonUtils.ObtainEntryAndRemove(parameters, "named");
 			bool encode = CommonUtils.ObtainEntryAndRemove(parameters, "encode", "false") == "true";
+			object routeParams = parameters["params"];
+			parameters.Remove("params");
+
+			UrlPartsBuilder url = null;
+
+			if (routeName == null)
+			{
+				url = CreateUrlUsingRouting(current.AppVirtualDir, parameters, routeParams, encode);
+
+				if (url != null)
+				{
+					return url;
+				}
+			}
 
 			if (routeName != null)
 			{
-				object routeParams = parameters["params"];
-				parameters.Remove("params");
-
 				return InternalBuildRouteUrl(current.Domain, current.AppVirtualDir, routeName, routeParams, encode);
 			}
 			else
@@ -501,25 +512,9 @@ namespace Castle.MonoRail.Framework.Services
 		protected virtual UrlPartsBuilder InternalBuildRouteUrl(string hostname, string virtualDir,
 		                                                        string name, object routeParams, bool encode)
 		{
-			IDictionary parameters;
+			IDictionary parameters = CreateParameters(routeParams);
 
-			if (routeParams != null)
-			{
-				if (typeof(IDictionary).IsAssignableFrom(routeParams.GetType()))
-				{
-					parameters = (IDictionary) routeParams;
-				}
-				else
-				{
-					parameters = new ReflectionBasedDictionaryAdapter(routeParams);
-				}
-			}
-			else
-			{
-				parameters = new Hashtable();
-			}
-
-			String url = routingEng.CreateUrl(name, hostname, virtualDir, parameters);
+			string url = routingEng.CreateUrl(name, hostname, virtualDir, parameters);
 
 			// TODO: should encode?
 
@@ -609,6 +604,55 @@ namespace Castle.MonoRail.Framework.Services
 			}
 
 			return path;
+		}
+
+		/// <summary>
+		/// Routings the can create URL.
+		/// </summary>
+		/// <returns></returns>
+		private UrlPartsBuilder CreateUrlUsingRouting(string appVirDir, IDictionary parameters, object routeParams, bool encode)
+		{
+			// This code will get a bit more complex once support for 
+			// domain/subdomain is implemented on the routing module
+
+			if (routingEng == null || routingEng.IsEmpty)
+			{
+				return null;
+			}
+
+			IDictionary finalParams = CreateParameters(routeParams);
+			CommonUtils.MergeOptions(finalParams, parameters);
+			string url = routingEng.CreateUrl(appVirDir, finalParams);
+
+			if (url == null)
+			{
+				return null;
+			}
+
+			return new UrlPartsBuilder(url);
+		}
+
+		private static IDictionary CreateParameters(object routeParams)
+		{
+			IDictionary parameters;
+
+			if (routeParams != null)
+			{
+				if (typeof(IDictionary).IsAssignableFrom(routeParams.GetType()))
+				{
+					parameters = (IDictionary) routeParams;
+				}
+				else
+				{
+					parameters = new ReflectionBasedDictionaryAdapter(routeParams);
+				}
+			}
+			else
+			{
+				parameters = new HybridDictionary(true);
+			}
+
+			return parameters;
 		}
 	}
 }

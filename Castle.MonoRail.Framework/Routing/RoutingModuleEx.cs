@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework.Routing
 {
 	using System;
 	using System.Collections.Generic;
+	using System.IO;
 	using System.Text;
 	using System.Web;
 	using Castle.MonoRail.Framework.Adapters;
@@ -53,6 +54,11 @@ namespace Castle.MonoRail.Framework.Routing
 		{
 			HttpContext context = HttpContext.Current;
 			HttpRequest request = context.Request;
+
+			if (File.Exists(request.PhysicalPath))
+			{
+				return; // Possibly requesting a static file, so we skip routing altogether
+			}
 
 			RouteMatch match =
 				engine.FindMatch(StripAppPathFrom(request.FilePath, request.ApplicationPath) + request.PathInfo, 

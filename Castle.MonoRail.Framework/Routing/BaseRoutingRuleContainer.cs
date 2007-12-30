@@ -63,6 +63,27 @@ namespace Castle.MonoRail.Framework.Routing
 		}
 
 		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="virtualPath">The virtual path.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		public string CreateUrl(string virtualPath, IDictionary parameters)
+		{
+			foreach(IRoutingRule rule in rules)
+			{
+				string url = rule.CreateUrl("", virtualPath, parameters);
+
+				if (url != null)
+				{
+					return url;
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
 		/// Finds the match.
 		/// </summary>
 		/// <param name="url">The URL.</param>
@@ -83,6 +104,15 @@ namespace Castle.MonoRail.Framework.Routing
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether this container is empty.
+		/// </summary>
+		/// <value><c>true</c> if this instance is empty; otherwise, <c>false</c>.</value>
+		public bool IsEmpty
+		{
+			get { return rules.Count == 0; }
 		}
 	}
 }

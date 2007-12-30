@@ -28,7 +28,6 @@ namespace Castle.MonoRail.Framework.Routing
 	public class PatternRoute : IRoutingRule
 	{
 		private readonly string pattern;
-//		private readonly Dictionary<string, string> defaults = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 		private readonly List<DefaultNode> nodes = new List<DefaultNode>();
 
 		/// <summary>
@@ -59,7 +58,42 @@ namespace Castle.MonoRail.Framework.Routing
 		/// <returns></returns>
 		public string CreateUrl(string hostname, string virtualPath, IDictionary parameters)
 		{
-			throw new NotImplementedException();
+			StringBuilder text = new StringBuilder(virtualPath);
+
+			foreach(DefaultNode node in nodes)
+			{
+				if (text.Length == 0 || text[text.Length - 1] != '/')
+				{
+					text.Append('/');
+				}
+
+				if (node.name == null)
+				{
+					text.Append(node.start);
+				}
+				else
+				{
+					object value = parameters[node.name];
+
+					if (value == null)
+					{
+						if (!node.optional)
+						{
+							return null;
+						}
+						else
+						{
+							break;
+						}
+					}
+					else
+					{
+						text.Append(value.ToString());
+					}
+				}
+			}
+
+			return text.ToString();
 		}
 
 		/// <summary>
@@ -123,7 +157,7 @@ namespace Castle.MonoRail.Framework.Routing
 		private class DefaultNode
 		{
 			public readonly string name, start, end;
-			private readonly bool optional;
+			public readonly bool optional;
 			private string defaultVal;
 			private bool acceptsIntOnly;
 			private string[] acceptedTokens;

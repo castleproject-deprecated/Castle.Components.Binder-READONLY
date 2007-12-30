@@ -40,9 +40,23 @@ namespace Castle.MonoRail.Framework.Routing
 		/// <summary>
 		/// Pendent
 		/// </summary>
+		/// <param name="virtualPath">The virtual path.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		string CreateUrl(string virtualPath, IDictionary parameters);
+
+		/// <summary>
+		/// Pendent
+		/// </summary>
 		/// <param name="url">The URL.</param>
 		/// <param name="context">The routing context.</param>
 		/// <returns></returns>
 		RouteMatch FindMatch(string url, IRouteContext context);
+
+		/// <summary>
+		/// Gets a value indicating whether this container is empty.
+		/// </summary>
+		/// <value><c>true</c> if this instance is empty; otherwise, <c>false</c>.</value>
+		bool IsEmpty { get; }
 	}
 }
