@@ -50,11 +50,29 @@ namespace Castle.MonoRail.Framework.Helpers
 		}
 
 		/// <summary>
+		/// Gets the name of the current step.
+		/// </summary>
+		/// <value>The name of the current step.</value>
+		public int CurrentStepIndex
+		{
+			get { return WizardUtils.GetCurrentStepIndex(Context, Controller, ControllerContext); }
+		}
+
+		/// <summary>
 		/// Returns the name of the previous step
 		/// </summary>
 		public String PreviousStepName
 		{
 			get { return WizardUtils.GetPreviousStepName(Context, Controller, ControllerContext); }
+		}
+
+		/// <summary>
+		/// Gets the name of the current step.
+		/// </summary>
+		/// <value>The name of the current step.</value>
+		public string CurrentStepName
+		{
+			get { return WizardUtils.GetCurrentStepName(Context, Controller, ControllerContext); }
 		}
 
 		/// <summary>

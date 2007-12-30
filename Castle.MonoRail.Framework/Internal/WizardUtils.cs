@@ -71,6 +71,40 @@ namespace Castle.MonoRail.Framework.Internal
 		}
 
 		/// <summary>
+		/// Gets the index of the current step.
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns></returns>
+		public static int GetCurrentStepIndex(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
+		{
+			String wizardName = WizardUtils.ConstructWizardNamespace(controllerContext);
+
+			int curIndex = (int) engineContext.Session[wizardName + "currentstepindex"];
+
+			return curIndex;
+		}
+
+		/// <summary>
+		/// Gets the name of the current step.
+		/// </summary>
+		/// <param name="engineContext">The engine context.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns></returns>
+		public static String GetCurrentStepName(IEngineContext engineContext, IController controller, IControllerContext controllerContext)
+		{
+			String wizardName = WizardUtils.ConstructWizardNamespace(controllerContext);
+
+			int curIndex = (int) engineContext.Session[wizardName + "currentstepindex"];
+
+			IList stepList = (IList) engineContext.Items["wizard.step.list"];
+
+			return (String) stepList[curIndex];
+		}
+
+		/// <summary>
 		/// Gets the name of the previous step.
 		/// </summary>
 		/// <param name="engineContext">The engine context.</param>
