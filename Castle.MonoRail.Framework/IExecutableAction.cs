@@ -41,7 +41,7 @@ namespace Castle.MonoRail.Framework
 		/// Gets the layout override.
 		/// </summary>
 		/// <value>The layout override.</value>
-		string LayoutOverride { get;  }
+		string[] LayoutOverride { get;  }
 
 		/// <summary>
 		/// Gets the http method that the action requires before being executed.

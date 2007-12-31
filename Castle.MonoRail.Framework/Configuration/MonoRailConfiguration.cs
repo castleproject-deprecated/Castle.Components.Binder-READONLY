@@ -19,6 +19,7 @@ namespace Castle.MonoRail.Framework.Configuration
 	using System.Xml;
 	using Castle.Core.Configuration;
 	using Castle.Core.Configuration.Xml;
+	using Castle.MonoRail.Framework.Helpers.ValidationStrategy;
 	using Castle.MonoRail.Framework.JSGeneration.Prototype;
 	using JSGeneration;
 
@@ -66,6 +67,7 @@ namespace Castle.MonoRail.Framework.Configuration
 				.AddExtension(typeof(CommonJSExtension))
 				.AddExtension(typeof(ScriptaculousExtension))
 				.AddExtension(typeof(BehaviourExtension))
+				.BrowserValidatorIs(typeof(PrototypeWebValidator))
 				.SetAsDefault();
 
 			// old routing support related

@@ -102,7 +102,7 @@ namespace Castle.MonoRail.Framework
 		/// Gets the layout override.
 		/// </summary>
 		/// <value>The layout override.</value>
-		public string LayoutOverride
+		public string[] LayoutOverride
 		{
 			get
 			{
@@ -110,7 +110,7 @@ namespace Castle.MonoRail.Framework
 				{
 					return null;
 				}
-				return actionMetaDescriptor.Layout.LayoutName;
+				return actionMetaDescriptor.Layout.LayoutNames;
 			}
 		}
 

@@ -15,7 +15,7 @@
 			LayoutDescriptor desc = provider.CollectLayout(typeof(LayoutOnController));
 	
 			Assert.IsNotNull(desc);
-			Assert.AreEqual("default", desc.LayoutName);
+			Assert.AreEqual("default", desc.LayoutNames[0]);
 		}
 
 		[Test]
@@ -24,7 +24,7 @@
 			LayoutDescriptor desc = provider.CollectLayout(typeof(LayoutOnActionController).GetMethod("Action1"));
 
 			Assert.IsNotNull(desc);
-			Assert.AreEqual("action", desc.LayoutName);
+			Assert.AreEqual("action", desc.LayoutNames[0]);
 		}
 
 		#region Controllers

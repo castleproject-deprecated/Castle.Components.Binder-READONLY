@@ -21,24 +21,35 @@ namespace Castle.MonoRail.Framework.Descriptors
 	/// </summary>
 	public class LayoutDescriptor
 	{
-		private readonly String layoutName;
+		private readonly string[] layoutNames;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LayoutDescriptor"/> class.
 		/// </summary>
-		/// <param name="layoutName">Name of the layout.</param>
-		public LayoutDescriptor(String layoutName)
+		/// <param name="layoutNames">The layout names.</param>
+		public LayoutDescriptor(params String[] layoutNames)
 		{
-			this.layoutName = layoutName;
+			this.layoutNames = layoutNames;
 		}
 
 		/// <summary>
 		/// Gets the name of the layout.
 		/// </summary>
 		/// <value>The name of the layout.</value>
-		public String LayoutName
+		public string[] LayoutNames
 		{
-			get { return layoutName; }
+			get { return layoutNames; }
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether this attribute represents a single layout.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance has single; otherwise, <c>false</c>.
+		/// </value>
+		public bool HasSingle
+		{
+			get { return layoutNames.Length == 0; }
 		}
 	}
 }

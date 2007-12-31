@@ -22,6 +22,7 @@ namespace Castle.MonoRail.Framework.Helpers
 	using System.IO;
 	using System.Reflection;
 	using System.Text;
+	using Configuration;
 	using Services;
 	using HtmlTextWriter = System.Web.UI.HtmlTextWriter;
 
@@ -290,12 +291,17 @@ namespace Castle.MonoRail.Framework.Helpers
 				logger = loggerFactory.Create(typeof(FormHelper));
 			}
 
-			IBrowserValidatorProvider validatorProv = (IBrowserValidatorProvider)
-				provider.GetService(typeof(IBrowserValidatorProvider));
+			IMonoRailConfiguration config = (IMonoRailConfiguration) provider.GetService(typeof(IMonoRailConfiguration));
 
-			if (validatorProv != null)
+			LibraryConfiguration jsLibConfig = config.JSGeneratorConfiguration.DefaultLibrary;
+
+			if (jsLibConfig != null)
 			{
-				validatorProvider = validatorProv;
+				if (jsLibConfig.BrowserValidatorProvider != null)
+				{
+					validatorProvider = (IBrowserValidatorProvider) 
+						Activator.CreateInstance(jsLibConfig.BrowserValidatorProvider);
+				}
 			}
 
 			validatorRegistry = (IValidatorRegistry) provider.GetService(typeof(IValidatorRegistry));

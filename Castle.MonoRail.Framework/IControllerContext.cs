@@ -55,7 +55,7 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Gets or set the layout being used.
 		/// </summary>
-		string LayoutName { get; set; }
+		string[] LayoutNames { get; set; }
 
 		/// <summary>
 		/// Gets the name of the action being processed.

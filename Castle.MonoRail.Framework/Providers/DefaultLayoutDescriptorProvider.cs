@@ -70,11 +70,6 @@ namespace Castle.MonoRail.Framework.Providers
 			{
 				LayoutDescriptor desc = (attributes[0] as ILayoutDescriptorBuilder).BuildLayoutDescriptor();
 				
-				if (logger.IsDebugEnabled)
-				{
-					logger.DebugFormat("Collected layout with name {0}", desc.LayoutName);
-				}
-				
 				return desc;
 			}
 

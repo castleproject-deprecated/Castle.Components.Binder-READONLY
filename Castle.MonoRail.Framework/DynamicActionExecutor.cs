@@ -66,7 +66,7 @@ namespace Castle.MonoRail.Framework
 		/// Gets the layout override.
 		/// </summary>
 		/// <value>The layout override.</value>
-		public string LayoutOverride
+		public string[] LayoutOverride
 		{
 			get { return null; }
 		}

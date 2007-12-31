@@ -23,6 +23,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 	using System.IO;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Text;
 	using Castle.Core;
 	using Commons.Collections;
 	using JSGeneration;
@@ -130,7 +131,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			{
 				AdjustContentType(context);
 
-				bool hasLayout = controllerContext.LayoutName != null;
+				bool hasLayout = controllerContext.LayoutNames != null && controllerContext.LayoutNames.Length != 0;
 
 				TextWriter writer;
 
@@ -158,8 +159,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 
 				if (hasLayout)
 				{
-					String contents = (writer as StringWriter).GetStringBuilder().ToString();
-					ProcessLayout(contents, controller, controllerContext, ctx, context, output);
+					ProcessLayoutRecursively((StringWriter) writer, context, controller, controllerContext, ctx, output);
 				}
 			}
 			catch(Exception ex)
@@ -290,7 +290,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 			IContext ctx = CreateContext(context, controller, controllerContext);
 			AdjustContentType(context);
 
-			bool hasLayout = controllerContext.LayoutName != null;
+			bool hasLayout = controllerContext.LayoutNames != null && controllerContext.LayoutNames.Length != 0;
 
 			if (hasLayout)
 			{
@@ -340,6 +340,24 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		{
 		}
 
+		private void ProcessLayoutRecursively(StringWriter writer, IEngineContext context,
+		                                      IController controller, IControllerContext controllerContext,
+		                                      IContext ctx, TextWriter finalOutput)
+		{
+			for(int i = controllerContext.LayoutNames.Length - 1; i >= 0; i--)
+			{
+				string layoutName = ResolveLayoutTemplateName(controllerContext.LayoutNames[i]);
+
+				string contents = writer.GetStringBuilder().ToString();
+
+				BeforeApplyingLayout(layoutName, ref contents, controller, controllerContext, ctx, context);
+
+				writer.GetStringBuilder().Length = 0;
+
+				RenderLayout(layoutName, contents, ctx, i == 0 ? finalOutput : writer);
+			}
+		}
+
 		private void ProcessLayout(String contents, string layoutName, IContext ctx, TextWriter output)
 		{
 			RenderLayout(layoutName, contents, ctx, output);
@@ -348,7 +366,7 @@ namespace Castle.MonoRail.Framework.Views.NVelocity
 		private void ProcessLayout(String contents, IController controller, IControllerContext controllerContext, IContext ctx,
 		                           IEngineContext context, TextWriter output)
 		{
-			String layout = ResolveLayoutTemplateName(controllerContext.LayoutName);
+			String layout = ResolveLayoutTemplateName(controllerContext.LayoutNames[0]);
 
 			BeforeApplyingLayout(layout, ref contents, controller, controllerContext, ctx, context);
 

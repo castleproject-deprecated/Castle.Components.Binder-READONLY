@@ -200,12 +200,12 @@ namespace Castle.MonoRail.Framework.Services
 		public void RenderStaticWithinLayout(String contents, IEngineContext context, IController controller,
 		                                     IControllerContext controllerContext)
 		{
-			if (controllerContext.LayoutName == null)
+			if (controllerContext.LayoutNames == null)
 			{
 				throw new MonoRailException("RenderStaticWithinLayout can only work with a layout");
 			}
 
-			String templateName = Path.Combine("layouts", controllerContext.LayoutName);
+			String templateName = Path.Combine("layouts", controllerContext.LayoutNames[0]);
 
 			IViewEngine engine = ResolveEngine(templateName);
 

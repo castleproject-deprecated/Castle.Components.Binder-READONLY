@@ -169,9 +169,9 @@ namespace Castle.MonoRail.Framework.Views.Aspx
 
 			Page page = (Page) Activator.CreateInstance(pageType);
 
-			if (controllerContext.LayoutName != null)
+			if (controllerContext.LayoutNames != null && controllerContext.LayoutNames.Length != 0)
 			{
-				page.MasterPageFile = ResolveMasterOnViewFolder(controllerContext.LayoutName);
+				page.MasterPageFile = ResolveMasterOnViewFolder(controllerContext.LayoutNames[0]);
 			}
 
 			PageBase pageBase = page as PageBase;

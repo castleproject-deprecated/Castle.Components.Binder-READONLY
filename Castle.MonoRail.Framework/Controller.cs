@@ -82,7 +82,7 @@ namespace Castle.MonoRail.Framework
 			this.context = context;
 			SetEngineContext(engineContext);
 
-			context.LayoutName = ObtainDefaultLayoutName();
+			ResolveLayout();
 			CreateControllerLevelResources();
 			CreateAndInitializeHelpers();
 			CreateFiltersDescriptors();
@@ -352,8 +352,17 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		public string LayoutName
 		{
-			get { return context.LayoutName; }
-			set { context.LayoutName = value; }
+			get { return (context.LayoutNames != null && context.LayoutNames.Length != 0) ? context.LayoutNames[0] : null; }
+			set { context.LayoutNames = new string[] { value }; }
+		}
+
+		/// <summary>
+		/// Gets or set the layouts being used.
+		/// </summary>
+		public string[] LayoutNames
+		{
+			get { return context.LayoutNames; }
+			set { context.LayoutNames = value; }
 		}
 
 		/// <summary>
@@ -1171,6 +1180,15 @@ namespace Castle.MonoRail.Framework
 
 		#endregion
 
+		/// <summary>
+		/// Gives a change to subclass 
+		/// to override the layout resolution code
+		/// </summary>
+		protected virtual void ResolveLayout()
+		{
+			context.LayoutNames = ObtainDefaultLayoutName();
+		}
+
 		private void RunActionAndRenderView()
 		{
 			IExecutableAction action = null;
@@ -1350,11 +1368,11 @@ namespace Castle.MonoRail.Framework
 		/// Obtains the name of the default layout.
 		/// </summary>
 		/// <returns></returns>
-		protected virtual String ObtainDefaultLayoutName()
+		protected virtual String[] ObtainDefaultLayoutName()
 		{
 			if (MetaDescriptor.Layout != null)
 			{
-				return MetaDescriptor.Layout.LayoutName;
+				return MetaDescriptor.Layout.LayoutNames;
 			}
 			else
 			{
@@ -1362,7 +1380,7 @@ namespace Castle.MonoRail.Framework
 
 				if (viewEngineManager.HasTemplate(defaultLayout))
 				{
-					return Name;
+					return new String[] { Name };
 				}
 			}
 

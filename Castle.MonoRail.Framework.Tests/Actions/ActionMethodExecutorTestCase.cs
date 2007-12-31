@@ -97,7 +97,7 @@ namespace Castle.MonoRail.Framework.Tests.Actions
 			Assert.IsFalse(executor.ShouldSkipFilter(typeof(DummyFilter)));
 			Assert.IsFalse(executor.ShouldSkipRescues);
 			Assert.IsFalse(executor.ShouldSkipAllFilters);
-			Assert.AreEqual("layoutname", executor.LayoutOverride);
+			Assert.AreEqual("layoutname", executor.LayoutOverride[0]);
 			Assert.AreEqual(0, executor.Resources.Length);
 		}
 

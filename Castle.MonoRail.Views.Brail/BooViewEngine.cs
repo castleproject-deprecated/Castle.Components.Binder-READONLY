@@ -139,13 +139,14 @@ namespace Castle.MonoRail.Views.Brail
 			if (layoutViewOutput.Layout != null)
 			{
 				layoutViewOutput.Layout.SetParent(view);
+
 				try
 				{
 					layoutViewOutput.Layout.Run();
 				}
 				catch(Exception e)
 				{
-					HandleException(controllerContext.LayoutName, layoutViewOutput.Layout, e);
+					HandleException(controllerContext.LayoutNames[0], layoutViewOutput.Layout, e);
 				}
 			}
 			Log("Finished executing view {0}", templateName);
@@ -339,9 +340,9 @@ namespace Castle.MonoRail.Views.Brail
 		                                   IControllerContext controllerContext)
 		{
 			BrailBase layout = null;
-			if (controllerContext.LayoutName != null)
+			if (controllerContext.LayoutNames != null && controllerContext.LayoutNames.Length != 0)
 			{
-				string layoutTemplate = controllerContext.LayoutName;
+				string layoutTemplate = controllerContext.LayoutNames[0];
 				if (layoutTemplate.StartsWith("/") == false)
 				{
 					layoutTemplate = "layouts\\" + layoutTemplate;

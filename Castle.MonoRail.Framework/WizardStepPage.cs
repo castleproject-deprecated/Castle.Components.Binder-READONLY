@@ -189,6 +189,20 @@ namespace Castle.MonoRail.Framework
 
 		#endregion
 
+		/// <summary>
+		/// Override takes care of selecting the wizard parent layout as default
+		/// layout if no layout is attached to the step
+		/// </summary>
+		protected override void ResolveLayout()
+		{
+			base.ResolveLayout();
+
+			if (LayoutName == null)
+			{
+				LayoutNames = wizardcontrollerContext.LayoutNames;
+			}
+		}
+
 		#region DoNavigate and Redirects
 
 		/// <summary>

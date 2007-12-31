@@ -28,10 +28,10 @@ namespace Castle.MonoRail.Framework
 	{
 		private string name;
 		private string areaName;
-		private string layoutName;
 		private string action;
 		private string selectedViewName;
 		private string viewFolder;
+		private string[] layoutNames;
 		private ControllerMetaDescriptor metaDescriptor;
 		private IDictionary<string, object> customActionParameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
 		private IDictionary propertyBag = new HybridDictionary(true);
@@ -127,10 +127,10 @@ namespace Castle.MonoRail.Framework
 		/// Gets or set the layout being used.
 		/// </summary>
 		/// <value></value>
-		public string LayoutName
+		public string[] LayoutNames
 		{
-			get { return layoutName; }
-			set { layoutName = value; }
+			get { return layoutNames; }
+			set { layoutNames = value; }
 		}
 
 		/// <summary>

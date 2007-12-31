@@ -142,11 +142,11 @@ namespace Castle.MonoRail.Framework
 			// use the template engine to generate the body of the message
 			StringWriter writer = new StringWriter();
 
-			String oldLayout = controllerContext.LayoutName;
+			String[] oldLayout = controllerContext.LayoutNames;
 
 			if (doNotApplyLayout)
 			{
-				controllerContext.LayoutName = null;
+				controllerContext.LayoutNames = null;
 			}
 
 			if (!templateName.StartsWith("/"))
@@ -156,7 +156,7 @@ namespace Castle.MonoRail.Framework
 
 			viewEngineManager.Process(templateName, writer, engineContext, controller, controllerContext);
 
-			controllerContext.LayoutName = oldLayout;
+			controllerContext.LayoutNames = oldLayout;
 
 			return CreateMessage(writer);
 		}
