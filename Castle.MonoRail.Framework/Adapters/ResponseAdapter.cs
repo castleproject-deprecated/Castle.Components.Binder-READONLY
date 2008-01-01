@@ -20,6 +20,7 @@ namespace Castle.MonoRail.Framework.Adapters
 	using System.IO;
 	using System.Web;
 	using Castle.MonoRail.Framework;
+	using Core;
 	using Services;
 
 	/// <summary>
@@ -249,6 +250,17 @@ namespace Castle.MonoRail.Framework.Adapters
 			redirected = true;
 
 			response.Redirect(urlBuilder.BuildUrl(currentUrl, controller, action), false);
+		}
+
+		/// <summary>
+		/// Redirects the specified controller.
+		/// </summary>
+		/// <param name="parameters">The parameters.</param>
+		public void Redirect(object parameters)
+		{
+			redirected = true;
+
+			response.Redirect(urlBuilder.BuildUrl(currentUrl, new ReflectionBasedDictionaryAdapter(parameters)), false);
 		}
 
 		/// <summary>

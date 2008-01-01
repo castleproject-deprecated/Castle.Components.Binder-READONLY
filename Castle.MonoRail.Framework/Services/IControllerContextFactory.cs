@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using Castle.MonoRail.Framework.Descriptors;
+	using Routing;
 
 	/// <summary>
 	/// Pendent
@@ -26,5 +27,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <returns></returns>
 		IControllerContext Create(string area, string controller, string action, ControllerMetaDescriptor metaDescriptor);
+
+		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <returns></returns>
+		IControllerContext Create(string area, string controller, string action, ControllerMetaDescriptor metaDescriptor, RouteMatch match);
 	}
 }

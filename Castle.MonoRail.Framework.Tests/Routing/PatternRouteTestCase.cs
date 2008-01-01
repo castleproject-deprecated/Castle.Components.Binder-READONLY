@@ -24,7 +24,7 @@ namespace Castle.MonoRail.Framework.Tests.Routing
 		public void ShouldMatchStatic()
 		{
 			PatternRoute route = new PatternRoute("/some/path");
-			RouteMatch match = new RouteMatch("");
+			RouteMatch match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/some/path", CreateGetContext(), match)); 
 		}
 
@@ -32,7 +32,7 @@ namespace Castle.MonoRail.Framework.Tests.Routing
 		public void ShouldMatchStaticWithFileExtension()
 		{
 			PatternRoute route = new PatternRoute("/default.aspx");
-			RouteMatch match = new RouteMatch("");
+			RouteMatch match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/default.aspx", CreateGetContext(), match));
 		}
 
@@ -40,34 +40,73 @@ namespace Castle.MonoRail.Framework.Tests.Routing
 		public void ShouldMatchStaticCaseInsensitive()
 		{
 			PatternRoute route = new PatternRoute("/default.aspx");
-			RouteMatch match = new RouteMatch("");
+			RouteMatch match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/DEFAULT.ASPX", CreateGetContext(), match));
 
 			route = new PatternRoute("/some/path");
-			match = new RouteMatch("");
+			match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/SOME/Path", CreateGetContext(), match));
+		}
+
+		[Test]
+		public void ShouldMatchHiphensAndUnderlines()
+		{
+			PatternRoute route = new PatternRoute("/some/path_to-this");
+			RouteMatch match = new RouteMatch();
+			Assert.IsTrue(route.Matches("/some/path_to-this", CreateGetContext(), match)); 
 		}
 
 		[Test]
 		public void NamedRequiredParameters()
 		{
 			PatternRoute route = new PatternRoute("/<controller>/<action>");
-			RouteMatch match = new RouteMatch("");
+			RouteMatch match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/some/act", CreateGetContext(), match));
 			Assert.AreEqual("some", match.Parameters["controller"]);
 			Assert.AreEqual("act", match.Parameters["action"]);
 		}
 
 		[Test]
+		public void NamedRequiredParametersForExtension()
+		{
+			PatternRoute route = new PatternRoute("/<controller>/<action>.<format>");
+			RouteMatch match = new RouteMatch();
+			Assert.IsTrue(route.Matches("/some/act.xml", CreateGetContext(), match));
+			Assert.AreEqual("some", match.Parameters["controller"]);
+			Assert.AreEqual("act", match.Parameters["action"]);
+			Assert.AreEqual("xml", match.Parameters["format"]);
+		}
+
+		[Test]
+		public void NamedParametersCanHaveUnderlines()
+		{
+			PatternRoute route = new PatternRoute("/<controller>/<action>");
+			RouteMatch match = new RouteMatch();
+			Assert.IsTrue(route.Matches("/some/act_name", CreateGetContext(), match));
+			Assert.AreEqual("some", match.Parameters["controller"]);
+			Assert.AreEqual("act_name", match.Parameters["action"]);
+		}
+
+		[Test]
+		public void NamedParametersCanHaveHiphens()
+		{
+			PatternRoute route = new PatternRoute("/<controller>/<action>");
+			RouteMatch match = new RouteMatch();
+			Assert.IsTrue(route.Matches("/some/act-name", CreateGetContext(), match));
+			Assert.AreEqual("some", match.Parameters["controller"]);
+			Assert.AreEqual("act-name", match.Parameters["action"]);
+		}
+
+		[Test]
 		public void NamedOptionalParameters()
 		{
 			PatternRoute route = new PatternRoute("/<controller>/[action]/[id]");
-			RouteMatch match = new RouteMatch("");
+			RouteMatch match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/some/act", CreateGetContext(), match));
 			Assert.AreEqual("some", match.Parameters["controller"]);
 			Assert.AreEqual("act", match.Parameters["action"]);
 
-			match = new RouteMatch("");
+			match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/some/act/10", CreateGetContext(), match));
 			Assert.AreEqual("some", match.Parameters["controller"]);
 			Assert.AreEqual("act", match.Parameters["action"]);
@@ -79,7 +118,7 @@ namespace Castle.MonoRail.Framework.Tests.Routing
 		{
 			PatternRoute route = new PatternRoute("/<controller>/[action]/[id]")
 				.DefaultFor("action").Is("index").DefaultFor("id").Is("0");
-			RouteMatch match = new RouteMatch("");
+			RouteMatch match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/some", CreateGetContext(), match));
 			Assert.AreEqual("some", match.Parameters["controller"]);
 			Assert.AreEqual("index", match.Parameters["action"]);
@@ -93,7 +132,7 @@ namespace Castle.MonoRail.Framework.Tests.Routing
 				.Restrict("action").AnyOf("index", "list")
 				.Restrict("id").ValidInteger;
 
-			RouteMatch match = new RouteMatch("");
+			RouteMatch match = new RouteMatch();
 			Assert.IsTrue(route.Matches("/some/index", CreateGetContext(), match));
 			Assert.IsTrue(route.Matches("/some/list", CreateGetContext(), match));
 			Assert.IsFalse(route.Matches("/some/new", CreateGetContext(), match));

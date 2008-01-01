@@ -85,6 +85,8 @@ namespace Castle.MonoRail.Framework
 
 			HttpRequest req = context.Request;
 
+			RouteMatch routeMatch = (RouteMatch) context.Items[RouteMatch.RouteMatchKey] ?? new RouteMatch();
+
 			UrlInfo urlInfo = urlTokenizer.TokenizeUrl(req.FilePath, req.PathInfo, req.Url, req.IsLocal, req.ApplicationPath);
 
 			if (urlInfo.Area == "MonoRail" && urlInfo.Controller == "Files")
@@ -111,8 +113,8 @@ namespace Castle.MonoRail.Framework
 			ControllerMetaDescriptor controllerDesc = 
 				mrContainer.ControllerDescriptorProvider.BuildDescriptor(controller);
 
-			IControllerContext controllerContext = 
-				controllerContextFactory.Create(urlInfo.Area, urlInfo.Controller, urlInfo.Action, controllerDesc);
+			IControllerContext controllerContext =
+				controllerContextFactory.Create(urlInfo.Area, urlInfo.Controller, urlInfo.Action, controllerDesc, routeMatch);
 
 			engineContext.CurrentController = controller;
 			engineContext.CurrentControllerContext = controllerContext;

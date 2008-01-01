@@ -173,6 +173,15 @@ namespace Castle.MonoRail.Framework.Test
 		/// <summary>
 		/// Redirects the specified controller.
 		/// </summary>
+		/// <param name="parameters">The parameters.</param>
+		public void Redirect(object parameters)
+		{
+			// TODO: figure a way to do this
+		}
+
+		/// <summary>
+		/// Redirects the specified controller.
+		/// </summary>
 		/// <param name="controller">The controller.</param>
 		/// <param name="action">The action.</param>
 		public virtual void Redirect(string controller, string action)

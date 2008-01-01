@@ -873,6 +873,17 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
+		/// Redirects to the specified URL. All other Redirects call this one.
+		/// </summary>
+		/// <param name="parameters">The parameters.</param>
+		public virtual void Redirect(object parameters)
+		{
+			CancelView();
+
+			Context.Response.Redirect(parameters);
+		}
+
+		/// <summary>
 		/// Redirects to the specified URL. 
 		/// </summary>
 		/// <param name="url">Target URL</param>

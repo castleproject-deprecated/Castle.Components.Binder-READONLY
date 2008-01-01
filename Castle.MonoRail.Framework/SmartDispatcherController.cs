@@ -173,11 +173,12 @@ namespace Castle.MonoRail.Framework
 			{
 				//
 				// If the param is decorated with an attribute that implements IParameterBinder
+				// then it calculates the points itself
 				//
 
 				object[] attributes = param.GetCustomAttributes(false);
 
-				String requestParameterName = null;
+				String requestParameterName;
 
 				bool calculated = false;
 
@@ -193,11 +194,11 @@ namespace Castle.MonoRail.Framework
 
 				if (calculated) continue;
 
-				requestParameterName = GetRequestParameterName(param);
-
 				//
 				// Otherwise
 				//
+
+				requestParameterName = GetRequestParameterName(param);
 
 				Type parameterType = param.ParameterType;
 
@@ -206,26 +207,6 @@ namespace Castle.MonoRail.Framework
 					points += 10;
 					matchCount++;
 				}
-				//
-				// I'm not sure about the following. Seems to be
-				// be fragile regarding the web parameters and the actionArgs array
-				//
-//				else if ((actionArgs != null) && actionArgs.Contains(requestParameterName))
-//				{
-//					object actionArg = actionArgs[requestParameterName];
-//
-//					bool exactMatch;
-//
-//					if (binder.Converter.CanConvert(parameterType, actionArg.GetType(), actionArg, out exactMatch))
-//					{
-//						points += 10;
-//
-//						// Give extra weight to exact matches.
-//						if (exactMatch) points += 5;
-//
-//						matchCount++;
-//					}
-//				}
 			}
 
 			// the bonus should be nice only for disambiguation.

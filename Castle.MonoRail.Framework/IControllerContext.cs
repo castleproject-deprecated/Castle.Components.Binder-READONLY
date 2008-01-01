@@ -18,6 +18,7 @@ namespace Castle.MonoRail.Framework
 	using System.Collections.Generic;
 	using Castle.MonoRail.Framework.Resources;
 	using Descriptors;
+	using Routing;
 
 	/// <summary>
 	/// Pendent
@@ -92,5 +93,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <value>The controller descriptor.</value>
 		ControllerMetaDescriptor ControllerDescriptor { get; set; }
+
+		/// <summary>
+		/// Gets or sets the route match.
+		/// </summary>
+		/// <value>The route match.</value>
+		RouteMatch RouteMatch { get; set; }
 	}
 }

@@ -134,6 +134,12 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Redirects the specified controller.
 		/// </summary>
+		/// <param name="parameters">The parameters.</param>
+		void Redirect(object parameters);
+
+		/// <summary>
+		/// Redirects the specified controller.
+		/// </summary>
 		/// <param name="controller">The controller.</param>
 		/// <param name="action">The action.</param>
 		void Redirect(String controller, String action);

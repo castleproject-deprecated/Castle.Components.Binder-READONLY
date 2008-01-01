@@ -293,14 +293,17 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			IMonoRailConfiguration config = (IMonoRailConfiguration) provider.GetService(typeof(IMonoRailConfiguration));
 
-			LibraryConfiguration jsLibConfig = config.JSGeneratorConfiguration.DefaultLibrary;
-
-			if (jsLibConfig != null)
+			if (config != null)
 			{
-				if (jsLibConfig.BrowserValidatorProvider != null)
+				LibraryConfiguration jsLibConfig = config.JSGeneratorConfiguration.DefaultLibrary;
+
+				if (jsLibConfig != null)
 				{
-					validatorProvider = (IBrowserValidatorProvider) 
-						Activator.CreateInstance(jsLibConfig.BrowserValidatorProvider);
+					if (jsLibConfig.BrowserValidatorProvider != null)
+					{
+						validatorProvider = (IBrowserValidatorProvider)
+							Activator.CreateInstance(jsLibConfig.BrowserValidatorProvider);
+					}
 				}
 			}
 

@@ -14,8 +14,10 @@
 
 namespace Castle.MonoRail.Framework.Services
 {
+	using System.Collections.Generic;
 	using System.IO;
 	using Descriptors;
+	using Routing;
 
 	/// <summary>
 	/// Pendent
@@ -25,18 +27,45 @@ namespace Castle.MonoRail.Framework.Services
 		/// <summary>
 		/// Pendent
 		/// </summary>
-		/// <param name="area">The area.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="action">The action.</param>
-		/// <param name="metaDescriptor">The meta descriptor.</param>
+		/// <param name="area"></param>
+		/// <param name="controller"></param>
+		/// <param name="action"></param>
+		/// <param name="metaDescriptor"></param>
 		/// <returns></returns>
 		public IControllerContext Create(string area, string controller, string action,
 		                                 ControllerMetaDescriptor metaDescriptor)
 		{
-			ControllerContext context = new ControllerContext(controller, area, action, metaDescriptor);
+			return Create(area, controller, action, metaDescriptor, new RouteMatch());
+		}
 
+		/// <summary>
+		/// Pendent
+		/// </summary>
+		/// <param name="area">The area.</param>
+		/// <param name="controller">The controller.</param>
+		/// <param name="action">The action.</param>
+		/// <param name="metaDescriptor">The meta descriptor.</param>
+		/// <param name="match">The routing match.</param>
+		/// <returns></returns>
+		public IControllerContext Create(string area, string controller, string action,
+										 ControllerMetaDescriptor metaDescriptor, RouteMatch match)
+		{
+			ControllerContext context = new ControllerContext(controller, area, action, metaDescriptor);
+			context.RouteMatch = match;
 			context.ViewFolder = ResolveViewFolder(context, area, controller, action);
 			context.SelectedViewName = ResolveDefaultViewSelection(context, area, controller, action);
+
+			foreach(KeyValuePair<string, string> pair in match.Parameters)
+			{
+				if (pair.Key == "controller" || pair.Key == "action" || pair.Key == "area")
+				{
+					// We skip those only to avoid compatibility issues as 
+					// customactionparameters have higher precedence on parameters matching
+					continue;
+				}
+
+				context.CustomActionParameters[pair.Key] = pair.Value;
+			}
 
 			return context;
 		}

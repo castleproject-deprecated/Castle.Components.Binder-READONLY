@@ -20,6 +20,7 @@ namespace Castle.MonoRail.Framework
 	using System.Collections.Specialized;
 	using Descriptors;
 	using Resources;
+	using Routing;
 
 	/// <summary>
 	/// Pendent
@@ -36,8 +37,9 @@ namespace Castle.MonoRail.Framework
 		private IDictionary<string, object> customActionParameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
 		private IDictionary propertyBag = new HybridDictionary(true);
 		private IDictionary helpers = new HybridDictionary(true);
-		private IDictionary<string, IDynamicAction> dynamicActions = new Dictionary<string, IDynamicAction>();
+		private readonly IDictionary<string, IDynamicAction> dynamicActions = new Dictionary<string, IDynamicAction>();
 		private readonly IDictionary<string, IResource> resources = new Dictionary<string, IResource>(StringComparer.InvariantCultureIgnoreCase);
+		private RouteMatch routeMatch;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ControllerContext"/> class.
@@ -192,6 +194,16 @@ namespace Castle.MonoRail.Framework
 		{
 			get { return metaDescriptor; }
 			set { metaDescriptor = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the route match.
+		/// </summary>
+		/// <value>The route match.</value>
+		public RouteMatch RouteMatch
+		{
+			get { return routeMatch; }
+			set { routeMatch = value; }
 		}
 	}
 }

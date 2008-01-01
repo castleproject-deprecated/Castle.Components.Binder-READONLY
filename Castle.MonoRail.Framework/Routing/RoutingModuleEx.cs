@@ -73,21 +73,22 @@ namespace Castle.MonoRail.Framework.Routing
 			string mrPath = CreateMrPath(match);
 			string url = request.RawUrl;
 
-			string paramsAsQueryString = ConvertToQueryString(match.Parameters, context.Server);
+			string paramsAsQueryString = "";
+//			string paramsAsQueryString = ConvertToQueryString(match.Parameters, context.Server);
 
 			int queryStringIndex = url.IndexOf('?');
 
 			if (queryStringIndex != -1)
 			{
-				if (paramsAsQueryString.Length != 0)
-				{
-					// Concat
-					paramsAsQueryString += url.Substring(queryStringIndex + 1);
-				}
-				else
-				{
+//				if (paramsAsQueryString.Length != 0)
+//				{
+//					// Concat
+//					paramsAsQueryString += url.Substring(queryStringIndex + 1);
+//				}
+//				else
+//				{
 					paramsAsQueryString = url.Substring(queryStringIndex + 1);
-				}
+//				}
 			}
 
 			if (paramsAsQueryString.Length != 0)
@@ -98,6 +99,8 @@ namespace Castle.MonoRail.Framework.Routing
 			{
 				context.RewritePath(mrPath);
 			}
+
+			context.Items.Add(RouteMatch.RouteMatchKey, match);
 		}
 
 		private string StripAppPathFrom(string path, string applicationPath)
@@ -109,17 +112,17 @@ namespace Castle.MonoRail.Framework.Routing
 			return path;
 		}
 
-		private static string ConvertToQueryString(Dictionary<string, string> parameters, HttpServerUtility serverUtil)
-		{
-			StringBuilder sb = new StringBuilder();
-
-			foreach(KeyValuePair<string, string> pair in parameters)
-			{
-				sb.AppendFormat("{0}={1}&", serverUtil.UrlEncode(pair.Key), serverUtil.UrlEncode(pair.Value));
-			}
-
-			return sb.ToString();
-		}
+//		private static string ConvertToQueryString(Dictionary<string, string> parameters, HttpServerUtility serverUtil)
+//		{
+//			StringBuilder sb = new StringBuilder();
+//
+//			foreach(KeyValuePair<string, string> pair in parameters)
+//			{
+//				sb.AppendFormat("{0}={1}&", serverUtil.UrlEncode(pair.Key), serverUtil.UrlEncode(pair.Value));
+//			}
+//
+//			return sb.ToString();
+//		}
 
 		private static string CreateMrPath(RouteMatch match)
 		{

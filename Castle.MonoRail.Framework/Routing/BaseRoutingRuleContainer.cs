@@ -95,7 +95,7 @@ namespace Castle.MonoRail.Framework.Routing
 
 			foreach(IRoutingRule rule in rules)
 			{
-				RouteMatch match = new RouteMatch(rule.RouteName);
+				RouteMatch match = new RouteMatch();
 
 				if (rule.Matches(url, context, match))
 				{
