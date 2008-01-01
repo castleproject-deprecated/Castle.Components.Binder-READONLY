@@ -115,8 +115,17 @@ namespace Castle.MonoRail.Framework.Tests.WindsorIntegration
 
 		class DummyController : IController
 		{
-			public event ControllerHandler BeforeAction;
-			public event ControllerHandler AfterAction;
+			public event ControllerHandler BeforeAction
+			{
+				add { throw new NotImplementedException(); }
+				remove { throw new NotImplementedException(); }
+			}
+
+			public event ControllerHandler AfterAction
+			{
+				add { throw new NotImplementedException(); }
+				remove { throw new NotImplementedException(); }
+			}
 
 			public void Process(IEngineContext engineContext, IControllerContext context)
 			{

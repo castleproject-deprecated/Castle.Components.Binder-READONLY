@@ -23,6 +23,9 @@ namespace Castle.MonoRail.Framework.Routing
 	[Serializable]
 	public class RouteMatch
 	{
+		/// <summary>
+		/// Key used to store the route match on the HttpContext.Items
+		/// </summary>
 		public static readonly string RouteMatchKey = "route.match";
 		private readonly Dictionary<string, string> parameters = new Dictionary<string, string>();
 
