@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Tests.Actions
 {
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.Reflection;
 	using Castle.MonoRail.Framework.Descriptors;
 	using Castle.MonoRail.Framework.Test;
@@ -63,7 +64,7 @@ namespace Castle.MonoRail.Framework.Tests.Actions
 				get { return wasExecuted; }
 			}
 
-			public object InvokeMethodStub(MethodInfo method, IRequest request, IDictionary methodArgs)
+			public object InvokeMethodStub(MethodInfo method, IRequest request, IDictionary<string,object> methodArgs)
 			{
 				wasExecuted = true;
 				return 2;

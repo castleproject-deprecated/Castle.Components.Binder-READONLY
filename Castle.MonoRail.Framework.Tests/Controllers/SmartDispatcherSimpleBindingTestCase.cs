@@ -66,6 +66,39 @@ namespace Castle.MonoRail.Framework.Tests.Controllers
 		}
 
 		[Test]
+		public void CanFillSimpleNameParametersWithDataFromCustomParams()
+		{
+			SDController controller = new SDController();
+
+			IControllerContext context = services.ControllerContextFactory.
+				Create("", "home", "stringparam", services.ControllerDescriptorProvider.BuildDescriptor(controller));
+
+			context.CustomActionParameters["name"] = "hammett";
+
+			controller.Process(engineContext, context);
+
+			Assert.IsTrue(controller.parameters.Count != 0);
+			Assert.AreEqual("hammett", controller.parameters[0]);
+		}
+
+		[Test]
+		public void CustomParamsHasPrecedenceOverParams()
+		{
+			SDController controller = new SDController();
+
+			IControllerContext context = services.ControllerContextFactory.
+				Create("", "home", "stringparam", services.ControllerDescriptorProvider.BuildDescriptor(controller));
+
+			context.CustomActionParameters["name"] = "hammett";
+			request.Params.Add("name", "john doe");
+
+			controller.Process(engineContext, context);
+
+			Assert.IsTrue(controller.parameters.Count != 0);
+			Assert.AreEqual("hammett", controller.parameters[0]);
+		}
+
+		[Test]
 		public void CanConvertSimpleParameter()
 		{
 			SDController controller = new SDController();

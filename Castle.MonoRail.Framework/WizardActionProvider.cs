@@ -188,7 +188,8 @@ namespace Castle.MonoRail.Framework
 			{
 				IControllerContext stepContext =
 					engineContext.Services.ControllerContextFactory.Create(
-						controllerContext.AreaName, controllerContext.Name, innerAction, stepMetaDescriptor);
+						controllerContext.AreaName, controllerContext.Name, innerAction, 
+						stepMetaDescriptor, controllerContext.RouteMatch);
 
 				SetUpWizardHelper(engineContext, currentStepInstance, stepContext);
 

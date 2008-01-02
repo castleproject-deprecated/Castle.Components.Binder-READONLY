@@ -146,13 +146,13 @@ namespace Castle.MonoRail.Framework
 		/// <value>The bound instance errors.</value>
 		public IDictionary<object, ErrorList> BoundInstanceErrors
 		{
-			get 
+			get
 			{
 				if (boundInstances == null)
 				{
 					boundInstances = new Dictionary<object, ErrorList>();
 				}
-				return boundInstances; 
+				return boundInstances;
 			}
 		}
 
@@ -353,7 +353,7 @@ namespace Castle.MonoRail.Framework
 		public string LayoutName
 		{
 			get { return (context.LayoutNames != null && context.LayoutNames.Length != 0) ? context.LayoutNames[0] : null; }
-			set { context.LayoutNames = new string[] { value }; }
+			set { context.LayoutNames = new string[] {value}; }
 		}
 
 		/// <summary>
@@ -1391,7 +1391,7 @@ namespace Castle.MonoRail.Framework
 
 				if (viewEngineManager.HasTemplate(defaultLayout))
 				{
-					return new String[] { Name };
+					return new String[] {Name};
 				}
 			}
 
@@ -1782,8 +1782,8 @@ namespace Castle.MonoRail.Framework
 		/// <param name="request">The request.</param>
 		/// <param name="actionArgs">The action args.</param>
 		/// <returns></returns>
-		protected virtual MethodInfo SelectMethod(string action, IDictionary actions,
-		                                          IRequest request, IDictionary actionArgs)
+		protected virtual MethodInfo SelectMethod(string action, IDictionary actions, IRequest request,
+		                                          IDictionary<string, object> actionArgs)
 		{
 			return null;
 		}
@@ -1794,7 +1794,8 @@ namespace Castle.MonoRail.Framework
 		/// <param name="method">The method.</param>
 		/// <param name="request">The request.</param>
 		/// <param name="methodArgs">The method args.</param>
-		protected virtual object InvokeMethod(MethodInfo method, IRequest request, IDictionary methodArgs)
+		protected virtual object InvokeMethod(MethodInfo method, IRequest request,
+		                                      IDictionary<string, object> methodArgs)
 		{
 			return method.Invoke(this, new object[0]);
 		}
@@ -1828,7 +1829,6 @@ namespace Castle.MonoRail.Framework
 			return action;
 		}
 
-	
 
 		private void RaiseOnActionExceptionOnExtension()
 		{

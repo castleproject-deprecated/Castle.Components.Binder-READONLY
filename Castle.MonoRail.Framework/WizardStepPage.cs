@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.Reflection;
 	using Castle.Components.Binder;
 	using Castle.MonoRail.Framework.Helpers;
@@ -174,8 +175,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="request">The request instance</param>
 		/// <param name="actionArgs">The custom arguments for the action</param>
 		/// <returns></returns>
-		protected override MethodInfo SelectMethod(string action, IDictionary actions, IRequest request,
-		                                           IDictionary actionArgs)
+		protected override MethodInfo SelectMethod(string action, IDictionary actions, IRequest request, IDictionary<string, object> actionArgs)
 		{
 			if (action == "RenderWizardView")
 			{
@@ -183,7 +183,7 @@ namespace Castle.MonoRail.Framework
 			}
 			else
 			{
-				return base.SelectMethod(action, actions, request, null);
+				return base.SelectMethod(action, actions, request, actionArgs);
 			}
 		}
 
