@@ -25,6 +25,7 @@ namespace Castle.MicroKernel
 	using Castle.MicroKernel.Handlers;
 	using Castle.MicroKernel.ModelBuilder;
 	using Castle.MicroKernel.Proxy;
+	using Castle.MicroKernel.Registration;
 	using Castle.MicroKernel.Releasers;
 	using Castle.MicroKernel.Resolvers;
 	using Castle.MicroKernel.SubSystems.Configuration;
@@ -96,8 +97,7 @@ namespace Castle.MicroKernel
 		/// Constructs a DefaultKernel with no component
 		/// proxy support.
 		/// </summary>
-		public DefaultKernel()
-			: this(new NotSupportedProxyFactory())
+		public DefaultKernel() : this(new NotSupportedProxyFactory())
 		{
 		}
 
@@ -111,7 +111,7 @@ namespace Castle.MicroKernel
 			: this(proxyFactory)
 		{
 			this.resolver = resolver;
-			this.resolver.Initialize(new DependencyDelegate(RaiseDependencyResolving));
+			this.resolver.Initialize(RaiseDependencyResolving);
 		}
 
 		/// <summary>
@@ -140,7 +140,7 @@ namespace Castle.MicroKernel
 		{
 			MemberInfo[] members = FormatterServices.GetSerializableMembers(GetType(), context);
 
-			object[] kernelmembers = (object[]) info.GetValue("members", typeof(object[]));
+			object[] kernelmembers = (object[])info.GetValue("members", typeof(object[]));
 
 			FormatterServices.PopulateObjectMembers(this, members, kernelmembers);
 		}
@@ -152,16 +152,16 @@ namespace Castle.MicroKernel
 		protected virtual void RegisterSubSystems()
 		{
 			AddSubSystem(SubSystemConstants.ConfigurationStoreKey,
-			             new DefaultConfigurationStore());
+						 new DefaultConfigurationStore());
 
 			AddSubSystem(SubSystemConstants.ConversionManagerKey,
-			             new DefaultConversionManager());
+						 new DefaultConversionManager());
 
 			AddSubSystem(SubSystemConstants.NamingKey,
-			             new DefaultNamingSubSystem());
+						 new DefaultNamingSubSystem());
 
 			AddSubSystem(SubSystemConstants.ResourceKey,
-			             new DefaultResourceSubSystem());
+						 new DefaultResourceSubSystem());
 		}
 
 		#endregion
@@ -279,7 +279,7 @@ namespace Castle.MicroKernel
 		/// Thrown if <paramref name="lifestyle"/> is <see cref="LifestyleType.Undefined"/>.
 		/// </exception>
 		public void AddComponent(string key, Type serviceType, Type classType, LifestyleType lifestyle,
-		                         bool overwriteLifestyle)
+								 bool overwriteLifestyle)
 		{
 			if (key == null) throw new ArgumentNullException("key");
 			if (serviceType == null) throw new ArgumentNullException("serviceType");
@@ -326,7 +326,7 @@ namespace Castle.MicroKernel
 		/// <param name="classType"></param>
 		/// <param name="parameters"></param>
 		public virtual void AddComponentWithExtendedProperties(String key, Type serviceType, Type classType,
-		                                                       IDictionary parameters)
+															   IDictionary parameters)
 		{
 			if (key == null) throw new ArgumentNullException("key");
 			if (parameters == null) throw new ArgumentNullException("parameters");
@@ -354,7 +354,7 @@ namespace Castle.MicroKernel
 
 			if (skipRegistration != null)
 			{
-				RegisterHandler(model.Name, handler, (bool) skipRegistration);
+				RegisterHandler(model.Name, handler, (bool)skipRegistration);
 			}
 			else
 			{
@@ -393,11 +393,15 @@ namespace Castle.MicroKernel
 		/// <param name="instance"></param>
 		public void AddComponentInstance(String key, Type serviceType, object instance)
 		{
+			AddComponentInstance(key, serviceType, instance.GetType(), instance);
+		}
+
+		public void AddComponentInstance(string key, Type serviceType, Type classType, object instance)
+		{
 			if (key == null) throw new ArgumentNullException("key");
 			if (serviceType == null) throw new ArgumentNullException("serviceType");
 			if (instance == null) throw new ArgumentNullException("instance");
-
-			Type classType = instance.GetType();
+			if (classType == null) throw new ArgumentNullException("classType");
 
 			ComponentModel model = new ComponentModel(key, serviceType, classType);
 			model.CustomComponentActivator = typeof(ExternalInstanceActivator);
@@ -526,7 +530,7 @@ namespace Castle.MicroKernel
 		public void AddComponentInstance<T>(object instance)
 		{
 			Type serviceType = typeof(T);
-			AddComponentInstance(serviceType.FullName, instance);
+			AddComponentInstance(serviceType.FullName, serviceType, instance);
 		}
 
 		/// <summary>
@@ -538,7 +542,18 @@ namespace Castle.MicroKernel
 		public void AddComponentInstance<T>(Type serviceType, object instance)
 		{
 			Type classType = typeof(T);
-			AddComponentInstance(classType.FullName, serviceType, instance);
+			AddComponentInstance(classType.FullName, serviceType, classType, instance);
+		}
+
+		/// <summary>
+		/// Adds a component to be registered with the <see cref="IKernel"/> 
+		/// using a fluent interface.
+		/// </summary>
+		/// <typeparam name="S">The service <see cref="Type"/> to manage.</typeparam>
+		/// <returns>The <see cref="ComponentRegistration{S,T}"/></returns>
+		public ComponentRegistration<S,IKernel> AddComponentEx<S>()
+		{
+			return new ComponentRegistration<S,IKernel>(this, this);
 		}
 
 		/// <summary>
@@ -550,7 +565,18 @@ namespace Castle.MicroKernel
 		public T Resolve<T>(IDictionary arguments)
 		{
 			Type serviceType = typeof(T);
-			return (T) Resolve(serviceType, arguments);
+			return (T)Resolve(serviceType, arguments);
+		}
+
+		/// <summary>
+		/// Returns the component instance by the service type
+		/// using dynamic arguments
+		/// </summary>
+		/// <param name="argumentsAsAnonymousType"></param>
+		/// <returns></returns>
+		public T Resolve<T>(object argumentsAsAnonymousType)
+		{
+			return Resolve<T>(new ReflectionBasedDictionaryAdapter(argumentsAsAnonymousType));
 		}
 
 		/// <summary>
@@ -560,7 +586,7 @@ namespace Castle.MicroKernel
 		public T Resolve<T>()
 		{
 			Type serviceType = typeof(T);
-			return (T) Resolve(serviceType);
+			return (T)Resolve(serviceType);
 		}
 
 		/// <summary>
@@ -591,7 +617,7 @@ namespace Castle.MicroKernel
 						NamingSubSystem.UnRegister(handler.ComponentModel.Service);
 					}
 
-					foreach(ComponentModel model in handler.ComponentModel.Dependents)
+					foreach (ComponentModel model in handler.ComponentModel.Dependents)
 					{
 						model.RemoveDepender(handler.ComponentModel);
 					}
@@ -703,6 +729,35 @@ namespace Castle.MicroKernel
 		}
 
 		/// <summary>
+		/// Returns all the valid component instances by
+		/// the service type
+		/// </summary>
+		/// <param name="service">The service type</param>
+		/// <param name="arguments">Arguments to resolve the services</param>
+		public Array ResolveAll(Type service, IDictionary arguments)
+		{
+			ArrayList list = new ArrayList();
+			IHandler[] handlers = GetAssignableHandlers(service);
+			foreach (IHandler handler in handlers)
+			{
+				object component = ResolveComponent(handler, service, arguments);
+				list.Add(component);
+			}
+			return list.ToArray(service);
+		}
+
+		/// <summary>
+		/// Returns all the valid component instances by
+		/// the service type
+		/// </summary>
+		/// <param name="service">The service type</param>
+		/// <param name="argumentsAsAnonymousType">Arguments to resolve the services</param>
+		public Array ResolveAll(Type service, object argumentsAsAnonymousType)
+		{
+			return ResolveAll(service, new ReflectionBasedDictionaryAdapter(argumentsAsAnonymousType));
+		}
+
+		/// <summary>
 		/// Returns the component instance by the service type
 		/// using dynamic arguments
 		/// </summary>
@@ -722,6 +777,18 @@ namespace Castle.MicroKernel
 			IHandler handler = GetHandler(service);
 
 			return ResolveComponent(handler, service, arguments);
+		}
+
+		/// <summary>
+		/// Returns the component instance by the service type
+		/// using dynamic arguments
+		/// </summary>
+		/// <param name="service"></param>
+		/// <param name="argumentsAsAnonymousType"></param>
+		/// <returns></returns>
+		public object Resolve(Type service, object argumentsAsAnonymousType)
+		{
+			return Resolve(service, new ReflectionBasedDictionaryAdapter(argumentsAsAnonymousType));
 		}
 
 		/// <summary>
@@ -746,25 +813,74 @@ namespace Castle.MicroKernel
 			return ResolveComponent(handler, arguments);
 		}
 
+		/// <summary>
+		/// Returns the component instance by the component key
+		/// using dynamic arguments
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="argumentsAsAnonymousType"></param>
+		/// <returns></returns>
+		public object Resolve(string key, object argumentsAsAnonymousType)
+		{
+			return Resolve(key, new ReflectionBasedDictionaryAdapter(argumentsAsAnonymousType));
+		}
 
+		/// <summary>
+		/// Associates objects with a component handler,
+		/// allowing it to use the specified dictionary
+		/// when resolving dependencies
+		/// </summary>
+		/// <param name="service"></param>
+		/// <param name="dependencies"></param>
 		public void RegisterCustomDependencies(Type service, IDictionary dependencies)
 		{
 			IHandler handler = GetHandler(service);
 
-			foreach(DictionaryEntry entry in dependencies)
+			foreach (DictionaryEntry entry in dependencies)
 			{
 				handler.AddCustomDependencyValue(entry.Key.ToString(), entry.Value);
 			}
 		}
 
+		/// <summary>
+		/// Associates objects with a component handler,
+		/// allowing it to use the specified dictionary
+		/// when resolving dependencies
+		/// </summary>
+		/// <param name="service"></param>
+		/// <param name="dependenciesAsAnonymousType"></param>
+		public void RegisterCustomDependencies(Type service, object dependenciesAsAnonymousType)
+		{
+			RegisterCustomDependencies(service, new ReflectionBasedDictionaryAdapter(dependenciesAsAnonymousType));
+		}
+
+		/// <summary>
+		/// Associates objects with a component handler,
+		/// allowing it to use the specified dictionary
+		/// when resolving dependencies
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="dependencies"></param>
 		public void RegisterCustomDependencies(String key, IDictionary dependencies)
 		{
 			IHandler handler = GetHandler(key);
 
-			foreach(DictionaryEntry entry in dependencies)
+			foreach (DictionaryEntry entry in dependencies)
 			{
 				handler.AddCustomDependencyValue(entry.Key.ToString(), entry.Value);
 			}
+		}
+
+		/// <summary>
+		/// Associates objects with a component handler,
+		/// allowing it to use the specified dictionary
+		/// when resolving dependencies
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="dependenciesAsAnonymousType"></param>
+		public void RegisterCustomDependencies(String key, object dependenciesAsAnonymousType)
+		{
+			RegisterCustomDependencies(key, new ReflectionBasedDictionaryAdapter(dependenciesAsAnonymousType));
 		}
 
 		/// <summary>
@@ -794,11 +910,11 @@ namespace Castle.MicroKernel
 			List<TService> services = new List<TService>();
 			IHandler[] handlers = GetHandlers(typeof(TService));
 
-			foreach(IHandler handler in handlers)
+			foreach (IHandler handler in handlers)
 			{
 				if (handler.CurrentState == HandlerState.Valid)
 				{
-					services.Add((TService) ResolveComponent(handler));
+					services.Add((TService)ResolveComponent(handler));
 				}
 			}
 
@@ -827,6 +943,24 @@ namespace Castle.MicroKernel
 			return ResolveComponent(handler, service, arguments);
 		}
 
+		/// <summary>
+		/// Resolves the specified key.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <param name="service">The service.</param>
+		/// <param name="argumentsAsAnonymousType">Type of the arguments as anonymous.</param>
+		/// <returns></returns>
+		public virtual object Resolve(String key, Type service, object argumentsAsAnonymousType)
+		{
+			return Resolve(key, service, new ReflectionBasedDictionaryAdapter(argumentsAsAnonymousType));
+		}
+
+		/// <summary>
+		/// Releases a component instance. This allows
+		/// the kernel to execute the proper decomission
+		/// lifecycles on the component instance.
+		/// </summary>
+		/// <param name="instance"></param>
 		public virtual void ReleaseComponent(object instance)
 		{
 			if (ReleasePolicy.HasTrack(instance))
@@ -1051,16 +1185,16 @@ namespace Castle.MicroKernel
 			if (model.CustomComponentActivator == null)
 			{
 				activator = new DefaultComponentActivator(model, this,
-				                                          new ComponentInstanceDelegate(RaiseComponentCreated),
-				                                          new ComponentInstanceDelegate(RaiseComponentDestroyed));
+														  new ComponentInstanceDelegate(RaiseComponentCreated),
+														  new ComponentInstanceDelegate(RaiseComponentDestroyed));
 			}
 			else
 			{
 				try
 				{
 					activator = (IComponentActivator)
-					            Activator.CreateInstance(model.CustomComponentActivator,
-					                                     new object[]
+								Activator.CreateInstance(model.CustomComponentActivator,
+														 new object[]
 					                                     	{
 					                                     		model,
 					                                     		this,
@@ -1068,7 +1202,7 @@ namespace Castle.MicroKernel
 					                                     		new ComponentInstanceDelegate(RaiseComponentDestroyed)
 					                                     	});
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
 					throw new KernelException("Could not instantiate custom activator", e);
 				}
@@ -1090,7 +1224,7 @@ namespace Castle.MicroKernel
 
 				IHandler[] handlers = NamingSubSystem.GetHandlers();
 
-				foreach(IHandler handler in handlers)
+				foreach (IHandler handler in handlers)
 				{
 					nodes[index++] = handler.ComponentModel;
 				}
@@ -1121,6 +1255,11 @@ namespace Castle.MicroKernel
 		/// <param name="serviceType">An object that specifies the type of service object to get. </param>
 		public object GetService(Type serviceType)
 		{
+			if (!HasComponent(serviceType))
+			{
+				return null;
+			}
+
 			return Resolve(serviceType);
 		}
 
@@ -1131,10 +1270,16 @@ namespace Castle.MicroKernel
 		/// <returns>
 		/// A service object of type serviceType.
 		/// </returns>
-		public T GetService<T>()
+		public T GetService<T>() where T : class
 		{
 			Type serviceType = typeof(T);
-			return (T) Resolve(serviceType);
+
+			if (!HasComponent(serviceType))
+			{
+				return null;
+			}
+
+			return (T)Resolve(serviceType);
 		}
 
 		#endregion
@@ -1155,7 +1300,7 @@ namespace Castle.MicroKernel
 
 		private void TerminateFacilities()
 		{
-			foreach(IFacility facility in facilities)
+			foreach (IFacility facility in facilities)
 			{
 				facility.Terminate();
 			}
@@ -1166,9 +1311,9 @@ namespace Castle.MicroKernel
 			GraphNode[] nodes = GraphNodes;
 			IVertex[] vertices = TopologicalSortAlgo.Sort(nodes);
 
-			for(int i = 0; i < vertices.Length; i++)
+			for (int i = 0; i < vertices.Length; i++)
 			{
-				ComponentModel model = (ComponentModel) vertices[i];
+				ComponentModel model = (ComponentModel)vertices[i];
 
 				// Prevent the removal of a component that belongs 
 				// to other container
@@ -1210,7 +1355,7 @@ namespace Castle.MicroKernel
 
 		private void DisposeSubKernels()
 		{
-			foreach(IKernel childKernel in childKernels)
+			foreach (IKernel childKernel in childKernels)
 			{
 				childKernel.Dispose();
 			}
@@ -1222,7 +1367,7 @@ namespace Castle.MicroKernel
 
 			if (handler is IDisposable)
 			{
-				((IDisposable) handler).Dispose();
+				((IDisposable)handler).Dispose();
 			}
 		}
 

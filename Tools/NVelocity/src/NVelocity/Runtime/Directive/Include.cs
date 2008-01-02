@@ -1,3 +1,17 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace NVelocity.Runtime.Directive
 {
 	using System;
@@ -18,7 +32,7 @@ namespace NVelocity.Runtime.Directive
 	/// 1) The included source material can only come from somewhere in
 	/// the TemplateRoot tree for security reasons. There is no way
 	/// around this.  If you want to include content from elsewhere on
-	/// your disk, use a link from somwhere under Template Root to that
+	/// your disk, use a link from somewhere under Template Root to that
 	/// content.
 	/// 
 	/// 2) By default, there is no output to the render stream in the event of
@@ -65,8 +79,8 @@ namespace NVelocity.Runtime.Directive
 			get { return DirectiveType.LINE; }
 		}
 
-		private String outputMsgStart = "";
-		private String outputMsgEnd = "";
+		private String outputMsgStart = string.Empty;
+		private String outputMsgEnd = string.Empty;
 
 		/// <summary>
 		/// simple init - init the tree and get the elementKey from
@@ -78,11 +92,11 @@ namespace NVelocity.Runtime.Directive
 
 			// get the msg, and add the space so we don't have to
 			// do it each time
-			outputMsgStart = rsvc.GetString(RuntimeConstants.ERRORMSG_START);
-			outputMsgStart = outputMsgStart + " ";
+			outputMsgStart = runtimeServices.GetString(RuntimeConstants.ERRORMSG_START);
+			outputMsgStart = string.Format("{0} ", outputMsgStart);
 
-			outputMsgEnd = rsvc.GetString(RuntimeConstants.ERRORMSG_END);
-			outputMsgEnd = " " + outputMsgEnd;
+			outputMsgEnd = runtimeServices.GetString(RuntimeConstants.ERRORMSG_END);
+			outputMsgEnd = string.Format(" {0}", outputMsgEnd);
 		}
 
 		/// <summary>
@@ -103,13 +117,15 @@ namespace NVelocity.Runtime.Directive
 				if (n.Type == ParserTreeConstants.STRING_LITERAL || n.Type == ParserTreeConstants.REFERENCE)
 				{
 					if (!RenderOutput(n, context, writer))
-						OutputErrorToStream(writer, "error with arg " + i + " please see log.");
+					{
+						OutputErrorToStream(writer, string.Format("error with arg {0} please see log.", i));
+					}
 				}
 				else
 				{
 					//UPGRADE_TODO: The equivalent in .NET for method 'java.Object.toString' may return a different value. 'ms-help://MS.VSCC/commoner/redir/redirect.htm?keyword="jlca1043"'
-					rsvc.Error("#include() error : invalid argument type : " + n.ToString());
-					OutputErrorToStream(writer, "error with arg " + i + " please see log.");
+					runtimeServices.Error(string.Format("#include() error : invalid argument type : {0}", n.ToString()));
+					OutputErrorToStream(writer, string.Format("error with arg {0} please see log.", i));
 				}
 			}
 
@@ -127,7 +143,7 @@ namespace NVelocity.Runtime.Directive
 		{
 			if (node == null)
 			{
-				rsvc.Error("#include() error :  null argument");
+				runtimeServices.Error("#include() error :  null argument");
 				return false;
 			}
 
@@ -135,7 +151,7 @@ namespace NVelocity.Runtime.Directive
 			Object val = node.Value(context);
 			if (val == null)
 			{
-				rsvc.Error("#include() error :  null argument");
+				runtimeServices.Error("#include() error :  null argument");
 				return false;
 			}
 
@@ -150,30 +166,38 @@ namespace NVelocity.Runtime.Directive
 			{
 				// get the resource, and assume that we use the encoding of the current template
 				// the 'current resource' can be null if we are processing a stream....
-				String encoding = null;
+				String encoding;
 
-				if (current != null)
-					encoding = current.Encoding;
+				if (current == null)
+				{
+					encoding = (String) runtimeServices.GetProperty(RuntimeConstants.INPUT_ENCODING);
+				}
 				else
-					encoding = (String) rsvc.GetProperty(RuntimeConstants.INPUT_ENCODING);
+				{
+					encoding = current.Encoding;
+				}
 
-				resource = rsvc.GetContent(arg, encoding);
+				resource = runtimeServices.GetContent(arg, encoding);
 			}
 			catch(ResourceNotFoundException)
 			{
 				// the arg wasn't found.  Note it and throw
-				rsvc.Error("#include(): cannot find resource '" + arg + "', called from template " + context.CurrentTemplateName +
-				           " at (" + Line + ", " + Column + ")");
+				runtimeServices.Error(
+					string.Format("#include(): cannot find resource '{0}', called from template {1} at ({2}, {3})", arg,
+					              context.CurrentTemplateName, Line, Column));
 				throw;
 			}
 			catch(Exception e)
 			{
-				rsvc.Error("#include(): arg = '" + arg + "',  called from template " + context.CurrentTemplateName + " at (" + Line +
-				           ", " + Column + ") : " + e);
+				runtimeServices.Error(
+					string.Format("#include(): arg = '{0}',  called from template {1} at ({2}, {3}) : {4}", arg,
+					              context.CurrentTemplateName, Line, Column, e));
 			}
 
 			if (resource == null)
+			{
 				return false;
+			}
 
 			writer.Write((String) resource.Data);
 			return true;

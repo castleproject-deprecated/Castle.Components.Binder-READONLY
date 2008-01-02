@@ -16,7 +16,11 @@ namespace Castle.MonoRail.Framework.Helpers
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Generic;
+	using System.Globalization;
 	using System.Text;
+	using System.Text.RegularExpressions;
+	using System.Threading;
 
 	/// <summary>
 	/// Provides methods for working with strings and grammar. At the moment,
@@ -30,6 +34,21 @@ namespace Castle.MonoRail.Framework.Helpers
 		public const string DefaultConnector = "and";
 
 		/// <summary>
+		/// Formats the specified string as a phone number, varying according to the culture. 
+		/// </summary>
+		/// <param name="phone">The phone number to format.</param>
+		/// <returns></returns>
+		public string FormatPhone(string phone)
+		{
+			if (string.IsNullOrEmpty(phone)) return string.Empty;
+			if (phone.Length <= 3) return phone;
+			if (phone.IndexOfAny(new char[] { '(', '-', '.' }) != -1) return phone;
+
+			PhoneFormatter formatter = new PhoneFormatter();
+			return formatter.Format(phone);
+		}
+
+		/// <summary>
 		/// Converts a camelized text to words. For instance:
 		/// <c>FileWriter</c> is converted to <c>File Writer</c>
 		/// </summary>
@@ -38,7 +57,6 @@ namespace Castle.MonoRail.Framework.Helpers
 		public static string PascalCaseToWord(string pascalText)
 		{
 			if (pascalText == null) throw new ArgumentNullException("pascalText");
-
 			if (pascalText == string.Empty) return string.Empty;
 
 			StringBuilder sbText = new StringBuilder(pascalText.Length + 4);
@@ -260,6 +278,153 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			caption.Append("&hellip;");
 			return string.Format("<span title=\"{1}\">{0}</span>", caption, text.Replace("\"", "&quot;"));
+		}
+
+		/// <summary>
+		/// Provides methods for formatting telephone numbers based on region.
+		/// </summary>
+		/// <remarks>At present, formats for USA and Brazil are defined.  These need to be expanded.
+		/// </remarks>
+		/// <example>
+		/// In C# code:
+		/// <code>
+		/// PhoneFormatter formatter = new PhoneFormatter();
+		/// string officePhone = formatter.Format(contact.OfficePhone);
+		/// string homePhone = formatter.Format(contact.HomePhone);
+		/// </code>
+		/// Using in a view:
+		/// <code>
+		///PropertyBag["phoneformatter"] = new PhoneFormatter();
+		///             
+		///#if ($OfficePhone)
+		///    &lt;h3&gt;Office Phone: $phoneformatter.Format($OfficePhone)&lt;/h3&gt;
+		///#end
+		/// </code>
+		/// </example>
+		public class PhoneFormatter
+		{
+			private readonly IEnumerable<FormatPair> formats;
+
+			/// <summary>
+			/// Initializes a new instance of the <see cref="PhoneFormatter"/> class for the specified region.
+			/// </summary>
+			/// <param name="name">The name or ISO 3166 code for region.</param>
+			/// <exception cref="ArgumentException"><paramref name="name"/> is not a valid country/region name or specific culture name.</exception>
+			/// <exception cref="ArgumentNullException"><paramref name="name"/> is null reference (<b>Nothing</b> in Visual Basic).</exception>
+			public PhoneFormatter(string name) : this(new RegionInfo(name))
+			{
+			}
+
+			/// <summary>
+			/// Initializes a new instance of the PhoneFormatter class for the region used by the current thread.
+			/// </summary>
+			public PhoneFormatter() : this((RegionInfo)null)
+			{
+			}
+
+			/// <summary>
+			/// Initializes a new instance of the PhoneFormatter class for the specified region
+			/// </summary>
+			/// <param name="rinfo">The Region </param>
+			public PhoneFormatter(RegionInfo rinfo)
+			{
+				if (rinfo == null)
+				{
+					rinfo = RegionInfo.CurrentRegion;
+				}
+
+				formats = PhoneFormatterFactory.GetFormatPairs(rinfo);
+			}
+
+			/// <summary>
+			/// Formats the specified string as a phone number, varying according to the culture. 
+			/// </summary>
+			/// <param name="orig">The string to format</param>
+			/// <returns>string, formatted phone number.</returns>
+			public string Format(string orig)
+			{
+				// Remove all characters besides numbers and letters.
+				Regex strip = new Regex(@"[^\w]", RegexOptions.IgnoreCase);
+				string stripped = strip.Replace(orig, "");
+
+				foreach (FormatPair testcase in formats)
+				{
+					Regex convert = new Regex(testcase.Pattern);
+					Match match = convert.Match(stripped);
+					if (match.Success)
+					{
+						return match.Result(testcase.Formatted);
+					}
+				}
+				return orig;
+			}
+		}
+
+		internal class FormatPair
+		{
+			public string Pattern;
+			public string Formatted;
+			/// <summary>
+			/// Initializes a new instance of the FormatPair class.
+			/// </summary>
+			/// <param name="pattern"></param>
+			/// <param name="formatted"></param>
+			public FormatPair(string pattern, string formatted)
+			{
+				Pattern = pattern;
+				Formatted = formatted;
+			}
+		}
+
+		internal static class PhoneFormatterFactory
+		{
+			public static IEnumerable<FormatPair> GetFormatPairs(RegionInfo rinfo)
+			{
+				List<FormatPair> pairs = new List<FormatPair>();
+
+				// This section 
+				//  a) Needs to be expanded to other regions.
+				//  b) should be cached.
+				//  c) Should be handled in a more robust fashion.  (resource files?  Xml file?)
+
+				switch (rinfo.TwoLetterISORegionName)
+				{
+					case "US":	// United States
+						pairs.Add(new FormatPair(@"^(\w\w\d)(\d\d\d\d)$", @"$1-$2"));
+						pairs.Add(new FormatPair(@"^(\d\d\d)(\w\w\d)(\d\d\d\d)$", @"($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^1(\d\d\d)(\w\w\d)(\d\d\d\d)$", @"+1 ($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^(\d\d\d)(\w\w\d)(\d\d\d\d)x?(\d+)$", @"($1) $2-$3 ext. $4"));
+						pairs.Add(new FormatPair(@"^1(\d\d\d)(\w\w\d)(\d\d\d\d)x?(\d+)$", @"+1 ($1) $2-$3 ext. $4"));
+						break;
+
+					case "BR":		// Brazil
+						pairs.Add(new FormatPair(@"^(\d\d\d\d)(\d\d\d\d)$", @"$1-$2"));
+						pairs.Add(new FormatPair(@"^(\d\d)(\d\d\d\d)(\d\d\d\d)$", @"($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^(0\d\d)(\d\d\d\d)(\d\d\d\d)$", @"($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^(xx\d\d)(\d\d\d\d)(\d\d\d\d)$", @"($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^(0xx\d\d)(\d\d\d\d)(\d\d\d\d)$", @"($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^55(\d\d)(\d\d\d\d)(\d\d\d\d)$", @"+55 ($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^55(0\d\d)(\d\d\d\d)(\d\d\d\d)$", @"+55 ($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^55(xx\d\d)(\d\d\d\d)(\d\d\d\d)$", @"+55 ($1) $2-$3"));
+						pairs.Add(new FormatPair(@"^55(0xx\d\d)(\d\d\d\d)(\d\d\d\d)$", @"+55 ($1) $2-$3"));
+
+						pairs.Add(new FormatPair(@"^(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"$1-$2 Reul. $3"));
+						pairs.Add(new FormatPair(@"^(\d\d)(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"($1) $2-$3 Reul. $4"));
+						pairs.Add(new FormatPair(@"^(0\d\d)(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"($1) $2-$3 Reul. $4"));
+						pairs.Add(new FormatPair(@"^(xx\d\d)(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"($1) $2-$3 Reul. $4"));
+						pairs.Add(new FormatPair(@"^(0xx\d\d)(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"($1) $2-$3 Reul. $4"));
+						pairs.Add(new FormatPair(@"^55(\d\d)(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"+55 ($1) $2-$3 Reul. $4"));
+						pairs.Add(new FormatPair(@"^55(0\d\d)(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"+55 ($1) $2-$3 Reul. $4"));
+						pairs.Add(new FormatPair(@"^55(xx\d\d)(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"+55 ($1) $2-$3 Reul. $4"));
+						pairs.Add(new FormatPair(@"^55(0xx\d\d)(\d\d\d\d)(\d\d\d\d)r?(\d+)$", @"+55 ($1) $2-$3 Reul. $4"));
+						break;
+
+					default:
+						throw new ArgumentOutOfRangeException("rinfo", "Telephone formats for given RegionInfo have not yet been defined.");
+				}
+
+				return pairs;
+			}
 		}
 	}
 }

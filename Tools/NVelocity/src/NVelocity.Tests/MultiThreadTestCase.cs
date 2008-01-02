@@ -14,13 +14,14 @@
 
 namespace NVelocity
 {
+	using System;
 	using System.Collections;
 	using System.IO;
 	using System.Text.RegularExpressions;
 	using System.Threading;
+	using App;
 	using NUnit.Framework;
-	using NVelocity.App;
-	using NVelocity.Test;
+	using Test;
 
 	[TestFixture, Explicit]
 	public class MultiThreadTestCase
@@ -28,7 +29,7 @@ namespace NVelocity
 		private ManualResetEvent startEvent = new ManualResetEvent(false);
 		private ManualResetEvent stopEvent = new ManualResetEvent(false);
 		private ArrayList items;
-		private VelocityEngine ve;
+		private VelocityEngine velocityEngine;
 
 		[SetUp]
 		public void Setup()
@@ -40,8 +41,28 @@ namespace NVelocity
 			items.Add("c");
 			items.Add("d");
 
-			ve = new VelocityEngine();
-			ve.Init();
+			velocityEngine = new VelocityEngine();
+			velocityEngine.Init();
+		}
+
+		[Test]
+		public void Multithreaded_ASTExecuteDoesNotShareParams()
+		{
+			const int threadCount = 1;
+
+			Thread[] threads = new Thread[threadCount];
+
+			for(int i = 0; i < threadCount; i++)
+			{
+				threads[i] = new Thread(ExecuteMethodUntilSignal3);
+				threads[i].Start();
+			}
+
+			startEvent.Set();
+
+			Thread.CurrentThread.Join(3 * 5000);
+
+			stopEvent.Set();
 		}
 
 		[Test]
@@ -53,7 +74,7 @@ namespace NVelocity
 
 			for(int i = 0; i < threadCount; i++)
 			{
-				threads[i] = new Thread(new ThreadStart(ExecuteMethodUntilSignal1));
+				threads[i] = new Thread(ExecuteMethodUntilSignal1);
 				threads[i].Start();
 			}
 
@@ -73,7 +94,7 @@ namespace NVelocity
 
 			for(int i = 0; i < threadCount; i++)
 			{
-				threads[i] = new Thread(new ThreadStart(ExecuteMethodUntilSignal2));
+				threads[i] = new Thread(ExecuteMethodUntilSignal2);
 				threads[i].Start();
 			}
 
@@ -93,8 +114,8 @@ namespace NVelocity
 
 			while(!stopEvent.WaitOne(0, false))
 			{
-				VelocityEngine ve = new VelocityEngine();
-				ve.Init();
+				VelocityEngine velocityEngine = new VelocityEngine();
+				velocityEngine.Init();
 
 				StringWriter sw = new StringWriter();
 
@@ -102,15 +123,15 @@ namespace NVelocity
 				c.Put("x", new Something());
 				c.Put("items", items);
 
-				bool ok = ve.Evaluate(c, sw,
-				                      "ContextTest.CaseInsensitive",
-				                      @"
+				bool ok = velocityEngine.Evaluate(c, sw,
+				                                  "ContextTest.CaseInsensitive",
+				                                  @"
 					#foreach( $item in $items )
 						$item,
 					#end
 				");
 
-				Assert.IsTrue(ok, "Evalutation returned failure");
+				Assert.IsTrue(ok, "Evaluation returned failure");
 				Assert.AreEqual("a,b,c,d,", Normalize(sw));
 			}
 		}
@@ -130,9 +151,9 @@ namespace NVelocity
 				c.Put("x", new Something());
 				c.Put("items", items);
 
-				bool ok = ve.Evaluate(c, sw,
-				                      "ContextTest.CaseInsensitive",
-									  @"
+				bool ok = velocityEngine.Evaluate(c, sw,
+				                                  "ContextTest.CaseInsensitive",
+				                                  @"
 					#foreach($item in $items)
 						$item,
 					#end
@@ -140,14 +161,68 @@ namespace NVelocity
 					$x.Print('hey') $x.Contents('test', '1')
 				");
 
-				Assert.IsTrue(ok, "Evalutation returned failure");
+				Assert.IsTrue(ok, "Evaluation returned failure");
 				Assert.AreEqual("a,b,c,d,heytest,1", Normalize(sw));
+			}
+		}
+
+		public void ExecuteMethodUntilSignal3()
+		{
+			startEvent.WaitOne(int.MaxValue, false);
+
+			try
+			{
+				while(!stopEvent.WaitOne(0, false))
+				{
+					StringWriter sw = new StringWriter();
+
+					VelocityContext c = new VelocityContext();
+					c.Put("x", new Urlhelper());
+
+					bool ok = velocityEngine.Evaluate(c, sw, string.Empty,
+					                                  "#foreach($i in [1..3000]) \r\n" +
+					                                  "#set($temp = $x.For(\"%{controller='Test',id=$i}\")) \r\n" +
+					                                  "#end \r\n");
+
+					Assert.IsTrue(ok, "Evaluation returned failure");
+				}
+			}
+			catch(System.Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
 			}
 		}
 
 		private string Normalize(StringWriter sw)
 		{
-			return Regex.Replace(sw.ToString(), "\\s+", "");
+			return Regex.Replace(sw.ToString(), "\\s+", string.Empty);
+		}
+
+		private class Urlhelper
+		{
+			public string For(IDictionary parameters)
+			{
+				if (parameters == null)
+				{
+					throw new ArgumentNullException("parameters", "parameters cannot be null");
+				}
+
+				try
+				{
+					string controller = (string) parameters["controller"];
+					int id = (int) parameters["id"];
+
+					parameters.Remove("controller");
+					parameters.Remove("id");
+
+					return controller + " " + id;
+				}
+				catch(System.Exception ex)
+				{
+					Console.WriteLine(ex.ToString());
+					throw;
+				}
+			}
 		}
 	}
 }

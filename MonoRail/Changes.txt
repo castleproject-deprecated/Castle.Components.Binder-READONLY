@@ -1,5 +1,51 @@
-Change history
---------------
+1.0
+===
+
+- Applied James Curran's patch fixing MR-347
+  "Cannot specify a default value for ViewComponentParameterAttribute"
+
+- Applied Adam Tybor's patch fixing MR-370
+  "RouteContext and Http Method Filtering for PatternRule"
+
+- Applied Daniel Jin's patch fixing MR-372
+  "add monorail configuration section to set the useExtensions option on DefaultUrlBuilder"
+
+- Fixed MR-84
+  "Nested classes are mapped wrongly to form fields"
+
+- Applied Kode Khan's patch changing logger creation to use type instead of controller's name
+
+- Implemented support for view component caching. Just use the attribute 
+  ViewComponentDetails and its properties (cache, cachekeygenerator)
+
+- Applied Michael Sanford's patch which adds image button support to FormHelper.
+
+- Applied Rafael Teixeira's patch fixing MR-357
+  "ViewEngineBase.IsTemplateForJSGeneration(String templateName) returns 
+   true for a templateName with an incorrect extension"
+
+- Added support for Composite Key in Formhelper select
+
+- Applied Chris Ortman's patch with changes for the REST support (MR-333)
+
+- Applied Nick Hemsley's patch adding support for rescue controllers (MR-332)
+  "add RescueController to RescueAttribute"
+
+- Applied suggestion by Daniel D to fix MR-329
+  "Impossible to Context.Response.Redirect to any controller in empty Area from controller placed in some Area."
+
+- Applied minor patch by Ken Egozi fixing MR-328
+  "In PrototypeWebValidation, SameAsValidator and NotSameAsValidator 
+   are forcing a locase id for text fields"
+
+- Applied minor patch by Nick Hemsley fixing MR-325
+  "DictHelper.FromNameValueCollection: persist arrays correctly"
+
+- Added LocalExceptionFilterHandler
+
+- Applied Robert Ream's patch which allows [DefaultAction] to be applied to Actions. This means that no strings are required. 
+
+- BaseControllerTest supports the ContextInitializer delegate, which makes it easier to modify the MockRailsEngineContext
 
 Release Candidate 3
 ===================

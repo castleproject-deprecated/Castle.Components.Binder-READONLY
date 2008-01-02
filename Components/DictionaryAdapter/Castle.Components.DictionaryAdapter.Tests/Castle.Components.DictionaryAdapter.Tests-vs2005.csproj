@@ -37,6 +37,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdaptingNameValueCollectionsTestCase.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="DictionaryAdapterFactoryTestCase.cs" />
   </ItemGroup>

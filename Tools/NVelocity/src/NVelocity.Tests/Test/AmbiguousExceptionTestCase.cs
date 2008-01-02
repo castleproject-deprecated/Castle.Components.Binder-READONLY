@@ -18,11 +18,9 @@ namespace NVelocity.Test
 	using System.Globalization;
 	using System.IO;
 	using System.Threading;
-
+	using App;
 	using NUnit.Framework;
-	
-	using NVelocity.App;
-	using NVelocity.Runtime;
+	using Runtime;
 
 	[TestFixture]
 	public class AmbiguousExceptionTestCase
@@ -30,10 +28,10 @@ namespace NVelocity.Test
 		[SetUp]
 		public void Init()
 		{
-			Thread.CurrentThread.CurrentCulture = 
+			Thread.CurrentThread.CurrentCulture =
 				CultureInfo.CreateSpecificCulture("en-us");
 		}
-		
+
 		[Test, ExpectedException(typeof(RuntimeException))]
 		public void ExceptionForAmbiguousMatches()
 		{
@@ -47,10 +45,10 @@ namespace NVelocity.Test
 			ve.Init();
 
 			ve.Evaluate(c, sw,
-				"ContextTest.CaseInsensitive",
-				"$model.Amount.ToString(null)");
+			            "ContextTest.CaseInsensitive",
+			            "$model.Amount.ToString(null)");
 		}
-		
+
 		[Test]
 		public void DecimalToString()
 		{
@@ -60,17 +58,17 @@ namespace NVelocity.Test
 			c.Put("x", (decimal) 1.2);
 			c.Put("model", new ModelClass());
 
-			VelocityEngine ve = new VelocityEngine();
-			ve.Init();
+			VelocityEngine velocityEngine = new VelocityEngine();
+			velocityEngine.Init();
 
-			bool ok = ve.Evaluate(c, sw,
-				"ContextTest.CaseInsensitive",
-				"$model.Amount.ToString() \r\n" +
-				"$model.Amount.ToString('#0.00') \r\n" +
-				"$x.ToString() \r\n" +
-				"$x.ToString('#0.00') \r\n");
+			bool ok = velocityEngine.Evaluate(c, sw,
+			                                  "ContextTest.CaseInsensitive",
+			                                  "$model.Amount.ToString() \r\n" +
+			                                  "$model.Amount.ToString('#0.00') \r\n" +
+			                                  "$x.ToString() \r\n" +
+			                                  "$x.ToString('#0.00') \r\n");
 
-			Assert.IsTrue(ok, "Evalutation returned failure");
+			Assert.IsTrue(ok, "Evaluation returned failure");
 			Assert.AreEqual("1.2 \r\n1.20 \r\n1.2 \r\n1.20 \r\n", sw.ToString());
 		}
 
@@ -82,14 +80,14 @@ namespace NVelocity.Test
 			VelocityContext c = new VelocityContext();
 			c.Put("model", new ModelClass());
 
-			VelocityEngine ve = new VelocityEngine();
-			ve.Init();
+			VelocityEngine velocityEngine = new VelocityEngine();
+			velocityEngine.Init();
 
-			bool ok = ve.Evaluate(c, sw,
-				"ContextTest.CaseInsensitive",
-				"$model.DoSome('y') $model.DoSome(2) ");
+			bool ok = velocityEngine.Evaluate(c, sw,
+			                                  "ContextTest.CaseInsensitive",
+			                                  "$model.DoSome('y') $model.DoSome(2) ");
 
-			Assert.IsTrue(ok, "Evalutation returned failure");
+			Assert.IsTrue(ok, "Evaluation returned failure");
 			Assert.AreEqual("x:y 4 ", sw.ToString());
 		}
 	}
@@ -97,10 +95,10 @@ namespace NVelocity.Test
 	public interface ISomething
 	{
 		String DoSome(String x);
-		
+
 		String DoSome(int x);
 	}
-	
+
 	public class ModelClass : ISomething
 	{
 		private decimal amount = (decimal) 1.2;
@@ -115,7 +113,7 @@ namespace NVelocity.Test
 		{
 			return "x:" + x;
 		}
-		
+
 		string ISomething.DoSome(string x)
 		{
 			return x;

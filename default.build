@@ -4,12 +4,9 @@
 	default="build"
 	xmlns="http://nant.sf.net/release/0.85/nant.xsd"
 >
-
 	<property name="root.dir" value="." />
 	<include buildfile="${root.dir}/common.xml" />
 	
-	<call target="common.find-svninfo" />
-
 	<fileset id="buildfiles.all">
 		<!-- Files have to be in dependency order -->
 		<include name="Core/core.build" />
@@ -24,6 +21,18 @@
 		-->
 		<include name="Facilities/facilities.build" />
 	</fileset>
+
+	<target name="debug" description="Selects the debug build configuration">
+		<property name="project.config" value="debug" />
+	</target>
+
+	<target name="release" description="Selects the release build configuration">
+		<property name="project.config" value="release" />
+	</target>
+
+	<target name="quick" description="Speed up the build by skipping tests">
+		<property name="common.testrunner.enabled" value="false" />
+	</target>
 
 	<target name="build"
 		depends="init copy-referenced-assemblies"
@@ -48,7 +57,7 @@
 		<mkdir dir="${testresults.dir}" />
 		
 		<call target="common.find-svninfo" />
-		<call target="common.find-nunit" />
+		<call target="common.find-nunit" if="${common.testrunner.enabled}" />
 	</target>
 	
 	<target name="clean" description="Deletes current build artifacts" depends="common.init">
@@ -845,6 +854,27 @@
 				<exclude name="**/_Resharper.*/*" />
 			</fileset>
 		</zip>
+		<zip zipfile="${root.dir}/samplesforwebsite/FacilityEventwiring.zip">
+			<fileset basedir="${root.dir}/Samples/Facilities/EventWiring">
+				<include name="**/*.build" />
+				<include name="**/*.sln" />
+				<include name="**/*.cs" />
+				<include name="**/*.ico" />
+				<include name="**/*.csproj" />
+				<include name="**/*.xml" />
+				<include name="**/*.config" />
+				<include name="**/*.txt" />
+				<include name="**/*.vm" />
+				<include name="**/*.resx" />
+				<include name="*.snk" />
+				<exclude name="**/bin/*" />
+				<exclude name="**/bin/Debug/*" />
+				<exclude name="**/bin/Release/*" />
+				<exclude name="**/obj/*" />
+				<exclude name="**.user" />
+				<exclude name="**/_Resharper.*/*" />
+			</fileset>
+		</zip>
 	</target>
 	
 	<target name="zip-samples">
@@ -936,6 +966,8 @@
 				<include name="**/*.txt" />
 				<include name="**/*.inc" />
 				<include name="**/*.vm" />
+				<include name="**/*.aspx" />
+				<include name="**/*.asax" />
 				<include name="*.snk" />
 				<exclude name="**/bin/*" />
 				<exclude name="**/bin/Debug/*" />
@@ -958,6 +990,8 @@
 				<include name="**/*.txt" />
 				<include name="**/*.inc" />
 				<include name="**/*.vm" />
+				<include name="**/*.aspx" />
+				<include name="**/*.asax" />
 				<include name="*.snk" />
 				<exclude name="**/bin/*" />
 				<exclude name="**/bin/Debug/*" />

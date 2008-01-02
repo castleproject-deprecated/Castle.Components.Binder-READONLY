@@ -26,6 +26,16 @@ namespace Castle.MonoRail.Views.Brail.TestSite.Controllers
 			PropertyBag["page_id"] = 123;
 		}
 
+		public void MR_371()
+		{
+			
+		}
+
+		public void MR_294_CaptureForInSubViewDoesNotPropogateUpward()
+		{
+			
+		}
+
 		public void Add()
 		{
 			

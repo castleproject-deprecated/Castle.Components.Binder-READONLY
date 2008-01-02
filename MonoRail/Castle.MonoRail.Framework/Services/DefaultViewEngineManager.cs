@@ -32,7 +32,7 @@ namespace Castle.MonoRail.Framework.Services
 		private MonoRailConfiguration config;
 		private IServiceProvider provider;
 		private IDictionary ext2ViewEngine;
-		private IViewSourceLoader viewSourceLoader;
+		private IDictionary viewEnginesFastLookup;
 		private IDictionary jsgFastLookup;
 
 		/// <summary>
@@ -42,6 +42,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			ext2ViewEngine = new HybridDictionary(true);
 			jsgFastLookup = new HybridDictionary(true);
+			viewEnginesFastLookup = new Hashtable();
 		}
 
 		#region IInitializable
@@ -51,13 +52,15 @@ namespace Castle.MonoRail.Framework.Services
 		/// </summary>
 		public void Initialize()
 		{
-			foreach(ViewEngineInfo info in config.ViewEngineConfig.ViewEngines)
+			foreach (ViewEngineInfo info in config.ViewEngineConfig.ViewEngines)
 			{
 				try
 				{
-					IViewEngine engine = (IViewEngine) Activator.CreateInstance(info.Engine);
+					IViewEngine engine = (IViewEngine)Activator.CreateInstance(info.Engine);
 
 					RegisterEngineForView(engine);
+
+					RegisterEngineForExtesionLookup(engine);
 
 					engine.XHtmlRendering = info.XhtmlRendering;
 
@@ -75,17 +78,22 @@ namespace Castle.MonoRail.Framework.Services
 						initializable.Initialize();
 					}
 				}
-				catch(InvalidCastException)
+				catch (InvalidCastException)
 				{
-					throw new RailsException("Type " + info.Engine.FullName + " does not implement IViewEngine");
+					throw new MonoRailException("Type " + info.Engine.FullName + " does not implement IViewEngine");
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
-					throw new RailsException("Could not create view engine instance: " + info.Engine, ex);
+					throw new MonoRailException("Could not create view engine instance: " + info.Engine, ex);
 				}
 			}
 
 			config = null;
+		}
+
+		private void RegisterEngineForExtesionLookup(IViewEngine engine)
+		{
+			viewEnginesFastLookup.Add(engine, null);
 		}
 
 		#endregion
@@ -100,8 +108,7 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			provider = serviceProvider;
 
-			config = (MonoRailConfiguration) provider.GetService(typeof(MonoRailConfiguration));
-			viewSourceLoader = (IViewSourceLoader) provider.GetService(typeof(IViewSourceLoader));
+			config = (MonoRailConfiguration)provider.GetService(typeof(MonoRailConfiguration));
 		}
 
 		#endregion
@@ -113,9 +120,12 @@ namespace Castle.MonoRail.Framework.Services
 		/// </summary>
 		/// <param name="templateName">View template name</param>
 		/// <returns><c>true</c> if it exists</returns>
-		public bool HasTemplate(string templateName)
+		public bool HasTemplate(String templateName)
 		{
-			return FindExistingTemplate(templateName) != null;
+			IViewEngine engine = ResolveEngine(templateName, false);
+			if (engine == null)
+				return false;
+			return engine.HasTemplate(templateName);
 		}
 
 		/// <summary>
@@ -126,24 +136,19 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="context"></param>
 		/// <param name="controller"></param>
 		/// <param name="templateName"></param>
-		public void Process(IRailsEngineContext context, Controller controller, string templateName)
+		public void Process(IRailsEngineContext context, IController controller, string templateName)
 		{
-			String resolvedTemplateName = FindExistingTemplate(templateName);
-
-			AssertTemplateExists(resolvedTemplateName, templateName);
-
-			IViewEngine engine = ResolveEngine(resolvedTemplateName);
+			IViewEngine engine = ResolveEngine(templateName);
 
 			ContextualizeViewEngine(engine);
 
-			if (jsgFastLookup.Contains(Path.GetExtension(resolvedTemplateName)))
+			if (engine.SupportsJSGeneration && engine.IsTemplateForJSGeneration(templateName))
 			{
-				engine.GenerateJS(context, controller, resolvedTemplateName);
+				engine.GenerateJS(context, controller, templateName);
+				return;
 			}
-			else
-			{
-				engine.Process(context, controller, templateName);
-			}
+
+			engine.Process(context, controller, templateName);
 		}
 
 		/// <summary>
@@ -158,24 +163,19 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="context"></param>
 		/// <param name="controller"></param>
 		/// <param name="templateName"></param>
-		public void Process(TextWriter output, IRailsEngineContext context, Controller controller, string templateName)
+		public void Process(TextWriter output, IRailsEngineContext context, IController controller, string templateName)
 		{
-			String resolvedTemplateName = FindExistingTemplate(templateName);
-
-			AssertTemplateExists(resolvedTemplateName, templateName);
-
-			IViewEngine engine = ResolveEngine(resolvedTemplateName);
+			IViewEngine engine = ResolveEngine(templateName);
 
 			ContextualizeViewEngine(engine);
 
-			if (jsgFastLookup.Contains(Path.GetExtension(resolvedTemplateName)))
+			if (engine.SupportsJSGeneration && engine.IsTemplateForJSGeneration(templateName))
 			{
-				engine.GenerateJS(output, context, controller, resolvedTemplateName);
+				engine.GenerateJS(output, context, controller, templateName);
+				return;
 			}
-			else
-			{
-				engine.Process(output, context, controller, templateName);
-			}
+
+			engine.Process(output, context, controller, templateName);
 		}
 
 		/// <summary>
@@ -187,66 +187,33 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="context">The context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="partialName">The partial name.</param>
-		public void ProcessPartial(TextWriter output, IRailsEngineContext context, Controller controller, string partialName)
+		public void ProcessPartial(TextWriter output, IRailsEngineContext context, IController controller, string partialName)
 		{
-			String resolvedTemplateName = FindExistingTemplate(partialName);
 
-			AssertTemplateExists(resolvedTemplateName, partialName);
+			IViewEngine engine = ResolveEngine(partialName);
 
-			IViewEngine engine = ResolveEngine(resolvedTemplateName);
-
-			engine.ProcessPartial(output, context, controller, resolvedTemplateName);
+			engine.ProcessPartial(output, context, controller, partialName);
 		}
 
 		/// <summary>
 		/// Wraps the specified content in the layout using
 		/// the context to output the result.
 		/// </summary>
-		public void ProcessContents(IRailsEngineContext context, Controller controller, string contents)
+		public void ProcessContents(IRailsEngineContext context, IController controller, String contents)
 		{
 			if (controller.LayoutName == null)
 			{
-				throw new RailsException("ProcessContents can only work with a layout");
+				throw new MonoRailException("ProcessContents can only work with a layout");
 			}
 
 			String templateName = Path.Combine("layouts", controller.LayoutName);
-			String resolvedTemplateName = FindExistingTemplate(templateName);
 
-			AssertTemplateExists(resolvedTemplateName, templateName);
-
-			IViewEngine engine = ResolveEngine(resolvedTemplateName);
+			IViewEngine engine = ResolveEngine(templateName);
 
 			engine.ProcessContents(context, controller, contents);
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Finds the existing template.
-		/// </summary>
-		/// <param name="templateName">Name of the template.</param>
-		/// <returns></returns>
-		private String FindExistingTemplate(string templateName)
-		{
-			if (Path.HasExtension(templateName))
-			{
-				return viewSourceLoader.HasTemplate(templateName) ? templateName : null;
-			}
-			else
-			{
-				foreach(String ext in ext2ViewEngine.Keys)
-				{
-					String tempTemplateName = templateName + ext;
-
-					if (viewSourceLoader.HasTemplate(tempTemplateName))
-					{
-						return tempTemplateName;
-					}
-				}
-
-				return null;
-			}
-		}
 
 		/// <summary>
 		/// Contextualizes the view engine.
@@ -259,29 +226,49 @@ namespace Castle.MonoRail.Framework.Services
 
 		/// <summary>
 		/// The view can be informed with an extension. If so, we use it
-		/// to discover the extension. Otherwise, we use the view source
-		/// to find out the file that exists there, and hence the view 
-		/// engine instance
+		/// to discover the extension. Otherwise, we ask the configured 
+		/// view engines to find out which (if any) can handle the requested
+		/// view. If no suitable view engine is found, an exception would be thrown
 		/// </summary>
 		/// <param name="templateName">View name</param>
 		/// <returns>A view engine instance</returns>
-		private IViewEngine ResolveEngine(string templateName)
+		private IViewEngine ResolveEngine(String templateName)
 		{
-			if (!Path.HasExtension(templateName))
+			return ResolveEngine(templateName, true);
+		}
+
+		/// <summary>
+		/// The view can be informed with an extension. If so, we use it
+		/// to discover the extension. Otherwise, we ask the configured 
+		/// view engines to find out which (if any) can handle the requested
+		/// view.
+		/// </summary>
+		/// <param name="throwIfNotFound">If true and no suitable view engine is found, an exception would be thrown</param>
+		/// <param name="templateName">View name</param>
+		/// <returns>A view engine instance</returns>
+		private IViewEngine ResolveEngine(String templateName, bool throwIfNotFound)
+		{
+			if (Path.HasExtension(templateName))
 			{
-				throw new ArgumentException("ResolveEngine only works with a template " +
-				                            "name with extension. templateName " + templateName);
+				String extension = Path.GetExtension(templateName);
+				IViewEngine engine = ext2ViewEngine[extension] as IViewEngine;
+				return engine;
 			}
 
-			String extension = Path.GetExtension(templateName);
+			foreach(IViewEngine engine in viewEnginesFastLookup.Keys)
+			{
+				if (engine.HasTemplate(templateName)) return engine;
+			}
+					
+			if (throwIfNotFound)
+			{
+				throw new MonoRailException(string.Format(
+@"MonoRail could not resolve a view engine instance for the template '{0}'
+There are two possible reasons: either the template does not exist, or the view engine " + 
+"that handles the template (by file extension) has not been configured correctly in web.config (section monorail, node viewEngines).", templateName));
+			}
 
-			IViewEngine engine = (IViewEngine) ext2ViewEngine[extension];
-
-			if (engine != null) return engine;
-
-			throw new RailsException(
-				"Could not find a suitable View engine to " +
-				"handle view template with extension " + extension + ". View template: " + templateName);
+			return null;
 		}
 
 		/// <summary>
@@ -292,9 +279,9 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			if (ext2ViewEngine.Contains(engine.ViewFileExtension))
 			{
-				IViewEngine existing = (IViewEngine) ext2ViewEngine[engine.ViewFileExtension];
+				IViewEngine existing = (IViewEngine)ext2ViewEngine[engine.ViewFileExtension];
 
-				throw new RailsException(
+				throw new MonoRailException(
 					"At least two view engines are handling the same file extension. " +
 					"This isn't going to work. Extension: " + engine.ViewFileExtension +
 					" View Engine 1: " + existing.GetType() +
@@ -302,16 +289,16 @@ namespace Castle.MonoRail.Framework.Services
 			}
 
 			String extension = engine.ViewFileExtension.StartsWith(".")
-			                   	? engine.ViewFileExtension
-			                   	: "." + engine.ViewFileExtension;
+								? engine.ViewFileExtension
+								: "." + engine.ViewFileExtension;
 
 			ext2ViewEngine[extension] = engine;
 
 			if (engine.SupportsJSGeneration && ext2ViewEngine.Contains(engine.JSGeneratorFileExtension))
 			{
-				IViewEngine existing = (IViewEngine) ext2ViewEngine[engine.JSGeneratorFileExtension];
+				IViewEngine existing = (IViewEngine)ext2ViewEngine[engine.JSGeneratorFileExtension];
 
-				throw new RailsException(
+				throw new MonoRailException(
 					"At least two view engines are handling the same file extension. " +
 					"This isn't going to work. Extension: " + engine.JSGeneratorFileExtension +
 					" View Engine 1: " + existing.GetType() +
@@ -321,24 +308,11 @@ namespace Castle.MonoRail.Framework.Services
 			if (engine.SupportsJSGeneration)
 			{
 				extension = engine.JSGeneratorFileExtension.StartsWith(".")
-				            	? engine.JSGeneratorFileExtension
-				            	: "." + engine.JSGeneratorFileExtension;
+								? engine.JSGeneratorFileExtension
+								: "." + engine.JSGeneratorFileExtension;
 
 				ext2ViewEngine[extension] = engine;
 				jsgFastLookup[extension] = engine;
-			}
-		}
-
-		/// <summary>
-		/// Asserts the template exists.
-		/// </summary>
-		/// <param name="resolvedTemplateName">Name of the resolved template.</param>
-		/// <param name="templateName">Name of the template.</param>
-		private void AssertTemplateExists(string resolvedTemplateName, string templateName)
-		{
-			if (resolvedTemplateName == null)
-			{
-				throw new RailsException("Could not find view template: " + templateName);
 			}
 		}
 	}

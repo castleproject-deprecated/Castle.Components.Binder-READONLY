@@ -74,23 +74,23 @@ namespace Castle.MonoRail.Framework.Views.NVelocity.CustomDirectives
 		{
 			if (context == null)
 			{
-				throw new RailsException("context is null");
+				throw new MonoRailException("context is null");
 			}
 
 			if (contextAdapter == null)
 			{
-				throw new RailsException("contextAdapter is null");
+				throw new MonoRailException("contextAdapter is null");
 			}
 
 			if (contextAdapter.ContextVars == null)
 			{
-				throw new RailsException("contextAdapter.ContextVars is null");
+				throw new MonoRailException("contextAdapter.ContextVars is null");
 			}
 
-			foreach(DictionaryEntry entry in contextAdapter.ContextVars)
-			{
-				context.Put(entry.Key.ToString(), entry.Value);
-			}
+//			foreach(DictionaryEntry entry in contextAdapter.ContextVars)
+//			{
+//				context.Put(entry.Key.ToString(), entry.Value);
+//			}
 
 			for(int i=0; i < savedNode.ChildrenCount; i++)
 			{

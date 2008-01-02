@@ -35,6 +35,8 @@ namespace Castle.MonoRail.Framework.Tests.ViewComponents
 
 			singlePage = new Page(new string[] {"a", "b", "c"}, 1, 4, 1);
 			secondPageOfThree = new Page(new string[] {"a", "b", "c", "d"}, 2, 4, 10);
+
+			BuildRailsContext("area", "controller", "action");
 		}
 
 		[TearDown]
@@ -62,6 +64,7 @@ namespace Castle.MonoRail.Framework.Tests.ViewComponents
 			SectionRender["link"] = delegate(IDictionary context, TextWriter writer) { actions.Add("link"); };
 
 			diggComponent.Page = singlePage;
+			Request.FilePath = "/something";
 			PrepareViewComponent(diggComponent);
 			diggComponent.Render();
 
@@ -80,6 +83,7 @@ namespace Castle.MonoRail.Framework.Tests.ViewComponents
 			SectionRender["link"] = delegate(IDictionary context, TextWriter writer) { actions.Add("link"); };
 
 			diggComponent.Page = secondPageOfThree;
+			Request.FilePath = "/something";
 			PrepareViewComponent(diggComponent);
 			diggComponent.Render();
 
@@ -100,6 +104,7 @@ namespace Castle.MonoRail.Framework.Tests.ViewComponents
 
 			diggComponent.UseInlineStyle = false;
 			diggComponent.Page = singlePage;
+			Request.FilePath = "/something";
 			PrepareViewComponent(diggComponent);
 			diggComponent.Render();
 
@@ -118,6 +123,7 @@ namespace Castle.MonoRail.Framework.Tests.ViewComponents
 
 			diggComponent.UseInlineStyle = false;
 			diggComponent.Page = singlePage;
+			Request.FilePath = "/something";
 			PrepareViewComponent(diggComponent);
 			diggComponent.Render();
 
@@ -126,7 +132,6 @@ namespace Castle.MonoRail.Framework.Tests.ViewComponents
 				"<span class=\"disabled\">customnext</span>ended", Output);
 		}
 
-
 		[Test]
 		public void PageWithLinksPrintsLinks()
 		{
@@ -134,15 +139,18 @@ namespace Castle.MonoRail.Framework.Tests.ViewComponents
 			SectionRender["endblock"] = delegate(IDictionary context, TextWriter writer) { writer.Write("ended"); };
 			SectionRender["link"] = delegate(IDictionary context, TextWriter writer)
 			{
-				writer.Write(" {0} {1} {2} ", context["pageIndex"], context["url"], context["text"]);
+				writer.Write(" <{0} {1} {2}> ", context["pageIndex"], context["url"], context["text"]);
 			};
 
 			diggComponent.UseInlineStyle = false;
 			diggComponent.Page = secondPageOfThree;
+			Request.FilePath = "/something";
 			PrepareViewComponent(diggComponent);
 			diggComponent.Render();
 
-			Assert.AreEqual("started 1  &laquo; prev  1  1 \r\n<span class=\"current\">2</span>\r\n 3  3  3  next &raquo; ended", Output);
+			Assert.AreEqual("started <1 /something?page=1 &laquo; prev>  " +
+				"<1 /something?page=1 1> \r\n<span class=\"current\">2</span>\r\n " +
+				"<3 /something?page=3 3>  <3 /something?page=3 next &raquo;> ended", Output);
 		}
 
 		[Test]

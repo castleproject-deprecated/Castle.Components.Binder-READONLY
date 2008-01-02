@@ -15,6 +15,7 @@
 namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 {
 	using System;
+	using System.Collections;
 	using NHibernate;
 	using NHibernate.Cache;
 	using NHibernate.Engine;
@@ -195,7 +196,12 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 			throw new NotImplementedException();
 		}
 
-		public object[] GetDatabaseSnapshot(object id, ISessionImplementor session)
+	    public bool IsInstrumented(EntityMode entityMode)
+	    {
+	        throw new NotImplementedException();
+	    }
+
+	    public object[] GetDatabaseSnapshot(object id, ISessionImplementor session)
 		{
 			throw new NotImplementedException();
 		}
@@ -331,7 +337,12 @@ namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 			get { throw new NotImplementedException(); }
 		}
 
-		public IVersionType VersionType
+	    public IComparer VersionComparator
+	    {
+	        get { throw new NotImplementedException(); }
+	    }
+
+	    public IVersionType VersionType
 		{
 			get { throw new NotImplementedException(); }
 		}

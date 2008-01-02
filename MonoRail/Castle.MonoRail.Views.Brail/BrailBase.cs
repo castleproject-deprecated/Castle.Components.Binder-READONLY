@@ -55,6 +55,7 @@ namespace Castle.MonoRail.Views.Brail
 		private IList viewComponentsParameters;
 
 		protected BooViewEngine viewEngine;
+		public string LastVariableAccessed;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BrailBase"/> class.
@@ -200,6 +201,13 @@ namespace Castle.MonoRail.Views.Brail
 				subView.properties[entry.Key] = entry.Value;
 			}
 			subView.Run();
+			foreach (DictionaryEntry entry in subView.Properties)
+			{
+				if (subView.Properties.Contains(entry.Key + ".@bubbleUp") == false)
+					continue;
+				properties[entry.Key] = entry.Value;
+				properties[entry.Key + ".@bubbleUp"] = true;
+			}
 		}
 
 		/// <summary>
@@ -228,7 +236,7 @@ namespace Castle.MonoRail.Views.Brail
 		{
 			ParameterSearch search = GetParameterInternal(name);
 			if (search.Found == false)
-				throw new RailsException("Parameter '" + name + "' was not found!");
+				throw new MonoRailException("Parameter '" + name + "' was not found!");
 			return search.Value;
 		}
 
@@ -253,6 +261,7 @@ namespace Castle.MonoRail.Views.Brail
 		/// <returns></returns>
 		private ParameterSearch GetParameterInternal(string name)
 		{
+			LastVariableAccessed = name;
 			//temporary syntax to turn @variable to varaible, imitating :symbol in ruby
 			if (name.StartsWith("@"))
 				return new ParameterSearch(name.Substring(1), true);
@@ -376,15 +385,18 @@ namespace Castle.MonoRail.Views.Brail
 		/// </summary>
 		/// <param name="myContext"></param>
 		/// <param name="myController"></param>
-		private void InitProperties(IRailsEngineContext myContext, Controller myController)
+		private void InitProperties(IRailsEngineContext myContext, IController myController)
 		{
 			properties = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 			//properties.Add("dsl", new DslWrapper(this));
 			properties.Add("Controller", myController);
 			properties.Add("Context", myContext);
-			properties.Add("request", myContext.Request);
-			properties.Add("response", myContext.Response);
-			properties.Add("session", myContext.Session);
+			if (myContext != null)
+			{
+				properties.Add("request", myContext.Request);
+				properties.Add("response", myContext.Response);
+				properties.Add("session", myContext.Session);
+			}
 
 			if (myController.Resources != null)
 			{
@@ -394,29 +406,43 @@ namespace Castle.MonoRail.Views.Brail
 				}
 			}
 
-			foreach (string key in myController.Params.AllKeys)
+			if (myContext != null && myController.Params != null)
 			{
-				if (key == null)
-					continue;
-				properties[key] = myContext.Params[key];
+				foreach (string key in myController.Params.AllKeys)
+				{
+					if (key == null)
+						continue;
+					properties[key] = myContext.Params[key];
+				}
+			}
+			if (myContext != null && myContext.Flash != null)
+			{
+				foreach (DictionaryEntry entry in myContext.Flash)
+				{
+					properties[entry.Key] = entry.Value;
+				}
 			}
 
-			foreach (DictionaryEntry entry in myContext.Flash)
+			if (myController.PropertyBag != null)
 			{
-				properties[entry.Key] = entry.Value;
+				foreach (DictionaryEntry entry in myController.PropertyBag)
+				{
+					properties[entry.Key] = entry.Value;
+				}
 			}
 
-			foreach (DictionaryEntry entry in myController.PropertyBag)
+			if (myController.Helpers != null)
 			{
-				properties[entry.Key] = entry.Value;
+				foreach (DictionaryEntry entry in myController.Helpers)
+				{
+					properties[entry.Key] = entry.Value;
+				}
 			}
 
-			foreach (DictionaryEntry entry in myController.Helpers)
+			if(myContext != null )
 			{
-				properties[entry.Key] = entry.Value;
+				properties["siteRoot"] = myContext.ApplicationPath;
 			}
-
-			properties["siteRoot"] = myContext.ApplicationPath;
 		}
 
 		#region Nested type: ParameterSearch

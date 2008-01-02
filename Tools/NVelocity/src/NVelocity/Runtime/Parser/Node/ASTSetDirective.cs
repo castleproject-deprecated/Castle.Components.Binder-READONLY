@@ -10,7 +10,7 @@ namespace NVelocity.Runtime.Parser.Node
 	/// </summary>
 	public class ASTSetDirective : SimpleNode
 	{
-		private String leftReference = "";
+		private String leftReference = string.Empty;
 		private INode right;
 		private ASTReference left;
 		internal bool blather = false;
@@ -53,7 +53,7 @@ namespace NVelocity.Runtime.Parser.Node
 			right = RightHandSide;
 			left = LeftHandSide;
 
-			blather = rsvc.GetBoolean(RuntimeConstants.RUNTIME_LOG_REFERENCE_LOG_INVALID, true);
+			blather = runtimeServices.GetBoolean(RuntimeConstants.RUNTIME_LOG_REFERENCE_LOG_INVALID, true);
 
 			/*
 	    *  grab this now.  No need to redo each time
@@ -71,35 +71,36 @@ namespace NVelocity.Runtime.Parser.Node
 	    *  get the RHS node, and it's value
 	    */
 
-			Object value_ = right.Value(context);
+			Object value = right.Value(context);
 
 			/*
 	    * it's an error if we don't have a value of some sort
 	    */
 
-			if (value_ == null)
+			if (value == null)
 			{
 				/*
 				*  first, are we supposed to say anything anyway?
 				*/
 				if (blather)
 				{
-					EventCartridge ec = context.EventCartridge;
+					EventCartridge eventCartridge = context.EventCartridge;
 
-					bool doit = true;
+					bool doIt = true;
 
 					/*
 		    *  if we have an EventCartridge...
 		    */
-					if (ec != null)
+					if (eventCartridge != null)
 					{
-						doit = ec.ShouldLogOnNullSet(left.Literal, right.Literal);
+						doIt = eventCartridge.ShouldLogOnNullSet(left.Literal, right.Literal);
 					}
 
-					if (doit)
+					if (doIt)
 					{
-						rsvc.Error("RHS of #set statement is null. Context will not be modified. " + context.CurrentTemplateName +
-						           " [line " + Line + ", column " + Column + "]");
+						runtimeServices.Error(
+							string.Format("RHS of #set statement is null. Context will not be modified. {0} [line {1}, column {2}]",
+							              context.CurrentTemplateName, Line, Column));
 					}
 				}
 
@@ -114,11 +115,11 @@ namespace NVelocity.Runtime.Parser.Node
 
 			if (left.ChildrenCount == 0)
 			{
-				context.Put(leftReference, value_);
+				context.Put(leftReference, value);
 			}
 			else
 			{
-				left.SetValue(context, value_);
+				left.SetValue(context, value);
 			}
 
 			return true;

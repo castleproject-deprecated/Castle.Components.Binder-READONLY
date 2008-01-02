@@ -1,3 +1,17 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace NVelocity.App.Tools
 {
 	using System;
@@ -25,10 +39,10 @@ namespace NVelocity.App.Tools
 	public class VelocityFormatter
 	{
 		internal IContext context = null;
-		internal SupportClass.TextNumberFormat nf = SupportClass.TextNumberFormat.getTextNumberInstance();
+		internal SupportClass.TextNumberFormat textNumberFormat = SupportClass.TextNumberFormat.GetTextNumberInstance();
 
 		/// <summary>
-		/// Constructor needs a backpointer to the context.
+		/// Constructor needs a backPointer to the context.
 		/// </summary>
 		/// <param name="context">A Context.</param>
 		public VelocityFormatter(IContext context)
@@ -100,13 +114,13 @@ namespace NVelocity.App.Tools
 
 		/// <summary>
 		/// Formats an array into the form
-		/// "A&lt;delim&gt;B&lt;finaldelim&gt;C".
+		/// "A&lt;delim&gt;B&lt;finalDelimiter&gt;C".
 		/// </summary>
 		/// <param name="array">An Object.</param>
 		/// <param name="delim">A String.</param>
-		/// <param name="finaldelim">A String.</param>
+		/// <param name="finalDelimiter">A String.</param>
 		/// <returns>A String.</returns>
-		public String FormatArray(Object array, String delim, String finaldelim)
+		public String FormatArray(Object array, String delim, String finalDelimiter)
 		{
 			// TODO: if this is not right - it will blow up
 			Array a = (Array) array;
@@ -131,7 +145,7 @@ namespace NVelocity.App.Tools
 				}
 				else if (i < arrayLen - 1)
 				{
-					sb.Append(finaldelim);
+					sb.Append(finalDelimiter);
 				}
 			}
 			return sb.ToString();
@@ -160,13 +174,13 @@ namespace NVelocity.App.Tools
 
 		/// <summary>
 		/// Formats a list into the form
-		/// "Adelim&gt;B&lt;finaldelim&gt;C".
+		/// "Adelim&gt;B&lt;finalDelimiter&gt;C".
 		/// </summary>
 		/// <param name="list">A list.</param>
 		/// <param name="delim">A String.</param>
-		/// <param name="finaldelim">A String.</param>
+		/// <param name="finalDelimiter">A String.</param>
 		/// <returns>A String.</returns>
-		public String FormatVector(IList list, String delim, String finaldelim)
+		public String FormatVector(IList list, String delim, String finalDelimiter)
 		{
 			StringBuilder sb = new StringBuilder();
 			Int32 size = list.Count;
@@ -179,38 +193,38 @@ namespace NVelocity.App.Tools
 				}
 				else if (i < size - 1)
 				{
-					sb.Append(finaldelim);
+					sb.Append(finalDelimiter);
 				}
 			}
 			return sb.ToString();
 		}
 
 		/// <summary>
-		/// Limits 'string' to 'maxlen' characters.  If the string gets
+		/// Limits 'string' to 'maximumLength' characters.  If the string gets
 		/// curtailed, "..." is appended to it.
 		/// </summary>
-		/// <param name="maxlen">An int with the maximum length.</param>
+		/// <param name="maximumLength">An int with the maximum length.</param>
 		/// <param name="value">A String.</param>
 		/// <returns>A String.</returns>
-		public String LimitLen(int maxlen, String value)
+		public String LimitLen(int maximumLength, String value)
 		{
-			return LimitLen(maxlen, value, "...");
+			return LimitLen(maximumLength, value, "...");
 		}
 
 		/// <summary>
-		/// Limits 'string' to 'maxlen' character.  If the string gets
+		/// Limits 'string' to 'maximumLength' character.  If the string gets
 		/// curtailed, 'suffix' is appended to it.
 		/// </summary>
-		/// <param name="maxlen">An int with the maximum length.</param>
+		/// <param name="maximumLength">An int with the maximum length.</param>
 		/// <param name="value">A String.</param>
 		/// <param name="suffix">A String.</param>
 		/// <returns>A String.</returns>
-		public String LimitLen(int maxlen, String value, String suffix)
+		public String LimitLen(int maximumLength, String value, String suffix)
 		{
 			String ret = value;
-			if (value.Length > maxlen)
+			if (value.Length > maximumLength)
 			{
-				ret = value.Substring(0, (maxlen - suffix.Length) - (0)) + suffix;
+				ret = value.Substring(0, (maximumLength - suffix.Length) - (0)) + suffix;
 			}
 			return ret;
 		}
@@ -246,7 +260,7 @@ namespace NVelocity.App.Tools
 			{
 				current++;
 				current %= alternates.Length;
-				return "";
+				return string.Empty;
 			}
 
 			/// <summary>
@@ -278,7 +292,7 @@ namespace NVelocity.App.Tools
 
 			/// <summary>
 			/// Returns the current alternate, and automatically alternates
-			/// to the next alternate in its sequence (trigged upon
+			/// to the next alternate in its sequence (triggered upon
 			/// rendering).
 			/// </summary>
 			/// <returns>The current alternate in the sequence.</returns>
@@ -297,10 +311,10 @@ namespace NVelocity.App.Tools
 		/// 
 		/// <code>
 		/// &lt;table&gt;
-		/// $formatter.makeAlternator("rowcolor", "#c0c0c0", "#e0e0e0")
+		/// $formatter.makeAlternator("rowColor", "#c0c0c0", "#e0e0e0")
 		/// #foreach $item in $items
-		/// &lt;tr&gt;&lt;td bgcolor="$rowcolor"&gt;$item.Name&lt;/td&gt;&lt;/tr&gt;
-		/// $rowcolor.alternate()
+		/// &lt;tr&gt;&lt;td bgcolor="$rowColor"&gt;$item.Name&lt;/td&gt;&lt;/tr&gt;
+		/// $rowColor.alternate()
 		/// #end
 		/// &lt;/table&gt;
 		/// </code>
@@ -313,7 +327,7 @@ namespace NVelocity.App.Tools
 		public String MakeAlternator(String name, String alt1, String alt2)
 		{
 			context.Put(name, new VelocityAlternator(alt1, alt2));
-			return "";
+			return string.Empty;
 		}
 
 		/// <summary>
@@ -322,7 +336,7 @@ namespace NVelocity.App.Tools
 		public String MakeAlternator(String name, String alt1, String alt2, String alt3)
 		{
 			context.Put(name, new VelocityAlternator(alt1, alt2, alt3));
-			return "";
+			return string.Empty;
 		}
 
 		/// <summary>
@@ -331,7 +345,7 @@ namespace NVelocity.App.Tools
 		public String MakeAlternator(String name, String alt1, String alt2, String alt3, String alt4)
 		{
 			context.Put(name, new VelocityAlternator(alt1, alt2, alt3, alt4));
-			return "";
+			return string.Empty;
 		}
 
 		/// <summary>
@@ -341,16 +355,16 @@ namespace NVelocity.App.Tools
 		public String MakeAutoAlternator(String name, String alt1, String alt2)
 		{
 			context.Put(name, new VelocityAutoAlternator(alt1, alt2));
-			return "";
+			return string.Empty;
 		}
 
 		/// <summary>
 		/// Returns a default value if the object passed is null.
 		/// </summary>
-		public Object IsNull(Object o, Object dflt)
+		public Object IsNull(Object o, Object defaultValue)
 		{
 			if (o == null)
-				return dflt;
+				return defaultValue;
 			else
 				return o;
 		}

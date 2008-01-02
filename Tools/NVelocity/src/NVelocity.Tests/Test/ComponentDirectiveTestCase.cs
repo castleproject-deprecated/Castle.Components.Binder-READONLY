@@ -1,4 +1,5 @@
-using ExtendedProperties = Commons.Collections.ExtendedProperties;
+using ExtendedProperties=Commons.Collections.ExtendedProperties;
+
 // Copyright 2004-2007 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,35 +16,34 @@ using ExtendedProperties = Commons.Collections.ExtendedProperties;
 
 namespace NVelocity.Test
 {
-	using System;
 	using System.IO;
+	using App;
 	using NUnit.Framework;
-	using NVelocity.App;
-	using NVelocity.Runtime;
-
+	using Runtime;
 
 	[TestFixture]
 	public class ComponentDirectiveTestCase : BaseTestCase
 	{
-		private VelocityEngine ve;
+		private VelocityEngine velocityEngine;
 		private ExtendedProperties testProperties;
 
 		[SetUp]
 		protected void SetUp()
 		{
-			ve = new VelocityEngine();
+			velocityEngine = new VelocityEngine();
 
-			ExtendedProperties ep = new ExtendedProperties();
-			
-			ep.SetProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, 
-				TemplateTest.FILE_RESOURCE_LOADER_PATH);
+			ExtendedProperties extendedProperties = new ExtendedProperties();
 
-			ep.SetProperty(RuntimeConstants.RUNTIME_LOG_ERROR_STACKTRACE, "true");
-			ep.SetProperty(RuntimeConstants.RUNTIME_LOG_WARN_STACKTRACE, "true");
-			ep.SetProperty(RuntimeConstants.RUNTIME_LOG_INFO_STACKTRACE, "true");
-			ep.SetProperty("userdirective", "NVelocity.Runtime.Directive.Component;NVelocity,NVelocity.Runtime.Directive.BlockComponent;NVelocity");
+			extendedProperties.SetProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH,
+			                               TemplateTest.FILE_RESOURCE_LOADER_PATH);
 
-			ve.Init(ep);
+			extendedProperties.SetProperty(RuntimeConstants.RUNTIME_LOG_ERROR_STACKTRACE, "true");
+			extendedProperties.SetProperty(RuntimeConstants.RUNTIME_LOG_WARN_STACKTRACE, "true");
+			extendedProperties.SetProperty(RuntimeConstants.RUNTIME_LOG_INFO_STACKTRACE, "true");
+			extendedProperties.SetProperty("userdirective",
+			                               "NVelocity.Runtime.Directive.Component;NVelocity,NVelocity.Runtime.Directive.BlockComponent;NVelocity");
+
+			velocityEngine.Init(extendedProperties);
 
 			testProperties = new ExtendedProperties();
 			testProperties.Load(new FileStream(TemplateTest.TEST_CASE_PROPERTIES, FileMode.Open, FileAccess.Read));
@@ -54,27 +54,26 @@ namespace NVelocity.Test
 		{
 			VelocityContext context = new VelocityContext();
 
-			Template template = ve.GetTemplate(
+			Template template = velocityEngine.GetTemplate(
 				GetFileName(null, "componentusage1", TemplateTest.TMPL_FILE_EXT));
-			
+
 			StringWriter writer = new StringWriter();
 
 			template.Merge(context, writer);
 
-			System.Console.WriteLine( writer.GetStringBuilder().ToString() );
+			System.Console.WriteLine(writer.GetStringBuilder().ToString());
 
 			writer = new StringWriter();
 
 			template.Merge(context, writer);
 
-			System.Console.WriteLine( writer.GetStringBuilder().ToString() );
+			System.Console.WriteLine(writer.GetStringBuilder().ToString());
 
 			writer = new StringWriter();
 
 			template.Merge(context, writer);
 
-			System.Console.WriteLine( writer.GetStringBuilder().ToString() );
+			System.Console.WriteLine(writer.GetStringBuilder().ToString());
 		}
-
 	}
 }

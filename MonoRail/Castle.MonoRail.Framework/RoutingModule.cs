@@ -38,7 +38,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="context">An <see cref="T:System.Web.HttpApplication"></see> that provides access to the methods, properties, and events common to all application objects within an ASP.NET application</param>
 		public void Init(HttpApplication context)
 		{
-			context.BeginRequest += new EventHandler(OnBeginRequest);
+			context.BeginRequest += OnBeginRequest;
 
 			routingRules = MonoRailConfiguration.GetConfig().RoutingRules;
 		}
@@ -110,18 +110,12 @@ namespace Castle.MonoRail.Framework
 
 		private static bool ShouldUseHostAndPath
 		{
-			get
-			{
-				return MonoRailConfiguration.GetConfig().MatchHostNameAndPath;
-			}
+			get { return MonoRailConfiguration.GetConfig().MatchHostNameAndPath; }
 		}
 
 		private static bool ExcludeAppPath
 		{
-			get
-			{
-				return MonoRailConfiguration.GetConfig().ExcludeAppPath;
-			}
+			get { return MonoRailConfiguration.GetConfig().ExcludeAppPath; }
 		}
 
 		private static string GetHostNameAndPath()

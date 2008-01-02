@@ -60,6 +60,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
     <Compile Include="BrailBugsTestCase.cs" />
+    <Compile Include="BrailLayoutsTestCase.cs" />
     <Compile Include="DirectRenderTestCase.cs" />
     <Compile Include="DslFixture.cs" />
     <Compile Include="DslLayoutFixture.cs" />
@@ -78,6 +79,7 @@
     <EmbeddedResource Include="Resources\Language.resources" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ResourcedViews\Login\Welcome.brail" />
     <None Include="Views\CommonScripts\extentions.brail" />
     <None Include="Views\components\SimpleInlineViewComponent2\mycompview1.brail" />
     <None Include="Views\components\SimpleInlineViewComponent3\default.brail" />
@@ -96,6 +98,8 @@
     <None Include="Views\layout\update.brail" />
     <None Include="App.config" />
     <None Include="Views\regressions\CanCompareToNullableParameter.brail" />
+    <None Include="Views\regressions\questionMarkOp_if_when_exists.brail" />
+    <None Include="Views\regressions\questionMarkOp_if_when_missing.brail" />
     <None Include="Views\regressions\questionMarkOp_unless_whenPassed.brail" />
     <None Include="Views\regressions\HtmlEncodingStringInterpolation.brail" />
     <None Include="Views\regressions\questionMarkOp_unless.brail" />

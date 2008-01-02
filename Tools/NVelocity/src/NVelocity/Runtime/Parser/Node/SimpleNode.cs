@@ -8,7 +8,7 @@ namespace NVelocity.Runtime.Parser.Node
 
 	public class SimpleNode : INode
 	{
-		protected internal IRuntimeServices rsvc = null;
+		protected internal IRuntimeServices runtimeServices = null;
 
 		protected internal INode parent;
 		protected internal INode[] children;
@@ -103,7 +103,17 @@ namespace NVelocity.Runtime.Parser.Node
 
 		public int ChildrenCount
 		{
-			get { return (children == null) ? 0 : children.Length; }
+			get
+			{
+				if (children == null)
+				{
+					return 0;
+				}
+				else
+				{
+					return children.Length;
+				}
+			}
 		}
 
 		/// <summary>Accept the visitor. *
@@ -155,7 +165,7 @@ namespace NVelocity.Runtime.Parser.Node
 					SimpleNode n = (SimpleNode) children[i];
 					if (n != null)
 					{
-						n.Dump(prefix + " ");
+						n.Dump(string.Format("{0} ", prefix));
 					}
 				}
 			}
@@ -186,7 +196,7 @@ namespace NVelocity.Runtime.Parser.Node
 	    * hold onto the RuntimeServices
 	    */
 
-			rsvc = (IRuntimeServices) data;
+			runtimeServices = (IRuntimeServices) data;
 
 			int i, k = ChildrenCount;
 
@@ -198,7 +208,7 @@ namespace NVelocity.Runtime.Parser.Node
 				}
 				catch(ReferenceException re)
 				{
-					rsvc.Error(re);
+					runtimeServices.Error(re);
 				}
 			}
 
@@ -220,7 +230,9 @@ namespace NVelocity.Runtime.Parser.Node
 			int i, k = ChildrenCount;
 
 			for(i = 0; i < k; i++)
+			{
 				GetChild(i).Render(context, writer);
+			}
 
 			return true;
 		}

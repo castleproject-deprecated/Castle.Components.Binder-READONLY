@@ -23,7 +23,6 @@ namespace Castle.MonoRail.Framework.Adapters
 	using System.Collections.Specialized;
 	using Castle.MonoRail.Framework;
 	using Castle.MonoRail.Framework.Services;
-	using Castle.Core;
 
 	/// <summary>
 	/// Adapter to expose a valid <see cref="IRailsEngineContext"/> 
@@ -42,7 +41,7 @@ namespace Castle.MonoRail.Framework.Adapters
 		private UrlInfo _urlInfo;
 		private String _url;
 		private ICacheProvider _cache;
-		private Controller currentController;
+		private IController currentController;
 		private IServiceProvider container;
 		private bool customSessionSet;
 
@@ -62,7 +61,7 @@ namespace Castle.MonoRail.Framework.Adapters
 			_request = new RequestAdapter(context.Request);
 			_trace = new TraceAdapter(context.Trace);
 			_server = new ServerUtilityAdapter(context.Server);
-			_response = new ResponseAdapter(context.Response, this, ApplicationPath);
+			_response = new ResponseAdapter(context.Response, this);
 			_url = _context.Request.RawUrl;
 			_cache = parent.GetService(typeof(ICacheProvider)) as ICacheProvider;
 			this.container = container;
@@ -337,7 +336,7 @@ namespace Castle.MonoRail.Framework.Adapters
 		/// Gets or sets the current controller.
 		/// </summary>
 		/// <value>The current controller.</value>
-		public Controller CurrentController
+		public IController CurrentController
 		{
 			get { return currentController; }
 			set { currentController = value; }

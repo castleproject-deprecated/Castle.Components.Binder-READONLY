@@ -29,7 +29,7 @@ namespace Castle.Facilities.ActiveRecordIntegration
 	using Castle.ActiveRecord.Framework;
 	using NHibernate.Stat;
 
-	/// <summary>
+    /// <summary>
 	/// Implements <see cref="ISessionFactory"/> allowing 
 	/// it to be used by the container as an ordinary component.
 	/// However only <see cref="ISessionFactory.OpenSession(IDbConnection)"/>
@@ -99,17 +99,17 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
 		}
 
-		public IStatelessSession OpenStatelessSession()
-		{
-			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
-		}
+        public IStatelessSession OpenStatelessSession()
+        {
+            throw new NotImplementedException("SessionFactoryDelegate: not implemented");
+        }
 
-		public IStatelessSession OpenStatelessSession(IDbConnection connection)
-		{
-			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
-		}
+        public IStatelessSession OpenStatelessSession(IDbConnection connection)
+        {
+            throw new NotImplementedException("SessionFactoryDelegate: not implemented");
+        }
 
-		public void Close()
+        public void Close()
 		{
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
 		}
@@ -124,12 +124,12 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
 		}
 
-		public void EvictEntity(string entityName)
-		{
-			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
-		}
+        public void EvictEntity(string entityName)
+        {
+            throw new NotImplementedException("SessionFactoryDelegate: not implemented");
+        }
 
-		public void EvictCollection(string roleName)
+        public void EvictCollection(string roleName)
 		{
 			throw new NotImplementedException("SessionFactoryDelegate: not implemented");
 		}
@@ -164,12 +164,7 @@ namespace Castle.Facilities.ActiveRecordIntegration
 			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
 		}
 
-		ICollection<string> ISessionFactory.DefinedFilterNames
-		{
-			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
-		}
-
-		public ICollection DefinedFilterNames
+		public ICollection<string> DefinedFilterNames
 		{
 			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
 		}
@@ -181,15 +176,15 @@ namespace Castle.Facilities.ActiveRecordIntegration
 
 		public IDictionary Items
 		{
-			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
+            get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
 		}
 
-		public IStatistics Statistics
-		{
-			get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
-		}
+        public IStatistics Statistics
+        {
+            get { throw new NotImplementedException("SessionFactoryDelegate: not implemented"); }
+        }
 
-		public void Dispose()
+        public void Dispose()
 		{
 		}
 	}

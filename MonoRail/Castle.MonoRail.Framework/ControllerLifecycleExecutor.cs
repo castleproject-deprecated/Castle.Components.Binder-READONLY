@@ -24,6 +24,7 @@ namespace Castle.MonoRail.Framework
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Helpers;
 	using Castle.MonoRail.Framework.Internal;
+	using Castle.MonoRail.Framework.Services.Utils;
 
 	/// <summary>
 	/// Default implementation of <see cref="IControllerLifecycleExecutor"/>
@@ -44,6 +45,8 @@ namespace Castle.MonoRail.Framework
 		private ControllerMetaDescriptor metaDescriptor;
 		private IServiceProvider serviceProvider;
 		private ILogger logger = NullLogger.Instance;
+
+		private IServiceProvider provider;
 
 		/// <summary>
 		/// The reference to the <see cref="IViewEngineManager"/> instance
@@ -96,9 +99,10 @@ namespace Castle.MonoRail.Framework
 		/// Invoked by the framework in order to give a chance to
 		/// obtain other services
 		/// </summary>
-		/// <param name="provider">The service proviver</param>
+		/// <param name="provider">The service provider</param>
 		public void Service(IServiceProvider provider)
 		{
+			this.provider = provider;
 			viewEngineManager = (IViewEngineManager) provider.GetService(typeof(IViewEngineManager));
 			filterFactory = (IFilterFactory) provider.GetService(typeof(IFilterFactory));
 			resourceFactory = (IResourceFactory) provider.GetService(typeof(IResourceFactory));
@@ -225,14 +229,11 @@ namespace Castle.MonoRail.Framework
 
 					if (actionDesc.AccessibleThrough != null)
 					{
-						string verbName = actionDesc.AccessibleThrough.Verb.ToString();
-						string requestType = context.RequestType;
-
-						if (String.Compare(verbName, requestType, true) != 0)
+						if (!actionDesc.AccessibleThrough.ForHttpMethod(context.RequestType))
 						{
 							exceptionToThrow = new ControllerException(string.Format("Access to the action [{0}] " +
 							                                            "on controller [{1}] is not allowed by the http verb [{2}].",
-							                                            actionName, controllerName, requestType));
+																													actionName, controllerName, context.RequestType));
 
 							hasError = true;
 
@@ -486,14 +487,7 @@ namespace Castle.MonoRail.Framework
 
 			metaDescriptor = controller.metaDescriptor;
 
-			controller.viewEngineManager = viewEngineManager;
-
-			ILoggerFactory loggerFactory = (ILoggerFactory) context.GetService(typeof(ILoggerFactory));
-
-			if (loggerFactory != null)
-			{
-				controller.logger = loggerFactory.Create(controller.GetType().Name);
-			}
+			controller.viewEngineManager = viewEngineManager;			
 		}
 
 		/// <summary>
@@ -688,7 +682,7 @@ namespace Castle.MonoRail.Framework
 					                 "configuration file, or, to use the standard ActiveRecord support " +
 					                 "copy the necessary assemblies to the bin folder.";
 
-					throw new RailsException(message);
+					throw new MonoRailException(message);
 				}
 
 				scaffoldSupport.Process(controller);
@@ -939,8 +933,32 @@ namespace Castle.MonoRail.Framework
 
 			try
 			{
-				controller._selectedViewName = Path.Combine("rescues", att.ViewName);
-				ProcessView();
+				if (att.RescueController != null)
+				{
+					Controller rescueController = (Controller) Activator.CreateInstance(att.RescueController);
+
+					using(ControllerLifecycleExecutor rescueExecutor = new ControllerLifecycleExecutor(rescueController, context))
+					{
+						rescueExecutor.Service(provider);
+						ControllerDescriptor rescueDescriptor = ControllerInspectionUtil.Inspect(att.RescueController);
+						rescueExecutor.InitializeController(rescueDescriptor.Area, rescueDescriptor.Name, att.RescueMethod.Name);
+						rescueExecutor.SelectAction(att.RescueMethod.Name, rescueDescriptor.Name);
+
+						IDictionary args = new Hashtable();
+						IDictionary propertyBag = rescueController.PropertyBag;
+						args["exception"] = propertyBag["exception"] = ex;
+						args["controller"] = propertyBag["controller"] = controller;
+						args["method"] = propertyBag["method"] = method;
+
+						rescueExecutor.ProcessSelectedAction(args);
+					}
+				}
+				else
+				{
+					controller._selectedViewName = Path.Combine("rescues", att.ViewName);
+					ProcessView();
+				}
+
 				return true;
 			}
 			catch(Exception exception)

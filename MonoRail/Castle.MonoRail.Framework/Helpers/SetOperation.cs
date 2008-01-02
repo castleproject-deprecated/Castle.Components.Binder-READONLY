@@ -119,10 +119,10 @@ namespace Castle.MonoRail.Framework.Helpers
 			{
 				String sourceProperty = CommonUtils.ObtainEntryAndRemove(attributes, "sourceProperty");
 
-				return new DifferentTypeOperationState(initialSelectionType, 
-				                                       dataSourceType, initialSelection, dataSource,
-													   sourceProperty, valueProperty, textProperty, textFormat, valueFormat, 
-				                                       isInitialSelectionASet);
+				return new DifferentTypeOperationState(initialSelectionType,
+													   dataSourceType, initialSelection, dataSource,
+													   sourceProperty, valueProperty, textProperty, textFormat, valueFormat,
+													   isInitialSelectionASet);
 			}
 		}
 
@@ -324,7 +324,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </summary>
 		/// <param name="value">The value to be formatted.</param>
 		/// <param name="format">The format to apply.</param>
-		protected void FormatText(ref object value, string format)
+		protected static void FormatText(ref object value, string format)
 		{
 			if (format != null && value != null)
 			{

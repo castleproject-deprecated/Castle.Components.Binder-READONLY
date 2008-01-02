@@ -38,13 +38,10 @@ namespace NVelocity.Runtime.Resource.Loader
 		/// </summary>
 		protected Hashtable templatePaths = new Hashtable();
 
-		public FileResourceLoader()
-		{
-		}
 
 		public override void Init(ExtendedProperties configuration)
 		{
-			rsvc.Info("FileResourceLoader : initialization starting.");
+			runtimeServices.Info("FileResourceLoader : initialization starting.");
 
 			paths = configuration.GetVector("path");
 		}
@@ -62,7 +59,6 @@ namespace NVelocity.Runtime.Resource.Loader
 		{
 			lock(this)
 			{
-				String template = null;
 				int size = paths.Count;
 
 				// Make sure we have a valid templateName.
@@ -75,12 +71,14 @@ namespace NVelocity.Runtime.Resource.Loader
 					throw new ResourceNotFoundException("Need to specify a file name or file path!");
 				}
 
-				template = StringUtils.NormalizePath(templateName);
+				string template = StringUtils.NormalizePath(templateName);
 
 				if (template == null || template.Length == 0)
 				{
-					String msg = "File resource error : argument " + template + " contains .. and may be trying to access " +
-					             "content outside of template root.  Rejected.";
+					String msg =
+						string.Format(
+							"File resource error : argument {0} contains .. and may be trying to access content outside of template root.  Rejected.",
+							template);
 
 					throw new ResourceNotFoundException(msg);
 				}
@@ -115,7 +113,7 @@ namespace NVelocity.Runtime.Resource.Loader
 				// We have now searched all the paths for
 				// templates and we didn't find anything so
 				// throw an exception.
-				String msg2 = "FileResourceLoader Error: cannot find resource " + template;
+				String msg2 = string.Format("FileResourceLoader Error: cannot find resource {0}", template);
 				throw new ResourceNotFoundException(msg2);
 			}
 		}
@@ -141,7 +139,7 @@ namespace NVelocity.Runtime.Resource.Loader
 					filename = template;
 				}
 
-				rsvc.Debug("FileResourceLoader attempting to load " + filename);
+				runtimeServices.Debug(string.Format("FileResourceLoader attempting to load {0}", filename));
 
 				FileInfo file = new FileInfo(filename);
 
@@ -150,16 +148,16 @@ namespace NVelocity.Runtime.Resource.Loader
 				 * as if there are permission errors
 				if (!file.Exists)
 				{
-					rsvc.debug("FileResourceLoader : File does not exist " + filename);
+					runtimeServices.debug("FileResourceLoader : File does not exist " + filename);
 					return null;
 				}
 				**/
 
 				return new BufferedStream(file.OpenRead());
 			}
-			catch(Exception ex)
+			catch(Exception exception)
 			{
-				rsvc.Debug("FileResourceLoader : " + ex.Message);
+				runtimeServices.Debug(string.Format("FileResourceLoader : {0}", exception.Message));
 				return null;
 			}
 		}

@@ -39,6 +39,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Boo.Lang.dll</HintPath>
     </Reference>
+    <Reference Include="Boo.Lang.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=32c39770e9a21a67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\net-2.0\debug\Boo.Lang.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="Boo.Lang.Compiler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=32c39770e9a21a67, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\net-2.0\debug\Boo.Lang.Compiler.dll</HintPath>
@@ -76,10 +80,12 @@
     <Compile Include="FixTryGetParameterConditionalChecks.cs" />
     <Compile Include="HtmlExtension.cs" />
     <Compile Include="IDslLanguageExtension.cs" />
+    <Compile Include="IndependentBooViewEngine.cs" />
     <Compile Include="Macros\CodeBuilderHelper.cs" />
     <Compile Include="Macros\ComponentMacro.cs" />
     <Compile Include="CustomTypeSystem.cs" />
     <Compile Include="IgnoreNull.cs" />
+    <Compile Include="Macros\ComponentNaming.cs" />
     <Compile Include="Macros\OutputMacro.cs" />
     <Compile Include="Attributes\OutputMethodAttribute.cs" />
     <Compile Include="Macros\SectionMacro.cs" />

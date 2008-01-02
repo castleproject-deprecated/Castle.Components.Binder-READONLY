@@ -324,19 +324,19 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 				helper.TextField("subscription.months4[0].name"));
 		}
 
-		[Test, ExpectedException(typeof(RailsException))]
+		[Test, ExpectedException(typeof(MonoRailException))]
 		public void InvalidIndex1()
 		{
 			helper.TextField("roles[a].Id");
 		}
 
-		[Test, ExpectedException(typeof(RailsException))]
+		[Test, ExpectedException(typeof(MonoRailException))]
 		public void InvalidIndex2()
 		{
 			helper.TextField("roles[1a].Id");
 		}
 
-		[Test, ExpectedException(typeof(RailsException)), Ignore("The behavior for array access has changed")]
+		[Test, ExpectedException(typeof(MonoRailException)), Ignore("The behavior for array access has changed")]
 		public void InvalidIndex3()
 		{
 			helper.TextField("roles[10].Id");
@@ -752,6 +752,45 @@ namespace Castle.MonoRail.Framework.Tests.Helpers
 		}
 
 		#endregion
+	}
+
+	public class Key
+	{
+		private int id;
+		public int Id
+		{
+			get { return id; }
+			set { id = value; }
+		}
+
+		public Key(int id)
+		{
+			this.id = id;
+		}
+	}
+
+	public class ClassWithCompositKey
+	{
+		private string name;
+		private Key key;
+
+		public ClassWithCompositKey(int id, string name)
+		{
+			this.name = name;
+			key = new Key(id);
+		}
+
+		public string Name
+		{
+			get { return name; }
+			set { name = value; }
+		}
+
+		public Key Key
+		{
+			get { return key; }
+			set { key = value; }
+		}
 	}
 
 	#endregion

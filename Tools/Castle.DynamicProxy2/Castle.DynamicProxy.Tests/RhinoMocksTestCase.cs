@@ -133,6 +133,16 @@ namespace Castle.DynamicProxy.Tests
 			Assert.IsNotNull(o);
 		}
 
+
+		[Test]
+		public void CanGetCorrectValuesFromIntPtr()
+		{
+			IFooWithIntPtr o = (IFooWithIntPtr)generator
+				.CreateInterfaceProxyWithoutTarget(typeof(IFooWithIntPtr), new IntPtrInterceptor());
+			IntPtr buffer = o.Buffer(15);
+			Assert.AreEqual(IntPtr.Zero, buffer);
+		}
+
 		[Test]
 		public void ProxyInternalMethod()
 		{
@@ -261,6 +271,11 @@ namespace Castle.DynamicProxy.Tests
 		T Create<T>() where T : List<T>;
 	}
 
+	public interface IFooWithIntPtr
+	{
+		IntPtr Buffer(UInt32 index);
+	}
+
 	public abstract class
 		SomeClassWithProtectedInternalAbstractClass
 	{
@@ -293,6 +308,14 @@ namespace Castle.DynamicProxy.Tests
 		{
 			get { return name; }
 			set { name = value; }
+		}
+	}
+
+	public class IntPtrInterceptor : IInterceptor
+	{
+		public void Intercept(IInvocation invocation)
+		{
+			invocation.ReturnValue = IntPtr.Zero;
 		}
 	}
 

@@ -52,7 +52,7 @@ namespace Castle.MonoRail.Framework.Internal
 		{
 			string value = ObtainEntry(attributes, key);
 
-			return value != null ? value : defaultValue;
+			return value ?? defaultValue;
 		}
 
 		/// <summary>
@@ -66,7 +66,7 @@ namespace Castle.MonoRail.Framework.Internal
 		{
 			string value = ObtainEntryAndRemove(attributes, key);
 
-			return value != null ? value : defaultValue;
+			return value ?? defaultValue;
 		}
 
 		/// <summary>
@@ -148,24 +148,73 @@ namespace Castle.MonoRail.Framework.Internal
 
 			StringBuilder sb = new StringBuilder();
 
+			bool useSeparator = false;
+
 			foreach (string key in parameters.Keys)
 			{
 				if (key == null) continue;
 
 				foreach (string value in parameters.GetValues(key))
 				{
-					sb.Append(serverUtil.UrlEncode(key))
-						.Append('=')
-						.Append(serverUtil.UrlEncode(value));
-
-					if (encodeAmp)
+					if (useSeparator)
 					{
-						sb.Append("&amp;");
+						if (encodeAmp)
+						{
+							sb.Append("&amp;");
+						}
+						else
+						{
+							sb.Append("&");
+						}
 					}
 					else
 					{
+						useSeparator = true;
+					}
+
+					sb.Append(serverUtil.UrlEncode(key))
+						.Append('=')
+						.Append(serverUtil.UrlEncode(value));
+				}
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Builds a query string.
+		/// </summary>
+		/// <remarks>
+		/// Supports multi-value query strings, using any
+		/// <see cref="IEnumerable"/> as a value.
+		/// </remarks>
+		/// <param name="parameters">The parameters</param>
+		public static string BuildQueryString(NameValueCollection parameters)
+		{
+			if (parameters == null || parameters.Count == 0) return string.Empty;
+
+			StringBuilder sb = new StringBuilder();
+
+			bool useSeparator = false;
+
+			foreach(string key in parameters.Keys)
+			{
+				if (key == null) continue;
+
+				foreach(string value in parameters.GetValues(key))
+				{
+					if (useSeparator)
+					{
 						sb.Append("&");
 					}
+					else
+					{
+						useSeparator = true;
+					}
+
+					sb.Append(key)
+						.Append('=')
+						.Append(value);
 				}
 			}
 
@@ -199,6 +248,8 @@ namespace Castle.MonoRail.Framework.Internal
 			Object[] singleValueEntry = new Object[1];
 			StringBuilder sb = new StringBuilder();
 
+			bool useSeparator = false;
+
 			foreach(DictionaryEntry entry in parameters)
 			{
 				if (entry.Value == null) continue;
@@ -216,18 +267,25 @@ namespace Castle.MonoRail.Framework.Internal
 
 				foreach(object value in values)
 				{
-					string encoded = serverUtil.UrlEncode(Convert.ToString(value, CultureInfo.CurrentCulture));
-
-					sb.Append(serverUtil.UrlEncode(entry.Key.ToString())).Append('=').Append(encoded);
-					
-					if (encodeAmp)
+					if (useSeparator)
 					{
-						sb.Append("&amp;");
+						if (encodeAmp)
+						{
+							sb.Append("&amp;");
+						}
+						else
+						{
+							sb.Append("&");
+						}
 					}
 					else
 					{
-						sb.Append("&");
+						useSeparator = true;
 					}
+
+					string encoded = serverUtil.UrlEncode(Convert.ToString(value, CultureInfo.CurrentCulture));
+
+					sb.Append(serverUtil.UrlEncode(entry.Key.ToString())).Append('=').Append(encoded);
 				}
 			}
 

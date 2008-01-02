@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Reflection;
-using Castle.DynamicProxy.Generators.Emitters;
-using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-
 namespace Castle.DynamicProxy.Tests
 {
 	using System;
+	using System.Collections.Generic;
+	using System.Reflection;
+	using Castle.DynamicProxy.Generators.Emitters;
+	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using NUnit.Framework;
 
 	[TestFixture]
 	public class ClassEmitterTestCase : BasePEVerifyTestCase
 	{
-		public override void TearDown ()
-		{
-			generator.ProxyBuilder.ModuleScope.SaveAssembly ();
-			base.TearDown ();
-		}
-
 		[Test]
 		public void AutomaticDefaultConstructorGeneration ()
 		{

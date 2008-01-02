@@ -17,36 +17,57 @@ namespace Castle.MonoRail.Framework
 	using System;
 
 	/// <summary>
+	/// Identifies the cache strategy associated with a view component
+	/// </summary>
+	public enum ViewComponentCache
+	{
+		/// <summary>
+		/// No cache 
+		/// </summary>
+		Disabled,
+		/// <summary>
+		/// Always cache the view component output, no varying.
+		/// </summary>
+		Always,
+		/// <summary>
+		/// Uses a custom key generator that should implement the vary algorithm. 
+		/// </summary>
+		UseCustomCacheKeyGenerator
+	}
+
+	/// <summary>
 	/// Decorates a <see cref="ViewComponent"/> to associate a custom name with it.
 	/// </summary>
-    /// <remarks>
-    /// Decorates a <see cref="ViewComponent"/> to associate a custom name with it.
-    /// <para>
-    /// Optionally you can associate the section names supported by the 
-    /// <see cref="ViewComponent"/>.
-    /// </para>
-    /// </remarks>
-    /// <example>
-    /// In the code below, the class MyHeaderViewConponent will be referenced as just <c>Header</c>,
-    /// and it will support the subsections <c>header</c> and <c>footer</c>.
-    /// <code><![CDATA[
-    /// [ViewComponentDetails("Header", Sections="header,footer")
-    /// public class MyHeaderViewComponent : ViewComponent
-    /// {
-    ///    // :
-    ///    // :
-    /// }
-    /// ]]>
-    /// </code>
-    /// </example>
-    /// <seealso cref="ViewComponent"/>
-    /// <seealso cref="ViewComponentParamAttribute"/>
-
+	/// 	<remarks>
+	/// Decorates a <see cref="ViewComponent"/> to associate a custom name with it.
+	/// <para>
+	/// Optionally you can associate the section names supported by the 
+	/// <see cref="ViewComponent"/>.
+	/// </para>
+	/// </remarks>
+	/// <example>
+	/// In the code below, the class MyHeaderViewConponent will be referenced as just <c>Header</c>,
+	/// and it will support the subsections <c>header</c> and <c>footer</c>.
+	/// <code><![CDATA[
+	/// [ViewComponentDetails("Header", Sections="header,footer")
+	/// public class MyHeaderViewComponent : ViewComponent
+	/// {
+	///    // :
+	///    // :
+	/// }
+	/// ]]>
+	/// </code>
+	/// </example>
+	/// <seealso cref="ViewComponent"/>
+	/// <seealso cref="ViewComponentParamAttribute"/>
 	[AttributeUsage(AttributeTargets.Class), Serializable]
 	public class ViewComponentDetailsAttribute : Attribute
 	{
 		private readonly string name;
 		private string sections;
+		private ViewComponentCache cache = ViewComponentCache.Disabled;
+		private Type cacheKeyFactory;
+		private string[] sectionsFromAttribute;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ViewComponentDetailsAttribute"/> class.
@@ -72,7 +93,57 @@ namespace Castle.MonoRail.Framework
 		public string Sections
 		{
 			get { return sections; }
-			set { sections = value; }
+			set
+			{
+				sections = value;
+				if (!string.IsNullOrEmpty(sections))
+				{
+					sectionsFromAttribute = sections.Split(new char[] {',', ' ', '|'}, StringSplitOptions.RemoveEmptyEntries);
+				}
+
+				if (sectionsFromAttribute == null)
+				{
+					sectionsFromAttribute = new string[0];
+				}
+			}
+		}
+
+		/// <summary>
+		/// Sets the cache strategy.
+		/// </summary>
+		/// <value>The cache.</value>
+		public ViewComponentCache Cache
+		{
+			get { return cache; }
+			set { cache = value; }
+		}
+
+		/// <summary>
+		/// Sets the cache key factory.
+		/// </summary>
+		/// <value>The cache key factory.</value>
+		public Type CacheKeyFactory
+		{
+			get { return cacheKeyFactory; }
+			set
+			{
+				if (value != null)
+				{
+					cache = ViewComponentCache.UseCustomCacheKeyGenerator;
+				}
+				cacheKeyFactory = value;
+			}
+		}
+
+		/// <summary>
+		/// Returns true if the section name specified is present on the list of sections.
+		/// </summary>
+		/// <param name="name">The section name.</param>
+		/// <returns></returns>
+		public bool SupportsSection(string name)
+		{
+			return Array.FindIndex(sectionsFromAttribute,
+							  delegate(string item) { return string.Equals(item, name, StringComparison.InvariantCultureIgnoreCase); }) != -1;
 		}
 	}
 }

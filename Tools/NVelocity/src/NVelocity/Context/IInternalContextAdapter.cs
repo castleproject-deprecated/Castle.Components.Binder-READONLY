@@ -1,3 +1,17 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace NVelocity.Context
 {
 	using System;
@@ -19,9 +33,9 @@ namespace NVelocity.Context
 	                                           IInternalEventContext, IDictionary
 	{
 		/// <summary>
-		/// Need to define this method here otherwise since both IDicationary and IContext
+		/// Need to define this method here otherwise since both <see cref="IDictionary"/> and <see cref="IContext"/> 
 		/// contains a Remove(Object key) method we will need to cast the object to either interface
-		/// before calling this method, for backward compabillity we make the IContext.Remove the default
+		/// before calling this method, for backward compatibility we make the IContext.Remove the default
 		/// </summary>
 		/// <param name="key"></param>
 		/// <returns></returns>

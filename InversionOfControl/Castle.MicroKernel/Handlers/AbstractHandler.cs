@@ -61,7 +61,7 @@ namespace Castle.MicroKernel.Handlers
 		{
 			this.model = model;
 			state = HandlerState.Valid;
-			customParameters = new HybridDictionary(true);
+			InitializeCustomDependencies();
 		}
 
 		#region IHandler Members
@@ -407,8 +407,8 @@ namespace Castle.MicroKernel.Handlers
 					AddDependency(dependency);
 				}
 				else if (dependency.DependencyType == DependencyType.Parameter &&
-				         !ComponentModel.Constructors.HasAmbiguousFewerArgumentsCandidate &&
-				         !ComponentModel.Parameters.Contains(dependency.DependencyKey))
+						 !ComponentModel.Constructors.HasAmbiguousFewerArgumentsCandidate &&
+						 !ComponentModel.Parameters.Contains(dependency.DependencyKey))
 				{
 					AddDependency(dependency);
 				}
@@ -433,7 +433,7 @@ namespace Castle.MicroKernel.Handlers
 		/// <param name="dependency"></param>
 		protected void AddDependency(DependencyModel dependency)
 		{
-			if (Kernel.Resolver.CanResolve(null, this, model, dependency))
+			if (HasValidComponentFromResolver(dependency))
 			{
 				if (dependency.DependencyType == DependencyType.Service && dependency.TargetType != null)
 				{
@@ -526,27 +526,29 @@ namespace Castle.MicroKernel.Handlers
 
 			// Check within the Kernel
 
-			Type[] services = new Type[DependenciesByService.Count];
-			DependenciesByService.Keys.CopyTo(services, 0);
-
-			foreach (Type service in services)
+			foreach (DictionaryEntry kvp in new Hashtable(DependenciesByService))
 			{
-				if (HasValidComponent(service))
+				Type service = (Type)kvp.Key;
+				DependencyModel dependencyModel = (DependencyModel)kvp.Value;
+				if (HasValidComponent(service, dependencyModel))
 				{
 					DependenciesByService.Remove(service);
-					AddGraphDependency(kernel.GetHandler(service).ComponentModel);
+					IHandler dependingHandler = kernel.GetHandler(service);
+					if(dependingHandler!=null)//may not be real handler, if comes from resolver
+						AddGraphDependency(dependingHandler.ComponentModel);
 				}
 			}
 
-			String[] keys = new String[DependenciesByKey.Keys.Count];
-			DependenciesByKey.Keys.CopyTo(keys, 0);
-
-			foreach (String compKey in keys)
+			foreach (DictionaryEntry kvp in new Hashtable(DependenciesByKey))
 			{
-				if (HasValidComponent(compKey) || HasCustomParameter(compKey))
+				string compKey = (string)kvp.Key;
+				DependencyModel dependency = (DependencyModel)kvp.Value;
+				if (HasValidComponent(compKey, dependency) || HasCustomParameter(compKey))
 				{
 					DependenciesByKey.Remove(compKey);
-					AddGraphDependency(kernel.GetHandler(compKey).ComponentModel);
+					IHandler dependingHandler = kernel.GetHandler(compKey);
+					if(dependingHandler!=null)//may not be real handler, if we are using sub resovler
+						AddGraphDependency(dependingHandler.ComponentModel);
 				}
 			}
 
@@ -597,7 +599,7 @@ namespace Castle.MicroKernel.Handlers
 
 			String[] keys = new String[DependenciesByKey.Count];
 
-			DependenciesByKey.Keys.CopyTo(services, 0);
+			DependenciesByKey.Keys.CopyTo(keys, 0);
 
 			foreach (String key in keys)
 			{
@@ -643,7 +645,17 @@ namespace Castle.MicroKernel.Handlers
 			}
 		}
 
-		private bool HasValidComponent(Type service)
+		private void InitializeCustomDependencies()
+		{
+			customParameters = new HybridDictionary(true);
+
+			foreach (DictionaryEntry customParameter in model.CustomDependencies)
+			{
+				customParameters.Add(customParameter.Key, customParameter.Value);	
+			}
+		}
+
+		private bool HasValidComponent(Type service, DependencyModel dependency)
 		{
 			foreach (IHandler handler in kernel.GetHandlers(service))
 			{
@@ -652,12 +664,25 @@ namespace Castle.MicroKernel.Handlers
 					return true;
 				}
 			}
-			return false;
+
+			// could not find in kernel directly, check using resolvers
+			return HasValidComponentFromResolver(dependency);
 		}
 
-		private bool HasValidComponent(String key)
+		private bool HasValidComponent(String key, DependencyModel dependency)
 		{
-			return IsValidHandlerState(kernel.GetHandler(key));
+			if (IsValidHandlerState(kernel.GetHandler(key)))
+				return true;
+			// could not find in kernel directly, check using resolvers
+			return HasValidComponentFromResolver(dependency);
+
+		}
+
+		private bool HasValidComponentFromResolver(DependencyModel dependency)
+		{
+			if (Kernel.Resolver.CanResolve(null, this, model, dependency))
+				return true;
+			return false;
 		}
 
 		private bool IsValidHandlerState(IHandler handler)

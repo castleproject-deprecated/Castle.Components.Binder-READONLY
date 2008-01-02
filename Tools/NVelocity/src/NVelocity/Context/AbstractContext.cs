@@ -1,3 +1,17 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace NVelocity.Context
 {
 	using System;
@@ -37,6 +51,40 @@ namespace NVelocity.Context
 	[Serializable]
 	public abstract class AbstractContext : InternalContextBase, IContext
 	{
+		/// <summary>  the chained Context if any
+		/// </summary>
+		private readonly IContext innerContext = null;
+
+		/// <summary>  default CTOR
+		/// </summary>
+		public AbstractContext()
+		{
+		}
+
+		/// <summary>  Chaining constructor accepts a Context argument.
+		/// It will relay get() operations into this Context
+		/// in the even the 'local' get() returns null.
+		///
+		/// </summary>
+		/// <param name="inner">context to be chained
+		///
+		/// </param>
+		public AbstractContext(IContext inner)
+		{
+			innerContext = inner;
+
+			/*
+			 *  now, do a 'forward pull' of event cartridge so
+			 *  it's accessible, bringing to the top level.
+			 */
+
+			IInternalEventContext internalEventContext = innerContext as IInternalEventContext;
+			if (internalEventContext != null)
+			{
+				AttachEventCartridge(internalEventContext.EventCartridge);
+			}
+		}
+
 		public Object[] Keys
 		{
 			get { return InternalGetKeys(); }
@@ -46,10 +94,6 @@ namespace NVelocity.Context
 		{
 			get { return innerContext; }
 		}
-
-		/// <summary>  the chained Context if any
-		/// </summary>
-		private IContext innerContext = null;
 
 		///
 		/// <summary>  Implement to return a value from the context storage.
@@ -76,12 +120,12 @@ namespace NVelocity.Context
 		/// </summary>
 		/// <param name="key">key with which to associate the value
 		/// </param>
-		/// <param name="value_">value to be associated with the key
+		/// <param name="value">value to be associated with the key
 		/// </param>
 		/// <returns>previously stored value if exists, or null
 		///
 		/// </returns>
-		public abstract Object InternalPut(String key, Object value_);
+		public abstract Object InternalPut(String key, Object value);
 
 		///
 		/// <summary>  Implement to determine if a key is in the storage.
@@ -111,7 +155,7 @@ namespace NVelocity.Context
 		public abstract Object[] InternalGetKeys();
 
 		///
-		/// <summary>  I mplement to remove an item from your storage.
+		/// <summary>  Implement to remove an item from your storage.
 		/// <br/><br/>
 		/// Currently, this method is not used internally by
 		/// the Velocity core.
@@ -124,47 +168,18 @@ namespace NVelocity.Context
 		/// </returns>
 		public abstract Object InternalRemove(Object key);
 
-		/// <summary>  default CTOR
-		/// </summary>
-		public AbstractContext()
-		{
-		}
-
-		/// <summary>  Chaining constructor accepts a Context argument.
-		/// It will relay get() operations into this Context
-		/// in the even the 'local' get() returns null.
-		///
-		/// </summary>
-		/// <param name="inner">context to be chained
-		///
-		/// </param>
-		public AbstractContext(IContext inner)
-		{
-			innerContext = inner;
-
-			/*
-	    *  now, do a 'forward pull' of event cartridge so
-	    *  it's accessable, bringing to the top level.
-	    */
-
-			if (innerContext is IInternalEventContext)
-			{
-				AttachEventCartridge(((IInternalEventContext) innerContext).EventCartridge);
-			}
-		}
-
 		/// <summary> Adds a name/value pair to the context.
 		///
 		/// </summary>
 		/// <param name="key">  The name to key the provided value with.
 		/// </param>
-		/// <param name="value_">The corresponding value.
+		/// <param name="value">The corresponding value.
 		/// </param>
 		/// <returns>Object that was replaced in the the Context if
 		/// applicable or null if not.
 		///
 		/// </returns>
-		public Object Put(String key, Object value_)
+		public Object Put(String key, Object value)
 		{
 			/*
 	    * don't even continue if key or value is null
@@ -174,12 +189,12 @@ namespace NVelocity.Context
 			{
 				return null;
 			}
-//			else if (value_ == null)
+//			else if (value == null)
 //			{
 //				return null;
 //			}
 
-			return InternalPut(key, value_);
+			return InternalPut(key, value);
 		}
 
 		/// <summary>  Gets the value corresponding to the provided key from the context.

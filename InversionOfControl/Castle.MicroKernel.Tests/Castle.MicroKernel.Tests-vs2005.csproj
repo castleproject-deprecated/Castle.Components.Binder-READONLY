@@ -128,6 +128,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ClassComponents\CommonImplWithDependancy.cs" />
+    <Compile Include="ClassComponents\CustomerChain.cs" />
     <Compile Include="ClassComponents\CustomerImpl.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -169,6 +170,8 @@
     <Compile Include="Configuration\ConfigurationTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DependencyResolvingTestCase.cs" />
+    <Compile Include="EventTests.cs" />
     <Compile Include="Facilities\FactorySupport\FactorySupportProgrammaticTestCase.cs" />
     <Compile Include="Facilities\FactorySupport\FactorySupportTestCase.cs" />
     <Compile Include="Facilities\Startable\Components\StartableComponentWithCustomDependencies.cs" />
@@ -180,9 +183,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DependencyResolvers.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DependencyResolvingTestCases.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Facilities\Startable\Components\NoInterfaceStartableComponent.cs">
@@ -203,6 +203,7 @@
     <Compile Include="Lifecycle\Components\HttpFakeServer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Lifestyle\Components\MyCustomerActivator.cs" />
     <Compile Include="Lifestyle\DecomissioningResponsibilitiesTestCase.cs" />
     <Compile Include="Lifecycle\LifecycleTestCase.cs">
       <SubType>Code</SubType>
@@ -247,6 +248,7 @@
     <Compile Include="Pools\PooledLifestyleManagerTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Registration\ComponentRegistrationTestCase.cs" />
     <Compile Include="RuntimeParametersTestCase.cs" />
     <Compile Include="RuntimeParameters\ComponentWithParameters.cs" />
     <Compile Include="SerializationTestCase.cs">
@@ -255,6 +257,7 @@
     <Compile Include="SubContainers\SubContainersTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SubResolverTestCase.cs" />
     <Compile Include="TransientMultiConstructorTestCase.cs" />
     <Compile Include="UnsatisfiedDependenciesTestCase.cs">
       <SubType>Code</SubType>

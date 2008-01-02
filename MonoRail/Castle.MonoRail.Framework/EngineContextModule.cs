@@ -19,6 +19,7 @@ namespace Castle.MonoRail.Framework
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Adapters;
 	using Castle.MonoRail.Framework.Extensions.ExceptionChaining;
+	using Castle.MonoRail.Framework.Routing;
 
 	/// <summary>
 	/// Provides the services used and shared by the framework. Also 
@@ -54,8 +55,8 @@ namespace Castle.MonoRail.Framework
 				CreateAndStartContainer(context);
 			}
 
-			context.BeginRequest += new EventHandler(OnStartMonoRailRequest);
-			context.AuthorizeRequest += new EventHandler(CreateControllerAndRunStartRequestFilters);
+			context.BeginRequest += OnStartMonoRailRequest;
+			context.AuthenticateRequest += CreateControllerAndRunStartRequestFilters;
 
 			SubscribeToApplicationHooks(context);
 		}
@@ -78,6 +79,7 @@ namespace Castle.MonoRail.Framework
 			{
 				container = new MonoRailServiceContainer();
 				container.RegisterBaseService(typeof(IServerUtility), new ServerUtilityAdapter(context.Server));
+				container.RegisterBaseService(typeof(IRoutingEngine), RoutingModuleEx.Engine);
 				container.Start();
 
 				ILoggerFactory loggerFactory = (ILoggerFactory) container.GetService(typeof(ILoggerFactory));
@@ -147,7 +149,7 @@ namespace Castle.MonoRail.Framework
 			{
 				controller = CreateController(context);
 			}
-			catch(Exception ex)
+			catch(ControllerNotFoundException ex)
 			{
 				IViewEngineManager viewEngineManager = context.GetService<IViewEngineManager>();
 
@@ -200,12 +202,12 @@ namespace Castle.MonoRail.Framework
 
 		#endregion
 
-		private void MarkRequestAsMonoRailRequest(HttpContext context)
+		private static void MarkRequestAsMonoRailRequest(HttpContext context)
 		{
 			context.Items["is.mr.request"] = true;
 		}
 
-		private bool IsMonoRailRequest(HttpContext context)
+		private static bool IsMonoRailRequest(HttpContext context)
 		{
 			return context.Items.Contains("is.mr.request");
 		}
@@ -354,10 +356,13 @@ namespace Castle.MonoRail.Framework
 			HttpApplication app = (HttpApplication)sender;
 			if (!IsMonoRailRequest(app.Context)) return;
 			IRailsEngineContext mrContext = ObtainContextFromApplication(sender);
+			
+			if (mrContext != null)
+			{
+				mrContext.LastException = mrContext.UnderlyingContext.Server.GetLastError();
 
-			mrContext.LastException = mrContext.UnderlyingContext.Server.GetLastError();
-
-			container.extensionManager.RaiseUnhandledError(mrContext);
+				container.extensionManager.RaiseUnhandledError(mrContext);
+			}
 		}
 
 		private void OnResolveRequestCache(object sender, EventArgs e)
@@ -390,7 +395,7 @@ namespace Castle.MonoRail.Framework
 
 				HttpRequest req = context.Request;
 
-				UrlInfo urlInfo = urlTokenizer.TokenizeUrl(req.FilePath, req.Url, req.IsLocal, req.ApplicationPath);
+				UrlInfo urlInfo = urlTokenizer.TokenizeUrl(req.FilePath, req.PathInfo, req.Url, req.IsLocal, req.ApplicationPath);
 
 				IServiceProvider userServiceProvider = ServiceProviderLocator.Instance.LocateProvider();
 

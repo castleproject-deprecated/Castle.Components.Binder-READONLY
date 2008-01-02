@@ -82,7 +82,7 @@ namespace Castle.MonoRail.Framework
 		{
 			if (HttpContext.Current == null)
 			{
-				throw new RailsException("No http context available");
+				throw new MonoRailException("No http context available");
 			}
 			
 			if (logger.IsDebugEnabled)
@@ -92,11 +92,11 @@ namespace Castle.MonoRail.Framework
 
 			IRailsEngineContext context = EngineContextModule.ObtainRailsEngineContext(HttpContext.Current);
 
-			Controller controller = context.CurrentController;
+			IController controller = context.CurrentController;
 
 			if (controller == null)
 			{
-				throw new RailsException("No controller found on the executing activity");
+				throw new MonoRailException("No controller found on the executing activity");
 			}
 
 			if (parameters != null && parameters.Count != 0)
@@ -136,7 +136,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="doNotApplyLayout">If <c>true</c>, it will skip the layout</param>
 		/// <returns>An instance of <see cref="Message"/></returns>
 		public Message RenderMailMessage(String templateName, IRailsEngineContext context,
-		                                 Controller controller, bool doNotApplyLayout)
+										 IController controller, bool doNotApplyLayout)
 		{
 			// create a message object
 			Message message = new Message();

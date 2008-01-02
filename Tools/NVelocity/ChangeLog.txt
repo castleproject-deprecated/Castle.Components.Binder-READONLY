@@ -1,3 +1,21 @@
+- Applied Simon Cropp's patch fixing NVELOCITY-19
+  "Clean up more code in nvelocity"
+
+- Applied Ashish Kulkarni's patch that adds a new loader. Fixes NVELOCITY-20
+  "add AssemblyRelativeResourceLoader for loading resources using with relative template names"
+
+- Applied Simon Cropp's patch fixing NVELOCITY-18
+  "Clean up more code in nvelocity"
+
+- Applied Simon Cropp's patch fixing NVELOCITY-17
+  "Clean up string concatenation, variable naming and spelling errors"
+
+- Applied patch by Simon Cropp fixing NVELOCITY-16
+  "Exception handling in character parsing is not optimal"
+
+- Fixed NVELOCITY-15
+  "Fix thread safety issue in ASTMethod.Execute()"
+
 - Added escape support for the dictionary strings
 
   For example: #{onclick='alert(\'hello\')'}

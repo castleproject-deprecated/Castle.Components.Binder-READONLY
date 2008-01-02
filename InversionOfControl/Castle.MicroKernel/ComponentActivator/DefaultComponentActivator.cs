@@ -17,6 +17,8 @@ namespace Castle.MicroKernel.ComponentActivator
 	using System;
 	using System.Reflection;
 	using System.Runtime.Remoting;
+	using System.Security;
+	using System.Security.Permissions;
 	using Castle.Core;
 	using Castle.Core.Interceptor;
 	using Castle.MicroKernel.LifecycleConcerns;
@@ -35,6 +37,8 @@ namespace Castle.MicroKernel.ComponentActivator
 	[Serializable]
 	public class DefaultComponentActivator : AbstractComponentActivator
 	{
+		private readonly bool useFastCreateInstance;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultComponentActivator"/> class.
 		/// </summary>
@@ -47,6 +51,7 @@ namespace Castle.MicroKernel.ComponentActivator
 										 ComponentInstanceDelegate onDestruction)
 			: base(model, kernel, onCreation, onDestruction)
 		{
+			useFastCreateInstance = !model.Implementation.IsContextful && SecurityManager.IsGranted(new SecurityPermission(SecurityPermissionFlag.SerializationFormatter));
 		}
 
 		#region AbstractComponentActivator Members
@@ -97,18 +102,13 @@ namespace Castle.MicroKernel.ComponentActivator
 			{
 				try
 				{
-					if (implType.IsContextful)
+					if (useFastCreateInstance)
 					{
-						instance = Activator.CreateInstance(implType, arguments);
+						instance = FastCreateInstance(implType, arguments, signature);
 					}
 					else
 					{
-						ConstructorInfo cinfo = implType.GetConstructor(
-							BindingFlags.Public | BindingFlags.Instance, null, signature, null);
-
-						instance = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(implType);
-
-						cinfo.Invoke(instance, arguments);
+						instance = Activator.CreateInstance(implType, arguments);
 					}
 				}
 				catch(Exception ex)
@@ -130,6 +130,17 @@ namespace Castle.MicroKernel.ComponentActivator
 				}
 			}
 
+			return instance;
+		}
+
+		private static object FastCreateInstance(Type implType, object[] arguments, Type[] signature)
+		{
+			ConstructorInfo cinfo = implType.GetConstructor(
+				BindingFlags.Public | BindingFlags.Instance, null, signature, null);
+
+			object instance = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(implType);
+
+			cinfo.Invoke(instance, arguments);
 			return instance;
 		}
 

@@ -34,6 +34,11 @@ namespace Castle.MonoRail.Views.Brail.TestSite.Controllers
             this.Redirect("home", "index");
         }
 
+		[Layout("/layoutable/notInLayouts")]
+		public void CustomLayoutLocation()
+		{
+
+		}
     }
 }
 

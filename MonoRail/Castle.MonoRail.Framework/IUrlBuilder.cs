@@ -33,6 +33,17 @@ namespace Castle.MonoRail.Framework
 		/// <param name="current">The current Url information.</param>
 		/// <param name="parameters">The parameters.</param>
 		/// <returns></returns>
+		UrlPartsBuilder CreateUrlPartsBuilder(UrlInfo current, IDictionary parameters);
+
+		/// <summary>
+		/// Builds the URL using the current url as contextual information and a parameter dictionary.
+		/// <para>
+		/// Common parameters includes area, controller and action. 
+		/// </para>
+		/// </summary>
+		/// <param name="current">The current Url information.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
 		string BuildUrl(UrlInfo current, IDictionary parameters);
 
 		/// <summary>
@@ -95,5 +106,31 @@ namespace Castle.MonoRail.Framework
 		/// <param name="queryStringParams">The query string params.</param>
 		/// <returns></returns>
 		string BuildUrl(UrlInfo current, string area, string controller, string action, NameValueCollection queryStringParams);
+
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="current">The current.</param>
+		/// <param name="routeName">Name of the route.</param>
+		/// <returns></returns>
+		string BuildRouteUrl(UrlInfo current, string routeName);
+
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="current">The current.</param>
+		/// <param name="routeName">Name of the route.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		string BuildRouteUrl(UrlInfo current, string routeName, IDictionary parameters);
+
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="current">The current.</param>
+		/// <param name="routeName">Name of the route.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		string BuildRouteUrl(UrlInfo current, string routeName, object parameters);
 	}
 }

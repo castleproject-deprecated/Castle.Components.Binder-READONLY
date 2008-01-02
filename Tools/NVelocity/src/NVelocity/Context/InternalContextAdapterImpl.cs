@@ -1,3 +1,17 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace NVelocity.Context
 {
 	using System;
@@ -27,7 +41,7 @@ namespace NVelocity.Context
 	/// *
 	/// This class ensures that an InternalContextBase is available for internal
 	/// use.  If an application constructs their own Context-implementing
-	/// object w/o subclassing AbstractContext, it may be that support for
+	/// object w/o sub-classing AbstractContext, it may be that support for
 	/// InternalContext is not available.  Therefore, InternalContextAdapter will
 	/// create an InternalContextBase if necessary for this support.  Note that
 	/// if this is necessary, internal information such as node-cache data will be
@@ -41,24 +55,72 @@ namespace NVelocity.Context
 	/// <version> $Id: InternalContextAdapterImpl.cs,v 1.4 2003/10/27 13:54:08 corts Exp $
 	///
 	/// </version>
-	//TODO: class was sealed
 	public class InternalContextAdapterImpl : IInternalContextAdapter
 	{
+		///
+		/// <summary>  the user data Context that we are wrapping
+		/// </summary>
+		internal IContext context = null;
+
+		///
+		/// <summary>  the ICB we are wrapping.  We may need to make one
+		/// if the user data context implementation doesn't
+		/// support one.  The default AbstractContext-derived
+		/// VelocityContext does, and it's recommended that
+		/// people derive new contexts from AbstractContext
+		/// rather than piecing things together
+		/// </summary>
+		internal IInternalHousekeepingContext internalHousekeepingContext = null;
+
+		/// <summary>  The InternalEventContext that we are wrapping.  If
+		/// the context passed to us doesn't support it, no
+		/// biggie.  We don't make it for them - since its a
+		/// user context thing, nothing gained by making one
+		/// for them now
+		/// </summary>
+		internal IInternalEventContext internalEventContext = null;
+
+		/// <summary>  CTOR takes a Context and wraps it, delegating all 'data' calls
+		/// to it.
+		///
+		/// For support of internal contexts, it will create an InternalContextBase
+		/// if need be.
+		/// </summary>
+		public InternalContextAdapterImpl(IContext c)
+		{
+			context = c;
+
+			if (c is IInternalHousekeepingContext)
+			{
+				internalHousekeepingContext = (IInternalHousekeepingContext) context;
+			}
+			else
+			{
+				internalHousekeepingContext = new InternalContextBase();
+			}
+
+			IInternalEventContext internalEventContext = context as IInternalEventContext;
+			if (internalEventContext != null)
+			{
+				this.internalEventContext = internalEventContext;
+			}
+		}
+
 		public String CurrentTemplateName
 		{
-			get { return icb.CurrentTemplateName; }
+			get { return internalHousekeepingContext.CurrentTemplateName; }
 		}
 
 		public Object[] TemplateNameStack
 		{
-			get { return icb.TemplateNameStack; }
+			get { return internalHousekeepingContext.TemplateNameStack; }
 		}
 
 		public Resource CurrentResource
 		{
-			get { return icb.CurrentResource; }
+			get { return internalHousekeepingContext.CurrentResource; }
 
-			set { icb.CurrentResource = value; }
+			set { internalHousekeepingContext.CurrentResource = value; }
 		}
 
 		public Object[] Keys
@@ -117,60 +179,12 @@ namespace NVelocity.Context
 		{
 			get
 			{
-				if (iec != null)
+				if (internalEventContext != null)
 				{
-					return iec.EventCartridge;
+					return internalEventContext.EventCartridge;
 				}
 
 				return null;
-			}
-		}
-
-		///
-		/// <summary>  the user data Context that we are wrapping
-		/// </summary>
-		internal IContext context = null;
-
-		///
-		/// <summary>  the ICB we are wrapping.  We may need to make one
-		/// if the user data context implementation doesn't
-		/// support one.  The default AbstractContext-derived
-		/// VelocityContext does, and it's recommended that
-		/// people derive new contexts from AbstractContext
-		/// rather than piecing things together
-		/// </summary>
-		internal IInternalHousekeepingContext icb = null;
-
-		/// <summary>  The InternalEventContext that we are wrapping.  If
-		/// the context passed to us doesn't support it, no
-		/// biggie.  We don't make it for them - since its a
-		/// user context thing, nothing gained by making one
-		/// for them now
-		/// </summary>
-		internal IInternalEventContext iec = null;
-
-		/// <summary>  CTOR takes a Context and wraps it, delegating all 'data' calls
-		/// to it.
-		///
-		/// For support of internal contexts, it will create an InternalContextBase
-		/// if need be.
-		/// </summary>
-		public InternalContextAdapterImpl(IContext c)
-		{
-			context = c;
-
-			if (!(c is IInternalHousekeepingContext))
-			{
-				icb = new InternalContextBase();
-			}
-			else
-			{
-				icb = (IInternalHousekeepingContext) context;
-			}
-
-			if (c is IInternalEventContext)
-			{
-				iec = (IInternalEventContext) context;
 			}
 		}
 
@@ -178,31 +192,30 @@ namespace NVelocity.Context
 
 		public void PushCurrentTemplateName(String s)
 		{
-			icb.PushCurrentTemplateName(s);
+			internalHousekeepingContext.PushCurrentTemplateName(s);
 		}
 
 		public void PopCurrentTemplateName()
 		{
-			icb.PopCurrentTemplateName();
+			internalHousekeepingContext.PopCurrentTemplateName();
 		}
-
 
 		public IntrospectionCacheData ICacheGet(Object key)
 		{
-			return icb.ICacheGet(key);
+			return internalHousekeepingContext.ICacheGet(key);
 		}
 
 		public void ICachePut(Object key, IntrospectionCacheData o)
 		{
-			icb.ICachePut(key, o);
+			internalHousekeepingContext.ICachePut(key, o);
 		}
 
 
 		/* ---  Context interface methods --- */
 
-		public Object Put(String key, Object value_)
+		public Object Put(String key, Object value)
 		{
-			return context.Put(key, value_);
+			return context.Put(key, value);
 		}
 
 		public Object Get(String key)
@@ -233,11 +246,11 @@ namespace NVelocity.Context
 		/// be something else
 		/// </summary>
 		/* -----  InternalEventContext ---- */
-		public EventCartridge AttachEventCartridge(EventCartridge ec)
+		public EventCartridge AttachEventCartridge(EventCartridge eventCartridge)
 		{
-			if (iec != null)
+			if (internalEventContext != null)
 			{
-				return iec.AttachEventCartridge(ec);
+				return internalEventContext.AttachEventCartridge(eventCartridge);
 			}
 
 			return null;
@@ -305,12 +318,12 @@ namespace NVelocity.Context
 	public class InternalContextAdapterImplEnumerator : IDictionaryEnumerator
 	{
 		private int index = -1;
-		private IContext ctx;
-		private object[] keys;
+		private readonly IContext context;
+		private readonly object[] keys;
 
 		public InternalContextAdapterImplEnumerator(IContext context)
 		{
-			ctx = context;
+			this.context = context;
 			keys = context.Keys;
 		}
 
@@ -323,7 +336,7 @@ namespace NVelocity.Context
 
 		public object Value
 		{
-			get { return ctx.Get(keys[index].ToString()); }
+			get { return context.Get(keys[index].ToString()); }
 		}
 
 		public DictionaryEntry Entry

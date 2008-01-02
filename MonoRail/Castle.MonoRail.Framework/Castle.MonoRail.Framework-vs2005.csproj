@@ -75,10 +75,6 @@
       <Name>Castle.Components.Common.EmailSender</Name>
       <HintPath>..\..\build\net-2.0\debug\Castle.Components.Common.EmailSender.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Core">
-      <Name>Castle.Core</Name>
-      <HintPath>..\..\build\net-2.0\debug\Castle.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -161,6 +157,24 @@
     <Compile Include="Attributes\ViewComponentParamAttribute.cs" />
     <Compile Include="Configuration\DefaultUrl.cs" />
     <Compile Include="Configuration\DefaultUrlCollection.cs" />
+    <Compile Include="Configuration\UrlConfig.cs" />
+    <Compile Include="IController.cs" />
+    <Compile Include="Extensions\ExceptionChaining\LocalExceptionFilterHandler.cs" />
+    <Compile Include="Internal\Descriptors\ViewComponentDescriptor.cs" />
+    <Compile Include="Internal\Providers\DefaultViewComponentDescriptorProvider.cs" />
+    <Compile Include="Internal\Providers\IViewComponentDescriptorProvider.cs" />
+    <Compile Include="Internal\ViewComponentCacheBag.cs" />
+    <Compile Include="IRescueController.cs" />
+    <Compile Include="IRouteContext.cs" />
+    <Compile Include="IRoutingEngine.cs" />
+    <Compile Include="CacheKey.cs" />
+    <Compile Include="Routing\IRoutingRule.cs" />
+    <Compile Include="Routing\PatternRule.cs" />
+    <Compile Include="Routing\RegexRule.cs" />
+    <Compile Include="Routing\RouteContext.cs" />
+    <Compile Include="Routing\RouteMatch.cs" />
+    <Compile Include="Routing\RoutingEngine.cs" />
+    <Compile Include="Routing\RoutingModuleEx.cs" />
     <Compile Include="ServiceProviderLocator.cs" />
     <Compile Include="Extensions\ExceptionChaining\FilteredExceptionHandler.cs" />
     <Compile Include="Extensions\ExceptionChaining\LoggingExceptionHandler.cs" />
@@ -422,7 +436,7 @@
     <Compile Include="ProcessEngine.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="RailsException.cs">
+    <Compile Include="MonoRailException.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="RoutingModule.cs">
@@ -451,6 +465,7 @@
     <Compile Include="SmartDispatcherController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Test\IMockRequest.cs" />
     <Compile Include="Test\IMockResponse.cs" />
     <Compile Include="Test\IMockViewComponentContext.cs" />
     <Compile Include="Test\MockCacheProvider.cs" />
@@ -469,16 +484,23 @@
     <Compile Include="TransformFilters\LowerCaseTransformFilter.cs" />
     <Compile Include="TransformFilters\UpperCaseTransformFilter.cs" />
     <Compile Include="TransformFilters\WikiTransformFilter.cs" />
+    <Compile Include="UrlPartsBuilder.cs" />
     <Compile Include="ViewComponent.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewComponentException.cs" />
+    <Compile Include="ViewComponents\AbstractPaginationViewComponent.cs" />
+    <Compile Include="ViewComponents\AlwaysCacheKeyGenerator.cs" />
     <Compile Include="ViewComponents\AuthenticatedContent.cs" />
     <Compile Include="ViewComponents\CaptureFor.cs" />
     <Compile Include="ViewComponents\ChildContentComponent.cs" />
     <Compile Include="ViewComponents\ColumnRenderer.cs" />
     <Compile Include="ViewComponents\DiggStylePagination.cs" />
+    <Compile Include="ViewComponents\IViewComponentCacheKeyGenerator.cs" />
     <Compile Include="ViewComponents\SecurityComponent.cs" />
+    <Compile Include="ViewComponents\SelectStylePagination.cs" />
+    <Compile Include="ViewComponents\SiteMapComponent.cs" />
+    <Compile Include="ViewComponents\TreeMakerComponent.cs" />
     <Compile Include="ViewComponents\UpdatePage.cs" />
     <Compile Include="ViewComponents\UpdatePageTag.cs" />
     <Compile Include="Views\Aspx\Contents.cs">
@@ -595,13 +617,14 @@
       <Project>{98F19522-C9B8-400D-8A12-DABB3DA9411D}</Project>
       <Name>Castle.Components.Binder-vs2005</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Components\Validator\Castle.Components.Validator\Castle.Components.Validator.csproj">
+    <ProjectReference Include="..\..\Components\Validator\Castle.Components.Validator\Castle.Components.Validator-vs2005.csproj">
       <Project>{4C945D49-02E9-43F2-9202-E7A6E7C56E77}</Project>
-      <Name>Castle.Components.Validator</Name>
+      <Name>Castle.Components.Validator-vs2005</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Internal\Graph\" />
+    <ProjectReference Include="..\..\Core\Castle.Core\Castle.Core-vs2005.csproj">
+      <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
+      <Name>Castle.Core-vs2005</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,3 +1,17 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace NVelocity
 {
 	using System;
@@ -28,12 +42,6 @@ namespace NVelocity
 	{
 		private System.Exception errorCondition = null;
 
-		/// <summary>
-		/// Default constructor.
-		/// </summary>
-		public Template()
-		{
-		}
 
 		/// <summary>
 		/// Gets the named resource as a stream, parses and inits.
@@ -51,11 +59,10 @@ namespace NVelocity
 		public override bool Process()
 		{
 			data = null;
-			Stream s = null;
 			errorCondition = null;
 
 			// first, try to get the stream from the loader
-			s = ObtainStream();
+			Stream s = ObtainStream();
 
 			// if that worked, lets protect in case a loader impl
 			// forgets to throw a proper exception
@@ -67,20 +74,20 @@ namespace NVelocity
 				{
 					StreamReader br = new StreamReader(s, System.Text.Encoding.GetEncoding(encoding));
 
-					data = rsvc.Parse(br, name);
+					data = runtimeServices.Parse(br, name);
 					InitDocument();
 					return true;
 				}
-				catch(IOException uce)
+				catch(IOException ioException)
 				{
-					String msg = "Template.process : Unsupported input encoding : " + encoding + " for template " + name;
+					String msg = string.Format("Template.process : Unsupported input encoding : {0} for template {1}", encoding, name);
 
-					throw errorCondition = new ParseErrorException(msg, uce);
+					throw errorCondition = new ParseErrorException(msg, ioException);
 				}
-				catch(ParseException pex)
+				catch(ParseException parseException)
 				{
 					// remember the error and convert
-					throw errorCondition = new ParseErrorException(pex.Message, pex);
+					throw errorCondition = new ParseErrorException(parseException.Message, parseException);
 				}
 				catch(System.Exception e)
 				{
@@ -97,34 +104,34 @@ namespace NVelocity
 			else
 			{
 				// is == null, therefore we have some kind of file issue
-				throw errorCondition = new ResourceNotFoundException("Unknown resource error for resource " + name);
+				throw errorCondition = new ResourceNotFoundException(string.Format("Unknown resource error for resource {0}", name));
 			}
 		}
 
 		/// <summary> 
 		/// initializes the document.  init() is not longer
 		/// dependant upon context, but we need to let the
-		/// init() carry the template name down throught for VM
+		/// init() carry the template name down through for VM
 		/// namespace features
 		/// </summary>
 		public void InitDocument()
 		{
 			// send an empty InternalContextAdapter down into the AST to initialize it
-			InternalContextAdapterImpl ica = new InternalContextAdapterImpl(new VelocityContext());
+			InternalContextAdapterImpl internalContextAdapterImpl = new InternalContextAdapterImpl(new VelocityContext());
 
 			try
 			{
 				// put the current template name on the stack
-				ica.PushCurrentTemplateName(name);
+				internalContextAdapterImpl.PushCurrentTemplateName(name);
 
 				// init the AST
-				((SimpleNode) data).Init(ica, rsvc);
+				((SimpleNode) data).Init(internalContextAdapterImpl, runtimeServices);
 			}
 			finally
 			{
 				// in case something blows up...
 				// pull it off for completeness
-				ica.PopCurrentTemplateName();
+				internalContextAdapterImpl.PopCurrentTemplateName();
 			}
 		}
 
@@ -135,7 +142,7 @@ namespace NVelocity
 		/// Throws IOException if failure is due to a file related
 		/// issue, and Exception otherwise
 		/// </summary>
-		/// <param name="context">Conext with data elements accessed by template</param>
+		/// <param name="context">Context with data elements accessed by template</param>
 		/// <param name="writer">writer for rendered template</param>
 		/// <exception cref="ResourceNotFoundException">
 		/// if template not found from any available source.
@@ -160,20 +167,20 @@ namespace NVelocity
 			{
 				// create an InternalContextAdapter to carry the user Context down
 				// into the rendering engine.  Set the template name and render()
-				InternalContextAdapterImpl ica = new InternalContextAdapterImpl(context);
+				InternalContextAdapterImpl internalContextAdapterImpl = new InternalContextAdapterImpl(context);
 
 				try
 				{
-					ica.PushCurrentTemplateName(name);
-					ica.CurrentResource = this;
+					internalContextAdapterImpl.PushCurrentTemplateName(name);
+					internalContextAdapterImpl.CurrentResource = this;
 
-					((SimpleNode) data).Render(ica, writer);
+					((SimpleNode) data).Render(internalContextAdapterImpl, writer);
 				}
 				finally
 				{
 					// lets make sure that we always clean up the context 
-					ica.PopCurrentTemplateName();
-					ica.CurrentResource = null;
+					internalContextAdapterImpl.PopCurrentTemplateName();
+					internalContextAdapterImpl.CurrentResource = null;
 				}
 			}
 			else
@@ -181,7 +188,7 @@ namespace NVelocity
 				// this shouldn't happen either, but just in case.
 				String msg = "Template.merge() failure. The document is null, most likely due to parsing error.";
 
-				rsvc.Error(msg);
+				runtimeServices.Error(msg);
 				throw new System.Exception(msg);
 			}
 		}
@@ -192,10 +199,10 @@ namespace NVelocity
 			{
 				return resourceLoader.GetResourceStream(name);
 			}
-			catch(ResourceNotFoundException rnfe)
+			catch(ResourceNotFoundException resourceNotFoundException)
 			{
 				//  remember and re-throw
-				errorCondition = rnfe;
+				errorCondition = resourceNotFoundException;
 				throw;
 			}
 		}

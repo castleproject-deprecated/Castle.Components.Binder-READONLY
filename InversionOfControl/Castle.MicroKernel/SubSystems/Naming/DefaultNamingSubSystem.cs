@@ -16,11 +16,14 @@ namespace Castle.MicroKernel.SubSystems.Naming
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Specialized;
+	using System.Threading;
 
 	/// <summary>
 	/// Default <see cref="INamingSubSystem"/> implementation.
-	/// Keeps services and key maps as simple hash tables. Does not
-	/// support a query string.
+	/// Keeps services map as a simple hash table.
+	/// Keeps key map as a list dictionary to maintain order.
+	/// Does not support a query string.
 	/// </summary>
 	[Serializable]
 	public class DefaultNamingSubSystem : AbstractSubSystem, INamingSubSystem
@@ -28,24 +31,29 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		/// <summary>
 		/// Map(String, IHandler) to map component keys
 		/// to <see cref="IHandler"/>
+		/// Items in this dictionary are sorted in insertion order.
 		/// </summary>
 		protected IDictionary key2Handler;
 
 		/// <summary>
-		/// Map(Type, IHandler) to map services 
-		/// to <see cref="IHandler"/>
+		/// Map(Type, IHandler) to map a service
+		/// to <see cref="IHandler"/>.
+		/// If there is more than a single service of the type, only the first
+		/// registered services is stored in this dictionary.
+		/// It serve as a fast lookup for the common case of having a single handler for 
+		/// a type.
 		/// </summary>
 		protected IDictionary service2Handler;
 
-		private object locker = new object();
+		private readonly ReaderWriterLock locker = new ReaderWriterLock();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultNamingSubSystem"/> class.
 		/// </summary>
 		public DefaultNamingSubSystem()
 		{
-			key2Handler = Hashtable.Synchronized(new Hashtable());
-			service2Handler = Hashtable.Synchronized(new Hashtable());
+			key2Handler = new OrderedDictionary();
+			service2Handler = new Hashtable();
 		}
 
 		#region INamingSubSystem Members
@@ -54,8 +62,9 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		{
 			Type service = handler.ComponentModel.Service;
 
-			lock(locker)
+			try
 			{
+				locker.AcquireWriterLock(Timeout.Infinite);
 				if (key2Handler.Contains(key))
 				{
 					throw new ComponentRegistrationException(
@@ -69,38 +78,61 @@ namespace Castle.MicroKernel.SubSystems.Naming
 
 				this[key] = handler;
 			}
-
+			finally
+			{
+				locker.ReleaseLock();
+			}
 		}
 
 		public virtual bool Contains(String key)
 		{
-			lock(locker)
+			try
 			{
+				locker.AcquireReaderLock(Timeout.Infinite);
 				return key2Handler.Contains(key);
+			}
+			finally
+			{
+				locker.ReleaseLock();
 			}
 		}
 
 		public virtual bool Contains(Type service)
 		{
-			lock(locker)
+			try
 			{
+				locker.AcquireReaderLock(Timeout.Infinite);
 				return service2Handler.Contains(service);
+			}
+			finally
+			{
+				locker.ReleaseLock();
 			}
 		}
 
 		public virtual void UnRegister(String key)
 		{
-			lock (locker)
+			try
 			{
+				locker.AcquireWriterLock(Timeout.Infinite);
 				key2Handler.Remove(key);
+			}
+			finally
+			{
+				locker.ReleaseLock();
 			}
 		}
 
 		public virtual void UnRegister(Type service)
 		{
-			lock(locker)
+			try
 			{
+				locker.AcquireWriterLock(Timeout.Infinite);
 				service2Handler.Remove(service);
+			}
+			finally
+			{
+				locker.ReleaseLock();
 			}
 		}
 
@@ -108,9 +140,14 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		{
 			get
 			{
-				lock(locker)
+				try
 				{
+					locker.AcquireReaderLock(Timeout.Infinite);
 					return key2Handler.Count;
+				}
+				finally
+				{
+					locker.ReleaseLock();
 				}
 			}
 		}
@@ -119,9 +156,14 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		{
 			if (key == null) throw new ArgumentNullException("key");
 
-			lock (locker)
+			try
 			{
+				locker.AcquireReaderLock(Timeout.Infinite);
 				return key2Handler[key] as IHandler;
+			}
+			finally
+			{
+				locker.ReleaseLock();
 			}
 		}
 
@@ -134,11 +176,16 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		{
 			if (service == null) throw new ArgumentNullException("service");
 
-			lock (locker)
+			try
 			{
+				locker.AcquireReaderLock(Timeout.Infinite);
 				IHandler handler = service2Handler[service] as IHandler;
 
 				return handler;
+			}
+			finally
+			{
+				locker.ReleaseLock();
 			}
 		}
 
@@ -147,11 +194,16 @@ namespace Castle.MicroKernel.SubSystems.Naming
 			if (key == null) throw new ArgumentNullException("key");
 			if (service == null) throw new ArgumentNullException("service");
 
-			lock (locker)
+			try
 			{
+				locker.AcquireReaderLock(Timeout.Infinite);
 				IHandler handler = key2Handler[key] as IHandler;
 
 				return handler;
+			}
+			finally
+			{
+				locker.ReleaseLock();
 			}
 		}
 
@@ -161,7 +213,7 @@ namespace Castle.MicroKernel.SubSystems.Naming
 
 			ArrayList list = new ArrayList();
 
-			foreach(IHandler handler in GetHandlers())
+			foreach (IHandler handler in GetHandlers())
 			{
 				if (service == handler.ComponentModel.Service)
 				{
@@ -169,7 +221,7 @@ namespace Castle.MicroKernel.SubSystems.Naming
 				}
 			}
 
-			return (IHandler[]) list.ToArray(typeof(IHandler));
+			return (IHandler[]) list.ToArray(typeof (IHandler));
 		}
 
 		public virtual IHandler[] GetAssignableHandlers(Type service)
@@ -178,31 +230,45 @@ namespace Castle.MicroKernel.SubSystems.Naming
 
 			ArrayList list = new ArrayList();
 
-			foreach(IHandler handler in GetHandlers())
+			foreach (IHandler handler in GetHandlers())
 			{
-				if (service.IsAssignableFrom(handler.ComponentModel.Service))
+				Type handlerService = handler.ComponentModel.Service;
+				if (service.IsAssignableFrom(handlerService))
 				{
 					list.Add(handler);
 				}
+				else
+				{
+					if (service.IsGenericType &&
+						service.GetGenericTypeDefinition().IsAssignableFrom(handlerService))
+					{
+						list.Add(handler);
+					}
+				}
 			}
 
-			return (IHandler[]) list.ToArray(typeof(IHandler));
+			return (IHandler[]) list.ToArray(typeof (IHandler));
 		}
 
 		public virtual IHandler[] GetHandlers()
 		{
-			lock (locker)
+			try
 			{
+				locker.AcquireReaderLock(Timeout.Infinite);
 				IHandler[] list = new IHandler[key2Handler.Values.Count];
 
 				int index = 0;
 
-				foreach(IHandler handler in key2Handler.Values)
+				foreach (IHandler handler in key2Handler.Values)
 				{
 					list[index++] = handler;
 				}
 
 				return list;
+			}
+			finally
+			{
+				locker.ReleaseLock();
 			}
 		}
 
@@ -210,9 +276,14 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		{
 			set
 			{
-				lock(locker)
+				try
 				{
+					locker.AcquireWriterLock(Timeout.Infinite);
 					service2Handler[service] = value;
+				}
+				finally
+				{
+					locker.ReleaseLock();
 				}
 			}
 		}
@@ -221,9 +292,14 @@ namespace Castle.MicroKernel.SubSystems.Naming
 		{
 			set
 			{
-				lock (locker)
+				try
 				{
+					locker.AcquireWriterLock(Timeout.Infinite);
 					key2Handler[key] = value;
+				}
+				finally
+				{
+					locker.ReleaseLock();
 				}
 			}
 		}

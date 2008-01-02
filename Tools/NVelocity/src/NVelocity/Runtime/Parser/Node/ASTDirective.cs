@@ -15,7 +15,7 @@ namespace NVelocity.Runtime.Parser.Node
 	public class ASTDirective : SimpleNode
 	{
 		private Directive directive;
-		private String directiveName = "";
+		private String directiveName = string.Empty;
 
 		public ASTDirective(int id) : base(id)
 		{
@@ -37,14 +37,14 @@ namespace NVelocity.Runtime.Parser.Node
 		{
 			base.Init(context, data);
 
-			if (directive == null && rsvc.IsVelocimacro(directiveName, context.CurrentTemplateName))
+			if (directive == null && runtimeServices.IsVelocimacro(directiveName, context.CurrentTemplateName))
 			{
-				directive = rsvc.GetVelocimacro(directiveName, context.CurrentTemplateName);
+				directive = runtimeServices.GetVelocimacro(directiveName, context.CurrentTemplateName);
 			}
 
 			if (directive != null)
 			{
-				directive.Init(rsvc, context, this);
+				directive.Init(runtimeServices, context, this);
 				directive.SetLocation(Line, Column);
 			}
 
@@ -54,14 +54,14 @@ namespace NVelocity.Runtime.Parser.Node
 		public override bool Render(IInternalContextAdapter context, TextWriter writer)
 		{
 			// normal processing
-			if (directive != null)
-			{
-				directive.Render(context, writer, this);
-			}
-			else
+			if (directive == null)
 			{
 				writer.Write("#");
 				writer.Write(directiveName);
+			}
+			else
+			{
+				directive.Render(context, writer, this);
 			}
 
 			return true;

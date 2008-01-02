@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework.Helpers
 {
 	using System;
+	using System.Collections.Specialized;
 	using System.Text;
 	using System.Collections;
 	using Castle.MonoRail.Framework.Internal;
@@ -36,7 +37,11 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </summary>
 		private Controller controller;
 
+		private UrlHelper urlHelper;
+
 		private IServerUtility serverUtility;
+
+		private IRailsEngineContext context;
 
 		/// <summary>
 		/// Sets the controller.
@@ -48,6 +53,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 			if (controller.Context != null) // It will be null when invoked from test cases
 			{
+				context = controller.Context;
 				serverUtility = controller.Context.Server;
 			}
 		}
@@ -77,9 +83,10 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// Gets the URL helper instance.
 		/// </summary>
 		/// <value>The URL helper.</value>
-		protected UrlHelper UrlHelper
+		public UrlHelper UrlHelper
 		{
-			get { return (UrlHelper) controller.Helpers["UrlHelper"]; }
+			get { return urlHelper ?? (UrlHelper) controller.Helpers["UrlHelper"]; }
+			set { urlHelper = value; }
 		}
 
 		/// <summary>
@@ -102,9 +109,10 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// Gets the current context.
 		/// </summary>
 		/// <value>The current context.</value>
-		protected IRailsEngineContext CurrentContext
+		public IRailsEngineContext CurrentContext
 		{
-			get { return controller.Context; }
+			get { return context; }
+			set { context = value; }
 		}
 
 		#region Helper methods
@@ -132,7 +140,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		protected string RenderScriptBlockToSource(string url)
 		{
 			return string.Format("<script type=\"text/javascript\" src=\"{0}.{1}?" + MonoRailVersion + "\"></script>",
-				Controller.Context.ApplicationPath + url, Controller.Context.UrlInfo.Extension);
+				context.ApplicationPath + url, context.UrlInfo.Extension);
 		}
 
 		/// <summary>
@@ -156,16 +164,16 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <param name="url">The url for the scripts (should start with a '/')</param>
 		/// <param name="queryString">The query string.</param>
 		/// <returns>An script block pointing to the given url.</returns>
-        protected string RenderScriptBlockToSource(string url, string queryString)
-        {
+		protected string RenderScriptBlockToSource(string url, string queryString)
+		{
 			if (queryString != null && queryString != string.Empty)
-            {
-            	queryString = "&" + queryString;
-            }
+			{
+				queryString = "&" + queryString;
+			}
 
-            return string.Format("<script type=\"text/javascript\" src=\"{0}.{1}?" + MonoRailVersion + "{2}\"></script>",
-                Controller.Context.ApplicationPath + url, Controller.Context.UrlInfo.Extension, queryString);
-        }
+			return string.Format("<script type=\"text/javascript\" src=\"{0}.{1}?" + MonoRailVersion + "{2}\"></script>",
+				context.ApplicationPath + url, context.UrlInfo.Extension, queryString);
+		}
 
 		/// <summary>
 		/// Generates HTML element attributes string from <paramref name="attributes"/>.
@@ -214,12 +222,25 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// dict.Add("id", 5);
 		/// dict.Add("selectedItem", new int[] { 2, 4, 99 });
 		/// string querystring = BuildQueryString(dict);
-		/// // should result in: "id=5&amp;selectedItem=2&amp;selectedItem=4&amp;selectedItem=99&amp;"
+		/// // should result in: "id=5&amp;selectedItem=2&amp;selectedItem=4&amp;selectedItem=99"
 		/// </code>
 		/// </example>
 		/// </remarks>
 		/// <param name="parameters">The parameters</param>
 		public string BuildQueryString(IDictionary parameters)
+		{
+			return CommonUtils.BuildQueryString(serverUtility, parameters, true);
+		}
+
+		/// <summary>
+		/// Builds a query string encoded.
+		/// </summary>
+		/// <remarks>
+		/// Supports multi-value query strings, using any
+		/// <see cref="IEnumerable"/> as a value.
+		/// </remarks>
+		/// <param name="parameters">The parameters</param>
+		public string BuildQueryString(NameValueCollection parameters)
 		{
 			return CommonUtils.BuildQueryString(serverUtility, parameters, true);
 		}
@@ -257,7 +278,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The HTML encoded text.</returns>
 		public virtual string HtmlEncode(string content)
 		{
-			return controller.Context.Server.HtmlEncode(content);
+			return serverUtility.HtmlEncode(content);
 		}
 
 		/// <summary>
@@ -281,7 +302,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The URL encoded text.</returns>
 		public virtual string UrlEncode(string content)
 		{
-			return controller.Context.Server.UrlEncode(content);
+			return serverUtility.UrlEncode(content);
 		}
 
 		/// <summary>
@@ -291,7 +312,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <returns>The URL encoded text.</returns>
 		public string UrlPathEncode(string content)
 		{
-			return controller.Context.Server.UrlPathEncode(content);
+			return serverUtility.UrlPathEncode(content);
 		}
 
 		/// <summary>
@@ -306,7 +327,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		{
 			if (string.IsNullOrEmpty(content)) return content;
 
-			return controller.Context.Server.JavaScriptEscape(content);
+			return serverUtility.JavaScriptEscape(content);
 		}
 
 		/// <summary>

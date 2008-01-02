@@ -28,13 +28,12 @@ namespace Castle.MonoRail.Framework
 	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Helpers;
 	using Castle.MonoRail.Framework.Internal;
-	using Castle.Core;
 
 	/// <summary>
 	/// Implements the core functionality and exposes the
 	/// common methods for concrete controllers.
 	/// </summary>
-	public abstract class Controller : IDisposable
+	public abstract class Controller : IController
 	{
 		#region Fields
 
@@ -628,6 +627,39 @@ namespace Castle.MonoRail.Framework
 			return viewEngineManager.HasTemplate(templateName);
 		}
 
+		#region RedirectToRoute
+
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="routeName">Name of the route.</param>
+		public void RedirectToRoute(string routeName)
+		{
+			Redirect(UrlBuilder.BuildRouteUrl(Context.UrlInfo, routeName));
+		}
+
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="routeName">Name of the route.</param>
+		/// <param name="parameters">The parameters.</param>
+		public void RedirectToRoute(string routeName, IDictionary parameters)
+		{
+			Redirect(UrlBuilder.BuildRouteUrl(Context.UrlInfo, routeName, parameters));
+		}
+
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="routeName">Name of the route.</param>
+		/// <param name="parameters">The parameters.</param>
+		public void RedirectToRoute(string routeName, object parameters)
+		{
+			Redirect(UrlBuilder.BuildRouteUrl(Context.UrlInfo, routeName, parameters));
+		}
+
+		#endregion
+
 		#region RedirectToAction
 
 		/// <summary> 
@@ -878,7 +910,7 @@ namespace Castle.MonoRail.Framework
 			
 			if (loggerFactory != null)
 			{
-				logger = loggerFactory.Create(GetType().Name);
+				logger = loggerFactory.Create(GetType());
 			}
 			
 			this.context = context;
@@ -1112,7 +1144,7 @@ namespace Castle.MonoRail.Framework
 				(view as IControllerAware).SetController(this);
 			}
 
-			if (context.Items != null)
+			if (context != null && context.Items != null)
 			{
 				context.Items[Constants.ControllerContextKey] = this;
 			}
@@ -1182,7 +1214,7 @@ namespace Castle.MonoRail.Framework
 					logger.Error("Error sending e-mail", ex);
 				}
 				
-				throw new RailsException("Error sending e-mail", ex);
+				throw new MonoRailException("Error sending e-mail", ex);
 			}
 		}
 

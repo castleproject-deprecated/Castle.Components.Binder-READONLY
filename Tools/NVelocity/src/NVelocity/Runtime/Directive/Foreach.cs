@@ -1,3 +1,17 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace NVelocity.Runtime.Directive
 {
 	using System;
@@ -62,9 +76,6 @@ namespace NVelocity.Runtime.Directive
 		/// </summary>
 		private String elementKey;
 
-		public Foreach()
-		{
-		}
 
 		/// <summary>
 		/// Return name of this directive.
@@ -95,25 +106,43 @@ namespace NVelocity.Runtime.Directive
 			name = name.ToLower();
 
 			if (name == "between")
+			{
 				return new ForeachBetweenSection();
+			}
 			else if (name == "odd")
+			{
 				return new ForeachOddSection();
+			}
 			else if (name == "even")
+			{
 				return new ForeachEvenSection();
+			}
 			else if (name == "nodata")
+			{
 				return new ForeachNoDataSection();
+			}
 			else if (name == "before")
+			{
 				return new ForeachBeforeSection();
+			}
 			else if (name == "after")
+			{
 				return new ForeachAfterSection();
+			}
 			else if (name == "beforeall")
+			{
 				return new ForeachBeforeAllSection();
+			}
 			else if (name == "afterall")
+			{
 				return new ForeachAfterAllSection();
+			}
 			else if (name == "each")
+			{
 				return new ForeachEachSection();
+			}
 
-			throw new NotSupportedException("Foreach directive error: Nested directive not supported: " + name);
+			throw new NotSupportedException(string.Format("Foreach directive error: Nested directive not supported: {0}", name));
 		}
 
 		/// <summary>  
@@ -124,8 +153,8 @@ namespace NVelocity.Runtime.Directive
 		{
 			base.Init(rs, context, node);
 
-			counterName = rsvc.GetString(RuntimeConstants.COUNTER_NAME);
-			counterInitialValue = rsvc.GetInt(RuntimeConstants.COUNTER_INITIAL_VALUE);
+			counterName = runtimeServices.GetString(RuntimeConstants.COUNTER_NAME);
+			counterInitialValue = runtimeServices.GetInt(RuntimeConstants.COUNTER_INITIAL_VALUE);
 
 			// this is really the only thing we can do here as everything
 			// else is context sensitive
@@ -144,23 +173,25 @@ namespace NVelocity.Runtime.Directive
 			Object listObject = node.GetChild(2).Value(context);
 
 			if (listObject == null)
+			{
 				return null;
+			}
 
 			// See if we already know what type this is. 
 			// Use the introspection cache
 			EnumType type = EnumType.Unknown;
 
-			IntrospectionCacheData icd = context.ICacheGet(this);
+			IntrospectionCacheData introspectionCacheData = context.ICacheGet(this);
 			Type c = listObject.GetType();
 
 			// if we have an entry in the cache, and the Class we have
 			// cached is the same as the Class of the data object
 			// then we are ok
 
-			if (icd != null && icd.ContextData == c)
+			if (introspectionCacheData != null && introspectionCacheData.ContextData == c)
 			{
-				// dig the type out of the cata object
-				type = ((EnumType) icd.Thingy);
+				// dig the type out of the data object
+				type = ((EnumType) introspectionCacheData.Thingy);
 			}
 
 			// If we still don't know what this is, 
@@ -169,21 +200,31 @@ namespace NVelocity.Runtime.Directive
 			if (type == EnumType.Unknown)
 			{
 				if (listObject.GetType().IsArray)
+				{
 					type = EnumType.Array;
+				}
 				else if (listObject is IDictionary)
+				{
 					type = EnumType.Dictionary;
+				}
 				else if (listObject is ICollection)
+				{
 					type = EnumType.Collection;
+				}
 				else if (listObject is IEnumerable)
+				{
 					type = EnumType.Enumerable;
+				}
 				else if (listObject is IEnumerator)
+				{
 					type = EnumType.Enumeration;
+				}
 
 				// if we did figure it out, cache it
 				if (type != EnumType.Unknown)
 				{
-					icd = new IntrospectionCacheData(c, type);
-					context.ICachePut(this, icd);
+					introspectionCacheData = new IntrospectionCacheData(c, type);
+					context.ICachePut(this, introspectionCacheData);
 				}
 			}
 
@@ -197,10 +238,10 @@ namespace NVelocity.Runtime.Directive
 					return ((IEnumerable) listObject).GetEnumerator();
 
 				case EnumType.Enumeration:
-					rsvc.Warn("Warning! The reference " + node.GetChild(2).FirstToken.Image +
-					          " is an Enumeration in the #foreach() loop at [" + Line + "," + Column + "]" + " in template " +
-					          context.CurrentTemplateName + ". Because it's not resetable," +
-					          " if used in more than once, this may lead to" + " unexpected results.");
+					runtimeServices.Warn(
+						string.Format(
+							"Warning! The reference {0} is an Enumeration in the #foreach() loop at [{1},{2}] in template {3}. Because it's not resetable, if used in more than once, this may lead to unexpected results.",
+							node.GetChild(2).FirstToken.Image, Line, Column, context.CurrentTemplateName));
 					return (IEnumerator) listObject;
 
 				case EnumType.Array:
@@ -211,9 +252,10 @@ namespace NVelocity.Runtime.Directive
 
 				default:
 					/*  we have no clue what this is  */
-					rsvc.Warn("Could not determine type of enumerator (" + listObject.GetType().Name + ") in " + "#foreach loop for " +
-					          node.GetChild(2).FirstToken.Image + " at [" + Line + "," + Column + "]" + " in template " +
-					          context.CurrentTemplateName);
+					runtimeServices.Warn(
+						string.Format(
+							"Could not determine type of enumerator ({0}) in #foreach loop for {1} at [{2},{3}] in template {4}",
+							listObject.GetType().Name, node.GetChild(2).FirstToken.Image, Line, Column, context.CurrentTemplateName));
 
 					return null;
 			}
@@ -253,11 +295,7 @@ namespace NVelocity.Runtime.Directive
 
 					context.Put(elementKey, current);
 
-					if (!isFancyLoop)
-					{
-						bodyNode.Render(context, writer);
-					}
-					else
+					if (isFancyLoop)
 					{
 						if (counter == counterInitialValue)
 						{
@@ -284,6 +322,10 @@ namespace NVelocity.Runtime.Directive
 
 						ProcessSection(ForeachSectionEnum.After, sections, context, writer);
 					}
+					else
+					{
+						bodyNode.Render(context, writer);
+					}
 
 					counter++;
 				} while(enumerator.MoveNext());
@@ -303,17 +345,25 @@ namespace NVelocity.Runtime.Directive
 
 			// restores the loop counter (if we were nested)
 			// if we have one, else just removes
-			if (ctr != null)
-				context.Put(counterName, ctr);
-			else
+			if (ctr == null)
+			{
 				context.Remove(counterName);
+			}
+			else
+			{
+				context.Put(counterName, ctr);
+			}
 
 			// restores element key if exists
 			// otherwise just removes
-			if (o != null)
-				context.Put(elementKey, o);
-			else
+			if (o == null)
+			{
 				context.Remove(elementKey);
+			}
+			else
+			{
+				context.Put(elementKey, o);
+			}
 
 			return true;
 		}
@@ -323,7 +373,10 @@ namespace NVelocity.Runtime.Directive
 		{
 			int sectionIndex = (int) sectionEnumType;
 
-			if (sections[sectionIndex] == null) return;
+			if (sections[sectionIndex] == null)
+			{
+				return;
+			}
 
 			foreach(INode node in sections[sectionIndex])
 			{

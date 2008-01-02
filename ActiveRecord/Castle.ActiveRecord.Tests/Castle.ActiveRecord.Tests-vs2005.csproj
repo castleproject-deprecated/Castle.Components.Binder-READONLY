@@ -202,9 +202,6 @@
     <Compile Include="Model\LineItem.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Model\NullableModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Model\Order.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -258,9 +255,6 @@
     <Compile Include="MultipleDatabasesTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="NullablesTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ActiveRecordGenericsTestCase.cs" />
     <Compile Include="SessionScopeTestCase.cs">
       <SubType>Code</SubType>
@@ -301,9 +295,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnyRelationTestCase.cs" />
+    <Compile Include="CompositeNestedClassTestCase.cs" />
     <Compile Include="CompositeUserTypeTestCase.cs" />
+    <Compile Include="CountQueryTestCase.cs" />
+    <Compile Include="InvalidRootTypeTestCase.cs" />
     <Compile Include="Model\ClassWithBrokenField.cs" />
+    <Compile Include="Model\CompositeNested\CompositeNestedParent.cs" />
     <Compile Include="Model\Ship.cs" />
+    <Compile Include="NestedModelValidation.cs" />
+    <Compile Include="Model\NestedValidation\UserWithNestedAddress.cs" />
     <Compile Include="VerifyModelsAgainstDBSchemaTestCase.cs" />
     <Compile Include="LazyTestCase.cs" />
     <Compile Include="Model\AnyModel\Models.cs" />

@@ -18,6 +18,7 @@ namespace Castle.MonoRail.Framework.Services
 	using System.Collections;
 	using System.Collections.Specialized;
 	using Castle.Core;
+	using Castle.MonoRail.Framework.Configuration;
 	using Castle.MonoRail.Framework.Internal;
 	using Framework;
 
@@ -39,12 +40,24 @@ namespace Castle.MonoRail.Framework.Services
 	{
 		private bool useExtensions = true;
 		private IServerUtility serverUtil;
+		private IRoutingEngine routingEng;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultUrlBuilder"/> class.
 		/// </summary>
 		public DefaultUrlBuilder()
 		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultUrlBuilder"/> class.
+		/// </summary>
+		/// <param name="serverUtil">The server util.</param>
+		/// <param name="routingEng">The routing eng.</param>
+		public DefaultUrlBuilder(IServerUtility serverUtil, IRoutingEngine routingEng)
+		{
+			this.serverUtil = serverUtil;
+			this.routingEng = routingEng;
 		}
 
 		#region Properties
@@ -69,6 +82,16 @@ namespace Castle.MonoRail.Framework.Services
 			set { serverUtil = value; }
 		}
 
+		/// <summary>
+		/// Gets or sets the routing engine.
+		/// </summary>
+		/// <value>The routing engine.</value>
+		public IRoutingEngine RoutingEngine
+		{
+			get { return routingEng; }
+			set { routingEng = value; }
+		}
+
 		#endregion
 
 		#region IServiceEnabledComponent
@@ -79,12 +102,103 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="provider">The provider.</param>
 		public void Service(IServiceProvider provider)
 		{
+			MonoRailConfiguration config = (MonoRailConfiguration)provider.GetService(typeof(MonoRailConfiguration));
+			useExtensions = config.UrlConfig.UseExtensions;
+
 			serverUtil = (IServerUtility) provider.GetService(typeof(IServerUtility));
+			routingEng = (IRoutingEngine) provider.GetService(typeof(IRoutingEngine));
 		}
 
 		#endregion
 
 		#region IUrlBuilder
+
+		/// <summary>
+		/// Builds the URL using the current url as contextual information and a parameter dictionary.
+		/// <para>
+		/// Common parameters includes area, controller and action. 
+		/// </para>
+		/// </summary>
+		/// <param name="current">The current Url information.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		public UrlPartsBuilder CreateUrlPartsBuilder(UrlInfo current, IDictionary parameters)
+		{
+			string routeName = CommonUtils.ObtainEntryAndRemove(parameters, "named");
+			bool encode = CommonUtils.ObtainEntryAndRemove(parameters, "encode", "false") == "true";
+
+			if (routeName != null)
+			{
+				object routeParams = parameters["params"];
+				parameters.Remove("params");
+
+				return InternalBuildRouteUrl(current.Domain, current.AppVirtualDir, routeName, routeParams, encode);
+			}
+			else
+			{
+				bool applySubdomain = false;
+				bool createAbsolutePath = CommonUtils.ObtainEntryAndRemove(parameters, "absolute", "false") == "true";
+
+				string area;
+
+				if (parameters.Contains("area"))
+				{
+					area = CommonUtils.ObtainEntryAndRemove(parameters, "area");
+					
+					if (area == null) area = string.Empty;
+				}
+				else
+				{
+					area = current.Area;
+				}
+
+				string controller = CommonUtils.ObtainEntryAndRemove(parameters, "controller", current.Controller);
+				string action = CommonUtils.ObtainEntryAndRemove(parameters, "action", current.Action);
+				
+				string domain = CommonUtils.ObtainEntryAndRemove(parameters, "domain", current.Domain);
+				string subdomain = CommonUtils.ObtainEntryAndRemove(parameters, "subdomain", current.Subdomain);
+				string protocol = CommonUtils.ObtainEntryAndRemove(parameters, "protocol", current.Protocol);
+				string port = CommonUtils.ObtainEntryAndRemove(parameters, "port", current.Port.ToString());
+				string pathInfo = CommonUtils.ObtainEntryAndRemove(parameters, "pathinfo");
+				string suffix = null;
+
+				object queryString = CommonUtils.ObtainObjectEntryAndRemove(parameters, "querystring");
+
+				string basePath = null;
+
+				if (parameters.Contains("basepath"))
+				{
+					basePath = CommonUtils.ObtainEntryAndRemove(parameters, "basepath");
+				}
+
+				if (queryString != null)
+				{
+					if (queryString is IDictionary)
+					{
+						IDictionary qsDictionary = (IDictionary) queryString;
+						
+						suffix = CommonUtils.BuildQueryString(serverUtil, qsDictionary, encode);
+					}
+					else if (queryString is NameValueCollection)
+					{
+						suffix = CommonUtils.BuildQueryString(serverUtil, (NameValueCollection) queryString, encode);	
+					}
+					else if (queryString is string)
+					{
+						suffix = queryString.ToString();
+					}
+				}
+
+				if (subdomain.ToLower() != current.Subdomain.ToLower())
+				{
+					applySubdomain = true;
+				}
+
+				return InternalBuildUrl(area, controller, action, protocol, port, domain, subdomain,
+				                        current.AppVirtualDir, current.Extension, createAbsolutePath, applySubdomain, suffix,
+				                        basePath, pathInfo);
+			}
+		}
 
 		/// <summary>
 		/// Builds the URL using the current url as contextual information and a parameter dictionary.
@@ -127,6 +241,13 @@ namespace Castle.MonoRail.Framework.Services
 		/// The <c>absolute</c> parameter forces the builder to output a full url like
 		/// <c>http://hostname/virtualdir/area/controller/name.extension</c>
 		/// </para>
+		///
+		/// <para>
+		/// The <c>pathinfo</c> parameter can be used to add information between the resource identifier and the 
+		/// query string (optional)
+		/// <c>http://hostname/virtualdir/area/controller/name.extension/path/info/here</c> or
+		/// <c>http://hostname/virtualdir/area/controller/name.extension/path/info/here?key=value</c>
+		/// </para>
 		/// 
 		/// <para>
 		/// The <c>encode</c> parameter forces the builder to encode the querystring
@@ -139,66 +260,42 @@ namespace Castle.MonoRail.Framework.Services
 		/// <returns></returns>
 		public virtual string BuildUrl(UrlInfo current, IDictionary parameters)
 		{
-			bool applySubdomain = false;
-			bool createAbsolutePath = CommonUtils.ObtainEntryAndRemove(parameters, "absolute", "false") == "true";
-			bool encode = CommonUtils.ObtainEntryAndRemove(parameters, "encode", "false") == "true";
+			return CreateUrlPartsBuilder(current, parameters).BuildPath();
+		}
 
-			string area;
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="current">The current.</param>
+		/// <param name="routeName">Name of the route.</param>
+		/// <returns></returns>
+		public string BuildRouteUrl(UrlInfo current, string routeName)
+		{
+			return InternalBuildRouteUrl(current.Domain, current.AppVirtualDir, routeName, null, false).BuildPath();
+		}
 
-			if (parameters.Contains("area"))
-			{
-				area = CommonUtils.ObtainEntryAndRemove(parameters, "area");
-				
-				if (area == null) area = string.Empty;
-			}
-			else
-			{
-				area = current.Area;
-			}
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="current">The current.</param>
+		/// <param name="routeName">Name of the route.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		public string BuildRouteUrl(UrlInfo current, string routeName, IDictionary parameters)
+		{
+			return InternalBuildRouteUrl(current.Domain, current.AppVirtualDir, routeName, parameters, false).BuildPath();
+		}
 
-			string controller = CommonUtils.ObtainEntryAndRemove(parameters, "controller", current.Controller);
-			string action = CommonUtils.ObtainEntryAndRemove(parameters, "action", current.Action);
-			
-			string domain = CommonUtils.ObtainEntryAndRemove(parameters, "domain", current.Domain);
-			string subdomain = CommonUtils.ObtainEntryAndRemove(parameters, "subdomain", current.Subdomain);
-			string protocol = CommonUtils.ObtainEntryAndRemove(parameters, "protocol", current.Protocol);
-			string port = CommonUtils.ObtainEntryAndRemove(parameters, "port", current.Port.ToString());
-			string suffix = null;
-
-			object queryString = CommonUtils.ObtainObjectEntryAndRemove(parameters, "querystring");
-
-			string basePath = null;
-
-			if (parameters.Contains("basepath"))
-			{
-				basePath = CommonUtils.ObtainEntryAndRemove(parameters, "basepath");
-			}
-
-			if (queryString != null)
-			{
-				if (queryString is IDictionary)
-				{
-					IDictionary qsDictionary = (IDictionary) queryString;
-					
-					suffix = CommonUtils.BuildQueryString(serverUtil, qsDictionary, encode);
-				}
-				else if (queryString is NameValueCollection)
-				{
-					suffix = CommonUtils.BuildQueryString(serverUtil, (NameValueCollection) queryString, encode);	
-				}
-				else if (queryString is string)
-				{
-					suffix = queryString.ToString();
-				}
-			}
-
-			if (subdomain.ToLower() != current.Subdomain.ToLower())
-			{
-				applySubdomain = true;
-			}
-
-			return InternalBuildUrl(area, controller, action, protocol, port, domain, subdomain,
-				current.AppVirtualDir, current.Extension, createAbsolutePath, applySubdomain, suffix, basePath);
+		/// <summary>
+		/// Pendent.
+		/// </summary>
+		/// <param name="current">The current.</param>
+		/// <param name="routeName">Name of the route.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		public string BuildRouteUrl(UrlInfo current, string routeName, object parameters)
+		{
+			return InternalBuildRouteUrl(current.Domain, current.AppVirtualDir, routeName, parameters, false).BuildPath();
 		}
 
 		/// <summary>
@@ -296,7 +393,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="queryStringParams">The query string params.</param>
 		/// <returns></returns>
 		public virtual string BuildUrl(UrlInfo current, string area, string controller, string action,
-		                       NameValueCollection queryStringParams)
+		                               NameValueCollection queryStringParams)
 		{
 			Hashtable parameters = new Hashtable();
 			parameters["area"] = area;
@@ -325,12 +422,13 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="suffix">The suffix.</param>
 		/// <returns></returns>
 		protected virtual string InternalBuildUrl(string area, string controller, string action, string protocol,
-		                                string port, string domain, string subdomain, string appVirtualDir, string extension, 
-		                                bool absolutePath, bool applySubdomain, string suffix)
+		                                          string port, string domain, string subdomain, string appVirtualDir,
+		                                          string extension,
+		                                          bool absolutePath, bool applySubdomain, string suffix)
 		{
 			return
 				InternalBuildUrl(area, controller, action, protocol, port, domain, subdomain, appVirtualDir, extension, absolutePath,
-				                 applySubdomain, suffix, null);
+				                 applySubdomain, suffix, null, null).BuildPath();
 		}
 
 		/// <summary>
@@ -349,10 +447,14 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="applySubdomain">if set to <c>true</c> [apply subdomain].</param>
 		/// <param name="suffix">The suffix.</param>
 		/// <param name="basePath">The base path.</param>
+		/// <param name="pathInfo">Path info</param>
 		/// <returns></returns>
-		protected virtual string InternalBuildUrl(string area, string controller, string action, string protocol,
-		                                string port, string domain, string subdomain, string appVirtualDir, string extension,
-										bool absolutePath, bool applySubdomain, string suffix, string basePath)
+		protected virtual UrlPartsBuilder InternalBuildUrl(string area, string controller, string action, string protocol,
+		                                                   string port, string domain, string subdomain, string appVirtualDir,
+		                                                   string extension,
+		                                                   bool absolutePath, bool applySubdomain, string suffix,
+		                                                   string basePath,
+		                                                   string pathInfo)
 		{
 			if (area == null) throw new ArgumentNullException("area");
 			if (controller == null) throw new ArgumentNullException("controller");
@@ -375,12 +477,53 @@ namespace Castle.MonoRail.Framework.Services
 				path += "." + extension;
 			}
 
-			if (suffix != null && suffix != String.Empty)
+			UrlPartsBuilder urlBuilder = new UrlPartsBuilder(path);
+
+			urlBuilder.PathInfoDict.Parse(pathInfo);
+
+			if (!string.IsNullOrEmpty(suffix))
 			{
-				path += "?" + suffix;
+				urlBuilder.SetQueryString(suffix);
 			}
 
-			return path;
+			return urlBuilder;
+		}
+
+		/// <summary>
+		/// Internals the build route URL.
+		/// </summary>
+		/// <param name="hostname">The hostname.</param>
+		/// <param name="virtualDir">The virtual dir.</param>
+		/// <param name="name">The name.</param>
+		/// <param name="routeParams">The route params.</param>
+		/// <param name="encode">if set to <c>true</c> [encode].</param>
+		/// <returns></returns>
+		protected virtual UrlPartsBuilder InternalBuildRouteUrl(string hostname, string virtualDir,
+		                                                        string name, object routeParams, bool encode)
+		{
+			IDictionary parameters;
+
+			if (routeParams != null)
+			{
+				if (typeof(IDictionary).IsAssignableFrom(routeParams.GetType()))
+				{
+					parameters = (IDictionary) routeParams;
+				}
+				else
+				{
+					parameters = new ReflectionBasedDictionaryAdapter(routeParams);
+				}
+			}
+			else
+			{
+				parameters = new Hashtable();
+			}
+
+			String url = routingEng.CreateUrl(name, hostname, virtualDir, parameters);
+
+			// TODO: should encode?
+
+			return new UrlPartsBuilder(url);
 		}
 
 		/// <summary>
@@ -397,7 +540,10 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="protocol">The protocol.</param>
 		/// <param name="subdomain">The subdomain.</param>
 		/// <returns></returns>
-		private static string InternalBuildUsingAppVirtualDir(bool absolutePath, string action, bool applySubdomain, string appVirtualDir, string area, string controller, string domain, string port, string protocol, string subdomain)
+		protected static string InternalBuildUsingAppVirtualDir(bool absolutePath, string action,
+		                                                        bool applySubdomain, string appVirtualDir,
+		                                                        string area, string controller,
+		                                                        string domain, string port, string protocol, string subdomain)
 		{
 			string path;
 
@@ -447,7 +593,7 @@ namespace Castle.MonoRail.Framework.Services
 		/// <param name="basePath">The base path.</param>
 		/// <param name="controller">The controller.</param>
 		/// <returns></returns>
-		private static string InternalBuildUrlUsingBasePath(string action, string area, string basePath, string controller)
+		protected static string InternalBuildUrlUsingBasePath(string action, string area, string basePath, string controller)
 		{
 			string path;
 

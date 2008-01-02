@@ -6,8 +6,8 @@ namespace NVelocity.Test
 {
 	using System;
 	using System.IO;
+	using App;
 	using NUnit.Framework;
-	using NVelocity.App;
 
 	/// <summary>
 	/// Test Velocity processing
@@ -43,25 +43,23 @@ namespace NVelocity.Test
 //
 //	    throw new System.Exception(nodes);
 
-			VelocityEngine ve = new VelocityEngine();
-			ve.Init();
+			VelocityEngine velocityEngine = new VelocityEngine();
+			velocityEngine.Init();
 
 			VelocityContext c = new VelocityContext();
 			c.Put("A", new A());
 
 			// modified version so Bernhard could continue
 			StringWriter sw = new StringWriter();
-			Boolean ok = ve.Evaluate(c, sw, "VTLTest1", "#set($hash = \"#\"):=t${hash}${A.T1}ms");
-			Assert.IsTrue(ok, "Evalutation returned failure");
+			Boolean ok = velocityEngine.Evaluate(c, sw, "VTLTest1", "#set($hash = \"#\"):=t${hash}${A.T1}ms");
+			Assert.IsTrue(ok, "Evaluation returned failure");
 			Assert.AreEqual(":=t#0ms", sw.ToString());
 
 			// the actual problem reported
 			sw = new StringWriter();
-			ok = ve.Evaluate(c, sw, "VTLTest1", ":=t#${A.T1}ms");
-			Assert.IsTrue(ok, "Evalutation returned failure");
+			ok = velocityEngine.Evaluate(c, sw, "VTLTest1", ":=t#${A.T1}ms");
+			Assert.IsTrue(ok, "Evaluation returned failure");
 			Assert.AreEqual(":=t#0ms", sw.ToString());
-
 		}
-
 	}
 }

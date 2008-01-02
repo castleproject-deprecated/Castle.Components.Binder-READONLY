@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.RegularExpressions;
-
-namespace Castle.DynamicProxy.Test
+namespace Castle.DynamicProxy.Tests
 {
 	using System;
 	using System.Collections;
@@ -22,9 +20,10 @@ namespace Castle.DynamicProxy.Test
 	using System.Reflection;
 	using System.Runtime.Serialization;
 	using System.Runtime.Serialization.Formatters.Binary;
+	using System.Text.RegularExpressions;
 	using Castle.Core.Interceptor;
 	using Castle.DynamicProxy.Serialization;
-	using Castle.DynamicProxy.Test.Classes;
+	using Castle.DynamicProxy.Tests.Classes;
 	using Castle.DynamicProxy.Tests;
 	using Castle.DynamicProxy.Tests.BugsReported;
 	using Castle.DynamicProxy.Tests.InterClasses;
@@ -35,11 +34,21 @@ namespace Castle.DynamicProxy.Test
 	[TestFixture]
 	public class SerializableClassTestCase : BasePEVerifyTestCase
 	{
+		public override void Init ()
+		{
+			base.Init ();
+			ProxyObjectReference.ResetScope ();
+		}
+
+		public override void TearDown ()
+		{
+			base.TearDown ();
+			ProxyObjectReference.ResetScope ();
+		}
+
 		[Test]
 		public void CreateSerializable()
 		{
-			ProxyObjectReference.ResetScope();
-
 			MySerializableClass proxy = (MySerializableClass)
 			                            generator.CreateClassProxy(typeof(MySerializableClass), new StandardInterceptor());
 
@@ -49,8 +58,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void ImplementsISerializable()
 		{
-			ProxyObjectReference.ResetScope();
-
 			MySerializableClass proxy = (MySerializableClass)
 			                            generator.CreateClassProxy(typeof(MySerializableClass), new StandardInterceptor());
 
@@ -60,8 +67,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SimpleProxySerialization()
 		{
-			ProxyObjectReference.ResetScope();
-
 			MySerializableClass proxy = (MySerializableClass)
 			                            generator.CreateClassProxy(typeof(MySerializableClass), new StandardInterceptor());
 
@@ -75,8 +80,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SerializationDelegate()
 		{
-			ProxyObjectReference.ResetScope();
-
 			MySerializableClass2 proxy = (MySerializableClass2)
 			                             generator.CreateClassProxy(typeof(MySerializableClass2), new StandardInterceptor());
 
@@ -90,8 +93,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SimpleInterfaceProxy()
 		{
-			ProxyObjectReference.ResetScope();
-
 			object proxy =
 				generator.CreateInterfaceProxyWithTarget(typeof(IMyInterface2), new MyInterfaceImpl(), new StandardInterceptor());
 
@@ -114,8 +115,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SimpleInterfaceProxy_WithoutTarget()
 		{
-			ProxyObjectReference.ResetScope();
-
 			object proxy =
 				generator.CreateInterfaceProxyWithoutTarget(typeof(IMyInterface2), new Type[] {typeof(IMyInterface)},
 				                                            new StandardInterceptor());
@@ -133,8 +132,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void CustomMarkerInterface()
 		{
-			ProxyObjectReference.ResetScope();
-
 			object proxy = generator.CreateClassProxy(typeof(ClassWithMarkerInterface),
 			                                          new Type[] {typeof(IMarkerInterface)},
 			                                          new StandardInterceptor());
@@ -150,8 +147,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void HashtableSerialization()
 		{
-			ProxyObjectReference.ResetScope();
-
 			object proxy = generator.CreateClassProxy(
 				typeof(Hashtable), new StandardInterceptor());
 
@@ -165,13 +160,13 @@ namespace Castle.DynamicProxy.Test
 			Assert.AreEqual("helloooo!", otherProxy["key"]);
 		}
 
-		public static object SerializeAndDeserialize(object proxy)
+		public static T SerializeAndDeserialize<T>(T proxy)
 		{
 			MemoryStream stream = new MemoryStream();
 			BinaryFormatter formatter = new BinaryFormatter();
 			formatter.Serialize(stream, proxy);
 			stream.Position = 0;
-			return formatter.Deserialize(stream);
+			return (T) formatter.Deserialize(stream);
 		}
 
 		[Serializable]
@@ -190,8 +185,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SerializatingObjectsWithoutDefaultConstructor ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			C proxy = (C) generator.CreateClassProxy (typeof (C), new IInterceptor[] { new StandardInterceptor () }, 1);
 			C otherProxy = (C) SerializeAndDeserialize (proxy);
 
@@ -236,8 +229,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SerializeObjectsWithDelegateToOtherObject ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			EventHandlerClass eventHandlerInstance = new EventHandlerClass();
 			DelegateHolder proxy = (DelegateHolder) generator.CreateClassProxy (typeof (DelegateHolder), new IInterceptor[] {new StandardInterceptor ()});
 
@@ -271,8 +262,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SerializeObjectsWithDelegateToThisObject ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			DelegateHolder proxy = (DelegateHolder) generator.CreateClassProxy (typeof (DelegateHolder), new IInterceptor[] { new StandardInterceptor () });
 
 			proxy.DelegateMember = new EventHandler (proxy.TestHandler);
@@ -302,8 +291,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SerializeObjectsWithIndirectDelegateToThisObject ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			IndirectDelegateHolder proxy = (IndirectDelegateHolder) generator.CreateClassProxy (typeof (IndirectDelegateHolder),
 				new IInterceptor[] { new StandardInterceptor () });
 
@@ -334,8 +321,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SerializeObjectsWithIndirectDelegateToMember ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			IndirectDelegateHolder proxy = (IndirectDelegateHolder) generator.CreateClassProxy (typeof (IndirectDelegateHolder),
 				new IInterceptor[] { new StandardInterceptor () });
 
@@ -377,8 +362,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SerializeClassWithIndirectSelfReference ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			ClassWithIndirectSelfReference proxy = (ClassWithIndirectSelfReference) generator.CreateClassProxy (typeof (ClassWithIndirectSelfReference),
 				new Type[0], new StandardInterceptor ());
 			Assert.AreSame (proxy, proxy.List[0]);
@@ -403,8 +386,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void SerializeClassWithDirectAndIndirectSelfReference ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			ClassWithDirectAndIndirectSelfReference proxy = (ClassWithDirectAndIndirectSelfReference) generator.CreateClassProxy (typeof (ClassWithDirectAndIndirectSelfReference),
 				new Type[0], new StandardInterceptor ());
 			Assert.AreSame (proxy, proxy.This);
@@ -495,8 +476,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void ProxyGenerationOptionsRespectedOnDeserialization ()
 		{
-			ProxyObjectReference.ResetScope();
-
 			MethodFilterHook hook = new MethodFilterHook ("get_Current");
 			ProxyGenerationOptions options = new ProxyGenerationOptions (hook);
 			options.AddMixinInstance (new SerializableMixin());
@@ -528,8 +507,6 @@ namespace Castle.DynamicProxy.Test
 		[Ignore ("Checks serialization with mixins, un-ignore when these are implemented.")]
 		public void MixinsAppliedOnDeserialization ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			ProxyGenerationOptions options = new ProxyGenerationOptions ();
 			options.AddMixinInstance (new SerializableMixin ());
 
@@ -558,8 +535,6 @@ namespace Castle.DynamicProxy.Test
 		[Test]
 		public void ProxyGenerationOptionsRespectedOnDeserializationComplex ()
 		{
-			ProxyObjectReference.ResetScope ();
-
 			MethodFilterHook hook = new MethodFilterHook ("get_Current");
 			ProxyGenerationOptions options = new ProxyGenerationOptions (hook);
 			options.AddMixinInstance (new SerializableMixin());
@@ -598,6 +573,25 @@ namespace Castle.DynamicProxy.Test
 			options2 = (ProxyGenerationOptions) otherHolder.Element.GetType ().GetField ("proxyGenerationOptions").GetValue (null);
 			Assert.IsNotNull (Array.Find (options2.MixinsAsArray (), delegate (object o) { return o is SerializableMixin; }));
 			Assert.IsNotNull (options2.Selector);
+		}
+
+		[Test]
+		public void ReusingModuleScopeFromProxyObjectReference ()
+		{
+			ProxyGenerator generatorWithSpecificModuleScope = new ProxyGenerator (new DefaultProxyBuilder (ProxyObjectReference.ModuleScope));
+			Assert.AreSame (generatorWithSpecificModuleScope.ProxyBuilder.ModuleScope, ProxyObjectReference.ModuleScope);
+			MySerializableClass first = generatorWithSpecificModuleScope.CreateClassProxy<MySerializableClass> (new StandardInterceptor ());
+			MySerializableClass second = SerializeAndDeserialize (first);
+			Assert.AreSame (first.GetType (), second.GetType ());
+		}
+
+		[Test]
+		public void DeserializationWithSpecificModuleScope ()
+		{
+			ProxyObjectReference.SetScope (generator.ProxyBuilder.ModuleScope);
+			MySerializableClass first = generator.CreateClassProxy<MySerializableClass> (new StandardInterceptor ());
+			MySerializableClass second = SerializeAndDeserialize (first);
+			Assert.AreSame (first.GetType (), second.GetType ());
 		}
 	}
 	

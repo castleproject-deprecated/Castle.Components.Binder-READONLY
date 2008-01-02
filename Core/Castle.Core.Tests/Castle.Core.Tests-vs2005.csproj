@@ -47,6 +47,7 @@
     <Compile Include="GraphTestCase.cs" />
     <Compile Include="LevelFilteredLoggerTests.cs" />
     <Compile Include="LinkedListTestCase.cs" />
+    <Compile Include="ReflectionBasedDictionaryAdapterTestCase.cs" />
     <Compile Include="Resources\AssemblyResourceFactoryTestCase.cs" />
     <Compile Include="Resources\CustomUriTestCase.cs" />
     <Compile Include="Resources\FileResourceFactoryTestCase.cs" />
@@ -68,6 +69,9 @@
       <Link>CastleKey.snk</Link>
     </None>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

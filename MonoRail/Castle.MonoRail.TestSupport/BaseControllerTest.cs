@@ -19,8 +19,8 @@ namespace Castle.MonoRail.TestSupport
 	using System.Collections.Specialized;
 	using System.IO;
 	using Castle.Components.Common.EmailSender;
+	using Castle.MonoRail.Framework;
 	using Castle.MonoRail.Framework.Test;
-	using Framework;
 
 	public delegate void ContextInitializer(MockRailsEngineContext context);
 
@@ -104,7 +104,7 @@ namespace Castle.MonoRail.TestSupport
 		private readonly int port;
 		protected string virtualDir = "";
 		private MockRailsEngineContext context;
-		private IRequest request;
+		private IMockRequest request;
 		private IMockResponse response;
 		private ITrace trace;
 		private IDictionary cookies;
@@ -134,7 +134,6 @@ namespace Castle.MonoRail.TestSupport
 		/// </summary>
 		protected virtual void OnSetUp()
 		{
-			
 		}
 
 		/// <summary>
@@ -159,7 +158,7 @@ namespace Castle.MonoRail.TestSupport
 		/// Gets the request.
 		/// </summary>
 		/// <value>The request.</value>
-		public IRequest Request
+		public IMockRequest Request
 		{
 			get { return request; }
 		}
@@ -189,7 +188,7 @@ namespace Castle.MonoRail.TestSupport
 		/// <param name="controller">The controller.</param>
 		protected void PrepareController(Controller controller)
 		{
-			PrepareController(controller, null);
+			PrepareController(controller, InitializeRailsEngineContext);
 		}
 
 		/// <summary>
@@ -271,7 +270,7 @@ namespace Castle.MonoRail.TestSupport
 		/// Builds the request.
 		/// </summary>
 		/// <returns></returns>
-		protected virtual IRequest BuildRequest()
+		protected virtual IMockRequest BuildRequest()
 		{
 			return new MockRequest(cookies);
 		}
@@ -320,8 +319,15 @@ namespace Castle.MonoRail.TestSupport
 		{
 			return new UrlInfo(domain, domainPrefix, virtualDir, "http", port,
 			                   Path.Combine(Path.Combine(areaName, controllerName), actionName),
-			                   areaName, controllerName, actionName, "rails");
+			                   areaName, controllerName, actionName, "rails", null);
 		}
+
+        /// <summary>
+        /// Allows modifying of the engine context created by <see cref="BuildRailsEngineContext"/>
+        /// </summary>
+        /// <param name="mockRailsEngineContext">The engine context to modify</param>
+        protected virtual void InitializeRailsEngineContext(MockRailsEngineContext mockRailsEngineContext)
+        { }
 
 		/// <summary>
 		/// Determines whether a specified template was rendered -- to send an email.

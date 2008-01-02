@@ -1,3 +1,17 @@
+// Copyright 2004-2007 Castle Project - http://www.castleproject.org/
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 namespace NVelocity.Runtime.Directive
 {
 	using System;
@@ -7,7 +21,6 @@ namespace NVelocity.Runtime.Directive
 	using NVelocity.Exception;
 	using NVelocity.Runtime.Parser.Node;
 	using Resource;
-	using Node = NVelocity.Runtime.Parser.Node.INode;
 
 	/// <summary>
 	/// Pluggable directive that handles the #parse() statement in VTL.
@@ -17,7 +30,7 @@ namespace NVelocity.Runtime.Directive
 	/// 1) The parsed source material can only come from somewhere in
 	/// the TemplateRoot tree for security reasons. There is no way
 	/// around this.  If you want to include content from elsewhere on
-	/// your disk, use a link from somwhere under Template Root to that
+	/// your disk, use a link from somewhere under Template Root to that
 	/// content.
 	/// 
 	/// 2) There is a limited parse depth.  It is set as a property
@@ -51,7 +64,7 @@ namespace NVelocity.Runtime.Directive
 		/// argument that is appropriate.  Any non appropriate
 		/// arguments are logged, but render() continues.
 		/// </summary>
-		public override bool Render(IInternalContextAdapter context, TextWriter writer, Node node)
+		public override bool Render(IInternalContextAdapter context, TextWriter writer, INode node)
 		{
 			// did we get an argument?
 			if (!AssertArgument(node))
@@ -60,14 +73,14 @@ namespace NVelocity.Runtime.Directive
 			}
 
 			// does it have a value?  If you have a null reference, then no.
-			Object value_;
-			if (!AssertNodeHasValue(node, context, out value_))
+			Object value;
+			if (!AssertNodeHasValue(node, context, out value))
 			{
 				return false;
 			}
 
 			// get the path
-			String arg = value_.ToString();
+			String arg = value.ToString();
 
 			AssertTemplateStack(context);
 
@@ -75,15 +88,15 @@ namespace NVelocity.Runtime.Directive
 
 			// get the resource, and assume that we use the encoding of the current template
 			// the 'current resource' can be null if we are processing a stream....
-			String encoding = null;
+			String encoding;
 
-			if (current != null)
+			if (current == null)
 			{
-				encoding = current.Encoding;
+				encoding = (String) runtimeServices.GetProperty(RuntimeConstants.INPUT_ENCODING);
 			}
 			else
 			{
-				encoding = (String) rsvc.GetProperty(RuntimeConstants.INPUT_ENCODING);
+				encoding = current.Encoding;
 			}
 
 			// now use the Runtime resource loader to get the template
@@ -104,18 +117,18 @@ namespace NVelocity.Runtime.Directive
 			return true;
 		}
 
-		private bool AssertArgument(Node node)
+		private bool AssertArgument(INode node)
 		{
 			bool result = true;
 			if (node.GetChild(0) == null)
 			{
-				rsvc.Error("#parse() error :  null argument");
+				runtimeServices.Error("#parse() error :  null argument");
 				result = false;
 			}
 			return result;
 		}
 
-		private bool AssertNodeHasValue(Node node, IInternalContextAdapter context, out Object value)
+		private bool AssertNodeHasValue(INode node, IInternalContextAdapter context, out Object value)
 		{
 			bool result = true;
 
@@ -123,7 +136,7 @@ namespace NVelocity.Runtime.Directive
 
 			if (value == null)
 			{
-				rsvc.Error("#parse() error :  null argument");
+				runtimeServices.Error("#parse() error :  null argument");
 				result = false;
 			}
 			return result;
@@ -138,16 +151,16 @@ namespace NVelocity.Runtime.Directive
 			bool result = true;
 			Object[] templateStack = context.TemplateNameStack;
 
-			if (templateStack.Length >= rsvc.GetInt(RuntimeConstants.PARSE_DIRECTIVE_MAXDEPTH, 20))
+			if (templateStack.Length >= runtimeServices.GetInt(RuntimeConstants.PARSE_DIRECTIVE_MAXDEPTH, 20))
 			{
 				StringBuilder path = new StringBuilder();
 
 				for(int i = 0; i < templateStack.Length; ++i)
 				{
-					path.Append(" > " + templateStack[i]);
+					path.AppendFormat(" > {0}", (object[]) templateStack[i]);
 				}
 
-				rsvc.Error("Max recursion depth reached (" + templateStack.Length + ")" + " File stack:" + path);
+				runtimeServices.Error(string.Format("Max recursion depth reached ({0}) File stack:{1}", templateStack.Length, path));
 				result = false;
 			}
 			return result;
@@ -156,30 +169,32 @@ namespace NVelocity.Runtime.Directive
 
 		private Template GetTemplate(String arg, String encoding, IInternalContextAdapter context)
 		{
-			Template result = null;
+			Template result;
 			try
 			{
-				result = rsvc.GetTemplate(arg, encoding);
+				result = runtimeServices.GetTemplate(arg, encoding);
 			}
 			catch(ResourceNotFoundException)
 			{
 				// the arg wasn't found.  Note it and throw
-				rsvc.Error("#parse(): cannot find template '" + arg + "', called from template " + context.CurrentTemplateName +
-				           " at (" + Line + ", " + Column + ")");
+				runtimeServices.Error(
+					string.Format("#parse(): cannot find template '{0}', called from template {1} at ({2}, {3})", arg,
+					              context.CurrentTemplateName, Line, Column));
 				throw;
 			}
 			catch(ParseErrorException)
 			{
 				// the arg was found, but didn't parse - syntax error
 				// note it and throw
-				rsvc.Error("#parse(): syntax error in #parse()-ed template '" + arg + "', called from template " +
-				           context.CurrentTemplateName + " at (" + Line + ", " + Column + ")");
+				runtimeServices.Error(
+					string.Format("#parse(): syntax error in #parse()-ed template '{0}', called from template {1} at ({2}, {3})", arg,
+					              context.CurrentTemplateName, Line, Column));
 
 				throw;
 			}
 			catch(Exception e)
 			{
-				rsvc.Error("#parse() : arg = " + arg + ".  Exception : " + e);
+				runtimeServices.Error(string.Format("#parse() : arg = {0}.  Exception : {1}", arg, e));
 				result = null;
 			}
 			return result;
@@ -199,7 +214,7 @@ namespace NVelocity.Runtime.Directive
 				// if (e is MethodInvocationException)
 				throw;
 
-				// rsvc.Error("Exception rendering #parse( " + arg + " )  : " + e);
+				// runtimeServices.Error("Exception rendering #parse( " + arg + " )  : " + e);
 				// result = false;
 			}
 			finally

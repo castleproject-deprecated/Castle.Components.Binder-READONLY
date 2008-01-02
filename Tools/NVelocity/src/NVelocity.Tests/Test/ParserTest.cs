@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using ExtendedProperties = Commons.Collections.ExtendedProperties;
+using ExtendedProperties=Commons.Collections.ExtendedProperties;
 
 namespace NVelocity.Test
 {
@@ -20,12 +20,12 @@ namespace NVelocity.Test
 	using System.Collections;
 	using System.IO;
 	using System.Text;
+	using App;
+	using Exception;
 	using NUnit.Framework;
-	using NVelocity.App;
-	using NVelocity.Exception;
-	using NVelocity.Runtime;
 	using NVelocity.Runtime.Parser;
 	using NVelocity.Runtime.Parser.Node;
+	using Runtime;
 
 	/// <summary>
 	/// Test Velocity Introspector
@@ -33,25 +33,39 @@ namespace NVelocity.Test
 	[TestFixture]
 	public class ParserTest
 	{
+		//[Test]
+		//public void Test_VelocityCharStream()
+		//{
+		//  String s1 = "this is a test";
+		//  VelocityCharStream vcs = new VelocityCharStream(new StringReader(s1), 1, 1);
+
+		//  String s2 = String.Empty;
+		//  try
+		//  {
+		//    Char c = vcs.ReadChar();
+		//    while (true)
+		//    {
+		//      s2 += c;
+		//      c = vcs.ReadChar();
+		//    }
+		//  }
+		//  catch (IOException)
+		//  {
+		//    // this is expected to happen when the stream has been read
+		//  }
+		//  Assert.IsTrue(s1.Equals(s2), "read stream did not match source string");
+		//}
 		[Test]
-		public void Test_VelocityCharStream()
+		public void Test_VelocityTryCharStream()
 		{
 			String s1 = "this is a test";
 			VelocityCharStream vcs = new VelocityCharStream(new StringReader(s1), 1, 1);
 
 			String s2 = String.Empty;
-			try
+
+			while(vcs.ReadChar())
 			{
-				Char c = vcs.ReadChar();
-				while (true)
-				{
-					s2 += c;
-					c = vcs.ReadChar();
-				}
-			}
-			catch (IOException)
-			{
-				// this is expected to happen when the stream has been read
+				s2 += vcs.CurrentCharacter;
 			}
 			Assert.IsTrue(s1.Equals(s2), "read stream did not match source string");
 		}
@@ -71,16 +85,16 @@ namespace NVelocity.Test
 			{
 				Token t = root.FirstToken;
 				nodes += t.Kind.ToString();
-				while (t != root.LastToken)
+				while(t != root.LastToken)
 				{
 					t = t.Next;
-					nodes += "," + t.Kind.ToString();
+					nodes += "," + t.Kind;
 				}
 			}
 
 			if (!javaNodes.Equals(nodes))
 			{
-				Console.Out.WriteLine("");
+				Console.Out.WriteLine(string.Empty);
 				Console.Out.WriteLine(".Net parsed nodes did not match java nodes.");
 				Console.Out.WriteLine("java=" + javaNodes);
 				Console.Out.WriteLine(".net=" + nodes);
@@ -98,11 +112,11 @@ namespace NVelocity.Test
 			{
 				ri.Init();
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				Assert.Fail(ex.Message);
 			}
-			ExtendedProperties ep = ri.Configuration;
+			ExtendedProperties extendedProperties = ri.Configuration;
 		}
 
 		[Test]
@@ -115,12 +129,12 @@ namespace NVelocity.Test
 				* setup
 				*/
 
-				VelocityEngine ve = new VelocityEngine();
+				VelocityEngine velocityEngine = new VelocityEngine();
 
-				ExtendedProperties ep = new ExtendedProperties();
-				ep.SetProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, TemplateTest.FILE_RESOURCE_LOADER_PATH);
-				
-				ve.Init(ep);
+				ExtendedProperties extendedProperties = new ExtendedProperties();
+				extendedProperties.SetProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, TemplateTest.FILE_RESOURCE_LOADER_PATH);
+
+				velocityEngine.Init(extendedProperties);
 
 				/*
 				*  Make a context object and populate with the data.  This 
@@ -146,16 +160,17 @@ namespace NVelocity.Test
 
 				try
 				{
-					template = ve.GetTemplate(templateFile);
+					template = velocityEngine.GetTemplate(templateFile);
 				}
-				catch (ResourceNotFoundException rnfe)
+				catch(ResourceNotFoundException resourceNotFoundException)
 				{
-					Console.Out.WriteLine("Example : error : cannot find template " + templateFile + " : \n" + rnfe.Message);
+					Console.Out.WriteLine("Example : error : cannot find template {0} : \n{1}", templateFile,
+					                      resourceNotFoundException.Message);
 					Assert.Fail();
 				}
-				catch (ParseErrorException pee)
+				catch(ParseErrorException parseErrorException)
 				{
-					Console.Out.WriteLine("Example : Syntax error in template " + templateFile + " : \n" + pee);
+					Console.Out.WriteLine("Example : Syntax error in template {0} : \n{1}", templateFile, parseErrorException);
 					Assert.Fail();
 				}
 
@@ -177,7 +192,7 @@ namespace NVelocity.Test
 				writer.Flush();
 				writer.Close();
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				Assert.Fail(ex.Message);
 			}
@@ -220,6 +235,5 @@ namespace NVelocity.Test
 			VelocityCharStream vcs = new VelocityCharStream(new StringReader(sb.ToString()), 1, 1);
 			return vcs;
 		}
-
 	}
 }

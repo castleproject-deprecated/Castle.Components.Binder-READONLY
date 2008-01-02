@@ -388,13 +388,13 @@ namespace Castle.MonoRail.Framework
 			}
 			catch(FormatException ex)
 			{
-				throw new RailsException(
+				throw new MonoRailException(
 					String.Format("Could not convert {0} to request type. " +
 						"Argument value is '{1}'", paramName, Params.Get(paramName)), ex);
 			}
 			catch(Exception ex)
 			{
-				throw new RailsException(
+				throw new MonoRailException(
 					String.Format("Error building method arguments. " +
 						"Last param analyzed was {0} with value '{1}'", paramName, value), ex);
 			}
@@ -518,7 +518,7 @@ namespace Castle.MonoRail.Framework
 		/// Lazy initialized property with a hierarchical 
 		/// representation of the flat data on <see cref="Controller.Params"/>
 		/// </summary>
-		protected internal CompositeNode ParamsNode
+		protected virtual internal CompositeNode ParamsNode
 		{
 			get
 			{
@@ -536,7 +536,7 @@ namespace Castle.MonoRail.Framework
 		/// Lazy initialized property with a hierarchical 
 		/// representation of the flat data on <see cref="IRequest.Form"/>
 		/// </summary>
-		protected internal CompositeNode FormNode
+		protected virtual internal CompositeNode FormNode
 		{
 			get
 			{
@@ -554,7 +554,7 @@ namespace Castle.MonoRail.Framework
 		/// Lazy initialized property with a hierarchical 
 		/// representation of the flat data on <see cref="IRequest.QueryString"/>
 		/// </summary>
-		protected internal CompositeNode QueryStringNode
+		protected virtual internal CompositeNode QueryStringNode
 		{
 			get
 			{
