@@ -31,7 +31,7 @@ namespace Castle.MonoRail.Framework.Test
 //		private readonly string physicalPath = AppDomain.CurrentDomain.BaseDirectory;
 		private readonly IRequest request;
 		private readonly IResponse response;
-		private readonly Flash flash = new Flash();
+		private Flash flash = new Flash();
 		private IServerUtility serverUtility = new MockServerUtility();
 		private readonly IDictionary contextItems = new HybridDictionary(true);
 		private readonly List<RenderedEmailTemplate> renderedEmailTemplates = new List<RenderedEmailTemplate>();
@@ -147,6 +147,7 @@ namespace Castle.MonoRail.Framework.Test
 		public virtual Flash Flash
 		{
 			get { return flash; }
+			set { flash = value; }
 		}
 
 		/// <summary>

@@ -353,7 +353,17 @@ namespace Castle.MonoRail.Framework
 		public string LayoutName
 		{
 			get { return (context.LayoutNames != null && context.LayoutNames.Length != 0) ? context.LayoutNames[0] : null; }
-			set { context.LayoutNames = new string[] {value}; }
+			set
+			{
+				if (value == null)
+				{
+					context.LayoutNames = null;
+				}
+				else
+				{
+					context.LayoutNames = new string[] { value };
+				}
+			}
 		}
 
 		/// <summary>

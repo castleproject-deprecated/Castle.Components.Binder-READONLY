@@ -36,24 +36,13 @@ namespace Castle.MonoRail.Framework.Services
 		{
 			IDictionary session = ResolveRequestSession(container, urlInfo, context);
 
-			Flash flash = null;
-
-			if (session != null)
-			{
-				flash = new Flash((Flash) session[Flash.FlashKey]);
-			}
-			else
-			{
-				flash = new Flash();
-			}
-
 			IUrlBuilder urlBuilder = container.UrlBuilder;
 
 			return new DefaultEngineContext(container, urlInfo, context,
 			                                new ServerUtilityAdapter(context.Server),
 			                                new RequestAdapter(context.Request),
 											new ResponseAdapter(context.Response, urlInfo, urlBuilder),
-											new TraceAdapter(context.Trace), session, flash);
+											new TraceAdapter(context.Trace), session);
 		}
 
 		/// <summary>

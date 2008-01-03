@@ -82,6 +82,21 @@ namespace Castle.MonoRail.Framework
 				engineContext.Session = ResolveSession(context);
 			}
 
+			IDictionary session = engineContext.Session;
+
+			Flash flash;
+
+			if (session != null)
+			{
+				flash = new Flash((Flash) session[Flash.FlashKey]);
+			}
+			else
+			{
+				flash = new Flash();
+			}
+
+			engineContext.Flash = flash;
+
 			// items added to be used by the test context
 			context.Items["mr.controller"] = controller;
 			context.Items["mr.flash"] = engineContext.Flash;
