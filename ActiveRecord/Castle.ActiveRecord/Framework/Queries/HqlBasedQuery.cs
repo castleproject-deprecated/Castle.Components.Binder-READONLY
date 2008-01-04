@@ -16,13 +16,13 @@ namespace Castle.ActiveRecord.Queries
 {
 	using System;
 	using System.Collections;
-	using System.Text.RegularExpressions;
 
 	using Castle.ActiveRecord.Framework;
 	using Castle.ActiveRecord.Queries.Modifiers;
 
 	using NHibernate;
 	using NHibernate.Type;
+	using NHibernate.Transform;
 
 	/// <summary>
 	/// defines the possible query langauges
@@ -188,6 +188,19 @@ namespace Castle.ActiveRecord.Queries
 		public void AddSqlReturnDefinition(Type returnType, string returnAlias)
 		{
 			AddModifier(new SqlQueryReturnDefinition(returnType, returnAlias));
+		}
+
+		#endregion
+
+		#region SetResultTransformer
+
+		/// <summary>
+		/// Adds a query result transformer.
+		/// See <see cref="IResultTransformer"/> for more information.
+		/// </summary>
+		public void SetResultTransformer(IResultTransformer transformer)
+		{
+			AddModifier(new QueryResultTransformer(transformer));
 		}
 
 		#endregion

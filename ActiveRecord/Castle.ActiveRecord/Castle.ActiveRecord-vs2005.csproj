@@ -361,6 +361,7 @@
     <Compile Include="Framework\Queries\CountQuery.cs" />
     <Compile Include="Framework\Queries\HqlBasedQuery.cs" />
     <Compile Include="Framework\Queries\IActiveRecordQuery.Generic.cs" />
+    <Compile Include="Framework\Queries\Modifiers\QueryResultTransformer.cs" />
     <Compile Include="Framework\Queries\Modifiers\IQueryModifier.cs" />
     <Compile Include="Framework\Queries\Modifiers\QueryRange.cs" />
     <Compile Include="Framework\Queries\Modifiers\QueryParameter.cs" />
