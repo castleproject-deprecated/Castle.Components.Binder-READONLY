@@ -185,9 +185,22 @@ namespace Castle.ActiveRecord.Queries
 		/// Adds a SQL query return definition.
 		/// See <see cref="NHibernate.ISession.CreateSQLQuery(string,string[],Type[])"/> for more information.
 		/// </summary>
-		public void AddSqlReturnDefinition(Type returnType, string returnAlias)
+		public void AddSqlReturnDefinition(Type returnType, String returnAlias)
 		{
 			AddModifier(new SqlQueryReturnDefinition(returnType, returnAlias));
+		}
+
+		#endregion
+
+		#region AddSqlJoinDefinition
+
+		/// <summary>
+		/// Adds a SQL query join definition.
+		/// See <see cref="NHibernate.ISession.CreateSQLQuery(string,string[],Type[])"/> for more information.
+		/// </summary>
+		public void AddSqlJoinDefinition(String associationPath, String associationAlias)
+		{
+			AddModifier(new SqlQueryJoinDefinition(associationPath, associationAlias));
 		}
 
 		#endregion
