@@ -69,7 +69,7 @@ namespace Castle.ActiveRecord.Queries.Modifiers
 
 			if (sqlQuery != null)
 			{
-				sqlQuery.AddJoin(AssociationAlias, AssociationPath);
+				sqlQuery.AddJoin(associationAlias, associationPath);
 			}
 		}
 		

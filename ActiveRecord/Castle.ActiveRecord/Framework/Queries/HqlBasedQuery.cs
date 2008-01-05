@@ -179,7 +179,7 @@ namespace Castle.ActiveRecord.Queries
 
 		#endregion
 
-		#region AddSqlReturnDefinition
+		#region SqlQuery Modifiers 
 
 		/// <summary>
 		/// Adds a SQL query return definition.
@@ -190,10 +190,6 @@ namespace Castle.ActiveRecord.Queries
 			AddModifier(new SqlQueryReturnDefinition(returnType, returnAlias));
 		}
 
-		#endregion
-
-		#region AddSqlJoinDefinition
-
 		/// <summary>
 		/// Adds a SQL query join definition.
 		/// See <see cref="NHibernate.ISession.CreateSQLQuery(string,string[],Type[])"/> for more information.
@@ -201,6 +197,15 @@ namespace Castle.ActiveRecord.Queries
 		public void AddSqlJoinDefinition(String associationPath, String associationAlias)
 		{
 			AddModifier(new SqlQueryJoinDefinition(associationPath, associationAlias));
+		}
+
+		/// <summary>
+		/// Adds a SQL query scalar definition.
+		/// See <see cref="NHibernate.ISession.CreateSQLQuery(string,string[],Type[])"/> for more information.
+		/// </summary>
+		public void AddSqlScalarDefinition(IType scalarType, String columnAlias)
+		{
+			AddModifier(new SqlQueryScalarDefinition(scalarType, columnAlias));
 		}
 
 		#endregion
