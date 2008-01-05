@@ -221,21 +221,7 @@ namespace Castle.ActiveRecord.Queries
 					break;
 
 				case QueryLanguage.Sql:
-					ISQLQuery sqlQuery = session.CreateSQLQuery(Query);
-
-					if (queryModifiers != null)
-					{
-						foreach(IQueryModifier mod in queryModifiers)
-						{
-							SqlQueryReturnDefinition returnDef = mod as SqlQueryReturnDefinition;
-
-							if (returnDef == null) continue;
-
-							sqlQuery.AddEntity(returnDef.ReturnAlias, returnDef.ReturnType);
-						}
-					}
-					
-					nhibQuery = sqlQuery;
+					nhibQuery = session.CreateSQLQuery(Query);
 					break;
 
 				default:
