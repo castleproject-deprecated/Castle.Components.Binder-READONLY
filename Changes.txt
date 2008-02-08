@@ -1,6 +1,9 @@
 1.0
 ===
 
+- Fixed MR-412
+  "When applying a layout attribute over an Action, layout doesn't render for the rendered view."
+
 - Added FormHelper.TextFieldAutoComplete for combining AJAX AutoCompletion and FormHelper's round trip
   support.
 

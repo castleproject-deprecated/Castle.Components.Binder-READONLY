@@ -1280,6 +1280,18 @@ namespace Castle.MonoRail.Framework
 			context.LayoutNames = ObtainDefaultLayoutName();
 		}
 
+		/// <summary>
+		/// Resolves the action layout.
+		/// </summary>
+		/// <param name="action">The action.</param>
+		protected virtual void ResolveActionLayout(IExecutableAction action)
+		{
+			if (action.LayoutOverride != null && action.LayoutOverride.Length != 0)
+			{
+				context.LayoutNames = action.LayoutOverride;
+			}
+		}
+
 		private void RunActionAndRenderView()
 		{
 			IExecutableAction action = null;
@@ -1297,6 +1309,8 @@ namespace Castle.MonoRail.Framework
 				}
 
 				EnsureActionIsAccessibleWithCurrentHttpVerb(action);
+
+				ResolveActionLayout(action);
 
 				RunBeforeActionFilters(action, out cancel);
 
