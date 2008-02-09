@@ -1,6 +1,9 @@
 1.0
 ===
 
+- Applied Gauthier Segay's patch fixing MR-394
+  "PatternRoute should support url part with dot in it"
+
 - Fixed MR-409
   Introduced IMonoRailContainerEvents and IMonoRailConfigurationEvents that might be implemented by the
   HttpApplication subclass

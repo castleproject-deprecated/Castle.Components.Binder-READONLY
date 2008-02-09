@@ -160,5 +160,40 @@ namespace Castle.MonoRail.Framework.Tests.Routing
 			Assert.AreEqual("something", match.Parameters["param"]);
 			Assert.AreEqual("173e0970-c123-11dc-95ff-0800200c9a66", match.Parameters["key"]);
 		}
+
+		[Test]
+		public void WithDot() 
+		{
+			PatternRoute route = new PatternRoute("/<controller>/<id>/<action>")
+			.Restrict("action").AnyOf("index")
+			.Restrict("id").WithDot()
+			;
+			RouteMatch match = new RouteMatch();
+			Assert.IsTrue(route.Matches("/some/123/index", CreateGetContext(), match));
+			Assert.AreEqual("some", match.Parameters["controller"]);
+			Assert.AreEqual("123", match.Parameters["id"]);
+			Assert.AreEqual("index", match.Parameters["action"]);
+			Assert.IsTrue(route.Matches("/some/id.with.dot.in.it/index", CreateGetContext(), match));
+			Assert.AreEqual("some", match.Parameters["controller"]);
+			Assert.AreEqual("id.with.dot.in.it", match.Parameters["id"]);
+			Assert.AreEqual("index", match.Parameters["action"]);
+		}
+
+		[Test]
+		public void WithoutDot() 
+		{
+			PatternRoute route = new PatternRoute("/<controller>/<id>/<action>")
+				.Restrict("action").AnyOf("index")
+				.Restrict("id").WithoutDot();
+
+			RouteMatch match = new RouteMatch();
+
+			Assert.IsTrue(route.Matches("/some/123/index", CreateGetContext(), match));
+			Assert.AreEqual("some", match.Parameters["controller"]);
+			Assert.AreEqual("123", match.Parameters["id"]);
+			Assert.AreEqual("index", match.Parameters["action"]);
+
+			Assert.IsFalse(route.Matches("/some/id.with.dot.in.it/index", CreateGetContext(), match));
+		}
 	}
 }

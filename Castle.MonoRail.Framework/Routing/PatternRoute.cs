@@ -156,19 +156,37 @@ namespace Castle.MonoRail.Framework.Routing
 		/// <returns></returns>
 		public bool Matches(string url, IRouteContext context, RouteMatch match)
 		{
-			string[] parts = url.Split(new char[] {'/', '.'}, StringSplitOptions.RemoveEmptyEntries);
-			int index = 0;
+			string[] slashparts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+			int slashindex = 0;
+			int dotindex = 0;
+			int nodeindex = 0;
 
-			foreach(DefaultNode node in nodes)
+			for (nodeindex = 0; nodeindex < nodes.Count; ++nodeindex)
 			{
-				string part = index < parts.Length ? parts[index] : null;
-
-				if (!node.Matches(part, match))
+				DefaultNode node = nodes[nodeindex];
+				string part = slashindex < slashparts.Length ? slashparts[slashindex] : null; if (part == null) continue;
+				if (node.AcceptsDot)
 				{
-					return false;
+					if (!node.Matches(part, match))
+						return false;
 				}
-
-				index++;
+				else
+				{
+					string[] dotparts = part.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+					for (dotindex = 0; dotindex < dotparts.Length; )
+					{
+						string dotpart = dotparts[dotindex];
+						if (!node.Matches(dotpart, match))
+							return false;
+						++dotindex;
+						if ((nodeindex + dotindex) < nodes.Count)
+							node = nodes[nodeindex + dotindex];
+						else
+							break;
+					}
+					nodeindex += dotindex - 1;
+				}
+				++slashindex;
 			}
 
 			foreach(KeyValuePair<string, string> pair in defaults)
@@ -184,7 +202,7 @@ namespace Castle.MonoRail.Framework.Routing
 
 		private void CreatePatternNodes()
 		{
-			string[] parts = pattern.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+			string[] parts = pattern.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
 			foreach(string part in parts)
 			{
@@ -259,7 +277,7 @@ namespace Castle.MonoRail.Framework.Routing
 
 		#region DefaultNode
 
-		[DebuggerDisplay("Node {name} Opt: {optional} default: {defaultVal} Regular exp: {exp}")]
+		[DebuggerDisplay("Node {name} Opt: {optional} default: {defaultVal} Regular exp: {exp} acceptsDot: {acceptsDot}")]
 		private class DefaultNode
 		{
 			public readonly string name, start, end;
@@ -270,17 +288,17 @@ namespace Castle.MonoRail.Framework.Routing
 			private string[] acceptedTokens;
 			private Regex exp;
 			private string acceptedRegex;
-
+			private bool acceptsDot = false;
 			public DefaultNode(string part, bool optional, bool afterDot)
 			{
 				this.optional = optional;
 				this.afterDot = afterDot;
-				int indexStart = part.IndexOfAny(new char[] {'<', '['});
+				int indexStart = part.IndexOfAny(new char[] { '<', '[' });
 				int indexEndStart = -1;
 
 				if (indexStart != -1)
 				{
-					indexEndStart = part.IndexOfAny(new char[] {'>', ']'}, indexStart);
+					indexEndStart = part.IndexOfAny(new char[] { '>', ']' }, indexStart);
 					name = part.Substring(indexStart + 1, indexEndStart - indexStart - 1);
 				}
 
@@ -327,7 +345,7 @@ namespace Castle.MonoRail.Framework.Routing
 				{
 					StringBuilder text = new StringBuilder();
 
-					foreach(string token in acceptedTokens)
+					foreach (string token in acceptedTokens)
 					{
 						if (text.Length != 0)
 						{
@@ -342,7 +360,10 @@ namespace Castle.MonoRail.Framework.Routing
 				}
 				else
 				{
-					return "[a-zA-Z,_,0-9,-]+";
+					if (acceptsDot)
+						return "[a-zA-Z,_,0-9,-,\\.]+";
+					else
+						return "[a-zA-Z,_,0-9,-]+";
 				}
 			}
 
@@ -400,6 +421,17 @@ namespace Castle.MonoRail.Framework.Routing
 				}
 			}
 
+			public bool AcceptsDot
+			{
+				get { return acceptsDot; }
+				set
+				{
+					hasRestriction = true;
+					acceptsDot = value;
+					ReBuildRegularExpression();
+				}
+			}
+
 			public bool AcceptsGuidsOnly
 			{
 				set
@@ -423,6 +455,7 @@ namespace Castle.MonoRail.Framework.Routing
 
 				return (regExpMatch.Success);
 			}
+
 		}
 
 		#endregion
@@ -541,6 +574,28 @@ namespace Castle.MonoRail.Framework.Routing
 				targetNode.AcceptsRegex(regex);
 				return route;
 			}
+
+			/// <summary>
+			/// avoid dot being splitted as slashes
+			/// </summary>
+			/// <returns></returns>
+			public PatternRoute WithDot() 
+			{
+				targetNode.AcceptsDot = true;
+				return route;
+			}
+
+			/// <summary>
+			/// allow dot being splitted as slashes
+			/// </summary>
+			/// <returns></returns>
+			public PatternRoute WithoutDot()
+			{
+				targetNode.AcceptsDot = false;
+				return route;
+			}
+
+
 		}
 
 		/// <summary>
