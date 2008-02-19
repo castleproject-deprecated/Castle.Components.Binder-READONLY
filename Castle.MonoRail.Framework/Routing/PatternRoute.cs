@@ -79,8 +79,6 @@ namespace Castle.MonoRail.Framework.Routing
 			StringBuilder text = new StringBuilder(virtualPath);
 			IList<string> checkedParameters = new List<string>();
 
-			bool hasNamed = false;
-
 			foreach(DefaultNode node in nodes)
 			{
 				AppendSlashOrDot(text, node);
@@ -91,7 +89,6 @@ namespace Castle.MonoRail.Framework.Routing
 				}
 				else
 				{
-					hasNamed = true;
 					checkedParameters.Add(node.name);
 
 					object value = parameters[node.name];
@@ -105,7 +102,6 @@ namespace Castle.MonoRail.Framework.Routing
 						}
 						else
 						{
-//							points += 1;
 							break;
 						}
 					}
@@ -152,7 +148,7 @@ namespace Castle.MonoRail.Framework.Routing
 				text.Length = text.Length - 1;
 			}
 
-			return hasNamed ? text.ToString() : null;
+			return text.ToString();
 		}
 
 		/// <summary>
