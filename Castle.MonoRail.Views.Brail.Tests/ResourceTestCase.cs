@@ -16,12 +16,20 @@ namespace Castle.MonoRail.Views.Brail.Tests
 {
 	using System.Globalization;
 	using System.Threading;
-	
+	using Castle.MonoRail.Framework.Descriptors;
+	using Castle.MonoRail.Framework.Resources;
+	using Castle.MonoRail.Views.Brail.TestSite.Controllers;
 	using NUnit.Framework;
 
 	[TestFixture]
 	public class ResourceTestCase : BaseViewOnlyTestFixture
 	{
+        protected override void BeforEachTest()
+        {
+            AddResource("resx", "TestSiteBrail.Controllers.ResourceFile", 
+                typeof(ResourcedController).Assembly);
+        }
+
 		[Test]
 		public void GetIndexedResources()
 		{

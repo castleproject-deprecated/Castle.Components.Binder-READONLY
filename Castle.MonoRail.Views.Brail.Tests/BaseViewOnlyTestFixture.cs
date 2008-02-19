@@ -18,9 +18,14 @@ namespace Castle.MonoRail.Views.Brail.Tests
 	using System.Collections;
 	using System.IO;
 	using System.Reflection;
+	using Castle.MonoRail.Framework.Descriptors;
 	using Castle.MonoRail.Framework.Helpers;
+	using Castle.MonoRail.Framework.JSGeneration;
+	using Castle.MonoRail.Framework.JSGeneration.Prototype;
+	using Castle.MonoRail.Framework.Resources;
 	using Castle.MonoRail.Framework.Services;
 	using Castle.MonoRail.Framework.Test;
+	using Castle.MonoRail.Views.Brail.TestSite.Controllers;
 	using Framework;
 	using NUnit.Framework;
 
@@ -130,6 +135,54 @@ namespace Castle.MonoRail.Views.Brail.Tests
 			lastOutput = sw.ToString();
 			return lastOutput;
 		}
+
+        protected string ProcessViewJS(string templatePath)
+        {
+            StringWriter sw = new StringWriter();
+            if (string.IsNullOrEmpty(Layout) == false)
+                ControllerContext.LayoutNames = new string[] { Layout, };
+            MockEngineContext.CurrentControllerContext = ControllerContext;
+            JSCodeGenerator codeGenerator =
+                  new JSCodeGenerator(MockEngineContext.Server, null,
+                      MockEngineContext, null, ControllerContext, MockEngineContext.Services.UrlBuilder);
+
+            IJSGenerator jsGen = new PrototypeGenerator(codeGenerator);
+
+            codeGenerator.JSGenerator = jsGen;
+
+            JSCodeGeneratorInfo info = new JSCodeGeneratorInfo(codeGenerator, jsGen, new object[0], new object[0]);
+
+            BooViewEngine.GenerateJS(templatePath, sw, info,MockEngineContext, null, ControllerContext);
+            lastOutput = sw.ToString();
+            return lastOutput;
+        }
+
+        protected void AddResource(string name, string resourceName, Assembly asm)
+        {
+            IResourceFactory resourceFactory = new DefaultResourceFactory();
+            ResourceDescriptor descriptor = new ResourceDescriptor(
+                null,
+                name,
+                resourceName,
+                null,
+                null);
+            IResource resource = resourceFactory.Create(
+                descriptor,
+                asm);
+            ControllerContext.Resources.Add(name, resource);
+        }
+
+        protected string RenderStaticWithLayout(string staticText)
+        {
+            if (string.IsNullOrEmpty(Layout) == false)
+                ControllerContext.LayoutNames = new string[] { Layout, };
+            MockEngineContext.CurrentControllerContext = ControllerContext;
+            
+            BooViewEngine.RenderStaticWithinLayout(staticText, MockEngineContext, null, ControllerContext);
+            lastOutput = ((StringWriter)MockEngineContext.Response.Output)
+                .GetStringBuilder().ToString();
+            return lastOutput;
+        }
 
 		public void AssertReplyEqualTo(string expected)
 		{

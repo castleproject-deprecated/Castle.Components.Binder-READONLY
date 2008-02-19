@@ -26,7 +26,7 @@ namespace Castle.MonoRail.Framework.Tests.Routing
 		{
 			PatternRoute route = new PatternRoute("/some/path");
 			int points;
-			Assert.IsNull(route.CreateUrl("localhost", "", DictHelper.Create(""), out points));
+			Assert.IsNotNull(route.CreateUrl("localhost", "", DictHelper.Create(""), out points));
 			Assert.AreEqual(0, points);
 		}
 
