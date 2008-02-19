@@ -32,7 +32,9 @@ namespace Castle.MonoRail.Framework.Routing
 		private readonly string name;
 		private readonly string pattern;
 		private readonly List<DefaultNode> nodes = new List<DefaultNode>();
-		private readonly Dictionary<string, string> defaults = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+
+		private readonly Dictionary<string, string> defaults =
+			new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PatternRoute"/> class.
@@ -69,9 +71,11 @@ namespace Castle.MonoRail.Framework.Routing
 		/// <param name="hostname">The hostname.</param>
 		/// <param name="virtualPath">The virtual path.</param>
 		/// <param name="parameters">The parameters.</param>
+		/// <param name="points">The points.</param>
 		/// <returns></returns>
-		public string CreateUrl(string hostname, string virtualPath, IDictionary parameters)
+		public string CreateUrl(string hostname, string virtualPath, IDictionary parameters, out int points)
 		{
+			points = 0;
 			StringBuilder text = new StringBuilder(virtualPath);
 			IList<string> checkedParameters = new List<string>();
 
@@ -101,6 +105,7 @@ namespace Castle.MonoRail.Framework.Routing
 						}
 						else
 						{
+//							points += 1;
 							break;
 						}
 					}
@@ -111,7 +116,10 @@ namespace Castle.MonoRail.Framework.Routing
 							return null;
 						}
 
-						if (node.optional && StringComparer.InvariantCultureIgnoreCase.Compare(node.DefaultVal, value.ToString()) == 0)
+						points += 1;
+
+						if (node.optional && 
+							StringComparer.InvariantCultureIgnoreCase.Compare(node.DefaultVal, value.ToString()) == 0)
 						{
 							break; // end as there can't be more required nodes after an optional one
 						}
@@ -122,23 +130,24 @@ namespace Castle.MonoRail.Framework.Routing
 			}
 
 			// Validate that default parameters match parameters passed into to create url.
-			foreach (KeyValuePair<string, string> defaultParameter in defaults)
+			foreach(KeyValuePair<string, string> defaultParameter in defaults)
 			{
 				// Skip parameters we already checked.
-				if(checkedParameters.Contains(defaultParameter.Key))
+				if (checkedParameters.Contains(defaultParameter.Key))
 				{
 					continue;
 				}
 
 				object value = parameters[defaultParameter.Key];
 				string valAsString = value != null ? value.ToString() : null;
-				if(!string.IsNullOrEmpty(valAsString) && !defaultParameter.Value.Equals(valAsString, StringComparison.OrdinalIgnoreCase))
+				if (!string.IsNullOrEmpty(valAsString) &&
+				    !defaultParameter.Value.Equals(valAsString, StringComparison.OrdinalIgnoreCase))
 				{
 					return null;
 				}
 			}
 
-			if (text.Length == 0 || text[text.Length - 1] == '/' || text[text.Length -1] == '.')
+			if (text.Length == 0 || text[text.Length - 1] == '/' || text[text.Length - 1] == '.')
 			{
 				text.Length = text.Length - 1;
 			}
@@ -154,39 +163,22 @@ namespace Castle.MonoRail.Framework.Routing
 		/// <param name="context">The context</param>
 		/// <param name="match">The match.</param>
 		/// <returns></returns>
-		public bool Matches(string url, IRouteContext context, RouteMatch match)
+		public int Matches(string url, IRouteContext context, RouteMatch match)
 		{
-			string[] slashparts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-			int slashindex = 0;
-			int dotindex = 0;
-			int nodeindex = 0;
+			string[] parts = url.Split(new char[] {'/', '.'}, StringSplitOptions.RemoveEmptyEntries);
+			int index = 0;
+			int points = 0;
 
-			for (nodeindex = 0; nodeindex < nodes.Count; ++nodeindex)
+			foreach(DefaultNode node in nodes)
 			{
-				DefaultNode node = nodes[nodeindex];
-				string part = slashindex < slashparts.Length ? slashparts[slashindex] : null; if (part == null) continue;
-				if (node.AcceptsDot)
+				string part = index < parts.Length ? parts[index] : null;
+
+				if (!node.Matches(part, match, ref points))
 				{
-					if (!node.Matches(part, match))
-						return false;
+					return 0;
 				}
-				else
-				{
-					string[] dotparts = part.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-					for (dotindex = 0; dotindex < dotparts.Length; )
-					{
-						string dotpart = dotparts[dotindex];
-						if (!node.Matches(dotpart, match))
-							return false;
-						++dotindex;
-						if ((nodeindex + dotindex) < nodes.Count)
-							node = nodes[nodeindex + dotindex];
-						else
-							break;
-					}
-					nodeindex += dotindex - 1;
-				}
-				++slashindex;
+
+				index++;
 			}
 
 			foreach(KeyValuePair<string, string> pair in defaults)
@@ -197,16 +189,16 @@ namespace Castle.MonoRail.Framework.Routing
 				}
 			}
 
-			return true;
+			return points;
 		}
 
 		private void CreatePatternNodes()
 		{
-			string[] parts = pattern.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+			string[] parts = pattern.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
 
 			foreach(string part in parts)
 			{
-				string[] subparts = part.Split(new char[] { '.' }, 2, StringSplitOptions.RemoveEmptyEntries);
+				string[] subparts = part.Split(new char[] {'.'}, 2, StringSplitOptions.RemoveEmptyEntries);
 
 				if (subparts.Length == 2)
 				{
@@ -277,7 +269,7 @@ namespace Castle.MonoRail.Framework.Routing
 
 		#region DefaultNode
 
-		[DebuggerDisplay("Node {name} Opt: {optional} default: {defaultVal} Regular exp: {exp} acceptsDot: {acceptsDot}")]
+		[DebuggerDisplay("Node {name} Opt: {optional} default: {defaultVal} Regular exp: {exp}")]
 		private class DefaultNode
 		{
 			public readonly string name, start, end;
@@ -288,17 +280,17 @@ namespace Castle.MonoRail.Framework.Routing
 			private string[] acceptedTokens;
 			private Regex exp;
 			private string acceptedRegex;
-			private bool acceptsDot = false;
+
 			public DefaultNode(string part, bool optional, bool afterDot)
 			{
 				this.optional = optional;
 				this.afterDot = afterDot;
-				int indexStart = part.IndexOfAny(new char[] { '<', '[' });
+				int indexStart = part.IndexOfAny(new char[] {'<', '['});
 				int indexEndStart = -1;
 
 				if (indexStart != -1)
 				{
-					indexEndStart = part.IndexOfAny(new char[] { '>', ']' }, indexStart);
+					indexEndStart = part.IndexOfAny(new char[] {'>', ']'}, indexStart);
 					name = part.Substring(indexStart + 1, indexEndStart - indexStart - 1);
 				}
 
@@ -345,7 +337,7 @@ namespace Castle.MonoRail.Framework.Routing
 				{
 					StringBuilder text = new StringBuilder();
 
-					foreach (string token in acceptedTokens)
+					foreach(string token in acceptedTokens)
 					{
 						if (text.Length != 0)
 						{
@@ -360,14 +352,11 @@ namespace Castle.MonoRail.Framework.Routing
 				}
 				else
 				{
-					if (acceptsDot)
-						return "[a-zA-Z,_,0-9,-,\\.]+";
-					else
-						return "[a-zA-Z,_,0-9,-]+";
+					return "[a-zA-Z,_,0-9,-]+";
 				}
 			}
 
-			public bool Matches(string part, RouteMatch match)
+			public bool Matches(string part, RouteMatch match, ref int points)
 			{
 				if (part == null)
 				{
@@ -377,6 +366,9 @@ namespace Castle.MonoRail.Framework.Routing
 						{
 							match.AddNamed(name, defaultVal);
 						}
+
+						// points += 2;
+
 						return true;
 					}
 					else
@@ -393,6 +385,8 @@ namespace Castle.MonoRail.Framework.Routing
 					{
 						match.AddNamed(name, part);
 					}
+
+					points += 2;
 
 					return true;
 				}
@@ -415,21 +409,7 @@ namespace Castle.MonoRail.Framework.Routing
 
 			public bool AcceptsIntOnly
 			{
-				set
-				{
-					AcceptsRegex("[0-9]+");
-				}
-			}
-
-			public bool AcceptsDot
-			{
-				get { return acceptsDot; }
-				set
-				{
-					hasRestriction = true;
-					acceptsDot = value;
-					ReBuildRegularExpression();
-				}
+				set { AcceptsRegex("[0-9]+"); }
 			}
 
 			public bool AcceptsGuidsOnly
@@ -437,8 +417,8 @@ namespace Castle.MonoRail.Framework.Routing
 				set
 				{
 					AcceptsRegex("[A-Fa-f0-9]{32}|" +
-								"({|\\()?[A-Fa-f0-9]{8}-([A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}(}|\\))?|" +
-								"({)?[0xA-Fa-f0-9]{3,10}(, {0,1}[0xA-Fa-f0-9]{3,6}){2}, {0,1}({)([0xA-Fa-f0-9]{3,4}, {0,1}){7}[0xA-Fa-f0-9]{3,4}(}})");
+					             "({|\\()?[A-Fa-f0-9]{8}-([A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}(}|\\))?|" +
+					             "({)?[0xA-Fa-f0-9]{3,10}(, {0,1}[0xA-Fa-f0-9]{3,6}){2}, {0,1}({)([0xA-Fa-f0-9]{3,4}, {0,1}){7}[0xA-Fa-f0-9]{3,4}(}})");
 				}
 			}
 
@@ -455,7 +435,6 @@ namespace Castle.MonoRail.Framework.Routing
 
 				return (regExpMatch.Success);
 			}
-
 		}
 
 		#endregion
@@ -574,28 +553,6 @@ namespace Castle.MonoRail.Framework.Routing
 				targetNode.AcceptsRegex(regex);
 				return route;
 			}
-
-			/// <summary>
-			/// avoid dot being splitted as slashes
-			/// </summary>
-			/// <returns></returns>
-			public PatternRoute WithDot() 
-			{
-				targetNode.AcceptsDot = true;
-				return route;
-			}
-
-			/// <summary>
-			/// allow dot being splitted as slashes
-			/// </summary>
-			/// <returns></returns>
-			public PatternRoute WithoutDot()
-			{
-				targetNode.AcceptsDot = false;
-				return route;
-			}
-
-
 		}
 
 		/// <summary>

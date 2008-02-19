@@ -62,14 +62,16 @@ namespace Castle.MonoRail.Framework.Routing
 		{
 			// lock for reading
 
-			IRoutingRule rule;
+//			IRoutingRule rule;
+//
+//			if (!name2Rule.TryGetValue(routeName, out rule))
+//			{
+//				throw new MonoRailException("Could not find named route: " + routeName);
+//			}
+//
+//			return rule.CreateUrl(hostname, virtualPath, parameters);
 
-			if (!name2Rule.TryGetValue(routeName, out rule))
-			{
-				throw new MonoRailException("Could not find named route: " + routeName);
-			}
-
-			return rule.CreateUrl(hostname, virtualPath, parameters);
+			return null;
 		}
 
 		/// <summary>
@@ -80,17 +82,23 @@ namespace Castle.MonoRail.Framework.Routing
 		/// <returns></returns>
 		public string CreateUrl(string virtualPath, IDictionary parameters)
 		{
+			int winnerPoints = 0;
+			string winnerUrl = null;
+
 			foreach(IRoutingRule rule in rules)
 			{
-				string url = rule.CreateUrl("", virtualPath, parameters);
+				int points;
 
-				if (url != null)
+				string url = rule.CreateUrl("", virtualPath, parameters, out points);
+
+				if (url != null && points > winnerPoints)
 				{
-					return url;
+					winnerUrl = url;
+					winnerPoints = points;
 				}
 			}
 
-			return null;
+			return winnerUrl;
 		}
 
 		/// <summary>
@@ -114,17 +122,23 @@ namespace Castle.MonoRail.Framework.Routing
 		{
 			// lock for reading
 
+			int winnerPoints = 0;
+			RouteMatch winner = null;
+
 			foreach(IRoutingRule rule in rules)
 			{
 				RouteMatch match = new RouteMatch();
 
-				if (rule.Matches(url, context, match))
+				int points = rule.Matches(url, context, match);
+
+				if (points != 0 && points > winnerPoints)
 				{
-					return match;
+					winnerPoints = points;
+					winner = match;
 				}
 			}
 
-			return null;
+			return winner;
 		}
 
 		/// <summary>
