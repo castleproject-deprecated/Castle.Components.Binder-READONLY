@@ -153,6 +153,7 @@ namespace Castle.MonoRail.Framework.Tests.Providers
 				Expect.Call(rescueDescProviderMock.CollectRescues(actionMethod)).Return(new RescueDescriptor[0]);
 				Expect.Call(layoutDescProviderMock.CollectLayout(actionMethod)).Return(null);
 				Expect.Call(transformDescProviderMock.CollectFilters(actionMethod)).Return(new TransformFilterDescriptor[0]);
+				Expect.Call(returnTypeDescProviderMock.Collect(actionMethod)).Return(null);
 			}
 
 			using(mockRepository.Playback())
