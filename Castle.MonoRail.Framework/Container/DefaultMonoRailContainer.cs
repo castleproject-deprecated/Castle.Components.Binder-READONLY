@@ -118,6 +118,10 @@ namespace Castle.MonoRail.Framework.Container
 			/// </summary>
 			FilterDescriptorProvider,
 			/// <summary>
+			/// The <see cref="IReturnBinderDescriptorProvider"/> service
+			/// </summary>
+			ReturnBinderDescriptorProvider,
+			/// <summary>
 			/// The <see cref="IResourceFactory"/> service
 			/// </summary>
 			ResourceFactory,
@@ -282,6 +286,13 @@ namespace Castle.MonoRail.Framework.Container
 				AddService(typeof(ITransformFilterDescriptorProvider), transformFilterDescriptorProvider);
 			}
 
+			IReturnBinderDescriptorProvider returnBinderDescriptorProvider =
+				(IReturnBinderDescriptorProvider) Parent.GetService(typeof(IReturnBinderDescriptorProvider));
+			if (returnBinderDescriptorProvider != null)
+			{
+				AddService(typeof(IReturnBinderDescriptorProvider), returnBinderDescriptorProvider);
+			}
+
 			IViewEngineManager viewEngManager = (IViewEngineManager) Parent.GetService(typeof(IViewEngineManager));
 			if (viewEngManager != null)
 			{
@@ -424,6 +435,10 @@ namespace Castle.MonoRail.Framework.Container
 			if (!HasService<ITransformFilterDescriptorProvider>())
 			{
 				AddService<ITransformFilterDescriptorProvider>(CreateService<DefaultTransformFilterDescriptorProvider>());
+			}
+			if (!HasService<IReturnBinderDescriptorProvider>())
+			{
+				AddService<IReturnBinderDescriptorProvider>(CreateService<DefaultReturnBinderDescriptorProvider>());
 			}
 			if (!HasService<IControllerDescriptorProvider>())
 			{
@@ -1036,6 +1051,8 @@ namespace Castle.MonoRail.Framework.Container
 					return typeof(IScaffoldingSupport);
 				case ServiceIdentification.EmailTemplateService:
 					return typeof(IEmailTemplateService);
+				case ServiceIdentification.ReturnBinderDescriptorProvider:
+					return typeof(IReturnBinderDescriptorProvider);
 //				case ServiceIdentification.TransformationFilterFactory:
 //					return typeof(ITransformFilterFactory);
 				case ServiceIdentification.AjaxProxyGenerator:
