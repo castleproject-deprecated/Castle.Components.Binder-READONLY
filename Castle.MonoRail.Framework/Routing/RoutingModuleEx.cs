@@ -43,7 +43,8 @@ namespace Castle.MonoRail.Framework.Routing
 			{
 				HttpHandlersSection httpHandlersConfig =
 					(HttpHandlersSection) WebConfigurationManager.GetSection("system.web/httpHandlers");
-				foreach (HttpHandlerAction handlerAction in httpHandlersConfig.Handlers)
+
+				foreach(HttpHandlerAction handlerAction in httpHandlersConfig.Handlers)
 				{
 					if (Type.GetType(handlerAction.Type) == typeof (MonoRailHttpHandlerFactory))
 					{
