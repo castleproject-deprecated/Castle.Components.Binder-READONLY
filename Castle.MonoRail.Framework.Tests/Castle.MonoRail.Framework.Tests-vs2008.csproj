@@ -80,7 +80,7 @@
     <Reference Include="Castle.DynamicProxy2, Version=2.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build\net-2.0\debug\Castle.MicroKernel.dll</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\Castle.MicroKernel.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -237,6 +237,7 @@
     <Compile Include="ViewComponents\SelectStylePaginationTestCase.cs" />
     <Compile Include="ViewEngines\ViewEngineBaseTestCase.cs" />
     <Compile Include="WikiFormatterTestCase.cs" />
+    <Compile Include="WindsorIntegration\FacilityTestCase.cs" />
     <Compile Include="Wizards\WizardActionProviderTestCase.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -258,9 +259,6 @@
     <EmbeddedResource Include="Services\StaticResourceRegistry\DummyRes.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="WindsorIntegration\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

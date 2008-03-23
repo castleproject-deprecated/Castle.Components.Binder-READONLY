@@ -150,7 +150,11 @@ namespace Castle.MonoRail.Framework
 
 		private bool IsAsyncAction(IControllerContext controllerContext)
 		{
-			return controllerContext.ControllerDescriptor.Actions[controllerContext.Action] is AsyncActionPair;
+            if (controllerContext.ControllerDescriptor==null)
+                return false;
+            if (controllerContext.Action==null)
+                return false;
+            return controllerContext.ControllerDescriptor.Actions[controllerContext.Action] is AsyncActionPair;
 		}
 
 		/// <summary>
