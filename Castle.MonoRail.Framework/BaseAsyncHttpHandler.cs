@@ -75,7 +75,7 @@ namespace Castle.MonoRail.Framework
 
 				engineContext.Services.ExtensionManager.RaiseUnhandledError(engineContext);
 
-				AfterCotrollerProcess();
+				AfterControllerProcess();
 
 				throw new MonoRailException("Error processing MonoRail request. Action " +
 				                            controllerContext.Action + " on controller " + controllerContext.Name, ex);
@@ -118,7 +118,7 @@ namespace Castle.MonoRail.Framework
 			}
 			finally
 			{
-				AfterCotrollerProcess();
+				AfterControllerProcess();
 			}
 		}
 	}

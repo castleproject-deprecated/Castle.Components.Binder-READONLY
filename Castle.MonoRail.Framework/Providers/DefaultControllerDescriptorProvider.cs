@@ -274,10 +274,10 @@ namespace Castle.MonoRail.Framework.Providers
 				}
 			}
 
-			MergeAsyncMethodPairsToSignleAction(desc);
+			MergeAsyncMethodPairsToSingleAction(desc);
 		}
 
-		private void MergeAsyncMethodPairsToSignleAction(ControllerMetaDescriptor desc)
+		private void MergeAsyncMethodPairsToSingleAction(ControllerMetaDescriptor desc)
 		{
 			foreach(string name in new ArrayList(desc.Actions.Keys))
 			{
@@ -313,7 +313,7 @@ namespace Castle.MonoRail.Framework.Providers
 				string endActionName = "End" + actionName;
 				if (desc.Actions.Contains(endActionName) == false)
 				{
-					throw new MonoRailException("Found begining of async pair '" + name + "' but not the end '" + endActionName +
+					throw new MonoRailException("Found beginning of async pair '" + name + "' but not the end '" + endActionName +
 					                            "' on controller '" + desc.ControllerDescriptor.Name + "', did you forget to define " +
 					                            endActionName + "(IAsyncResult ar) ?");
 				}

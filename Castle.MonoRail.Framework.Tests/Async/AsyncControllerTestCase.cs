@@ -69,9 +69,9 @@ namespace Castle.MonoRail.Framework.Tests.Async
 
 		[Test]
 		[ExpectedException(typeof(MonoRailException),
-			"Found begining of async pair 'BeginIndex' but not the end 'EndIndex' on controller 'ControllerWithBeginIndexWithoutEndIndex', did you forget to define EndIndex(IAsyncResult ar) ?"
+			"Found beginning of async pair 'BeginIndex' but not the end 'EndIndex' on controller 'ControllerWithBeginIndexWithoutEndIndex', did you forget to define EndIndex(IAsyncResult ar) ?"
 			)]
-		public void BeginActionWitoutEndActionNotAllowed()
+		public void BeginActionWithoutEndActionNotAllowed()
 		{
 			IController controller = new ControllerWithBeginIndexWithoutEndIndex();
 			services.ControllerDescriptorProvider.BuildDescriptor(controller);
@@ -162,7 +162,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 
 
 		[Test]
-		public void CanExecuteActionAsyncronously()
+		public void CanExecuteActionAsynchronously()
 		{
 			IController controller = new ControllerWithAsyncAction();
 

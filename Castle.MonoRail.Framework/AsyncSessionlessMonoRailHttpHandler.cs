@@ -32,14 +32,14 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
-		/// Overriden to prevent acquiring a session from the custom session
+		/// Overridden to prevent acquiring a session from the custom session
 		/// </summary>
 		protected override void AcquireCustomSession()
 		{
 		}
 
 		/// <summary>
-		/// Overriden to prevent persisting a session to the custom session
+		/// Overridden to prevent persisting a session to the custom session
 		/// </summary>
 		protected override void PersistCustomSession()
 		{

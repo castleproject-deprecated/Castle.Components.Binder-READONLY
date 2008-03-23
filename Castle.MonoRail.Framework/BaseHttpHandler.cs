@@ -113,14 +113,14 @@ namespace Castle.MonoRail.Framework
 			}
 			finally
 			{
-				AfterCotrollerProcess();
+				AfterControllerProcess();
 			}
 		}
 
 		/// <summary>
 		/// Handles MonoRail's actions afters the cotroller action finished processing
 		/// </summary>
-	    protected void AfterCotrollerProcess()
+	    protected void AfterControllerProcess()
 	    {
 	        if (!sessionless)
 	        {
