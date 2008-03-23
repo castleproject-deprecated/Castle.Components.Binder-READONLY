@@ -39,6 +39,15 @@ namespace Castle.MonoRail.Framework
 		{
 		}
 
+		/// <summary>
+		/// Initiates an asynchronous call to the HTTP handler.
+		/// </summary>
+		/// <param name="context">An <see cref="T:System.Web.HttpContext"/> object that provides references to intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
+		/// <param name="cb">The <see cref="T:System.AsyncCallback"/> to call when the asynchronous method call is complete. If <paramref name="cb"/> is null, the delegate is not called.</param>
+		/// <param name="extraData">Any extra data needed to process the request.</param>
+		/// <returns>
+		/// An <see cref="T:System.IAsyncResult"/> that contains information about the status of the process.
+		/// </returns>
 		public IAsyncResult BeginProcessRequest(HttpContext context, AsyncCallback cb, object extraData)
 		{
 			this.httpContext = context;
@@ -73,6 +82,10 @@ namespace Castle.MonoRail.Framework
 			}
 		}
 
+		/// <summary>
+		/// Provides an asynchronous process End method when the process ends.
+		/// </summary>
+		/// <param name="result">An <see cref="T:System.IAsyncResult"/> that contains information about the status of the process.</param>
 		public void EndProcessRequest(IAsyncResult result)
 		{
 			try

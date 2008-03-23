@@ -17,23 +17,47 @@ namespace Castle.MonoRail.Framework
 	using System;
 	using System.Threading;
 
+	/// <summary>
+	/// This is used to mark that an operation has failed during the begin phase
+	/// and that the end method of the async action should not be called.
+	/// </summary>
 	public class FailedToExecuteBeginActionAsyncResult : IAsyncResult
 	{
+		/// <summary>
+		/// Gets an indication whether the asynchronous operation has completed.
+		/// </summary>
+		/// <value></value>
+		/// <returns>true if the operation is complete; otherwise, false.</returns>
 		public bool IsCompleted
 		{
 			get { return true; }
 		}
 
+		/// <summary>
+		/// Gets a <see cref="T:System.Threading.WaitHandle"/> that is used to wait for an asynchronous operation to complete.
+		/// </summary>
+		/// <value></value>
+		/// <returns>A <see cref="T:System.Threading.WaitHandle"/> that is used to wait for an asynchronous operation to complete.</returns>
 		public WaitHandle AsyncWaitHandle
 		{
 			get { return null; }
 		}
 
+		/// <summary>
+		/// Gets a user-defined object that qualifies or contains information about an asynchronous operation.
+		/// </summary>
+		/// <value></value>
+		/// <returns>A user-defined object that qualifies or contains information about an asynchronous operation.</returns>
 		public object AsyncState
 		{
 			get { return null; }
 		}
 
+		/// <summary>
+		/// Gets an indication of whether the asynchronous operation completed synchronously.
+		/// </summary>
+		/// <value></value>
+		/// <returns>true if the asynchronous operation completed synchronously; otherwise, false.</returns>
 		public bool CompletedSynchronously
 		{
 			get { return true; }

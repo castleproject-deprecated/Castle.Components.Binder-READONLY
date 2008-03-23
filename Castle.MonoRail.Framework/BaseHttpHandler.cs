@@ -25,8 +25,17 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	public abstract class BaseHttpHandler : IHttpHandler
 	{
+		/// <summary>
+		/// The controller
+		/// </summary>
 	    protected readonly IController controller;
+		/// <summary>
+		/// The controller context
+		/// </summary>
 	    protected readonly IControllerContext controllerContext;
+		/// <summary>
+		/// The engine context
+		/// </summary>
 	    protected readonly IEngineContext engineContext;
 		private readonly bool sessionless;
 
@@ -108,6 +117,9 @@ namespace Castle.MonoRail.Framework
 			}
 		}
 
+		/// <summary>
+		/// Handles MonoRail's actions afters the cotroller action finished processing
+		/// </summary>
 	    protected void AfterCotrollerProcess()
 	    {
 	        if (!sessionless)
@@ -120,6 +132,10 @@ namespace Castle.MonoRail.Framework
 	        ReleaseController(controller);
 	    }
 
+		/// <summary>
+		/// Handles MonoRail's actions before the controller action started processing
+		/// </summary>
+		/// <param name="context">The context.</param>
 	    protected void BeforeControllerProcess(HttpContext context)
 	    {
 	        if (!sessionless)

@@ -25,6 +25,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="context">The context.</param>
+		/// <param name="actionType">Type of the action.</param>
 		/// <returns></returns>
 		IExecutableAction Select(IEngineContext engineContext, IController controller, IControllerContext context,
 		                         ActionType actionType);

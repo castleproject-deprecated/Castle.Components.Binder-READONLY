@@ -14,10 +14,22 @@
 
 namespace Castle.MonoRail.Framework
 {
+	/// <summary>
+	/// The type of the action requested
+	/// </summary>
 	public enum ActionType
 	{
+		/// <summary>
+		/// Standard syncronous action
+		/// </summary>
 		Sync,
+		/// <summary>
+		/// Beginning of an async action
+		/// </summary>
 		AsyncBegin,
+		/// <summary>
+		/// End of an async action
+		/// </summary>
 		AsyncEnd
 	}
 }
