@@ -97,7 +97,7 @@
 			object action = context.ControllerDescriptor.Actions[name];
 			if (actionType == ActionType.Sync)
 			{
-				var methodInfo = action as MethodInfo;
+				MethodInfo methodInfo = action as MethodInfo;
 
 				if (methodInfo != null)
 				{
