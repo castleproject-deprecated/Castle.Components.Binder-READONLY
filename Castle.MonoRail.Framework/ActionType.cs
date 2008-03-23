@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2008 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2008 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,19 +14,10 @@
 
 namespace Castle.MonoRail.Framework
 {
-	/// <summary>
-	/// Pendent
-	/// </summary>
-	public interface ISubActionSelector
+	public enum ActionType
 	{
-		/// <summary>
-		/// Pendent
-		/// </summary>
-		/// <param name="engineContext">The engine context.</param>
-		/// <param name="controller">The controller.</param>
-		/// <param name="context">The context.</param>
-		/// <returns></returns>
-		IExecutableAction Select(IEngineContext engineContext, IController controller, IControllerContext context,
-		                         ActionType actionType);
+		Sync,
+		AsyncBegin,
+		AsyncEnd
 	}
 }

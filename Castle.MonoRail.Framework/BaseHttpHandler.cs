@@ -25,9 +25,9 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	public abstract class BaseHttpHandler : IHttpHandler
 	{
-		private readonly IController controller;
-		private readonly IControllerContext controllerContext;
-		private readonly IEngineContext engineContext;
+	    protected readonly IController controller;
+	    protected readonly IControllerContext controllerContext;
+	    protected readonly IEngineContext engineContext;
 		private readonly bool sessionless;
 
 		/// <summary>
@@ -76,36 +76,9 @@ namespace Castle.MonoRail.Framework
 		/// <param name="context">The context.</param>
 		public virtual void Process(HttpContext context)
 		{
-			if (!sessionless)
-			{
-				// Now we have a session
-				engineContext.Session = ResolveSession(context);
-			}
+		    BeforeControllerProcess(context);
 
-			IDictionary session = engineContext.Session;
-
-			Flash flash;
-
-			if (session != null)
-			{
-				flash = new Flash((Flash) session[Flash.FlashKey]);
-			}
-			else
-			{
-				flash = new Flash();
-			}
-
-			engineContext.Flash = flash;
-
-			// items added to be used by the test context
-			context.Items["mr.controller"] = controller;
-			context.Items["mr.flash"] = engineContext.Flash;
-			context.Items["mr.propertybag"] = controllerContext.PropertyBag;
-			context.Items["mr.session"] = context.Session;
-
-			AcquireCustomSession();
-
-			try
+		    try
 			{
 				engineContext.Services.ExtensionManager.RaisePreProcessController(engineContext);
 
@@ -131,18 +104,55 @@ namespace Castle.MonoRail.Framework
 			}
 			finally
 			{
-				if (!sessionless)
-				{
-					PersistFlashItems();
-				}
-
-				PersistCustomSession();
-
-				ReleaseController(controller);
+				AfterCotrollerProcess();
 			}
 		}
 
-		/// <summary>
+	    protected void AfterCotrollerProcess()
+	    {
+	        if (!sessionless)
+	        {
+	            PersistFlashItems();
+	        }
+
+	        PersistCustomSession();
+
+	        ReleaseController(controller);
+	    }
+
+	    protected void BeforeControllerProcess(HttpContext context)
+	    {
+	        if (!sessionless)
+	        {
+	            // Now we have a session
+	            engineContext.Session = ResolveSession(context);
+	        }
+
+	        IDictionary session = engineContext.Session;
+
+	        Flash flash;
+
+	        if (session != null)
+	        {
+	            flash = new Flash((Flash) session[Flash.FlashKey]);
+	        }
+	        else
+	        {
+	            flash = new Flash();
+	        }
+
+	        engineContext.Flash = flash;
+
+	        // items added to be used by the test context
+	        context.Items["mr.controller"] = controller;
+	        context.Items["mr.flash"] = engineContext.Flash;
+	        context.Items["mr.propertybag"] = controllerContext.PropertyBag;
+	        context.Items["mr.session"] = context.Session;
+
+	        AcquireCustomSession();
+	    }
+
+	    /// <summary>
 		/// Resolves the session.
 		/// </summary>
 		/// <param name="context">The context.</param>

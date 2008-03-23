@@ -38,6 +38,6 @@ namespace Castle.MonoRail.Framework
 		/// <param name="controller">The controller.</param>
 		/// <param name="context">The context.</param>
 		/// <returns></returns>
-		IExecutableAction Select(IEngineContext engineContext, IController controller, IControllerContext context);
+		IExecutableAction Select(IEngineContext engineContext, IController controller, IControllerContext context, ActionType actionType);
 	}
 }

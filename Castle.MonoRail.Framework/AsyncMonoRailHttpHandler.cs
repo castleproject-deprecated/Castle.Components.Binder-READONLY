@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2008 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2008 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,19 +14,25 @@
 
 namespace Castle.MonoRail.Framework
 {
+	using System.Web;
+	using System.Web.SessionState;
+
 	/// <summary>
-	/// Pendent
+	/// Implements <see cref="IHttpHandler"/> to dispatch the web
+	/// requests. 
+	/// <seealso cref="MonoRailHttpHandlerFactory"/>
 	/// </summary>
-	public interface ISubActionSelector
+	public class AsyncMonoRailHttpHandler : BaseAsyncHttpHandler, IRequiresSessionState
 	{
 		/// <summary>
-		/// Pendent
+		/// Initializes a new instance of the <see cref="MonoRailHttpHandler"/> class.
 		/// </summary>
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="context">The context.</param>
-		/// <returns></returns>
-		IExecutableAction Select(IEngineContext engineContext, IController controller, IControllerContext context,
-		                         ActionType actionType);
+		public AsyncMonoRailHttpHandler(IEngineContext engineContext, IController controller, IControllerContext context)
+			: base(engineContext, controller, context, false)
+		{
+		}
 	}
 }

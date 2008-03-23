@@ -84,7 +84,7 @@
     </Reference>
     <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build\net-2.0\debug\Castle.Windsor.dll</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <Name>nunit.framework</Name>
@@ -154,6 +154,15 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Async\AsyncControllerTestCase.cs" />
+    <Compile Include="Async\ControllerWithAsyncAction.cs" />
+    <Compile Include="Async\ControllerWithAsyncActionThrowOnBegin.cs" />
+    <Compile Include="Async\ControllerWithAsyncActionThrowOnAsync.cs" />
+    <Compile Include="Async\ControllerWithAsyncActionThrowOnEnd.cs" />
+    <Compile Include="Async\ControllerWithBeginIndexAndIndex.cs" />
+    <Compile Include="Async\ControllerWithBeginIndexWithoutEndIndex.cs" />
+    <Compile Include="Async\ControllerWithTwoBeginIndex.cs" />
+    <Compile Include="Async\ControllerWithTwoEndActions.cs" />
     <Compile Include="Configuration\ViewEngineConfigTestCase.cs" />
     <Compile Include="Controllers\AccessibleThroughTestCase.cs" />
     <Compile Include="Controllers\Clients\ClientCartController.cs" />
@@ -228,7 +237,6 @@
     <Compile Include="ViewComponents\SelectStylePaginationTestCase.cs" />
     <Compile Include="ViewEngines\ViewEngineBaseTestCase.cs" />
     <Compile Include="WikiFormatterTestCase.cs" />
-    <Compile Include="WindsorIntegration\FacilityTestCase.cs" />
     <Compile Include="Wizards\WizardActionProviderTestCase.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -250,6 +258,9 @@
     <EmbeddedResource Include="Services\StaticResourceRegistry\DummyRes.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="WindsorIntegration\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

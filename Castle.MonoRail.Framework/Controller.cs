@@ -95,7 +95,14 @@ namespace Castle.MonoRail.Framework
 		/// <param name="context">The controller context.</param>
 		public virtual void Process(IEngineContext engineContext, IControllerContext context)
 		{
-			if (isContextualized == false) 
+			PrepareToExecuteAction(engineContext, context);
+
+			RunActionAndRenderView();
+		}
+
+		private void PrepareToExecuteAction(IEngineContext engineContext, IControllerContext context)
+		{
+			if (isContextualized == false)
 			{
 				Contextualize(engineContext, context);
 			}
@@ -106,10 +113,8 @@ namespace Castle.MonoRail.Framework
 			ProcessScaffoldIfAvailable();
 			ActionProviderUtil.RegisterActions(engineContext, this, context);
 			Initialize();
-
-			RunActionAndRenderView();
 		}
-		
+
 		/// <summary>
 		/// Invoked by the view engine to perform
 		/// any logic before the view is sent to the client.
@@ -126,6 +131,179 @@ namespace Castle.MonoRail.Framework
 		/// <param name="view"></param>
 		public virtual void PostSendView(object view)
 		{
+		}
+
+		public IAsyncResult BeginProcess(IEngineContext engineContext, IControllerContext context)
+		{
+			PrepareToExecuteAction(engineContext, context);
+
+			IExecutableAction action = null;
+			Exception actionException = null;
+			bool cancel;
+
+			try
+			{
+				action = SelectAction(Action, ActionType.AsyncBegin);
+
+				if (action == null)
+				{
+					throw new MonoRailException(404, "Not Found", "Could not find action named " +
+					                                              Action + " on controller " + AreaName + "\\" + Name);
+				}
+
+				EnsureActionIsAccessibleWithCurrentHttpVerb(action);
+
+				RunBeforeActionFilters(action, out cancel);
+
+				CreateControllerLevelResources();
+				CreateActionLevelResources(action);
+
+				if (cancel)
+				{
+					return new FailedToExecuteBeginActionAsyncResult();
+				}
+
+				if (BeforeAction != null)
+				{
+					BeforeAction(action, engineContext, this, context);
+				}
+
+				return (IAsyncResult) action.Execute(engineContext, this, context);
+			}
+			catch(MonoRailException ex)
+			{
+				if (Response.StatusCode == 200 && ex.HttpStatusCode.HasValue)
+				{
+					Response.StatusCode = ex.HttpStatusCode.Value;
+					Response.StatusDescription = ex.HttpStatusDesc;
+				}
+
+				actionException = ex;
+
+				RegisterExceptionAndNotifyExtensions(actionException);
+
+				RunAfterActionFilters(action, out cancel);
+
+				if (!ProcessRescue(action, actionException))
+				{
+					throw;
+				}
+				return new FailedToExecuteBeginActionAsyncResult();
+			}
+			catch(Exception ex)
+			{
+				if (Response.StatusCode == 200)
+				{
+					Response.StatusCode = 500;
+					Response.StatusDescription = "Error processing action";
+				}
+
+				actionException = (ex is TargetInvocationException) ? ex.InnerException : ex;
+
+				RegisterExceptionAndNotifyExtensions(actionException);
+
+				RunAfterActionFilters(action, out cancel);
+
+				if (!ProcessRescue(action, actionException))
+				{
+					throw;
+				}
+				return new FailedToExecuteBeginActionAsyncResult();
+			}
+		}
+
+		public void EndProcess()
+		{
+			IExecutableAction action = null;
+			Exception actionException = null;
+			bool cancel;
+
+			try
+			{
+				action = SelectAction(Action, ActionType.AsyncEnd);
+				object actionRetValue = action.Execute(engineContext, this, context);
+
+				// TO DO: review/refactor this code
+				if (action.ReturnBinderDescriptor != null)
+				{
+					IReturnBinder binder = action.ReturnBinderDescriptor.ReturnTypeBinder;
+
+					// Runs return binder and keep going
+					binder.Bind(Context, this, ControllerContext, action.ReturnBinderDescriptor.ReturnType, actionRetValue);
+				}
+
+				// Action executed successfully, so it's safe to process the cache configurer
+				if ((MetaDescriptor.CacheConfigurer != null || action.CachePolicyConfigurer != null) &&
+				    !Response.WasRedirected && Response.StatusCode == 200)
+				{
+					ConfigureCachePolicy(action);
+				}
+			}
+			catch(MonoRailException ex)
+			{
+				if (Response.StatusCode == 200 && ex.HttpStatusCode.HasValue)
+				{
+					Response.StatusCode = ex.HttpStatusCode.Value;
+					Response.StatusDescription = ex.HttpStatusDesc;
+				}
+
+				actionException = ex;
+
+				RegisterExceptionAndNotifyExtensions(actionException);
+
+				RunAfterActionFilters(action, out cancel);
+
+				if (!ProcessRescue(action, actionException))
+				{
+					throw;
+				}
+				return;
+			}
+			catch(Exception ex)
+			{
+				if (Response.StatusCode == 200)
+				{
+					Response.StatusCode = 500;
+					Response.StatusDescription = "Error processing action";
+				}
+
+				actionException = (ex is TargetInvocationException) ? ex.InnerException : ex;
+
+				RegisterExceptionAndNotifyExtensions(actionException);
+
+				RunAfterActionFilters(action, out cancel);
+
+				if (!ProcessRescue(action, actionException))
+				{
+					throw;
+				}
+				return;
+			}
+			finally
+			{
+				// AfterAction event: always executed
+				if (AfterAction != null)
+				{
+					AfterAction(action, engineContext, this, context);
+				}
+			}
+
+			RunAfterActionFilters(action, out cancel);
+			if (cancel)
+			{
+				return;
+			}
+
+			if (engineContext.Response.WasRedirected) // No need to process view or rescue in this case
+			{
+				return;
+			}
+
+			if (context.SelectedViewName != null)
+			{
+				ProcessView();
+				RunAfterRenderingFilters(action);
+			}
 		}
 
 		/// <summary>
@@ -389,7 +567,7 @@ namespace Castle.MonoRail.Framework
 				}
 				else
 				{
-					context.LayoutNames = new string[] { value };
+					context.LayoutNames = new string[] {value};
 				}
 			}
 		}
@@ -771,7 +949,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="action">The action name</param>
 		public void RedirectToAction(string action)
 		{
-			RedirectToAction(action, (NameValueCollection)null);
+			RedirectToAction(action, (NameValueCollection) null);
 		}
 
 		/// <summary>
@@ -1243,7 +1421,7 @@ namespace Castle.MonoRail.Framework
 				IEmailSender sender = engineContext.Services.EmailSender;
 				sender.Send(message);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				if (logger.IsErrorEnabled)
 				{
@@ -1314,12 +1492,12 @@ namespace Castle.MonoRail.Framework
 
 			IResourceFactory resourceFactory = engineContext.Services.ResourceFactory;
 
-			foreach (ResourceDescriptor resDesc in resources)
+			foreach(ResourceDescriptor resDesc in resources)
 			{
 				if (ControllerContext.Resources.ContainsKey(resDesc.Name))
 				{
 					throw new MonoRailException("There is a duplicated entry on the resource dictionary. Resource entry name: " +
-												resDesc.Name);
+					                            resDesc.Name);
 				}
 
 				ControllerContext.Resources.Add(resDesc.Name, resourceFactory.Create(resDesc, typeAssembly));
@@ -1345,12 +1523,12 @@ namespace Castle.MonoRail.Framework
 
 			try
 			{
-				action = SelectAction(Action);
+				action = SelectAction(Action, ActionType.Sync);
 
 				if (action == null)
 				{
 					throw new MonoRailException(404, "Not Found", "Could not find action named " +
-						Action + " on controller " + AreaName + "\\" + Name);
+					                                              Action + " on controller " + AreaName + "\\" + Name);
 				}
 
 				EnsureActionIsAccessibleWithCurrentHttpVerb(action);
@@ -1360,7 +1538,10 @@ namespace Castle.MonoRail.Framework
 				CreateControllerLevelResources();
 				CreateActionLevelResources(action);
 
-				if (cancel) return;
+				if (cancel)
+				{
+					return;
+				}
 
 				if (BeforeAction != null)
 				{
@@ -1380,12 +1561,12 @@ namespace Castle.MonoRail.Framework
 
 				// Action executed successfully, so it's safe to process the cache configurer
 				if ((MetaDescriptor.CacheConfigurer != null || action.CachePolicyConfigurer != null) &&
-					!Response.WasRedirected && Response.StatusCode == 200)
+				    !Response.WasRedirected && Response.StatusCode == 200)
 				{
 					ConfigureCachePolicy(action);
 				}
 			}
-			catch (MonoRailException ex)
+			catch(MonoRailException ex)
 			{
 				if (Response.StatusCode == 200 && ex.HttpStatusCode.HasValue)
 				{
@@ -1405,7 +1586,7 @@ namespace Castle.MonoRail.Framework
 				}
 				return;
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				if (Response.StatusCode == 200)
 				{
@@ -1435,7 +1616,10 @@ namespace Castle.MonoRail.Framework
 			}
 
 			RunAfterActionFilters(action, out cancel);
-			if (cancel) return;
+			if (cancel)
+			{
+				return;
+			}
 
 			if (engineContext.Response.WasRedirected) // No need to process view or rescue in this case
 			{
@@ -1465,10 +1649,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		/// <param name="action">The action name.</param>
 		/// <returns></returns>
-		protected virtual IExecutableAction SelectAction(string action)
+		protected virtual IExecutableAction SelectAction(string action, ActionType actionType)
 		{
 			// For backward compatibility purposes
-			MethodInfo method = SelectMethod(action, MetaDescriptor.Actions, engineContext.Request, context.CustomActionParameters);
+			MethodInfo method = SelectMethod(action, MetaDescriptor.Actions, engineContext.Request,
+			                                 context.CustomActionParameters);
 
 			if (method != null)
 			{
@@ -1478,7 +1663,7 @@ namespace Castle.MonoRail.Framework
 			}
 
 			// New supported way
-			return actionSelector.Select(engineContext, this, context);
+			return actionSelector.Select(engineContext, this, context, actionType);
 		}
 
 		/// <summary>
@@ -1492,8 +1677,8 @@ namespace Castle.MonoRail.Framework
 				if (scaffoldSupport == null)
 				{
 					String message = "You must enable scaffolding support on the " +
-									 "configuration file, or, to use the standard ActiveRecord support " +
-									 "copy the necessary assemblies to the bin folder.";
+					                 "configuration file, or, to use the standard ActiveRecord support " +
+					                 "copy the necessary assemblies to the bin folder.";
 
 					throw new MonoRailException(message);
 				}
@@ -1517,14 +1702,14 @@ namespace Castle.MonoRail.Framework
 
 			string method = engineContext.Request.HttpMethod;
 
-			Verb currentVerb = (Verb)Enum.Parse(typeof(Verb), method, true);
+			Verb currentVerb = (Verb) Enum.Parse(typeof(Verb), method, true);
 
 			if ((allowedVerbs & currentVerb) != currentVerb)
 			{
 				throw new MonoRailException(403, "Forbidden",
-											string.Format("Access to the action [{0}] " +
-														  "on controller [{1}] is not allowed to the http verb [{2}].",
-														  Action, Name, method));
+				                            string.Format("Access to the action [{0}] " +
+				                                          "on controller [{1}] is not allowed to the http verb [{2}].",
+				                                          Action, Name, method));
 			}
 		}
 
@@ -1546,7 +1731,7 @@ namespace Castle.MonoRail.Framework
 
 				if (viewEngineManager.HasTemplate(defaultLayout))
 				{
-					return new String[] { Name };
+					return new String[] {Name};
 				}
 			}
 
@@ -1577,7 +1762,7 @@ namespace Castle.MonoRail.Framework
 
 			// Custom helpers
 
-			foreach (HelperDescriptor helper in MetaDescriptor.Helpers)
+			foreach(HelperDescriptor helper in MetaDescriptor.Helpers)
 			{
 				bool initialized;
 				object helperInstance = helperFactory.Create(helper.HelperType, engineContext, out initialized);
@@ -1590,7 +1775,7 @@ namespace Castle.MonoRail.Framework
 				if (helpers.Contains(helper.Name))
 				{
 					throw new ControllerException(String.Format("Found a duplicate helper " +
-																"attribute named '{0}' on controller '{1}'", helper.Name, Name));
+					                                            "attribute named '{0}' on controller '{1}'", helper.Name, Name));
 				}
 
 				helpers.Add(helper.Name, helperInstance);
@@ -1616,10 +1801,10 @@ namespace Castle.MonoRail.Framework
 						new JSONHelper(engineContext), new ZebdaHelper(engineContext)
 					};
 
-			foreach (AbstractHelper helper in builtInHelpers)
+			foreach(AbstractHelper helper in builtInHelpers)
 			{
 				context.Helpers.Add(helper);
-				
+
 				if (helper is IServiceEnabledComponent)
 				{
 					serviceInitializer.Initialize(helper, engineContext);
@@ -1642,7 +1827,10 @@ namespace Castle.MonoRail.Framework
 		private void RunBeforeActionFilters(IExecutableAction action, out bool cancel)
 		{
 			cancel = false;
-			if (action.ShouldSkipAllFilters) return;
+			if (action.ShouldSkipAllFilters)
+			{
+				return;
+			}
 
 			if (!ProcessFilters(action, ExecuteWhen.BeforeAction))
 			{
@@ -1654,9 +1842,15 @@ namespace Castle.MonoRail.Framework
 		private void RunAfterActionFilters(IExecutableAction action, out bool cancel)
 		{
 			cancel = false;
-			if (action == null) return;
+			if (action == null)
+			{
+				return;
+			}
 
-			if (action.ShouldSkipAllFilters) return;
+			if (action.ShouldSkipAllFilters)
+			{
+				return;
+			}
 
 			if (!ProcessFilters(action, ExecuteWhen.AfterAction))
 			{
@@ -1667,7 +1861,10 @@ namespace Castle.MonoRail.Framework
 
 		private void RunAfterRenderingFilters(IExecutableAction action)
 		{
-			if (action.ShouldSkipAllFilters) return;
+			if (action.ShouldSkipAllFilters)
+			{
+				return;
+			}
 
 			ProcessFilters(action, ExecuteWhen.AfterRendering);
 		}
@@ -1714,11 +1911,11 @@ namespace Castle.MonoRail.Framework
 		/// </summary>
 		protected internal FilterDescriptor[] CopyFilterDescriptors()
 		{
-			FilterDescriptor[] clone = (FilterDescriptor[])MetaDescriptor.Filters.Clone();
+			FilterDescriptor[] clone = (FilterDescriptor[]) MetaDescriptor.Filters.Clone();
 
-			for (int i = 0; i < clone.Length; i++)
+			for(int i = 0; i < clone.Length; i++)
 			{
-				clone[i] = (FilterDescriptor)clone[i].Clone();
+				clone[i] = (FilterDescriptor) clone[i].Clone();
 			}
 
 			return clone;
@@ -1726,7 +1923,7 @@ namespace Castle.MonoRail.Framework
 
 		private bool ProcessFilters(IExecutableAction action, ExecuteWhen when)
 		{
-			foreach (FilterDescriptor desc in filters)
+			foreach(FilterDescriptor desc in filters)
 			{
 				if (action.ShouldSkipFilter(desc.FilterType))
 				{
@@ -1768,7 +1965,7 @@ namespace Castle.MonoRail.Framework
 
 				return desc.FilterInstance.Perform(when, engineContext, this, context);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				if (logger.IsErrorEnabled)
 				{
@@ -1781,9 +1978,12 @@ namespace Castle.MonoRail.Framework
 
 		private void DisposeFilters()
 		{
-			if (filters == null) return;
+			if (filters == null)
+			{
+				return;
+			}
 
-			foreach (FilterDescriptor desc in filters)
+			foreach(FilterDescriptor desc in filters)
 			{
 				if (desc.FilterInstance != null)
 				{
@@ -1843,7 +2043,7 @@ namespace Castle.MonoRail.Framework
 					if (logger.IsFatalEnabled)
 					{
 						logger.FatalFormat("Failed to process rescue view. View name " +
-										   context.SelectedViewName, exception);
+						                   context.SelectedViewName, exception);
 					}
 				}
 			}
@@ -1892,7 +2092,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="actionArgs">The action args.</param>
 		/// <returns></returns>
 		protected virtual MethodInfo SelectMethod(string action, IDictionary actions, IRequest request,
-												  IDictionary<string, object> actionArgs)
+		                                          IDictionary<string, object> actionArgs)
 		{
 			return null;
 		}
@@ -1904,7 +2104,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="request">The request.</param>
 		/// <param name="methodArgs">The method args.</param>
 		protected virtual object InvokeMethod(MethodInfo method, IRequest request,
-											  IDictionary<string, object> methodArgs)
+		                                      IDictionary<string, object> methodArgs)
 		{
 			return method.Invoke(this, new object[0]);
 		}
