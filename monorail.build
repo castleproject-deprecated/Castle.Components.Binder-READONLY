@@ -24,11 +24,12 @@
 		<include name="Castle.MonoRail.TransformFilters/Castle.MonoRail.TransformFilters.build " />
 		<include name="Castle.MonoRail.TestSupport/Castle.MonoRail.TestSupport.build" />
 		
+		<include name="TestSiteBrail/TestSiteBrail.build" if="${common.testrunner.enabled}"/>
+		
 		<!--
 		<include name="TestSite/TestSite.build" if="${common.testrunner.enabled}"/>
 		<include name="TestSiteWindsor/TestSiteWindsor.build" if="${common.testrunner.enabled}"/>
 		<include name="TestSiteNVelocity/TestSiteNVelocity.build" if="${common.testrunner.enabled}"/>
-		<include name="TestSiteBrail/TestSiteBrail.build" if="${common.testrunner.enabled}"/>
 		<include name="TestSiteARSupport/TestSiteARSupport.build" if="${common.testrunner.enabled}"/>
 		-->
 		
