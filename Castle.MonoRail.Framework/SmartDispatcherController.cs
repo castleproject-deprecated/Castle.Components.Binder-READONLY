@@ -20,6 +20,7 @@ namespace Castle.MonoRail.Framework
 	using System.Collections;
 	using System.Collections.Specialized;
 	using Castle.Components.Binder;
+	using Providers;
 
 	/// <summary>
 	/// Specialization of <see cref="Controller"/> that tries
@@ -96,6 +97,9 @@ namespace Castle.MonoRail.Framework
 
 			// should check for single-option as soon as possible (performance improvement)
 			if (methods is MethodInfo) return (MethodInfo) methods;
+
+			if (methods is AsyncActionPair)
+				return null;
 
 			ArrayList candidates = (ArrayList) methods;
 

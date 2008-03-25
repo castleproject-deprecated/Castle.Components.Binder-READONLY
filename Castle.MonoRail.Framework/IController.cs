@@ -77,7 +77,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="context">The controller context.</param>
 		/// <remarks>
-		/// The async infomrmation about this call is pass using the controller context AsyncInvocationInformation property
+		/// The async infomrmation about this call is pass using the controller context Async property
 		/// </remarks>
 		IAsyncResult BeginProcess(IEngineContext engineContext, IControllerContext context);
 
@@ -89,7 +89,7 @@ namespace Castle.MonoRail.Framework
 		/// 4. Invoke the view engine<br/>
 		/// </summary>
 		/// <remarks>
-		/// The async infomrmation about this call is pass using the controller context AsyncInvocationInformation property
+		/// The async infomrmation about this call is pass using the controller context Async property
 		/// </remarks>
 		void EndProcess();
 	}

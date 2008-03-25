@@ -21,8 +21,8 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	public class AsyncInvocationInformation
 	{
-		private AsyncCallback asyncCallback;
-		private IAsyncResult asyncResult;
+		private AsyncCallback callback;
+		private IAsyncResult result;
 		private object state;
 
 		/// <summary>
@@ -39,20 +39,20 @@ namespace Castle.MonoRail.Framework
 		/// Gets or sets the async result.
 		/// </summary>
 		/// <value>The async result.</value>
-		public IAsyncResult AsyncResult
+		public IAsyncResult Result
 		{
-			get { return asyncResult; }
-			set { asyncResult = value; }
+			get { return result; }
+			set { result = value; }
 		}
 
 		/// <summary>
 		/// Gets or sets the async callback.
 		/// </summary>
 		/// <value>The async callback.</value>
-		public AsyncCallback AsyncCallback
+		public AsyncCallback Callback
 		{
-			get { return asyncCallback; }
-			set { asyncCallback = value; }
+			get { return callback; }
+			set { callback = value; }
 		}
 	}
 }

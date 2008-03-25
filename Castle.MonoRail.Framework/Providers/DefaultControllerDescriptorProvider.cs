@@ -362,6 +362,7 @@ namespace Castle.MonoRail.Framework.Providers
 				{
 					AsyncActionPair asyncActionPair = (AsyncActionPair) action;
 					CollectActionAttributes(asyncActionPair.BeginActionInfo, descriptor);
+					CollectActionAttributes(asyncActionPair.EndActionInfo, descriptor);
 				}
 			}
 		}

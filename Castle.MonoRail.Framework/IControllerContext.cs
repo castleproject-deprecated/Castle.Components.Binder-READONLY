@@ -103,6 +103,6 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Get or set the information used to manage async invocations
 		/// </summary>
-		AsyncInvocationInformation AsyncInvocationInformation { get; set; }
+		AsyncInvocationInformation Async { get; set; }
 	}
 }

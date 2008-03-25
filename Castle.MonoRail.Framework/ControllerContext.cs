@@ -48,7 +48,7 @@ namespace Castle.MonoRail.Framework
 			new Dictionary<string, IResource>(StringComparer.InvariantCultureIgnoreCase);
 
 		private RouteMatch routeMatch;
-		private AsyncInvocationInformation asyncInvocationInformation = new AsyncInvocationInformation();
+		private AsyncInvocationInformation asyncInformation = new AsyncInvocationInformation();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ControllerContext"/> class.
@@ -218,10 +218,10 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Get or set the information used to manage async invocations
 		/// </summary>
-		public AsyncInvocationInformation AsyncInvocationInformation
+		public AsyncInvocationInformation Async
 		{
-			get { return asyncInvocationInformation; }
-			set { asyncInvocationInformation = value; }
+			get { return asyncInformation; }
+			set { asyncInformation = value; }
 		}
 	}
 }

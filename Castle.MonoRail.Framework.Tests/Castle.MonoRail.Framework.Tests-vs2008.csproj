@@ -155,6 +155,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Async\AsyncControllerTestCase.cs" />
+    <Compile Include="Async\AsyncIntegrationTestCase.cs" />
     <Compile Include="Async\ControllerWithAsyncAction.cs" />
     <Compile Include="Async\ControllerWithAsyncActionThrowOnBegin.cs" />
     <Compile Include="Async\ControllerWithAsyncActionThrowOnAsync.cs" />

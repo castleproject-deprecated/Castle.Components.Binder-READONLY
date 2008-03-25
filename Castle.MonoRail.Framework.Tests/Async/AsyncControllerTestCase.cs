@@ -122,7 +122,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 			try
 			{
 				IAsyncResult ar = controller.BeginProcess(engineContext, context);
-				context.AsyncInvocationInformation.AsyncResult = ar;
+				context.Async.Result = ar;
 				ar.AsyncWaitHandle.WaitOne();
 				controller.EndProcess();
 				Assert.Fail("Expected exception");
@@ -148,7 +148,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 			try
 			{
 				IAsyncResult ar = controller.BeginProcess(engineContext, context);
-				context.AsyncInvocationInformation.AsyncResult = ar;
+				context.Async.Result = ar;
 				ar.AsyncWaitHandle.WaitOne();
 				controller.EndProcess();
 				Assert.Fail("Expected exception");
@@ -170,7 +170,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 				Create("", "ControllerWithAsyncAction", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
 
 			IAsyncResult ar = controller.BeginProcess(engineContext, context);
-			context.AsyncInvocationInformation.AsyncResult = ar;
+			context.Async.Result = ar;
 			ar.AsyncWaitHandle.WaitOne();
 			controller.EndProcess();
 

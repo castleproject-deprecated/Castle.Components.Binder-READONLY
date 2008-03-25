@@ -55,8 +55,8 @@ namespace Castle.MonoRail.Framework
 
 			try
 			{
-				controllerContext.AsyncInvocationInformation.AsyncCallback = cb;
-				controllerContext.AsyncInvocationInformation.State = extraData;
+				controllerContext.Async.Callback = cb;
+				controllerContext.Async.State = extraData;
 
 				engineContext.Services.ExtensionManager.RaisePreProcessController(engineContext);
 
@@ -90,7 +90,7 @@ namespace Castle.MonoRail.Framework
 		{
 			try
 			{
-				controllerContext.AsyncInvocationInformation.AsyncResult = result;
+				controllerContext.Async.Result = result;
 				// if we failed on the Begin[Action] and had a rescue take care of rendering the output
 				// we won't be executing the End[Action] part
 				if (result is FailedToExecuteBeginActionAsyncResult == false)
