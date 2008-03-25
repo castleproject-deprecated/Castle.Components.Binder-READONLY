@@ -125,6 +125,27 @@ namespace TestSiteBrail.Controllers
 			throw new InvalidCastException("error from end");
 		}
 
+		public IAsyncResult BeginWithActionLayout()
+		{
+			return CallAsync();
+		}
+
+		[Layout("defaultlayout")]
+		public void EndWithActionLayout()
+		{
+			PropertyBag["value"] = output.EndInvoke(ControllerContext.Async.Result);
+		}
+
+		[Rescue("UpdateErrorMsg")]
+		[Layout("defaultlayout")]
+		public IAsyncResult BeginRescueOnBeginActionLayout()
+		{
+			throw new InvalidOperationException("blah");
+		}
+
+		public void EndRescueOnBeginActionLayout()
+		{
+		}
 
 		private IAsyncResult CallThrowingAsync()
 		{

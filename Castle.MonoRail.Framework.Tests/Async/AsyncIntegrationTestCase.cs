@@ -32,11 +32,11 @@ namespace Castle.MonoRail.Framework.Tests.Async
 			}
 
 			string path;
-			string currentDirectory = Path.GetDirectoryName(Environment.CurrentDirectory);
-			if (currentDirectory == "Debug" || currentDirectory == "Release")
-				path = "../../TestSiteBrail";
+			string currentDirectory = Path.GetFileNameWithoutExtension((AppDomain.CurrentDomain.BaseDirectory));
+			if (currentDirectory == "bin")
+				path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../TestSiteBrail");
 			else // assume that we are on the build directory
-				path = "../../../MonoRail/TestSiteBrail";
+				path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../MonoRail/TestSiteBrail");
 
 			server = Process.Start(webDevPath, "/port:9999 /path:\"" + Path.GetFullPath(path) + "\"");
 		}
@@ -122,6 +122,25 @@ Footer", output);
 		{
 			string output = GetErrorResponse("http://localhost:9999/async/ErrorAsync.rails");
 			Assert.IsTrue(output.Contains("error from async"));
+		}
+
+		[Test]
+		public void CanGetResponseFromAsyncController_RescueOnBeginActionLayout()
+		{
+			string output = GetErrorResponse("http://localhost:9999/async/RescueOnBeginActionLayout.rails");
+			Assert.AreEqual(@"start modified
+blah
+end", output);
+		}
+
+
+		[Test]
+		public void CanGetResponseFromAsyncController_WithActionLayout()
+		{
+			string output = GetResponse("http://localhost:9999/async/WithActionLayout.rails");
+			Assert.AreEqual(@"start modified
+value from async task
+end",output);
 		}
 
 		private string GetResponse(string url)
