@@ -51,7 +51,8 @@ namespace Castle.MonoRail.Framework
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MonoRailHttpHandlerFactory"/> class.
 		/// </summary>
-		public MonoRailHttpHandlerFactory() : this(ServiceProviderLocator.Instance)
+		public MonoRailHttpHandlerFactory()
+			: this(ServiceProviderLocator.Instance)
 		{
 		}
 
@@ -76,8 +77,8 @@ namespace Castle.MonoRail.Framework
 		/// A new <see cref="T:System.Web.IHttpHandler"></see> object that processes the request.
 		/// </returns>
 		public virtual IHttpHandler GetHandler(HttpContext context,
-		                                       String requestType,
-		                                       String url, String pathTranslated)
+											   String requestType,
+											   String url, String pathTranslated)
 		{
 			PerformOneTimeInitializationIfNecessary(context);
 
@@ -85,7 +86,7 @@ namespace Castle.MonoRail.Framework
 
 			HttpRequest req = context.Request;
 
-			RouteMatch routeMatch = (RouteMatch) context.Items[RouteMatch.RouteMatchKey] ?? new RouteMatch();
+			RouteMatch routeMatch = (RouteMatch)context.Items[RouteMatch.RouteMatchKey] ?? new RouteMatch();
 
 			UrlInfo urlInfo = urlTokenizer.TokenizeUrl(req.FilePath, req.PathInfo, req.Url, req.IsLocal, req.ApplicationPath);
 
@@ -106,11 +107,11 @@ namespace Castle.MonoRail.Framework
 			{
 				controller = controllerFactory.CreateController(urlInfo.Area, urlInfo.Controller);
 			}
-			catch(ControllerNotFoundException)
+			catch (ControllerNotFoundException)
 			{
 				return new NotFoundHandler(urlInfo.Area, urlInfo.Controller, engineContext);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				HttpResponse response = context.Response;
 
@@ -150,11 +151,11 @@ namespace Castle.MonoRail.Framework
 
 		private bool IsAsyncAction(IControllerContext controllerContext)
 		{
-            if (controllerContext.ControllerDescriptor==null)
-                return false;
-            if (controllerContext.Action==null)
-                return false;
-            return controllerContext.ControllerDescriptor.Actions[controllerContext.Action] is AsyncActionPair;
+			if (controllerContext.ControllerDescriptor == null)
+				return false;
+			if (controllerContext.Action == null)
+				return false;
+			return controllerContext.ControllerDescriptor.Actions[controllerContext.Action] is AsyncActionPair;
 		}
 
 		/// <summary>
@@ -168,7 +169,7 @@ namespace Castle.MonoRail.Framework
 		/// A new <see cref="T:System.Web.IHttpHandler"></see> object that processes the request.
 		/// </returns>
 		protected virtual IHttpHandler CreateHandler(ControllerMetaDescriptor controllerDesc, IEngineContext engineContext,
-		                                             IController controller, IControllerContext controllerContext)
+													 IController controller, IControllerContext controllerContext)
 		{
 			if (IgnoresSession(controllerDesc.ControllerDescriptor))
 			{
@@ -189,8 +190,8 @@ namespace Castle.MonoRail.Framework
 		/// A new <see cref="T:System.Web.IHttpHandler"></see> object that processes the request.
 		/// </returns>
 		protected virtual IHttpAsyncHandler CreateAsyncHandler(ControllerMetaDescriptor controllerDesc,
-		                                                       IEngineContext engineContext, IController controller,
-		                                                       IControllerContext controllerContext)
+															   IEngineContext engineContext, IController controller,
+															   IControllerContext controllerContext)
 		{
 			if (IgnoresSession(controllerDesc.ControllerDescriptor))
 			{
@@ -310,7 +311,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="appInstance">The app instance.</param>
 		/// <returns></returns>
 		protected virtual IMonoRailContainer CreateDefaultMonoRailContainer(IServiceProviderEx userServiceProvider,
-		                                                                    HttpApplication appInstance)
+																			HttpApplication appInstance)
 		{
 			DefaultMonoRailContainer container = new DefaultMonoRailContainer(userServiceProvider);
 
@@ -346,7 +347,12 @@ namespace Castle.MonoRail.Framework
 		/// <value>The current engine context.</value>
 		public static IEngineContext CurrentEngineContext
 		{
-			get { return HttpContext.Current.Items[CurrentEngineContextKey] as IEngineContext; }
+			get
+			{
+				if (HttpContext.Current == null)//for tests
+					return null;
+				return HttpContext.Current.Items[CurrentEngineContextKey] as IEngineContext;
+			}
 		}
 
 		/// <summary>
@@ -440,10 +446,10 @@ namespace Castle.MonoRail.Framework
 			if (config == null)
 			{
 				throw new ApplicationException("You have to provide a small configuration to use " +
-				                               "MonoRail. This can be done using the web.config or " +
-				                               "your global asax (your class that extends HttpApplication) " +
-				                               "through the method MonoRail_Configure(IMonoRailConfiguration config). " +
-				                               "Check the samples or the documentation.");
+											   "MonoRail. This can be done using the web.config or " +
+											   "your global asax (your class that extends HttpApplication) " +
+											   "through the method MonoRail_Configure(IMonoRailConfiguration config). " +
+											   "Check the samples or the documentation.");
 			}
 
 			return config;

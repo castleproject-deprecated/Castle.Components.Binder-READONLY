@@ -29,7 +29,7 @@ namespace Castle.MonoRail.Framework.Tests.Handlers
 	[TestFixture]
 	public class MRHandlerFactoryTestCase
 	{
-		private MockRepository mockRepository = new MockRepository();
+		private readonly MockRepository mockRepository = new MockRepository();
 		private MonoRailHttpHandlerFactory handlerFactory;
 		private IServiceProviderLocator serviceProviderLocatorMock;
 		private IMonoRailContainer container;
