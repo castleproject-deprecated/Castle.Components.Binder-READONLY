@@ -143,6 +143,16 @@ value from async task
 end",output);
 		}
 
+		[Test]
+		public void CanGetResponseFromAsyncController_WithParams()
+		{
+			string output = GetResponse("http://localhost:9999/async/WithParams.rails?id=15&name=ayende");
+			Assert.AreEqual(@"
+Welcome!
+<p>id: 15, name: ayende, value: value from async task</p>
+Footer", output);
+		}
+
 		private string GetResponse(string url)
 		{
 			return new WebClient().DownloadString(url);

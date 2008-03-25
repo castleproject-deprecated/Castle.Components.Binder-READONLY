@@ -83,15 +83,16 @@ namespace Castle.MonoRail.Framework
 		}
 
 		/// <summary>
-		/// Uses a simple heuristic to select the best method -- especially in the 
-		/// case of method overloads. 
+		/// Uses a simple heuristic to select the best method -- especially in the
+		/// case of method overloads.
 		/// </summary>
 		/// <param name="action">The action name</param>
 		/// <param name="actions">The avaliable actions</param>
 		/// <param name="request">The request instance</param>
 		/// <param name="actionArgs">The custom arguments for the action</param>
+		/// <param name="actionType">Type of the action.</param>
 		/// <returns></returns>
-		protected override MethodInfo SelectMethod(string action, IDictionary actions, IRequest request, IDictionary<string, object> actionArgs)
+		protected override MethodInfo SelectMethod(string action, IDictionary actions, IRequest request, IDictionary<string, object> actionArgs, ActionType actionType)
 		{
 			object methods = actions[action];
 
@@ -99,7 +100,13 @@ namespace Castle.MonoRail.Framework
 			if (methods is MethodInfo) return (MethodInfo) methods;
 
 			if (methods is AsyncActionPair)
-				return null;
+			{
+				AsyncActionPair pair = (AsyncActionPair) methods;
+				if (actionType == ActionType.AsyncBegin)
+					return pair.BeginActionInfo;
+				else
+					return pair.EndActionInfo;
+			}
 
 			ArrayList candidates = (ArrayList) methods;
 

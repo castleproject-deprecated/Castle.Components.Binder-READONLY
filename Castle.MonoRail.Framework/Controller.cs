@@ -1697,7 +1697,7 @@ namespace Castle.MonoRail.Framework
 		{
 			// For backward compatibility purposes
 			MethodInfo method = SelectMethod(action, MetaDescriptor.Actions, engineContext.Request,
-											 context.CustomActionParameters);
+											 context.CustomActionParameters, actionType);
 
 			if (method != null)
 			{
@@ -2134,9 +2134,10 @@ namespace Castle.MonoRail.Framework
 		/// <param name="actions">The actions.</param>
 		/// <param name="request">The request.</param>
 		/// <param name="actionArgs">The action args.</param>
+		/// <param name="actionType">Type of the action.</param>
 		/// <returns></returns>
 		protected virtual MethodInfo SelectMethod(string action, IDictionary actions, IRequest request,
-												  IDictionary<string, object> actionArgs)
+												  IDictionary<string, object> actionArgs, ActionType actionType)
 		{
 			return null;
 		}

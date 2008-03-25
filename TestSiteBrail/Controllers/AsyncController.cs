@@ -28,6 +28,20 @@ namespace TestSiteBrail.Controllers
 
 		private Output output;
 
+
+		public IAsyncResult BeginWithParams(int id, string name)
+		{
+			PropertyBag["id"] = id;
+			PropertyBag["name"] = name;
+			return CallAsync();
+		}
+
+		public void EndWithParams()
+		{
+			PropertyBag["value"] = output.EndInvoke(ControllerContext.Async.Result);
+		}
+
+
 		public IAsyncResult BeginIndex()
 		{
 			return CallAsync();
