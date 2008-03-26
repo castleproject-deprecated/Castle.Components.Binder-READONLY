@@ -35,7 +35,7 @@ namespace Castle.MonoRail.Framework
 	/// Implements the core functionality and exposes the
 	/// common methods for concrete controllers.
 	/// </summary>
-	public abstract class Controller : IController, IValidatorAccessor, IRedirectSupport
+	public abstract class Controller : IAsyncController, IValidatorAccessor, IRedirectSupport
 	{
 		private IEngineContext engineContext;
 		private IControllerContext context;

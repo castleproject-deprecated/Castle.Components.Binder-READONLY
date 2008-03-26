@@ -24,19 +24,21 @@ namespace Castle.MonoRail.Framework
 	/// </summary>
 	public class BaseAsyncHttpHandler : BaseHttpHandler, IHttpAsyncHandler
 	{
+		private readonly IAsyncController asyncController;
 		private HttpContext httpContext;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MonoRailHttpHandler"/> class.
 		/// </summary>
 		/// <param name="engineContext">The engine context.</param>
-		/// <param name="controller">The controller.</param>
+		/// <param name="controller">The asyncController.</param>
 		/// <param name="context">The context.</param>
 		/// <param name="sessionLess">Have session?</param>
-		public BaseAsyncHttpHandler(IEngineContext engineContext, IController controller, IControllerContext context,
+		public BaseAsyncHttpHandler(IEngineContext engineContext, IAsyncController controller, IControllerContext context,
 		                            bool sessionLess)
 			: base(engineContext, controller, context, sessionLess)
 		{
+			this.asyncController = controller;
 		}
 
 		/// <summary>
@@ -60,7 +62,7 @@ namespace Castle.MonoRail.Framework
 
 				engineContext.Services.ExtensionManager.RaisePreProcessController(engineContext);
 
-				return controller.BeginProcess(engineContext, controllerContext);
+				return asyncController.BeginProcess(engineContext, controllerContext);
 			}
 			catch(Exception ex)
 			{
@@ -78,7 +80,7 @@ namespace Castle.MonoRail.Framework
 				AfterControllerProcess();
 
 				throw new MonoRailException("Error processing MonoRail request. Action " +
-				                            controllerContext.Action + " on controller " + controllerContext.Name, ex);
+				                            controllerContext.Action + " on asyncController " + controllerContext.Name, ex);
 			}
 		}
 
@@ -95,7 +97,7 @@ namespace Castle.MonoRail.Framework
 				// we won't be executing the End[Action] part
 				if (result is FailedToExecuteBeginActionAsyncResult == false)
 				{
-					controller.EndProcess();
+					asyncController.EndProcess();
 				}
 
 				engineContext.Services.ExtensionManager.RaisePostProcessController(engineContext);
@@ -114,7 +116,7 @@ namespace Castle.MonoRail.Framework
 				engineContext.Services.ExtensionManager.RaiseUnhandledError(engineContext);
 
 				throw new MonoRailException("Error processing MonoRail request. Action " +
-				                            controllerContext.Action + " on controller " + controllerContext.Name, ex);
+				                            controllerContext.Action + " on asyncController " + controllerContext.Name, ex);
 			}
 			finally
 			{

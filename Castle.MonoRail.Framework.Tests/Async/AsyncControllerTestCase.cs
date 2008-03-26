@@ -41,7 +41,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 		[Test]
 		public void AsyncMethodPairAppearAsSingleAction()
 		{
-			IController controller = new ControllerWithAsyncAction();
+			IAsyncController controller = new ControllerWithAsyncAction();
 			ControllerMetaDescriptor descriptor = services.ControllerDescriptorProvider.BuildDescriptor(controller);
 			Assert.AreEqual(1, descriptor.Actions.Count);
 			Assert.AreEqual("Index", descriptor.Actions["Index"].ToString());
@@ -53,7 +53,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 			)]
 		public void OverloadingOfAsyncActionsIsNotAllowed()
 		{
-			IController controller = new ControllerWithTwoBeginIndex();
+			IAsyncController controller = new ControllerWithTwoBeginIndex();
 			services.ControllerDescriptorProvider.BuildDescriptor(controller);
 		}
 
@@ -63,7 +63,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 			)]
 		public void MixingAsyncAndSyncMethodNotAllowed()
 		{
-			IController controller = new ControllerWithBeginIndexAndIndex();
+			IAsyncController controller = new ControllerWithBeginIndexAndIndex();
 			services.ControllerDescriptorProvider.BuildDescriptor(controller);
 		}
 
@@ -73,7 +73,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 			)]
 		public void BeginActionWithoutEndActionNotAllowed()
 		{
-			IController controller = new ControllerWithBeginIndexWithoutEndIndex();
+			IAsyncController controller = new ControllerWithBeginIndexWithoutEndIndex();
 			services.ControllerDescriptorProvider.BuildDescriptor(controller);
 		}
 
@@ -83,14 +83,14 @@ namespace Castle.MonoRail.Framework.Tests.Async
 			)]
 		public void OverloadingForEndActionIsNotAllowed()
 		{
-			IController controller = new ControllerWithTwoEndActions();
+			IAsyncController controller = new ControllerWithTwoEndActions();
 			services.ControllerDescriptorProvider.BuildDescriptor(controller);
 		}
 
 		[Test]
 		public void BeginActionThrowsException()
 		{
-			IController controller = new ControllerWithAsyncActionThrowOnBegin();
+			IAsyncController controller = new ControllerWithAsyncActionThrowOnBegin();
 
 			IControllerContext context = services.ControllerContextFactory.
 				Create("", "ControllerWithAsyncAction", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
@@ -112,7 +112,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 		[Test]
 		public void EndActionThrowsException()
 		{
-			IController controller = new ControllerWithAsyncActionThrowOnEnd();
+			IAsyncController controller = new ControllerWithAsyncActionThrowOnEnd();
 
 			IControllerContext context = services.ControllerContextFactory.
 				Create("", "ControllerWithAsyncAction", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
@@ -138,7 +138,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 		[Test]
 		public void AsyncActionThrowsException()
 		{
-			IController controller = new ControllerWithAsyncActionThrowOnAsync();
+			IAsyncController controller = new ControllerWithAsyncActionThrowOnAsync();
 
 			IControllerContext context = services.ControllerContextFactory.
 				Create("", "ControllerWithAsyncAction", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));
@@ -164,7 +164,7 @@ namespace Castle.MonoRail.Framework.Tests.Async
 		[Test]
 		public void CanExecuteActionAsynchronously()
 		{
-			IController controller = new ControllerWithAsyncAction();
+			IAsyncController controller = new ControllerWithAsyncAction();
 
 			IControllerContext context = services.ControllerContextFactory.
 				Create("", "ControllerWithAsyncAction", "index", services.ControllerDescriptorProvider.BuildDescriptor(controller));

@@ -34,7 +34,7 @@ namespace Castle.MonoRail.Framework.Tests.Handlers
 		private IServiceProviderLocator serviceProviderLocatorMock;
 		private IMonoRailContainer container;
 		private IControllerFactory controllerFactoryMock;
-		private IController controllerMock;
+		private IAsyncController controllerMock;
 		private IControllerDescriptorProvider controllerDescriptorProviderMock;
 		private IControllerContextFactory controllerContextFactoryMock;
 
@@ -44,7 +44,7 @@ namespace Castle.MonoRail.Framework.Tests.Handlers
 			container = mockRepository.CreateMock<IMonoRailContainer>();
 			serviceProviderLocatorMock = mockRepository.CreateMock<IServiceProviderLocator>();
 			controllerFactoryMock = mockRepository.CreateMock<IControllerFactory>();
-			controllerMock = mockRepository.CreateMock<IController>();
+			controllerMock = mockRepository.CreateMock<IAsyncController>();
 			controllerDescriptorProviderMock = mockRepository.CreateMock<IControllerDescriptorProvider>();
 			controllerContextFactoryMock = mockRepository.CreateMock<IControllerContextFactory>();
 

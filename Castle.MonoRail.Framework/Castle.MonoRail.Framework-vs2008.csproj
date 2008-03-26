@@ -438,6 +438,7 @@
     <Compile Include="IActionSelector.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IAsyncController.cs" />
     <Compile Include="ICachePolicyConfigurer.cs">
       <SubType>Code</SubType>
     </Compile>

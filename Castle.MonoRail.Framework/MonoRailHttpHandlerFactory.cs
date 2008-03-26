@@ -145,7 +145,7 @@ namespace Castle.MonoRail.Framework
 			}
 			else
 			{
-				return CreateAsyncHandler(controllerDesc, engineContext, controller, controllerContext);
+				return CreateAsyncHandler(controllerDesc, engineContext, (IAsyncController)controller, controllerContext);
 			}
 		}
 
@@ -181,7 +181,7 @@ namespace Castle.MonoRail.Framework
 		/// A new <see cref="T:System.Web.IHttpHandler"></see> object that processes the request.
 		/// </returns>
 		protected virtual IHttpAsyncHandler CreateAsyncHandler(ControllerMetaDescriptor controllerDesc,
-															   IEngineContext engineContext, IController controller,
+															   IEngineContext engineContext, IAsyncController controller,
 															   IControllerContext controllerContext)
 		{
 			if (IgnoresSession(controllerDesc.ControllerDescriptor))

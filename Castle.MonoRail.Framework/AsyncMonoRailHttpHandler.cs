@@ -30,7 +30,7 @@ namespace Castle.MonoRail.Framework
 		/// <param name="engineContext">The engine context.</param>
 		/// <param name="controller">The controller.</param>
 		/// <param name="context">The context.</param>
-		public AsyncMonoRailHttpHandler(IEngineContext engineContext, IController controller, IControllerContext context)
+		public AsyncMonoRailHttpHandler(IEngineContext engineContext, IAsyncController controller, IControllerContext context)
 			: base(engineContext, controller, context, false)
 		{
 		}
