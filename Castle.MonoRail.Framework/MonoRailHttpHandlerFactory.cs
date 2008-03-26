@@ -107,11 +107,11 @@ namespace Castle.MonoRail.Framework
 			{
 				controller = controllerFactory.CreateController(urlInfo.Area, urlInfo.Controller);
 			}
-			catch (ControllerNotFoundException)
+			catch(ControllerNotFoundException)
 			{
 				return new NotFoundHandler(urlInfo.Area, urlInfo.Controller, engineContext);
 			}
-			catch (Exception ex)
+			catch(Exception ex)
 			{
 				HttpResponse response = context.Response;
 
@@ -147,15 +147,6 @@ namespace Castle.MonoRail.Framework
 			{
 				return CreateAsyncHandler(controllerDesc, engineContext, controller, controllerContext);
 			}
-		}
-
-		private bool IsAsyncAction(IControllerContext controllerContext)
-		{
-			if (controllerContext.ControllerDescriptor == null)
-				return false;
-			if (controllerContext.Action == null)
-				return false;
-			return controllerContext.ControllerDescriptor.Actions[controllerContext.Action] is AsyncActionPair;
 		}
 
 		/// <summary>
@@ -302,6 +293,20 @@ namespace Castle.MonoRail.Framework
 		protected virtual bool IgnoresSession(ControllerDescriptor controllerDesc)
 		{
 			return controllerDesc.Sessionless;
+		}
+
+		/// <summary>
+		/// Checks whether the target action is an async method.
+		/// </summary>
+		/// <param name="controllerContext">The controller context.</param>
+		/// <returns></returns>
+		protected virtual bool IsAsyncAction(IControllerContext controllerContext)
+		{
+			if (controllerContext.ControllerDescriptor == null || controllerContext.Action == null)
+			{
+				return false;
+			}
+			return controllerContext.ControllerDescriptor.Actions[controllerContext.Action] is AsyncActionPair;
 		}
 
 		/// <summary>
