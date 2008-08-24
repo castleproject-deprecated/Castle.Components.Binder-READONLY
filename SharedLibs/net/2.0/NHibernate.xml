@@ -9260,7 +9260,7 @@
         </member>
         <member name="T:NHibernate.Dialect.Dialect">
             <summary>
-            Represents a dialect of SQL implemented by a particular RDBMS. Sublcasses
+            Represents a dialect of SQL implemented by a particular RDBMS. Subclasses
             implement NHibernate compatibility with different systems.
             </summary>
             <remarks>
@@ -10970,11 +10970,28 @@
             <param name="hasOffset">Offset of the first row to process in the result set is non-zero</param>
             <returns></returns>
         </member>
+        <member name="M:NHibernate.Dialect.PostgreSQLDialect.GetSelectClauseNullString(NHibernate.SqlTypes.SqlType)">
+            <summary>PostgreSQL requires to cast NULL values to correctly handle UNION/UNION ALL</summary>
+            <remarks>
+            See <see href="http://archives.postgresql.org/pgsql-bugs/2005-08/msg00239.php">
+            PostgreSQL BUG #1847: Error in some kind of UNION query.</see>
+            </remarks>
+            <param name="sqlType">The <see cref="T:System.Data.DbType"/> type code.</param>
+            <returns>null casted as <paramref name="sqlType"/>: "<c>null::sqltypename</c>"</returns>
+        </member>
         <member name="P:NHibernate.Dialect.PostgreSQLDialect.AddColumnString">
             <summary></summary>
         </member>
         <member name="P:NHibernate.Dialect.PostgreSQLDialect.DropConstraints">
             <summary></summary>
+        </member>
+        <member name="P:NHibernate.Dialect.PostgreSQLDialect.SupportsUnionAll">
+            <summary>PostgreSQL supports UNION ALL clause</summary>
+            <remarks>
+            Reference: <see href="http://www.postgresql.org/docs/8.0/static/sql-select.html#SQL-UNION">
+            PostgreSQL 8.0 UNION Clause documentation</see>
+            </remarks>
+            <value><see langword="true"/></value>
         </member>
         <member name="P:NHibernate.Dialect.PostgreSQL81Dialect.SupportsIdentityColumns">
             <summary>
@@ -11127,14 +11144,14 @@
         </member>
         <member name="T:NHibernate.Dialect.SybaseAnywhereDialect">
             <summary>
-            An SQL dialect for Sybase Adaptive Server Anywhere 10.0
+            An SQL dialect for Sybase Adaptive Server Anywhere 9.0/10.0
             </summary>
             <remarks>
             <p>
             This dialect probably will not work with schema-export.  If anyone out there
             can fill in the ctor with DbTypes to Strings that would be helpful.
             </p>
-            The SybaseAnywhere10Dialect defaults the following configuration properties:
+            The SybaseAnywhereDialect defaults the following configuration properties:
             <list type="table">
             	<listheader>
             		<term>Property</term>
@@ -11241,9 +11258,9 @@
             <param name="typecode"></param>
             <param name="value"></param>
         </member>
-        <member name="T:NHibernate.Driver.ASAClientDriver">
+        <member name="T:NHibernate.Driver.ASA10ClientDriver">
             <summary>
-            The ASAClientDriver Driver provides a database driver for Adaptive Server Anywhere 9.0.
+            The ASAClientDriver Driver provides a database driver for Adaptive Server Anywhere 10.0.
             </summary>
         </member>
         <member name="T:NHibernate.Driver.DriverBase">
@@ -11412,7 +11429,7 @@
             <param name="connectionTypeName">Connection type name.</param>
             <param name="commandTypeName">Command type name.</param>
         </member>
-        <member name="M:NHibernate.Driver.ASAClientDriver.#ctor">
+        <member name="M:NHibernate.Driver.ASA10ClientDriver.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:NHibernate.Driver.ASAClientDriver"/> class.
             </summary>
@@ -11420,15 +11437,39 @@
             Thrown when the iAnywhere.Data.SQLAnywhere assembly is not and can not be loaded.
             </exception>
         </member>
-        <member name="P:NHibernate.Driver.ASAClientDriver.UseNamedPrefixInSql">
+        <member name="P:NHibernate.Driver.ASA10ClientDriver.UseNamedPrefixInSql">
             <summary>
             iAnywhere.Data.SQLAnywhere uses named parameters in the sql.
             </summary>
             <value><see langword="true" /> - Sybase uses <c>String.Empty</c> in the sql.</value>
         </member>
-        <member name="P:NHibernate.Driver.ASAClientDriver.NamedPrefix">
+        <member name="P:NHibernate.Driver.ASA10ClientDriver.NamedPrefix">
             <summary>
             iAnywhere.Data.SQLAnywhere use the <c>string.Empty</c> to locate parameters in sql.
+            </summary>
+        </member>
+        <member name="T:NHibernate.Driver.ASAClientDriver">
+            <summary>
+            The ASAClientDriver Driver provides a database driver for Adaptive Server Anywhere 9.0.
+            </summary>
+        </member>
+        <member name="M:NHibernate.Driver.ASAClientDriver.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NHibernate.Driver.ASAClientDriver"/> class.
+            </summary>
+            <exception cref="T:NHibernate.HibernateException">
+            Thrown when the ASA.Data.AsaClient assembly is not and can not be loaded.
+            </exception>
+        </member>
+        <member name="P:NHibernate.Driver.ASAClientDriver.UseNamedPrefixInSql">
+            <summary>
+            iAnywhere.Data.AsaClient uses named parameters in the sql.
+            </summary>
+            <value><see langword="true" /> - Sybase uses <c>String.Empty</c> in the sql.</value>
+        </member>
+        <member name="P:NHibernate.Driver.ASAClientDriver.NamedPrefix">
+            <summary>
+            iAnywhere.Data.AsaClient use the <c>string.Empty</c> to locate parameters in sql.
             </summary>
         </member>
         <member name="T:NHibernate.Driver.DB2400Driver">
@@ -25439,7 +25480,7 @@
         <member name="T:NHibernate.Mapping.RootClass">
             <summary>
             Declaration of a System.Type mapped with the <c>&lt;class&gt;</c> element that
-            is the root class of a table-per-sublcass, or table-per-concrete-class 
+            is the root class of a table-per-subclass, or table-per-concrete-class 
             inheritance heirarchy.
             </summary>
         </member>
@@ -27003,6 +27044,11 @@
             Thrown when a Property specified by the <c>propertyName</c> could not
             be found in the <see cref="T:System.Type"/>.
             </exception>
+        </member>
+        <member name="P:NHibernate.Properties.IPropertyAccessor.CanAccessTroughReflectionOptimizer">
+            <summary>
+            Allow embedded and custom accessors to define if the ReflectionOptimizer can be used.
+            </summary>
         </member>
         <member name="T:NHibernate.Properties.BackrefPropertyAccessor.BackrefSetter">
             <summary> The Setter implementation for id backrefs.</summary>
@@ -31606,6 +31652,14 @@
             to a <c>DbType.StringFixedLength</c> column.
             </summary>
         </member>
+        <member name="T:NHibernate.Type.ClassMetaType">
+            <summary>
+            ClassMetaType is a NH specif type to support "any" with meta-type="class"
+            </summary>
+            <remarks>
+            It work like a MetaType where the key is the entity-name it self
+            </remarks>
+        </member>
         <member name="M:NHibernate.Type.ComponentType.NullSafeSet(System.Data.IDbCommand,System.Object,System.Int32,NHibernate.Engine.ISessionImplementor)">
             <summary>
             
@@ -35924,6 +35978,12 @@
             <summary>
             NHibernate class type
             </summary>
+        </member>
+        <member name="F:NHibernate.NHibernateUtil.ClassMetaType">
+            <summary>
+            NHibernate class meta type for associtiation of kind <code>any</code>.
+            </summary>
+            <seealso cref="T:NHibernate.Type.AnyType"/>
         </member>
         <member name="F:NHibernate.NHibernateUtil.Serializable">
             <summary>
