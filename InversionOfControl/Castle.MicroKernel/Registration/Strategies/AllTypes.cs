@@ -58,7 +58,7 @@ namespace Castle.MicroKernel.Registration
 		/// </summary>
 		/// <param name="assemblyName">The assembly name.</param>
 		/// <returns>The corresponding <see cref="FromDescriptor"/></returns>
-		public static FromDescriptor FromAssemblyNamed(string assemblyName)
+		public static FromAssemblyDescriptor FromAssemblyNamed(string assemblyName)
 		{
 			Assembly assembly;
 			String extension = Path.GetExtension(assemblyName);
@@ -87,13 +87,13 @@ namespace Castle.MicroKernel.Registration
 		/// </summary>
 		/// <param name="assembly">The assembly.</param>
 		/// <returns>The corresponding <see cref="FromDescriptor"/></returns>
-		public static FromDescriptor FromAssembly(Assembly assembly)
+		public static FromAssemblyDescriptor FromAssembly(Assembly assembly)
 		{
 			if (assembly == null)
 			{
 				throw new ArgumentNullException("assembly");
 			}
-			return From(assembly.GetExportedTypes());
+			return new FromAssemblyDescriptor(assembly);
 		}
 
 		/// <summary>
@@ -101,9 +101,9 @@ namespace Castle.MicroKernel.Registration
 		/// </summary>
 		/// <param name="types">The list of types.</param>
 		/// <returns>The corresponding <see cref="FromDescriptor"/></returns>
-		public static FromDescriptor From(IEnumerable<Type> types)
+		public static FromTypesDescriptor From(IEnumerable<Type> types)
 		{
-			return new FromDescriptor(types);
+			return new FromTypesDescriptor(types);
 		}
 
 		/// <summary>
@@ -111,9 +111,9 @@ namespace Castle.MicroKernel.Registration
 		/// </summary>
 		/// <param name="types">The list of types.</param>
 		/// <returns>The corresponding <see cref="FromDescriptor"/></returns>
-		public static FromDescriptor Pick(IEnumerable<Type> types)
+		public static FromTypesDescriptor Pick(IEnumerable<Type> types)
 		{
-			return new FromDescriptor(types);
+			return new FromTypesDescriptor(types);
 		}
 
 		/// <summary>
@@ -121,9 +121,9 @@ namespace Castle.MicroKernel.Registration
 		/// </summary>
 		/// <param name="types">The list of types.</param>
 		/// <returns>The corresponding <see cref="FromDescriptor"/></returns>
-		public static FromDescriptor From(params Type[] types)
+		public static FromTypesDescriptor From(params Type[] types)
 		{
-			return new FromDescriptor(types);
+			return new FromTypesDescriptor(types);
 		}
 	}
 }

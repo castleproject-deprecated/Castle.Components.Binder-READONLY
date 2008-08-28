@@ -238,5 +238,30 @@ namespace Castle.MicroKernel.Tests.Registration
 			Assert.AreEqual(1, handlers.Length);		
 		}
 #endif	
+
+		[Test]
+		public void RegisterAssemblyTypes_OnlyPublicTypes_WillNotRegisterNonPublicTypes()
+		{
+			kernel.Register(
+				AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+					.BasedOn<NonPublicComponent>()
+					);
+
+			IHandler[] handlers = kernel.GetHandlers(typeof(NonPublicComponent));
+			Assert.AreEqual(0, handlers.Length);
+		}
+
+		[Test]
+		public void RegisterAssemblyTypes_IncludeNonPublicTypes_WillNRegisterNonPublicTypes()
+		{
+			kernel.Register(
+				AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+					.IncludeNonPublicTypes()
+					.BasedOn<NonPublicComponent>()
+					);
+
+			IHandler[] handlers = kernel.GetHandlers(typeof(NonPublicComponent));
+			Assert.AreEqual(1, handlers.Length);
+		}
 	}
 }
