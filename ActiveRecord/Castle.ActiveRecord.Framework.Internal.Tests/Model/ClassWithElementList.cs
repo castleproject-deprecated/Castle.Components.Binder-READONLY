@@ -14,9 +14,7 @@
 
 namespace Castle.ActiveRecord.Framework.Internal.Tests.Model
 {
-	using System;
 	using System.Collections;
-	using System.Text;
 
 	[ActiveRecord]
     public class ClassWithElementList

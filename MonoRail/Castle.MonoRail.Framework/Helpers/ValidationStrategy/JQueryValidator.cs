@@ -80,13 +80,13 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 
 			#region Instance Variables
 
-			private readonly Dictionary<String, CustomRule> _customRules = new Dictionary<String, CustomRule>();
-			private readonly Dictionary<string, string> _rules = new Dictionary<string, string>();
-			private readonly IDictionary _options = new Hashtable();
-			private readonly IDictionary _ajaxOptions = new Hashtable();
-			private readonly Dictionary<string, Group> _groups = new Dictionary<string, Group>();
-			private readonly IDictionary<string, IDictionary> _customClasses = new Dictionary<string, IDictionary>();
-			private readonly Dictionary<string, string> _messages = new Dictionary<string, string>();
+			private readonly IDictionary<string, CustomRule> _customRules = new SortedList<String, CustomRule>();
+			private readonly IDictionary<string, string> _rules = new SortedList<string, string>();
+			private readonly IDictionary _options = new SortedList();
+			private readonly IDictionary _ajaxOptions = new SortedList();
+			private readonly IDictionary<string, Group> _groups = new SortedList<string, Group>();
+			private readonly IDictionary<string, IDictionary> _customClasses = new SortedList<string, IDictionary>();
+			private readonly IDictionary<string, string> _messages = new SortedList<string, string>();
 
 			#endregion Instance Variables
 
@@ -272,7 +272,7 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 				foreach(KeyValuePair<string, Group> pair in _groups)
 				{
 					Group group = pair.Value;
-					AddCustomRule(group.GroupName, group.ViolationMessage, group.GetCustomRuleFunction());
+					AddCustomRule(string.Format("required{0}", group.GroupName), group.ViolationMessage, group.GetCustomRuleFunction());
 				}
 			}
 
@@ -379,6 +379,8 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 				              "function(value, element, param) { return ( IsNaN( value ) && IsNaN( jQuery(param).val() ) ) || ( value > jQuery(param).val() ); }");
 				AddCustomRule("lesserThan", "Must be lesser than {0}.",
 				              "function(value, element, param) { return ( IsNaN( value ) && IsNaN( jQuery(param).val() ) ) || ( value < jQuery(param).val() ); }");
+				AddCustomRule("regExp", "Must match expression.", 
+								"function(value, element, param) { return new RegExp(param).text(value); }"); 		
 			}
 
 			private static void AddParameterToOptions(IDictionary parameters, IDictionary options, string parameterName,
@@ -682,6 +684,7 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 			/// <param name="violationMessage">The violation message.</param>
 			public void SetRegExp(string target, string regExp, string violationMessage)
 			{
+				ConfigureTarget(target, "regExp", regExp, violationMessage);
 			}
 
 			/// <summary>
@@ -877,12 +880,11 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 			public void SetAsGreaterThan(string target, string comparisonFieldName, IsGreaterValidationType validationType,
 			                             string violationMessage)
 			{
-				if (validationType == IsGreaterValidationType.Decimal || validationType == IsGreaterValidationType.Integer)
-				{
-					string prefixedComparisonFieldName = GetPrefixJQuerySelector(GetPrefixedFieldld(target, comparisonFieldName));
+				if (validationType != IsGreaterValidationType.Decimal && validationType != IsGreaterValidationType.Integer)
+					return;
 
-					ConfigureTarget(target, "greaterThan", String.Format("\"{0}\"", prefixedComparisonFieldName), violationMessage);
-				}
+				string prefixedComparisonFieldName = GetPrefixJQuerySelector(GetPrefixedFieldld(target, comparisonFieldName));
+				ConfigureTarget(target, "greaterThan", String.Format("\"{0}\"", prefixedComparisonFieldName), violationMessage);
 			}
 
 			/// <summary>
@@ -896,12 +898,11 @@ namespace Castle.MonoRail.Framework.Helpers.ValidationStrategy
 			public void SetAsLesserThan(string target, string comparisonFieldName, IsLesserValidationType validationType,
 			                            string violationMessage)
 			{
-				if (validationType == IsLesserValidationType.Decimal || validationType == IsLesserValidationType.Integer)
-				{
-					string prefixedComparisonFieldName = GetPrefixJQuerySelector(GetPrefixedFieldld(target, comparisonFieldName));
+				if (validationType != IsLesserValidationType.Decimal && validationType != IsLesserValidationType.Integer)
+					return;
 
-					ConfigureTarget(target, "lesserThan", String.Format("\"{0}\"", prefixedComparisonFieldName), violationMessage);
-				}
+				string prefixedComparisonFieldName = GetPrefixJQuerySelector(GetPrefixedFieldld(target, comparisonFieldName));
+				ConfigureTarget(target, "lesserThan", String.Format("\"{0}\"", prefixedComparisonFieldName), violationMessage);
 			}
 
 			/// <summary>

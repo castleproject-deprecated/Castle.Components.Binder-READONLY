@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework.Helpers
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.Collections.Specialized;
 	using System.Text;
 	using Castle.MonoRail.Framework.Internal;
@@ -228,7 +229,7 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <see cref="string.Empty"/> only attribute name is appended to the string.
 		/// </para>
 		/// </remarks>
-		protected string GetAttributes(IDictionary attributes)
+		protected static string GetAttributes(IDictionary attributes)
 		{
 			if (attributes == null || attributes.Count == 0) return string.Empty;
 
@@ -378,6 +379,19 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// </summary>
 		/// <param name="jsOptions">The js options.</param>
 		/// <returns>An associative array in javascript</returns>
+		public static string JavascriptOptions(IDictionary<string, string> jsOptions)
+		{
+			return JavascriptOptions(jsOptions as IDictionary);
+		}
+
+		/// <summary>
+		/// Builds a JS associative array based on the specified dictionary instance.
+		/// <para>
+		/// For example: <c>{name: value, other: 'another'}</c>
+		/// </para>
+		/// </summary>
+		/// <param name="jsOptions">The js options.</param>
+		/// <returns>An associative array in javascript</returns>
 		public static string JavascriptOptions(IDictionary jsOptions)
 		{
 			if (jsOptions == null || jsOptions.Count == 0)
@@ -403,16 +417,16 @@ namespace Castle.MonoRail.Framework.Helpers
 		/// <summary>
 		/// Generates script block.
 		/// <code>
-		/// &lt;script type=\"text/javascript\"&gt;
+		/// &lt;script type=\"text/javascript\"&gt;/*&lt;![CDATA[*/
 		/// scriptContents
-		/// &lt;/script&gt;
+		/// /*]]&gt;*/&lt;/script&gt;
 		/// </code>
 		/// </summary>
 		/// <param name="scriptContents">The script contents.</param>
 		/// <returns><paramref name="scriptContents"/> placed inside <b>script</b> tags.</returns>
 		public static string ScriptBlock(string scriptContents)
 		{
-			return "\r\n<script type=\"text/javascript\">\r\n" + scriptContents + "</script>\r\n";
+			return "\r\n<script type=\"text/javascript\">/*<![CDATA[*/\r\n" + scriptContents + "/*]]>*/</script>\r\n";
 		}
 
 		/// <summary>

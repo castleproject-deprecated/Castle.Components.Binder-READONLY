@@ -779,7 +779,7 @@ namespace Castle.MonoRail.Framework
 			filterFactory = engineContext.Services.FilterFactory; // should not be null
 			viewEngineManager = engineContext.Services.ViewEngineManager; // should not be null
 			actionSelector = engineContext.Services.ActionSelector; // should not be null
-			scaffoldSupport = engineContext.Services.ScaffoldSupport; // might be null
+			scaffoldSupport = engineContext.Services.ScaffoldingSupport; // might be null
 			dynamicActionProviderFactory = engineContext.Services.DynamicActionProviderFactory; // should not be null
 		}
 
@@ -2066,7 +2066,7 @@ namespace Castle.MonoRail.Framework
 			{
 				if (logger.IsErrorEnabled)
 				{
-					logger.ErrorFormat("Error processing filter " + desc.FilterType.FullName, ex);
+					logger.Error("Error processing filter " + desc.FilterType.FullName, ex);
 				}
 
 				throw;
@@ -2218,7 +2218,7 @@ namespace Castle.MonoRail.Framework
 
 					if (logger.IsFatalEnabled)
 					{
-						logger.FatalFormat("Failed to process rescue view. View name " +
+						logger.Fatal("Failed to process rescue view. View name " +
 						                   context.SelectedViewName, exception);
 					}
 				}
