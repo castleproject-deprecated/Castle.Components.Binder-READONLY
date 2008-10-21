@@ -54,13 +54,13 @@ namespace Castle.Windsor.Proxy
 		/// <param name="target">The target.</param>
 		/// <param name="model">The model.</param>
 		/// <param name="constructorArguments">The constructor arguments.</param>
+        /// <param name="context">The creation context</param>
 		/// <returns>The component proxy.</returns>
-		public override object Create(IKernel kernel, object target, ComponentModel model,
-		                              params object[] constructorArguments)
+		public override object Create(IKernel kernel, object target, ComponentModel model, CreationContext context, params object[] constructorArguments)
 		{
 			object proxy;
 
-			IInterceptor[] interceptors = ObtainInterceptors(kernel, model);
+			IInterceptor[] interceptors = ObtainInterceptors(kernel, model, context);
 
 			ProxyOptions proxyOptions = ProxyUtil.ObtainProxyOptions(model, true);
 			ProxyGenerationOptions proxyGenOptions = CreateProxyGenerationOptionsFrom(proxyOptions);
@@ -78,7 +78,7 @@ namespace Castle.Windsor.Proxy
 				}
 				else if (proxyOptions.AllowChangeTarget)
 				{
-					proxy = generator.CreateInterfaceProxyWithTargetInterface(model.Service, target, 
+					proxy = generator.CreateInterfaceProxyWithTargetInterface(model.Service, interfaces, target, 
 						                                                      proxyGenOptions, interceptors);
 				}
 				else

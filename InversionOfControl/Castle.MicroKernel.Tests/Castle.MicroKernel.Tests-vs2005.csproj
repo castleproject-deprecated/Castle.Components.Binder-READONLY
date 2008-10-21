@@ -124,6 +124,8 @@
     <Compile Include="ClassComponents\CommonServiceUser2.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ClassComponents\CommonSub1Impl.cs" />
+    <Compile Include="ClassComponents\CommonSub2Impl.cs" />
     <Compile Include="ClassComponents\ComponentFactory.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -135,6 +137,7 @@
     <Compile Include="ClassComponents\CustomerImpl2.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ClassComponents\CustomerValidator.cs" />
     <Compile Include="ClassComponents\CustomLifestyleManager.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -160,9 +163,13 @@
     <Compile Include="ClassComponents\ICommon.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ClassComponents\ICommonSub1.cs" />
+    <Compile Include="ClassComponents\ICommonSub2.cs" />
     <Compile Include="ClassComponents\ICustomer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ClassComponents\IValidator.cs" />
+    <Compile Include="ClassComponents\NonPublicComponent.cs" />
     <Compile Include="ClassComponents\Repository.cs" />
     <Compile Include="Configuration\Components\ClassWithComplexParameter.cs" />
     <Compile Include="Configuration\Components\ClassWithConstructors.cs">
@@ -249,7 +256,7 @@
     <Compile Include="Pools\PooledLifestyleManagerTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Registration\AllTypesOfTestCase.cs" />
+    <Compile Include="Registration\AllTypesTestCase.cs" />
     <Compile Include="Registration\ComponentRegistrationTestCase.cs" />
     <Compile Include="RuntimeParametersTestCase.cs" />
     <Compile Include="RuntimeParameters\ComponentWithParameters.cs" />

@@ -112,6 +112,7 @@
     <Compile Include="BugsReported\DynProxy46.cs" />
     <Compile Include="CacheKeyTestCase.cs" />
     <Compile Include="ClassEmitterTestCase.cs" />
+    <Compile Include="Classes\ClassCallingVirtualMethodFromCtor.cs" />
     <Compile Include="Classes\ClassWithCharRetType.cs" />
     <Compile Include="Classes\ClassWithConstructors.cs" />
     <Compile Include="Classes\MySerializableClass.cs" />

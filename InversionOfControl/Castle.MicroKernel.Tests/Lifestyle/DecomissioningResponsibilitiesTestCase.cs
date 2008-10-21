@@ -18,9 +18,10 @@ namespace Castle.MicroKernel.Tests.Lifestyle
 	using Castle.Core;
 	using Castle.MicroKernel.Tests.ClassComponents;
 	using Castle.MicroKernel.Tests.Pools;
+	using MicroKernel.Lifestyle.Pool;
 	using NUnit.Framework;
 
-	[TestFixture, Explicit]
+	[TestFixture]
 	public class DecomissioningResponsibilitiesTestCase
 	{
 		private IKernel kernel;
@@ -38,89 +39,268 @@ namespace Castle.MicroKernel.Tests.Lifestyle
 		}
 
 		[Test]
-		public void ReferencedComponentsAreReleased()
+		public void TransientReferencedComponentsAreReleasedInChain()
 		{
 			kernel.AddComponent("spamservice", typeof(DisposableSpamService), LifestyleType.Transient);
-			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService), LifestyleType.Singleton);
 			kernel.AddComponent("templateengine", typeof(DisposableTemplateEngine), LifestyleType.Transient);
-			kernel.AddComponent("poolable", typeof(PoolableComponent1));
 
-			DisposableSpamService instance1 = (DisposableSpamService) kernel["spamservice"];
+			DisposableSpamService instance1 = (DisposableSpamService)kernel["spamservice"];
 			Assert.IsFalse(instance1.IsDisposed);
 			Assert.IsFalse(instance1.TemplateEngine.IsDisposed);
-			PoolableComponent1 poolable = instance1.Pool;
 
 			kernel.ReleaseComponent(instance1);
 
 			Assert.IsTrue(instance1.IsDisposed);
 			Assert.IsTrue(instance1.TemplateEngine.IsDisposed);
-
-			DisposableSpamService instance2 = (DisposableSpamService) kernel["spamservice"];
-			Assert.IsFalse(instance2.IsDisposed);
-			Assert.IsFalse(instance2.TemplateEngine.IsDisposed);
-			Assert.AreSame(instance2.Pool, poolable);
-		}
-	}
-
-	public class DisposableSpamService : IDisposable
-	{
-		private bool isDisposed = false;
-		private DefaultMailSenderService mailSender;
-		private DisposableTemplateEngine templateEngine;
-		private PoolableComponent1 pool;
-
-		public DisposableSpamService(DefaultMailSenderService mailsender, DisposableTemplateEngine templateEngine)
-		{
-			mailSender = mailsender;
-			this.templateEngine = templateEngine;
 		}
 
-		public DisposableSpamService(DefaultMailSenderService mailSender, DisposableTemplateEngine templateEngine,
-		                             PoolableComponent1 pool)
+		[Test]
+		public void DisposingSubLevelBurdenWontDisposeComponentAsTheyAreDisposedAlready()
 		{
-			this.mailSender = mailSender;
-			this.templateEngine = templateEngine;
-			this.pool = pool;
+			kernel.AddComponent("spamservice", typeof(DisposableSpamService), LifestyleType.Transient);
+			kernel.AddComponent("templateengine", typeof(DisposableTemplateEngine), LifestyleType.Transient);
+
+			DisposableSpamService instance1 = (DisposableSpamService)kernel["spamservice"];
+			Assert.IsFalse(instance1.IsDisposed);
+			Assert.IsFalse(instance1.TemplateEngine.IsDisposed);
+
+			kernel.ReleaseComponent(instance1);
+			kernel.ReleaseComponent(instance1.TemplateEngine);
 		}
 
-		public bool IsDisposed
+		[Test]
+		public void ComponentsAreOnlyDisposedOnce()
 		{
-			get { return isDisposed; }
+			kernel.AddComponent("spamservice", typeof(DisposableSpamService), LifestyleType.Transient);
+			kernel.AddComponent("templateengine", typeof(DisposableTemplateEngine), LifestyleType.Transient);
+
+			DisposableSpamService instance1 = (DisposableSpamService)kernel["spamservice"];
+			Assert.IsFalse(instance1.IsDisposed);
+			Assert.IsFalse(instance1.TemplateEngine.IsDisposed);
+
+			kernel.ReleaseComponent(instance1);
+			kernel.ReleaseComponent(instance1);
+			kernel.ReleaseComponent(instance1);
 		}
 
-		public DefaultMailSenderService MailSender
+		[Test]
+		public void GenericTransientComponentsAreReleasedInChain()
 		{
-			get { return mailSender; }
+			kernel.AddComponent("gena", typeof(GenA<>), LifestyleType.Transient);
+			kernel.AddComponent("genb", typeof(GenB<>), LifestyleType.Transient);
+
+			GenA<string> instance1 = kernel.Resolve<GenA<string>>();
+			Assert.IsFalse(instance1.IsDisposed);
+			Assert.IsFalse(instance1.GenBField.IsDisposed);
+
+			kernel.ReleaseComponent(instance1);
+
+			Assert.IsTrue(instance1.IsDisposed);
+			Assert.IsTrue(instance1.GenBField.IsDisposed);
 		}
 
-		public DisposableTemplateEngine TemplateEngine
+		[Test]
+		public void SingletonReferencedComponentIsNotDisposed()
 		{
-			get { return templateEngine; }
+			kernel.AddComponent("spamservice", typeof(DisposableSpamService), LifestyleType.Transient);
+			kernel.AddComponent("mailsender", typeof(DefaultMailSenderService), LifestyleType.Singleton);
+			kernel.AddComponent("templateengine", typeof(DisposableTemplateEngine), LifestyleType.Transient);
+
+			DisposableSpamService instance1 = (DisposableSpamService)kernel["spamservice"];
+			Assert.IsFalse(instance1.IsDisposed);
+			Assert.IsFalse(instance1.TemplateEngine.IsDisposed);
+
+			kernel.ReleaseComponent(instance1);
+
+			Assert.IsTrue(instance1.IsDisposed);
+			Assert.IsTrue(instance1.TemplateEngine.IsDisposed);
+			Assert.IsFalse(instance1.MailSender.IsDisposed);
 		}
 
-		public PoolableComponent1 Pool
+		[Test]
+		public void WhenRootComponentIsNotDisposableButDependenciesAre_DependenciesShouldBeDisposed()
 		{
-			get { return pool; }
+			kernel.AddComponent("root", typeof(NonDiposableRoot), LifestyleType.Transient);
+			kernel.AddComponent("a", typeof(A), LifestyleType.Transient);
+			kernel.AddComponent("b", typeof(B), LifestyleType.Transient);
+
+			NonDiposableRoot instance1 = kernel.Resolve<NonDiposableRoot>();
+			Assert.IsFalse(instance1.A.IsDisposed);
+			Assert.IsFalse(instance1.B.IsDisposed);
+
+			kernel.ReleaseComponent(instance1);
+
+			Assert.IsTrue(instance1.A.IsDisposed);
+			Assert.IsTrue(instance1.B.IsDisposed);
 		}
 
-		public void Dispose()
+		[Test]
+		public void WhenRootComponentIsNotDisposableButThirdLevelDependenciesAre_DependenciesShouldBeDisposed()
 		{
-			isDisposed = true;
+			kernel.AddComponent("root", typeof(Indirection), LifestyleType.Transient);
+			kernel.AddComponent("secroot", typeof(NonDiposableRoot), LifestyleType.Transient);
+			kernel.AddComponent("a", typeof(A), LifestyleType.Transient);
+			kernel.AddComponent("b", typeof(B), LifestyleType.Transient);
+
+			Indirection instance1 = kernel.Resolve<Indirection>();
+			Assert.IsFalse(instance1.FakeRoot.A.IsDisposed);
+			Assert.IsFalse(instance1.FakeRoot.B.IsDisposed);
+
+			kernel.ReleaseComponent(instance1);
+
+			Assert.IsTrue(instance1.FakeRoot.A.IsDisposed);
+			Assert.IsTrue(instance1.FakeRoot.B.IsDisposed);
 		}
-	}
 
-	public class DisposableTemplateEngine : DefaultTemplateEngine, IDisposable
-	{
-		private bool isDisposed = false;
+//		[Test]
+//		public void PooledComponentIsReleasedWhenRootComponentIsReleased()
+//		{
+//			kernel.AddComponentInstance("pool.fac", typeof(IPoolFactory), mockedPool);
+//
+//			kernel.AddComponent("spamservice", typeof(DisposableSpamService), LifestyleType.Transient);
+//			kernel.AddComponent("templateengine", typeof(DisposableTemplateEngine), LifestyleType.Transient);
+//			kernel.AddComponent("poolable", typeof(PoolableComponent1));
+//
+//			DisposableSpamService instance1 = (DisposableSpamService)kernel["spamservice"];
+//			Assert.IsFalse(instance1.IsDisposed);
+//			Assert.IsFalse(instance1.TemplateEngine.IsDisposed);
+//			PoolableComponent1 poolable = instance1.Pool;
+//
+//			kernel.ReleaseComponent(instance1);
+//
+//			// TODO: Assert that pool had its Release called
+//		}
 
-		public bool IsDisposed
+		public class Indirection
 		{
-			get { return isDisposed; }
+			private NonDiposableRoot fakeRoot;
+
+			public Indirection(NonDiposableRoot fakeRoot)
+			{
+				this.fakeRoot = fakeRoot;
+			}
+
+			public NonDiposableRoot FakeRoot
+			{
+				get { return fakeRoot; }
+			}
 		}
 
-		public void Dispose()
+		public class NonDiposableRoot
 		{
-			isDisposed = true;
+			private A a;
+			private B b;
+
+			public NonDiposableRoot(A a, B b)
+			{
+				this.a = a;
+				this.b = b;
+			}
+
+			public A A
+			{
+				get { return a; }
+			}
+
+			public B B
+			{
+				get { return b; }
+			}
+		}
+
+		public abstract class DisposableBase : IDisposable
+		{
+			private bool _isDisposed;
+
+
+			public bool IsDisposed
+			{
+				get { return _isDisposed; }
+				private set { _isDisposed = value; }
+			} 
+			
+			public void Dispose()
+			{
+				if (IsDisposed)
+				{
+					throw new Exception("Already disposed");
+				}
+				IsDisposed = true;
+			}
+		}
+
+		public class A : DisposableBase
+		{
+		}
+
+		public class B : DisposableBase
+		{
+		}
+
+		public class C : DisposableBase
+		{
+		}
+
+		public class GenA<T> : DisposableBase
+		{
+			private B bField;
+			private GenB<T> genBField;
+
+			public B BField
+			{
+				get { return bField; }
+				set { bField = value; }
+			}
+
+			public GenB<T> GenBField
+			{
+				get { return genBField; }
+				set { genBField = value; }
+			}
+		}
+
+		public class GenB<T> : DisposableBase
+		{
+
+		}
+
+		public class DisposableSpamService : DisposableBase
+		{
+			private DefaultMailSenderService mailSender;
+			private DisposableTemplateEngine templateEngine;
+			private PoolableComponent1 pool;
+
+			public DisposableSpamService(DisposableTemplateEngine templateEngine)
+			{
+				this.templateEngine = templateEngine;
+			}
+
+			public DisposableSpamService(DisposableTemplateEngine templateEngine,
+										 PoolableComponent1 pool)
+			{
+				this.templateEngine = templateEngine;
+				this.pool = pool;
+			}
+
+			public DefaultMailSenderService MailSender
+			{
+				get { return mailSender; }
+				set { mailSender = value; }
+			}
+
+			public DisposableTemplateEngine TemplateEngine
+			{
+				get { return templateEngine; }
+			}
+
+			public PoolableComponent1 Pool
+			{
+				get { return pool; }
+			}
+		}
+
+		public class DisposableTemplateEngine : DisposableBase
+		{
 		}
 	}
 }
