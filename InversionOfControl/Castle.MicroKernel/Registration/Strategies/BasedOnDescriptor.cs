@@ -16,7 +16,15 @@ namespace Castle.MicroKernel.Registration
 {
 	using System;
 	using System.Collections.Generic;
-	
+
+	/// <summary>
+	/// Delegate for custom registration configuration.
+	/// </summary>
+	/// <typeparam name="T">The return type.</typeparam>
+	/// <param name="registration">The component registration.</param>
+	/// <returns>Not uaed.</returns>
+	public delegate T ConfigureDelegate<T>(ComponentRegistration registration);
+
 	/// <summary>
 	/// Describes how to register a group of related types.
 	/// </summary>
@@ -28,7 +36,7 @@ namespace Castle.MicroKernel.Registration
 		private Action<ComponentRegistration> configurer;
 		private Predicate<Type> unlessFilter;
 		private Predicate<Type> ifFilter;
-		
+
 		/// <summary>
 		/// Initializes a new instance of the BasedOnDescriptor.
 		/// </summary>
@@ -89,6 +97,17 @@ namespace Castle.MicroKernel.Registration
 		}
 
 		/// <summary>
+		/// Allows customized configurations of each matching type.
+		/// </summary>
+		/// <param name="configurer">The configuration action.</param>
+		/// <returns></returns>
+		public BasedOnDescriptor Configure<T>(ConfigureDelegate<T> configurer)
+		{
+			this.configurer = delegate(ComponentRegistration registration) { configurer(registration); };
+			return this;
+		}
+
+		/// <summary>
 		/// Allows a type to be registered multiple times.
 		/// </summary>
 		public FromDescriptor AllowMultipleMatches()
@@ -114,6 +133,16 @@ namespace Castle.MicroKernel.Registration
 		public BasedOnDescriptor BasedOn(Type basedOn)
 		{
 			return from.BasedOn(basedOn);
+		}
+
+		/// <summary>
+		/// Returns the descriptor for accepting a type based on a condition.
+		/// </summary>
+		/// <param name="accepted">The accepting condition.</param>
+		/// <returns>The descriptor for the type.</returns>
+		public BasedOnDescriptor Where(Predicate<Type> accepted)
+		{
+			return from.Where(accepted);
 		}
 
 		internal bool TryRegister(Type type, IKernel kernel)

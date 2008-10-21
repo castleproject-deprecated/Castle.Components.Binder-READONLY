@@ -35,6 +35,6 @@ namespace Castle.Components.Validator
 		/// <param name="validatorRunner">The validator runner.</param>
 		/// <param name="type">The type that this validator is built for</param>
 		/// <returns></returns>
-		IValidator Build(ValidatorRunner validatorRunner, Type type);
+		IValidator Build(IValidatorRunner validatorRunner, Type type);
 	}
 }

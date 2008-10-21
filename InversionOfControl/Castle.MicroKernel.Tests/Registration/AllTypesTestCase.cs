@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System.Threading;
 
 namespace Castle.MicroKernel.Tests.Registration
 {
@@ -208,6 +209,20 @@ namespace Castle.MicroKernel.Tests.Registration
 		}
 
 		[Test]
+		public void RegisterAssemblyTypes_WithLinqConfigurationReturningValue_RegisteredInContainer()
+		{
+			kernel.Register(AllTypes.Of<ICommon>()
+				.FromAssembly(Assembly.GetExecutingAssembly())
+				.Configure(component => component.LifeStyle.Transient)
+				);
+
+			foreach (IHandler handler in kernel.GetAssignableHandlers(typeof(ICommon)))
+			{
+				Assert.AreEqual(LifestyleType.Transient, handler.ComponentModel.LifestyleType);
+			}
+		}
+
+		[Test]
 		public void RegisterMultipleAssemblyTypes_BasedOn_RegisteredInContainer()
 		{
 			kernel.Register(
@@ -237,6 +252,19 @@ namespace Castle.MicroKernel.Tests.Registration
 			handlers = kernel.GetAssignableHandlers(typeof(DefaultSpamServiceWithConstructor));
 			Assert.AreEqual(1, handlers.Length);		
 		}
+
+		[Test]
+		public void RegisterAssemblyTypes_WhereConditionSatisifed_RegisteredInContainer()
+		{
+			kernel.Register(
+				AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+					.Where(t => t.Name == "CustomerImpl")
+					.WithService.FirstInterface()
+					);
+
+			IHandler[] handlers = kernel.GetHandlers(typeof(ICustomer));
+			Assert.AreEqual(1, handlers.Length);
+		}
 #endif	
 
 		[Test]
@@ -262,6 +290,44 @@ namespace Castle.MicroKernel.Tests.Registration
 
 			IHandler[] handlers = kernel.GetHandlers(typeof(NonPublicComponent));
 			Assert.AreEqual(1, handlers.Length);
+		}
+
+		[Test]
+		public void RegisterAssemblyTypes_WhenTypeInNamespace_RegisteredInContainer()
+		{
+			kernel.Register(
+				AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+					.Where(Component.IsInNamespace("Castle.MicroKernel.Tests.ClassComponents"))
+					.WithService.FirstInterface()
+					);
+
+			IHandler[] handlers = kernel.GetHandlers(typeof(ICustomer));
+			Assert.IsTrue(handlers.Length > 0);
+		}
+
+		[Test]
+		public void RegisterAssemblyTypes_WhenTypeInMissingNamespace_NotRegisteredInContainer()
+		{
+			kernel.Register(
+				AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+					.Where(Component.IsInNamespace("Castle.MicroKernel.Tests.FooBar"))
+					.WithService.FirstInterface()
+					);
+
+			Assert.AreEqual(0, kernel.GetAssignableHandlers(typeof(object)).Length);
+		}
+
+		[Test]
+		public void RegisterAssemblyTypes_WhenTypeInSameNamespaceAsComponent_RegisteredInContainer()
+		{
+			kernel.Register(
+				AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+					.Where(Component.IsInSameNamespaceAs<CustomerImpl2>())
+					.WithService.FirstInterface()
+					);
+
+			IHandler[] handlers = kernel.GetHandlers(typeof(ICustomer));
+			Assert.IsTrue(handlers.Length > 0);
 		}
 	}
 }
