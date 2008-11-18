@@ -38,6 +38,14 @@ namespace Castle.MonoRail.Views.Brail.Tests
             AssertReplyContains("SubItem 2.1");
 	    }
 
+        [Test]
+        public void WillPropagateNullParameterInJS()
+        {
+            PropertyBag["id"] = 5;
+            ProcessViewJS("regressions/NullPropagationTestWithJS");
+            AssertReplyEqualTo("try \n{\nElement.show(\"foobar5\");\r\n}\ncatch(e)\n{\nalert('JS error ' + e.toString());\n}\r\n");
+        }
+
 		[Test]
 		public void WillPropagateNullParameterInBraces()
 		{
@@ -49,6 +57,39 @@ namespace Castle.MonoRail.Views.Brail.Tests
 			ProcessView("regressions/NullPropagationWithBracesTest");
 			AssertReplyContains("SubItem 2.1");
 		}
+
+        [Test]
+        public void WillNotPropagateNullParameterInQuotesInBraces() {
+            PropertyBag["items"] = new Item[]
+	                                   {
+	                                       new Item("Item 2", new Item("foo", null)),
+	                                   };
+            ProcessView("regressions/NullPropagationInQuotesWithBracesTest");
+            AssertReplyContains("doublequote.rails?id=foo");    // not ...TryGetParameter(...)...        
+            AssertReplyContains("triplequote.rails?id=foo");
+            AssertReplyContains("singlequote.rails?id=foo");
+        }
+
+        [Test]
+        public void CanHandleEscapedStringsWithNullPropagation() {
+            PropertyBag["items"] = new Item[]
+	                                   {
+	                                       new Item("Item 2", new Item("foo", null)),
+	                                   };
+            ProcessView("regressions/NullPropagationWithEscapedStrings");
+            AssertReplyContains("\"\"\"?id=foo");
+        }
+        [Test]
+        public void DoesNotEscapeNullPropagationsInMarkup() {
+            PropertyBag["items"] = new Item[]
+	                                   {
+	                                       new Item("Item 2", new Item("foo", null)),
+	                                   };
+            ProcessView("regressions/NullPropagationInMarkup");
+            AssertReplyContains("foo.rails?id=foo");
+        }
+
+       
 
 		[Test]
 		public void WillPropagateNullParameter_WithNullInArrayMiddle()
