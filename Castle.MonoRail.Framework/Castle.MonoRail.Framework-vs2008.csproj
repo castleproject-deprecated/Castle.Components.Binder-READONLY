@@ -503,6 +503,7 @@
     <Compile Include="Internal\CommonUtils.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Internal\ControllerServices.cs" />
     <Compile Include="Internal\RescueUtils.cs">
       <SubType>Code</SubType>
     </Compile>

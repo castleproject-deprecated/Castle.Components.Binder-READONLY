@@ -1523,7 +1523,7 @@ namespace Castle.MonoRail.Framework
 				return;
 			}
 
-			Assembly typeAssembly = GetType().Assembly;
+			Assembly typeAssembly = ControllerServices.GetRealControllerType(GetType()).Assembly;
 
 			IResourceFactory resourceFactory = engineContext.Services.ResourceFactory;
 

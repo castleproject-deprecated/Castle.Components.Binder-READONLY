@@ -22,6 +22,7 @@ namespace Castle.MonoRail.Framework.Providers
 	using Castle.MonoRail.Framework.Services.Utils;
 	using Core;
 	using Descriptors;
+	using Internal;
 	using Providers;
 
 	/// <summary>
@@ -240,7 +241,7 @@ namespace Castle.MonoRail.Framework.Providers
 		{
 			// HACK: GetRealControllerType is a workaround for DYNPROXY-14 bug
 			// see: http://support.castleproject.org/browse/DYNPROXY-14
-			controllerType = GetRealControllerType(controllerType);
+			controllerType = ControllerServices.GetRealControllerType(controllerType);
 
 			MethodInfo[] methods = controllerType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
@@ -508,32 +509,6 @@ namespace Castle.MonoRail.Framework.Providers
 		private void CollectReturnTypeBinder(ActionMetaDescriptor actionDescriptor, MethodInfo method)
 		{
 			actionDescriptor.ReturnDescriptor = returnBinderDescriptorProvider.Collect(method);
-		}
-
-		/// <summary>
-		/// Gets the real controller type, instead of the proxy type.
-		/// </summary>
-		/// <remarks>
-		/// Workaround for DYNPROXY-14 bug. See: http://support.castleproject.org/browse/DYNPROXY-14
-		/// </remarks>
-		private Type GetRealControllerType(Type controllerType)
-		{
-			Type prev = controllerType;
-
-			// try to get the first non-proxy type
-			while(ProxyServices.IsDynamicProxy(controllerType))
-			{
-				controllerType = controllerType.BaseType;
-
-				if (controllerType == typeof(IController))
-				{
-					// oops, it's a pure-proxy controller. just let it go.
-					controllerType = prev;
-					break;
-				}
-			}
-
-			return controllerType;
 		}
 
 		#endregion
