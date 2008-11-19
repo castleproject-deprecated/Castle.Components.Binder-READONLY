@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using Helpers;
 
 	/// <summary>
 	/// 

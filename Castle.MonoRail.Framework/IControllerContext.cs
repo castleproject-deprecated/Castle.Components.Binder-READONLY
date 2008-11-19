@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework
 {
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.ComponentModel.Composition;
 	using Castle.MonoRail.Framework.Resources;
 	using Descriptors;
 	using Routing;
@@ -23,6 +24,7 @@ namespace Castle.MonoRail.Framework
 	/// <summary>
 	/// Pendent
 	/// </summary>
+	[ContractType(/* CreationPolicy=CreationPolicy.NonShared */)]
 	public interface IControllerContext
 	{
 		/// <summary>

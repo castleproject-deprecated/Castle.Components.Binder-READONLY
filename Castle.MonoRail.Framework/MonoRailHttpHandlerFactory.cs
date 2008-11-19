@@ -462,7 +462,7 @@ namespace Castle.MonoRail.Framework
 				throw new ApplicationException("You have to provide a small configuration to use " +
 											   "MonoRail. This can be done using the web.config or " +
 											   "your global asax (your class that extends HttpApplication) " +
-											   "through the method MonoRail_Configure(IMonoRailConfiguration config). " +
+											   "by implementing IMonoRailConfigurationEvents. " +
 											   "Check the samples or the documentation.");
 			}
 
@@ -526,7 +526,7 @@ namespace Castle.MonoRail.Framework
 
 				if (engineContext.Services.ViewEngineManager.HasTemplate("rescues/404"))
 				{
-					Dictionary<string, object> parameters = new Dictionary<string, object>();
+					var parameters = new Dictionary<string, object>();
 
 					engineContext.Services.ViewEngineManager.Process("rescues/404", null, engineContext.Response.Output, parameters);
 

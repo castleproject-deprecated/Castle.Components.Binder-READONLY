@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Castle.MonoRail.Framework.ViewComponent" Collapsed="true">
+    <Position X="5.25" Y="4.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ADACAAYAAgBAEQAAIAAAAAAIAASAkAAIABACACBICAE=</HashCode>
+      <FileName>ViewComponent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Controller" Collapsed="true">
+    <Position X="2.25" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>qKA6RisB8jpMHSMSN0mYmHyhJI0c8BxgwCogLnloSLU=</HashCode>
+      <FileName>Controller.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.SmartDispatcherController" Collapsed="true">
+    <Position X="2.25" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAABAAggQQAAAAAAAAEAAAAAAQAgAAAAAgEAIAAAAAA=</HashCode>
+      <FileName>SmartDispatcherController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Filter" Collapsed="true">
+    <Position X="2.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACgAAAAAAAAACAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Filter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Flash" Collapsed="true">
+    <Position X="2.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIACAAAAAAEAACADAAACIggACAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Flash.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.AbstractHelper" Collapsed="true">
+    <Position X="19" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACKAIAKAwIABAUAAAAAAAAAuBAQAIIMAAEBCgABCAA=</HashCode>
+      <FileName>Helpers\AbstractHelper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.AjaxHelper" Collapsed="true">
+    <Position X="15.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAFAAIAAQAQAAEBACKgAAAARREQACAgBAEQAAAg=</HashCode>
+      <FileName>Helpers\AjaxHelper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.BehaviourHelper" Collapsed="true">
+    <Position X="20.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAKAAAAAAAEAAAAAAAIAFAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\BehaviourHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.FormHelper" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IEOAQBEAAIAgARQAAABEgIYEAIiQSGAADAAAYSECiSA=</HashCode>
+      <FileName>Helpers\FormHelper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.1" Collapsed="true" />
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.HtmlHelper" Collapsed="true">
+    <Position X="20.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>YIIQCEIAgACSGgDQIACAAAAAAEAQAEwEBAAAQQUAAgg=</HashCode>
+      <FileName>Helpers\HtmlHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.JSONHelper" Collapsed="true">
+    <Position X="22.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\JSONHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.PaginationHelper" Collapsed="true">
+    <Position X="13.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAQAAAEAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAgAMCA=</HashCode>
+      <FileName>Helpers\PaginationHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.ScriptaculousHelper" Collapsed="true">
+    <Position X="17.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAAAAAAAAABAAAgAAAAAABAAAAAAA=</HashCode>
+      <FileName>Helpers\ScriptaculousHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.TextHelper" Collapsed="true">
+    <Position X="24.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAABAQAAAAAAAAgAAAAAAAAAAAAAAAgQAAAA=</HashCode>
+      <FileName>Helpers\TextHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.UrlHelper" Collapsed="true">
+    <Position X="15.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAcEAAAFAAAAAAQACAAAA=</HashCode>
+      <FileName>Helpers\UrlHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.ValidationHelper" Collapsed="true">
+    <Position X="22.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAEAQAAAAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\ValidationHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.WizardHelper" Collapsed="true">
+    <Position X="20.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAIAAAAAAgAAAIAAAAEgAIAAACQAAAAAAAAACA=</HashCode>
+      <FileName>Helpers\WizardHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Castle.MonoRail.Framework.Helpers.AbstractFormRelatedHelper" Collapsed="true">
+    <Position X="17.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QDRAAAEGEAqCCAACAQAgYAFAEACAYAgAQIhAAEQIFAA=</HashCode>
+      <FileName>Helpers\AbstractFormRelatedHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Castle.MonoRail.Framework.IViewEngine" Collapsed="true">
+    <Position X="4.5" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ACAEACAAAAgAAAAAAwEAAAAgAAAAAAAAAAQAABAAAgA=</HashCode>
+      <FileName>IViewEngine.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IControllerContextFactory" Collapsed="true">
+    <Position X="8.5" Y="2.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IControllerContextFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IControllerFactory" Collapsed="true">
+    <Position X="8.5" Y="0.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>Services\IControllerFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IControllerTree" Collapsed="true">
+    <Position X="2" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAACE=</HashCode>
+      <FileName>Services\IControllerTree.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IFilterFactory" Collapsed="true">
+    <Position X="8.5" Y="3.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAABAAAAA=</HashCode>
+      <FileName>Services\IFilterFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IDynamicActionProviderFactory" Collapsed="true">
+    <Position X="8.5" Y="5.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAABAAAAA=</HashCode>
+      <FileName>Services\IDynamicActionProviderFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IViewComponentFactory" Collapsed="true">
+    <Position X="8.5" Y="4.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IViewComponentFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IViewComponentRegistry" Collapsed="true">
+    <Position X="7" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAQAAAAAA=</HashCode>
+      <FileName>Services\IViewComponentRegistry.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IEmailTemplateService" Collapsed="true">
+    <Position X="9.5" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>Services\IEmailTemplateService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IHelperFactory" Collapsed="true">
+    <Position X="8.5" Y="5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>IHelperFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IEngineContextFactory" Collapsed="true">
+    <Position X="8.5" Y="1.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>IEngineContextFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IEngineContext" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAIBACQgAAAAAAAIAAQAAgBAQAAAACgEIAAA=</HashCode>
+      <FileName>IEngineContext.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IController" Collapsed="true">
+    <Position X="5.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAEAAAAAAAAAEAAQBA=</HashCode>
+      <FileName>IController.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IControllerContext" Collapsed="true">
+    <Position X="5.25" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>gAACAAEAIAAAMAQAAAAEABwAAAAAAAAAAAAAAAAIAAQ=</HashCode>
+      <FileName>IControllerContext.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IFilter" Collapsed="true">
+    <Position X="5.25" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IFilter.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IDynamicActionProvider" Collapsed="true">
+    <Position X="5.25" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDynamicActionProvider.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.ICacheProvider" Collapsed="true">
+    <Position X="9.5" Y="8.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAABAAAAAAAAAAAEAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Services\ICacheProvider.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.Services.IJSONSerializer" Collapsed="true">
+    <Position X="7" Y="8.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAACBAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IJSONSerializer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.IUrlTokenizer" Collapsed="true">
+    <Position X="4.5" Y="8.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IUrlTokenizer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.Services.IUrlBuilder" Collapsed="true">
+    <Position X="2" Y="8.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAABAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Services\IUrlBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.ITransformFilterFactory" Collapsed="true">
+    <Position X="8.5" Y="6.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAABAAAAA=</HashCode>
+      <FileName>Services\ITransformFilterFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Castle.MonoRail.Framework.ITransformFilter" Collapsed="true">
+    <Position X="5.25" Y="6.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>ITransformFilter.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

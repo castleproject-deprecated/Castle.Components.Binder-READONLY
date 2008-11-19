@@ -16,6 +16,7 @@ namespace Castle.MonoRail.Framework
 {
 	using System;
 	using System.Collections.Specialized;
+	using System.ComponentModel.Composition;
 	using System.IO;
 	using System.Collections;
 	using System.Reflection;
@@ -68,6 +69,7 @@ namespace Castle.MonoRail.Framework
 	/// </code>
 	/// </example>
 	/// </remarks>
+	[ContractType(/* CreationPolicy=CreationPolicy.NonShared */)]
 	public abstract class ViewComponent
 	{
 		/// <summary>

@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.ComponentModel.Composition;
 
 	/// <summary>
 	/// Pendent
@@ -25,6 +26,7 @@ namespace Castle.MonoRail.Framework
 	/// <summary>
 	/// Represent the core functionality required out of a controller
 	/// </summary>
+	[ContractType]
 	public interface IController : IDisposable
 	{
 		/// <summary>

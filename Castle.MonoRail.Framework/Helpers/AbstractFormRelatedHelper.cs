@@ -1360,7 +1360,7 @@ namespace Castle.MonoRail.Framework.Helpers
 
 		private static BindingFlags ResolveFlagsToUse(Type type)
 		{
-			if (type.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen") || type.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2"))
+			if (ProxyServices.IsDynamicProxy(type))
 			{
 				return propertyFlagsDeclaredOnly;
 			}

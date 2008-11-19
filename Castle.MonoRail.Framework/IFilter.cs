@@ -15,6 +15,7 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.ComponentModel.Composition;
 
 	/// <summary>
 	/// Enum (flag) to indicate when the filter should 
@@ -62,6 +63,7 @@ namespace Castle.MonoRail.Framework
 	/// should use filter to perform any logic before and/or
 	/// after the action invocation.
 	/// </summary>
+	[ContractType(/* CreationPolicy=CreationPolicy.NonShared */)]
 	public interface IFilter
 	{
 		/// <summary>

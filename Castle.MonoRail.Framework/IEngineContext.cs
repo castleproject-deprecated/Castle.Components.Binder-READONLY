@@ -15,17 +15,17 @@
 namespace Castle.MonoRail.Framework
 {
 	using System;
+	using System.ComponentModel.Composition;
 	using System.ComponentModel.Design;
 	using System.Web;
 	using System.Security.Principal;
 	using System.Collections;
-	using System.Collections.Specialized;
-	using Castle.Components.Binder;
 
 	/// <summary>
 	/// Represents an abstraction between the MonoRail API
 	/// and the ASP.Net API. 
 	/// </summary>
+	[ContractType(/* CreationPolicy=CreationPolicy.NonShared */)]
 	public interface IEngineContext : IServiceContainer
 	{
 		/// <summary>

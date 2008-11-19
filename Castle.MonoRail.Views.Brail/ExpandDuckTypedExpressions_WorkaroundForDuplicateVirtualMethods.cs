@@ -21,6 +21,7 @@ namespace Castle.MonoRail.Views.Brail
 	using Boo.Lang.Compiler.Steps;
 	using Boo.Lang.Compiler.TypeSystem;
 	using Boo.Lang.Runtime;
+	using Castle.Core;
 
 	/// <summary>
 	/// This is here because we need to overcome a tendecy of Dynamic Proxy to generate virtual override that
@@ -240,8 +241,7 @@ namespace Castle.MonoRail.Views.Brail
 
 		private static BindingFlags ResolveFlagsToUse(Type type, BindingFlags flags)
 		{
-			if (type.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen") ||
-			    type.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2"))
+			if (ProxyServices.IsDynamicProxy(type))
 			{
 				return flags | BindingFlags.DeclaredOnly;
 			}

@@ -21,6 +21,7 @@ namespace Castle.MonoRail.Framework
 	using Castle.Components.Binder;
 	using Castle.MonoRail.Framework.Helpers;
 	using Castle.MonoRail.Framework.Internal;
+	using Core;
 	using Services;
 
 	/// <summary>
@@ -137,8 +138,7 @@ namespace Castle.MonoRail.Framework
 				Type thisType = GetType();
 
 				// Hack fix for "dynamic proxied" controllers
-				if (thisType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen") ||
-				    thisType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2"))
+				if (ProxyServices.IsDynamicProxy(thisType))
 				{
 					return thisType.BaseType.Name;
 				}

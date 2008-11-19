@@ -20,6 +20,7 @@ namespace Castle.MonoRail.Framework.Providers
 	using System.Threading;
 	using Castle.Core.Logging;
 	using Castle.MonoRail.Framework.Services.Utils;
+	using Core;
 	using Descriptors;
 	using Providers;
 
@@ -520,13 +521,11 @@ namespace Castle.MonoRail.Framework.Providers
 			Type prev = controllerType;
 
 			// try to get the first non-proxy type
-			while(controllerType.Assembly.FullName.StartsWith("DynamicProxyGenAssembly2") ||
-			      controllerType.Assembly.FullName.StartsWith("DynamicAssemblyProxyGen"))
+			while(ProxyServices.IsDynamicProxy(controllerType))
 			{
 				controllerType = controllerType.BaseType;
 
-				if ( // controllerType == typeof(SmartDispatcherController) || 
-					controllerType == typeof(IController))
+				if (controllerType == typeof(IController))
 				{
 					// oops, it's a pure-proxy controller. just let it go.
 					controllerType = prev;
