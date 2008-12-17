@@ -114,6 +114,8 @@
     <Compile Include="DefaultKernel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DefaultKernel_AddComponent.cs" />
+    <Compile Include="DefaultKernel_Resolve.cs" />
     <Compile Include="Exceptions\CircularDependencyException.cs" />
     <Compile Include="Exceptions\ComponentNotFoundException.cs">
       <SubType>Code</SubType>
@@ -219,6 +221,8 @@
     <Compile Include="IKernelEvents.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IKernel_AddComponent.cs" />
+    <Compile Include="IKernel_Resolve.cs" />
     <Compile Include="KernelEventSupport.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -485,9 +489,9 @@
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Castle.Core\Castle.Core-vs2008.csproj">
-      <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
-      <Name>Castle.Core-vs2008</Name>
+    <ProjectReference Include="..\..\Core\Castle.Core\Castle.Core.Silverlight.csproj">
+      <Project>{537D7B08-F0B6-49E6-A13D-AD905B7C9C27}</Project>
+      <Name>Castle.Core.Silverlight</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
