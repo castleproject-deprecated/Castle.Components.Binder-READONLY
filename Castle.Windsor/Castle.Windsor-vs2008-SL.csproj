@@ -103,18 +103,6 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <ProjectReference Include="..\..\Core\Castle.Core\Castle.Core-vs2008.csproj">
-      <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
-      <Name>Castle.Core-vs2008</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Tools\Castle.DynamicProxy2\Castle.DynamicProxy\Castle.DynamicProxy-vs2008.csproj">
-      <Project>{2DE7CC8C-6F06-43BC-A7B6-9466BEDEAC28}</Project>
-      <Name>Castle.DynamicProxy-vs2008</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Castle.MicroKernel\Castle.MicroKernel-vs2008.csproj">
-      <Project>{8C6AADEB-D099-4D2A-8F5B-4EBC12AC9159}</Project>
-      <Name>Castle.MicroKernel-vs2008</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapters\ComponentModel\ContainerAdapter.cs">
@@ -273,6 +261,16 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Castle.Core\Castle.Core.Silverlight.csproj">
+      <Project>{537D7B08-F0B6-49E6-A13D-AD905B7C9C27}</Project>
+      <Name>Castle.Core.Silverlight</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Castle.MicroKernel\Castle.MicroKernel-vs2008-SL.csproj">
+      <Project>{8C6AADEB-D099-4D2A-8F5B-4EBC12AC9159}</Project>
+      <Name>Castle.MicroKernel-vs2008-SL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
