@@ -146,10 +146,6 @@
       <Project>{4C945D49-02E9-43F2-9202-E7A6E7C56E77}</Project>
       <Name>Castle.Components.Validator-vs2008</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Core\Castle.Core\Castle.Core-vs2008.csproj">
-      <Project>{E4FA5B53-7D36-429E-8E5C-53D5479242BA}</Project>
-      <Name>Castle.Core-vs2008</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Castle.ActiveRecord.Tests.Model\Castle.ActiveRecord.Tests.Model.csproj">
       <Project>{DC2D80AC-4641-4798-B059-C90AA162D2AB}</Project>
       <Name>Castle.ActiveRecord.Tests.Model</Name>
