@@ -15,12 +15,13 @@
 	</fileset>
 
 	<patternset id="package.bin.set" >
-		<include name="Castle.Core.dll" />
-		<include name="Castle.Core.xml" />
-		<include name="Castle.Components.Validator.dll" />
-		<include name="Castle.Components.Validator.xml" />
-		<include name="Castle.Components.Binder.dll" />
-		<include name="Castle.Components.Binder.xml" />
+		<include name="Castle.*.*" />
+		<include name="**/*.resources.dll" />
+		<include name="log4net.*" />
+		<include name="NLog.*" />
+		<exclude name="Castle.Components.*.Tests.*" />
+		<exclude name="**/*.Tests.resources.dll" />
+		<exclude name="/net-3.5/*" />
 	</patternset>
 
 	<patternset id="ndepend.bin.set" >
