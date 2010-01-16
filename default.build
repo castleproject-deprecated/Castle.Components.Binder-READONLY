@@ -16,12 +16,11 @@
 
 	<patternset id="package.bin.set" >
 		<include name="Castle.*.*" />
-		<include name="**/*.resources.dll" />
+		<include name="*/*.resources.dll" />
 		<include name="log4net.*" />
 		<include name="NLog.*" />
 		<exclude name="Castle.Components.*.Tests.*" />
-		<exclude name="**/*.Tests.resources.dll" />
-		<exclude name="/net-3.5/*" />
+		<exclude name="*/*.Tests.resources.dll" />
 	</patternset>
 
 	<patternset id="ndepend.bin.set" >
