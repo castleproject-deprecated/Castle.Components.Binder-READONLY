@@ -3,6 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{37DCCFD7-ABD2-4231-8128-758F7E752813}"
 	ProjectSection(SolutionItems) = preProject
 		Changes.txt = Changes.txt
+		License.txt = License.txt
 		Settings.proj = Settings.proj
 	EndProjectSection
 EndProject
