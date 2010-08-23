@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{37DCCFD7-ABD2-4231-8128-758F7E752813}"
 	ProjectSection(SolutionItems) = preProject
 		Changes.txt = Changes.txt
@@ -7,24 +7,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Settings.proj = Settings.proj
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Castle.Components.Binder-vs2008", "src\Castle.Components.Binder\Castle.Components.Binder-vs2008.csproj", "{98F19522-C9B8-400D-8A12-DABB3DA9411D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Castle.Components.Binder-vs2010", "src\Castle.Components.Binder\Castle.Components.Binder-vs2010.csproj", "{98F19522-C9B8-400D-8A12-DABB3DA9411D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Castle.Components.Binder.Tests-vs2008", "src\Castle.Components.Binder.Tests\Castle.Components.Binder.Tests-vs2008.csproj", "{57ED99CE-404E-4029-A98A-2159E2E70E22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Castle.Components.Binder.Tests-vs2010", "src\Castle.Components.Binder.Tests\Castle.Components.Binder.Tests-vs2010.csproj", "{57ED99CE-404E-4029-A98A-2159E2E70E22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		ReleaseNET35|Any CPU = ReleaseNET35|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{98F19522-C9B8-400D-8A12-DABB3DA9411D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{98F19522-C9B8-400D-8A12-DABB3DA9411D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98F19522-C9B8-400D-8A12-DABB3DA9411D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98F19522-C9B8-400D-8A12-DABB3DA9411D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98F19522-C9B8-400D-8A12-DABB3DA9411D}.ReleaseNET35|Any CPU.ActiveCfg = Release|Any CPU
+		{98F19522-C9B8-400D-8A12-DABB3DA9411D}.ReleaseNET35|Any CPU.Build.0 = Release|Any CPU
 		{57ED99CE-404E-4029-A98A-2159E2E70E22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{57ED99CE-404E-4029-A98A-2159E2E70E22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57ED99CE-404E-4029-A98A-2159E2E70E22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57ED99CE-404E-4029-A98A-2159E2E70E22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57ED99CE-404E-4029-A98A-2159E2E70E22}.ReleaseNET35|Any CPU.ActiveCfg = Release|Any CPU
+		{57ED99CE-404E-4029-A98A-2159E2E70E22}.ReleaseNET35|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
