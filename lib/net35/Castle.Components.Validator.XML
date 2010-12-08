@@ -745,6 +745,134 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:Castle.Components.Validator.CachedMetadataValidationRegistry">
+            <summary>
+            <see cref="T:Castle.Components.Validator.IValidatorRegistry"/> implementation that
+            caches the reflection and custom attributes calls for better performance.
+            </summary>
+            <remarks>The validators set will be extracted from the provided metadata</remarks>
+        </member>
+        <member name="T:Castle.Components.Validator.IValidatorRegistry">
+            <summary>
+            Abstracts a validation registry per <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetValidators(Castle.Components.Validator.IValidatorRunner,System.Type,Castle.Components.Validator.RunWhen)">
+            <summary>
+            Gets all validators associated with a <see cref="T:System.Type"/>.
+            <para>
+            The validators returned are initialized.
+            </para>
+            </summary>
+            <param name="validatorRunner">The validator runner.</param>
+            <param name="targetType">Target type.</param>
+            <param name="runWhen">Restrict the set returned to the phase specified</param>
+            <returns>A Validator array</returns>
+        </member>
+        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetValidators(Castle.Components.Validator.IValidatorRunner,System.Type,System.Reflection.PropertyInfo,Castle.Components.Validator.RunWhen)">
+            <summary>
+            Gets all validators associated with a property.
+            <para>
+            The validators returned are initialized.
+            </para>
+            </summary>
+            <param name="validatorRunner">The validator runner.</param>
+            <param name="targetType">Target type.</param>
+            <param name="property">The property.</param>
+            <param name="runWhen">Restrict the set returned to the phase specified</param>
+            <returns>A Validator array</returns>
+        </member>
+        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetPropertyAccessor(System.Reflection.PropertyInfo)">
+            <summary>
+            Gets the property value accessor.
+            </summary>
+            <param name="property">The property.</param>
+            <returns>The property value accessor.</returns>
+        </member>
+        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetFieldOrPropertyAccessor(System.Type,System.String)">
+            <summary>
+            Gets the expression value accessor.
+            </summary>
+            <param name="targetType">The target type.</param>
+            <param name="path">The expression path.</param>
+            <returns>The expression accessor.</returns>
+        </member>
+        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetStringFromResource(System.String)">
+            <summary>
+            Gets the string from resource by key
+            </summary>
+            <param name="key">The key.</param>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.#cctor">
+            <summary>
+            Initializes the <see cref="T:Castle.Components.Validator.CachedMetadataValidationRegistry"/> class.
+            </summary>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Castle.Components.Validator.CachedMetadataValidationRegistry"/> class.
+            </summary>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.#ctor(System.Resources.ResourceManager)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Castle.Components.Validator.CachedMetadataValidationRegistry"/> class.
+            </summary>
+            <param name="resourceManager">The resource manager.</param>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.GetValidators(Castle.Components.Validator.IValidatorRunner,System.Type,Castle.Components.Validator.RunWhen)">
+            <summary>
+            Gets all validators associated with a <see cref="T:System.Type"/>.
+            <para>
+            The validators returned are initialized.
+            </para>
+            </summary>
+            <param name="validatorRunner">The validator runner.</param>
+            <param name="targetType">Target type.</param>
+            <param name="runWhen">Restrict the set returned to the phase specified</param>
+            <returns>A Validator array</returns>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.GetValidators(Castle.Components.Validator.IValidatorRunner,System.Type,System.Reflection.PropertyInfo,Castle.Components.Validator.RunWhen)">
+            <summary>
+            Gets all validators associated with a property.
+            <para>
+            The validators returned are initialized.
+            </para>
+            </summary>
+            <param name="validatorRunner">The validator runner.</param>
+            <param name="targetType">Target type.</param>
+            <param name="property">The property.</param>
+            <param name="runWhen">Restrict the set returned to the phase specified</param>
+            <returns>A Validator array</returns>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.GetPropertyAccessor(System.Reflection.PropertyInfo)">
+            <summary>
+            Gets the property value accessor.
+            </summary>
+            <param name="property">The property.</param>
+            <returns>The property value accessor.</returns>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.GetFieldOrPropertyAccessor(System.Type,System.String)">
+            <summary>
+            Gets the expression value accessor.
+            </summary>
+            <param name="targetType">The target type.</param>
+            <param name="path">The expression path.</param>
+            <returns>The expression accessor.</returns>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.GetStringFromResource(System.String)">
+            <summary>
+            Gets the string from resource by key
+            </summary>
+            <param name="key">The key.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Castle.Components.Validator.CachedMetadataValidationRegistry.ResolveProperties(System.Type)">
+            <summary>
+            Resolve properties that will be inspected for registered validators
+            </summary>
+            <param name="targetType">the type to examinate properties for</param>
+            <returns>resolved properties</returns>
+        </member>
         <member name="T:Castle.Components.Validator.AbstractValidationContributor">
             <summary>
             Base class for allowing custom validation of an instance beyond
@@ -1189,57 +1317,6 @@
             <summary>
             Checkbox element
             </summary>
-        </member>
-        <member name="T:Castle.Components.Validator.IValidatorRegistry">
-            <summary>
-            Abstracts a validation registry per <see cref="T:System.Type"/>.
-            </summary>
-        </member>
-        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetValidators(Castle.Components.Validator.IValidatorRunner,System.Type,Castle.Components.Validator.RunWhen)">
-            <summary>
-            Gets all validators associated with a <see cref="T:System.Type"/>.
-            <para>
-            The validators returned are initialized.
-            </para>
-            </summary>
-            <param name="validatorRunner">The validator runner.</param>
-            <param name="targetType">Target type.</param>
-            <param name="runWhen">Restrict the set returned to the phase specified</param>
-            <returns>A Validator array</returns>
-        </member>
-        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetValidators(Castle.Components.Validator.IValidatorRunner,System.Type,System.Reflection.PropertyInfo,Castle.Components.Validator.RunWhen)">
-            <summary>
-            Gets all validators associated with a property.
-            <para>
-            The validators returned are initialized.
-            </para>
-            </summary>
-            <param name="validatorRunner">The validator runner.</param>
-            <param name="targetType">Target type.</param>
-            <param name="property">The property.</param>
-            <param name="runWhen">Restrict the set returned to the phase specified</param>
-            <returns>A Validator array</returns>
-        </member>
-        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetPropertyAccessor(System.Reflection.PropertyInfo)">
-            <summary>
-            Gets the property value accessor.
-            </summary>
-            <param name="property">The property.</param>
-            <returns>The property value accessor.</returns>
-        </member>
-        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetFieldOrPropertyAccessor(System.Type,System.String)">
-            <summary>
-            Gets the expression value accessor.
-            </summary>
-            <param name="targetType">The target type.</param>
-            <param name="path">The expression path.</param>
-            <returns>The expression accessor.</returns>
-        </member>
-        <member name="M:Castle.Components.Validator.IValidatorRegistry.GetStringFromResource(System.String)">
-            <summary>
-            Gets the string from resource by key
-            </summary>
-            <param name="key">The key.</param>
         </member>
         <member name="T:Castle.Components.Validator.IBrowserValidationGenerator">
             <summary>
