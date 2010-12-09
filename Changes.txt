@@ -1,3 +1,8 @@
+2.5.0
+==================
+- Updated to Validator 2.5.0, Core 2.5.2 (Includes DP).
+- Included .NET 4 binaries on the release package
+
 1.1.1
 ==================
 - Updated to Validator 1.1.1, Core 1.2 and DP 2.1.
